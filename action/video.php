@@ -1,3 +1,6 @@
+<?php
+
+?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -84,8 +87,12 @@ to{ transform: translate(-1280px, 275px); }
 <body>
 
 <div id="video-screen">
-<video id="video" src="1.mp4" width="640" height="360" autoplay loop controls></video>
+<video id="video" src="http://127.0.0.1/netvideo/doc/1.mp4" width="640" height="360" autoplay loop controls></video>
 </div>
+<form id="comment-form">
+<input type="text" id="comment-input" autofocus autocomplete="off"><input type="submit" id="comment-button" value="コメント">
+</form>
+
 
 <div id="info"></div>
 
@@ -93,14 +100,18 @@ to{ transform: translate(-1280px, 275px); }
 
 <script>
 var $v = {};
-$v.comment = {}
 
 document.addEventListener('DOMContentLoaded', function(){
 
 $v.video  = document.getElementById("video");
 $v.screen = document.getElementById("video-screen");
-
 $v.screen.pos = $v.screen.getBoundingClientRect();
+
+$v.comment = {}
+$v.comment.form   = document.getElementById("comment-form");
+$v.comment.input  = document.getElementById("comment-input");
+$v.comment.button = document.getElementById("comment-button");
+
 $v.comment.list = [
     [
         ["000000000000000000000000000000000"],
@@ -246,6 +257,20 @@ $v.comment.lane = function(){
     return lane;
 };
 
+$v.post = function(url, param){
+    var body = "";
+    for(var key in param){
+        if(!param.hasOwnProperty(key)){ continue; }
+        body += encodeURIComponent(key) + "=" + encodeURIComponent(param[key]) + "&";
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+    xhr.send(body);
+};
+
+
 
 $v.video.addEventListener('timeupdate', function(){
     var sec_now = Math.floor($v.video.currentTime);
@@ -277,16 +302,28 @@ $v.video.addEventListener('play', function(){
     $v.comment.run();
 });
 
-$v.video.addEventListener('click', function(e){
-    e.preventDefault();
+$v.video.addEventListener('click', function(event){
+    event.preventDefault();
     $v.video.paused ? $v.video.play() : $v.video.pause();
 });
 
-$v.video.addEventListener('dblclick', function(e){
-    //e.preventDefault();//ieで効かない
+$v.video.addEventListener('dblclick', function(event){
+    event.preventDefault();//ieで最大化してしまう
 });
 
+$v.comment.form.addEventListener('submit', function(event){
+    event.preventDefault();
 
+    var text = $v.comment.input.value.trim();
+    if(text == ""){ return; }
+    //文字数制限
+    //IDチェック
+    //動画時間チェック
+
+    $v.comment.input.value = "";
+    $v.comment.input.focus();
+    $v.post('?action=commentpost', {id:1, text:text, time:"123456789"});
+});
 
 });
 </script>
