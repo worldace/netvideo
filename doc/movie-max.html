@@ -122,10 +122,9 @@ function objectPosition(screenW, screenH, objectW, objectH){
     var result = {};
     var marginW = screenW - objectW;
     var marginH = screenH - objectH;
-    
-    //■オブジェクトのサイズ決め
-    //横も縦もはみだす場合 or 横も縦もはみださない場合
-    if((marginW >= 0 && marginH >= 0) || (marginW < 0 && marginH < 0)){
+
+    //オブジェクトのサイズ決め
+    if((marginW >= 0 && marginH >= 0) || (marginW <= 0 && marginH <= 0)){
         if(marginW < marginH){
             result.w = screenW;
             result.h = screenW / objectW * objectH;
@@ -135,24 +134,20 @@ function objectPosition(screenW, screenH, objectW, objectH){
             result.h = screenH;
         }
     }
-    //横がはみでる場合
-    else if(marginW < 0){
+    else if(marginW <= 0){
         result.w = screenW;
         result.h = screenW / objectW * objectH;
     }
-    //縦がはみでる場合
-    else if(marginH < 0){
+    else if(marginH <= 0){
         result.w = screenH / objectH * objectW;
         result.h = screenH;
     }
     
-    //■オブジェクトの位置決め
-    //横ピッタリの場合
+    //オブジェクトの位置決め
     if(screenW == result.w){
         result.x = 0;
         result.y = (screenH / 2) - (result.h / 2);
     }
-    //縦ピッタリの場合
     else{
         result.x = (screenW / 2) - (result.w / 2);
         result.y = 0;

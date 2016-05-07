@@ -11,9 +11,9 @@
 <video id="video" width="640" height="360" loop controls></video>
 <form action="?action=videopost" method="POST">
 <table>
-<tr><td>動画URL</td><td><input type="text" name="url" id="url"></td></tr>
+<tr><td>動画URL</td><td><input type="text" name="url" id="url" autocomplete="off"></td></tr>
 <tr><td>サムネイル</td><td><button type="button" onClick="capture()" id="capture-button" disabled>キャプチャ</button><br>
-<canvas id="canvas" width="640" height="360"></canvas></td></tr>
+<canvas id="canvas" width="160" height="90"></canvas></td></tr>
 <tr><td>タイトル</td><td><input type="text" name="title" id="title"></td></tr>
 <tr><td>コメント</td><td><textarea name="comment" id="comment"></textarea></td></tr>
 <tr><td colspan="2"><input type="submit" value="動画を登録する" id="submit"></td></tr>
@@ -39,7 +39,7 @@ $v.url.addEventListener('input', function(e){
     document.getElementById("height").value   = "";
     document.getElementById("duration").value = "";
     document.getElementById("capture-button").disabled = true;
-    $v.canvas.getContext("2d").clearRect(0, 0, 640, 360);
+    $v.canvas.getContext("2d").clearRect(0, 0, 160, 90);
 
     var url = this.value.trim();
     if(!url.match(/^https*:\/\//i)){
@@ -68,7 +68,7 @@ $v.video.addEventListener('canplaythrough', function(){
 
 });
 function capture(){
-    $v.canvas.getContext("2d").drawImage($v.video, 0, 0, 640, 360);
+    $v.canvas.getContext("2d").drawImage($v.video, 0, 0, 160, 90);
     var str = $v.canvas.toDataURL('image/png');//成功時「data:image/png」 失敗時「data:,」
     if(str.indexOf("data:image/png") === -1){
         alert("キャプチャに失敗しました");
