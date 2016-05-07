@@ -268,6 +268,7 @@ $v.post = function(url, param){
     var xhr = new XMLHttpRequest();
     xhr.open('POST', url);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+    xhr.timeout = 20000;
     xhr.send(body);
 };
 
@@ -276,11 +277,13 @@ $v.post = function(url, param){
 $v.video.addEventListener('timeupdate', function(){
     var sec_now = Math.floor($v.video.currentTime);
 
-    $v.comment.out();
-
-    //コメント放出
-    if(sec_now !== $v.video.beforeTime && sec_now in $v.comment.list && $v.video.paused === false){
-        $v.comment.release($v.comment.list[sec_now], $v.comment.lane());
+    if(sec_now !== $v.video.beforeTime){
+        //欄外のコメント削除
+        $v.comment.out();
+        //コメント放出
+        if(sec_now in $v.comment.list && $v.video.paused === false){
+            $v.comment.release($v.comment.list[sec_now], $v.comment.lane());
+        }
         $v.video.beforeTime = sec_now;
     }
 
