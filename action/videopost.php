@@ -14,13 +14,13 @@ if(!isset($_POST['thumbnail'])){ エラー("サムネイルが存在しません
 //加工
 $_POST['width']    = floor($_POST['width']);
 $_POST['height']   = floor($_POST['height']);
-$_POST['duration'] = floor($_POST['duration']);
 
 
 //詳細確認
 if(!自然数なら($_POST['width']))   { エラー("横サイズが不適切です"); }
 if(!自然数なら($_POST['height']))  { エラー("縦サイズが不適切です"); }
-if(!自然数なら($_POST['duration'])){ エラー("動画時間が不適切です"); }
+
+if(!is_numeric($_POST['duration']) or $_POST['duration'] < 0) { エラー("動画時間が不適切です"); }
 
 if(mb_strlen($_POST['url'],"UTF-8")    > 2000)   { エラー("URLが長すぎます"); }
 if(mb_strlen($_POST['userid'],"UTF-8") > 250)    { エラー("ユーザIDが長すぎます"); }

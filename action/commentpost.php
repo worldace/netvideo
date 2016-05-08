@@ -10,7 +10,7 @@ if(!isset($_POST['path']))   { exit; }
 if(!自然数なら($_POST['id']))  { exit; }
 if(!自然数なら($_POST['path'])){ exit; }
 
-if($_POST['time'] == 0 or !自然数なら($_POST['time'])){ exit; }
+if(!is_numeric($_POST['time']) or $_POST['time'] < 0){ exit; }
 if(mb_strlen($_POST['comment'], "UTF-8") > 64) { exit; }
 
 

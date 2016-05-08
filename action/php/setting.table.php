@@ -23,7 +23,7 @@ $設定['テーブル定義:動画'] = array(
 "動画URL"      => "varchar(2000) not null",
 "横サイズ"     => "smallint unsigned not null",
 "縦サイズ"     => "smallint unsigned not null",
-"動画時間"     => "smallint unsigned not null",
+"動画時間"     => "float unsigned not null",
 "投稿時間"     => "integer unsigned not null",
 "アクセス数"   => "integer unsigned default 0",
 "コメント数"   => "integer unsigned default 0",
@@ -38,7 +38,7 @@ $設定['テーブル定義:動画'] = array(
 $設定['テーブル定義:コメント'] = array(
 "コメントID"   => "integer primary key auto_increment",
 "コメント"     => "varchar(64) not null",
-"動画時間"     => "smallint unsigned not null",
+"動画時間"     => "float unsigned not null",
 "投稿時間"     => "integer unsigned not null",
 );
 
