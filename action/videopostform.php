@@ -56,8 +56,7 @@ $v.url.addEventListener('input', function(e){
         return false;
     }
 
-    //$v.video.src = "?action=proxy&url=" + url;
-    $v.video.src = url;
+    $v.video.src = "?action=proxy&url=" + url;
 });
 
 $v.video.addEventListener('canplaythrough', function(){
