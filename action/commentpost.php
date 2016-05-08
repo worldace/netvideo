@@ -1,3 +1,31 @@
 <?php
 
+//存在確認
+if(!isset($_POST['comment'])){ exit; }
+if(!isset($_POST['id']))     { exit; }
+if(!isset($_POST['time']))   { exit; }
+if(!isset($_POST['path']))   { exit; }
 
+//詳細確認
+if(!自然数なら($_POST['id']))  { exit; }
+if(!自然数なら($_POST['path'])){ exit; }
+
+if($_POST['time'] == 0 or !自然数なら($_POST['time'])){ exit; }
+if(mb_strlen($_POST['comment'], "UTF-8") > 64) { exit; }
+
+
+//データベース追加
+$設定['DBドライバ'] = "sqlite:" . DBパス作成();
+
+データベース追加(
+    "insert into コメント (コメント, 動画時間, 投稿時間) values (?, {$_POST['time']}, {$_SERVER['REQUEST_TIME']})",
+    array($_POST['comment'])
+);
+
+
+function DBパス作成(){
+    $ymd  = date('Y/md', $_POST['path']);
+    $path = "{$設定['contentディレクトリ']}/{$ymd}/{$_POST['id']}.db";
+    if(!is_file($path)){ exit; }
+    return $path;
+}

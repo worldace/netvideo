@@ -50,9 +50,9 @@ if($imginfo[2] != 3){ //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:PNG�
 
 //データベース追加
 $設定['動画ID'] = データベース追加("
-    insert into 動画 (動画URL, 横サイズ, 縦サイズ, 動画時間, ユーザID, タイトル, 本文, 投稿時間) 
-    values (?, ?, ?, ?, ?, ?, ?, {$_SERVER['REQUEST_TIME']})",
-    array($_POST['url'], $_POST['width'], $_POST['height'], $_POST['duration'], $_POST['userid'], $_POST['title'], $_POST['text'])
+    insert into 動画 (動画URL, ユーザID, タイトル, 本文, 横サイズ, 縦サイズ, 動画時間, 投稿時間) 
+    values (?, ?, ?, ?, {$_POST['width']}, {$_POST['height']}, {$_POST['duration']}, {$_SERVER['REQUEST_TIME']})",
+    array($_POST['url'], $_POST['userid'], $_POST['title'], $_POST['text'])
 );
 if(!自然数なら($設定['動画ID'])){ エラー("動画データベースに追加できません"); }
 
@@ -78,10 +78,9 @@ $設定['URL'] = "?action=video&id={$設定['動画ID']}";
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <title>投稿成功</title>
+<meta charset="utf-8">
+<title>投稿成功</title>
+<script>window.onload = function(){ setTimeout(function(){ location.replace("<?= $設定['URL'] ?>"); }, 0); };</script>
 </head>
-<body>
-<script>window.onload = function(){ setTimeout(function(){ location.replace = "<?= $設定['URL'] ?>"; }, 0); };</script>
-</body>
+<body></body>
 </html>
