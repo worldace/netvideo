@@ -1,6 +1,6 @@
 <?php
 
-//動画投稿を許可するユーザのOpenID「array("OpenID1","OpenID2");」。デフォルトは「array();」で全ユーザ許可。OpenIDの確認は→http://open.login.yahoo.co.jp/
+//ログインを許可するユーザのOpenID「array("OpenID1","OpenID2");」。デフォルトは「array();」で全ユーザ許可。OpenIDの確認は→http://open.login.yahoo.co.jp/
 $設定['許可ユーザ'] = array();
 
 //基準ディレクトリの絶対パス (最後のスラッシュは不要)
