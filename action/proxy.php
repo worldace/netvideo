@@ -26,6 +26,8 @@ foreach($meta['wrapper_data'] as $value){
 }
 if(!$flag){ error(); }
 
+while(ob_get_level()){ ob_end_clean(); }
+
 while(!feof($fp)) {
     print fread($fp, 8192);
 }

@@ -148,7 +148,7 @@ $v.infostr = function(width ,height, time){
         return sec + "秒 " + width + "×" + height;
     }
     else{
-        var sec = Math.floor(time%min);
+        var sec = Math.floor(time-min*60);
         return min + "分" + sec + "秒 " + width + "×" + height;
     }
 };
