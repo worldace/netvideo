@@ -48,24 +48,24 @@ function リダイレクト($url){
 function エラー($str){
     global $設定;
 
-    if(Ajaxなら()){
-        header("HTTP/1.0 400 Bad Request");
-        header("Content-Type: text/plain; charset=UTF-8");
-        print $str;
-    }
-    else {
-        $設定['エラー'] = $str;
-        include_once("{$設定['actionディレクトリ']}/php/error.php");
-    }
+    header("HTTP/1.0 400 Bad Request");
+    header("Content-Type: text/html; charset=UTF-8");
+    print $str;
     exit;
 }
 
 
-function データベース接続() {
+function データベース接続($dsn = "", $user = "", $pass = "") {
     global $設定;
     static $pdo;
 
-    if (!isset($pdo)) {
+    if($dsn){
+        $pdo = null;
+        $設定['DBドライバ']   = $dsn;
+        $設定['DBユーザ']     = $user;
+        $設定['DBパスワード'] = $pass;
+    }
+    if(!isset($pdo)) {
         $pdo = new PDO($設定['DBドライバ'], $設定['DBユーザ'], $設定['DBパスワード'], array(
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
@@ -354,4 +354,20 @@ function ディレクトリ作成($path, $name, $permission = 707){
 }
 
 
+function 年月日ディレクトリ作成($dir, $time = 0){
+    if(!$time){
+        if($_SERVER['REQUEST_TIME']){ $time = $_SERVER['REQUEST_TIME']; }
+        else{ $time = time();}
+    }
+    
+    $年 = date('Y', $time);
+    $月 = date('m', $time);
+    $日 = date('d', $time);
+    $permission = decoct(fileperms($dir) & 0777);
 
+    ディレクトリ作成($dir, $年, $permission);
+    ディレクトリ作成("$dir/$年", "$月$日", $permission);
+
+    if(!is_dir("$dir/$年/$月$日")){ return false; }
+    return "$dir/$年/$月$日";
+}

@@ -18,28 +18,27 @@
 「autoincrement」ではなく「auto_increment」なので注意
 */
 
-//テーブルの型情報(MySQL互換)
 $設定['テーブル定義:動画'] = array(
-"動画ID"               => "integer primary key auto_increment",
-"動画URL"              => "varchar(255) not null",
-"横サイズ"             => "smallint unsigned not null",
-"縦サイズ"             => "smallint unsigned not null",
-"動画時間"             => "smallint unsigned not null",
-"投稿時間"             => "integer unsigned not null",
-"アクセス数"           => "integer unsigned default 0",
-"コメント数"           => "integer unsigned default 0",
-"ユーザID"             => "varchar(255) not null",
-"タイトル"             => "varchar(255) not null",
-"コメント"             => "text",
-"サムネイル"           => "varchar(255)",
-"状態"                 => "varchar(32) default '公開'",
+"動画ID"       => "integer primary key auto_increment",
+"動画URL"      => "varchar(255) not null",
+"横サイズ"     => "smallint unsigned not null",
+"縦サイズ"     => "smallint unsigned not null",
+"動画時間"     => "smallint unsigned not null",
+"投稿時間"     => "integer unsigned not null",
+"アクセス数"   => "integer unsigned default 0",
+"コメント数"   => "integer unsigned default 0",
+"ユーザID"     => "varchar(255) not null",
+"状態"         => "varchar(32) default '公開'",
+"タイトル"     => "varchar(255) not null",
+"本文"         => "text",
+"備考"         => "text",
 );
 
 
 $設定['テーブル定義:コメント'] = array(
-"コメントID"           => "integer primary key auto_increment",
-"コメント"             => "varchar(64) not null",
-"動画時間"             => "smallint unsigned not null",
-"投稿時間"             => "integer unsigned not null",
+"コメントID"   => "integer primary key auto_increment",
+"コメント"     => "varchar(64) not null",
+"動画時間"     => "smallint unsigned not null",
+"投稿時間"     => "integer unsigned not null",
 );
 

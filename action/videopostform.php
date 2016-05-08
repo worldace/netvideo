@@ -19,9 +19,10 @@
 <tr><td>動画URL</td><td><input type="text" name="url" id="url" autocomplete="off"></td></tr>
 <tr><td>サムネイル</td><td><canvas id="canvas" width="192" height="108"></canvas></td></tr>
 <tr><td>タイトル</td><td><input type="text" name="title" id="title"></td></tr>
-<tr><td>コメント</td><td><textarea name="comment" id="comment"></textarea></td></tr>
+<tr><td>コメント</td><td><textarea name="text" id="text"></textarea></td></tr>
 <tr><td colspan="2"><input type="submit" value="     この動画を登録する     " id="submit"></td></tr>
 </table>
+<input type="hidden" name="userid" id="userid" value="https://me.yahoo.co.jp/a/AjmNPG4KI7K6wv__pqr7NKTl0L9UynRa">
 <input type="hidden" name="width" id="width" value="">
 <input type="hidden" name="height" id="height" value="">
 <input type="hidden" name="duration" id="duration" value="">
