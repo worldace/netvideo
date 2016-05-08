@@ -19,19 +19,6 @@ header("Content-Type: application/json; charset=utf-8");
 print json_encode($検索結果);
 
 
-/*
-$検索結果 = データベース取得("select コメント,動画時間,投稿時間 from コメント order by コメントID desc limit {$_POST['num']}");
-
-$result = array();
-foreach($検索結果 as $comment){
-    $result[] = array($comment['コメント'], $comment['動画時間'], $comment['投稿時間']);
-}
-
-header("Content-Type: application/json; charset=utf-8");
-print json_encode($result);
-*/
-
-
 function DBパス作成(){
     $ymd  = date('Y/md', $_POST['path']);
     $path = "{$設定['contentディレクトリ']}/{$ymd}/{$_POST['id']}.db";

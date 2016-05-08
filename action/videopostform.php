@@ -16,10 +16,12 @@
 
 <form action="?action=videopost" method="POST" id="form">
 <table>
-<tr><td>動画URL</td><td><input type="text" name="url" id="url" autocomplete="off"></td></tr>
+<tr><td>動画URL</td><td><input type="text" name="url" id="url" autocomplete="off" spellcheck="false"></td></tr>
+
 <tr><td>サムネイル</td><td><canvas id="canvas" width="192" height="108"></canvas></td></tr>
-<tr><td>タイトル</td><td><input type="text" name="title" id="title"></td></tr>
-<tr><td>コメント</td><td><textarea name="text" id="text"></textarea></td></tr>
+<tr><td>動画情報</td><td id="info"></td></tr>
+<tr><td>タイトル</td><td><input type="text" name="title" id="title" spellcheck="false"></td></tr>
+<tr><td>コメント</td><td><textarea name="text" id="text" spellcheck="false"></textarea></td></tr>
 <tr><td colspan="2"><input type="submit" value="     この動画を登録する     " id="submit"></td></tr>
 </table>
 <input type="hidden" name="userid" id="userid" value="https://me.yahoo.co.jp/a/AjmNPG4KI7K6wv__pqr7NKTl0L9UynRa">
@@ -40,10 +42,11 @@ $v.url    = document.getElementById("url");
 $v.thumbnail  = document.getElementById("thumbnail");
 
 $v.url.addEventListener('input', function(e){
-    document.getElementById("width").value     = "";
-    document.getElementById("height").value    = "";
-    document.getElementById("duration").value  = "";
-    document.getElementById("thumbnail").value = "";
+    document.getElementById("width").value      = "";
+    document.getElementById("height").value     = "";
+    document.getElementById("duration").value   = "";
+    document.getElementById("thumbnail").value  = "";
+    document.getElementById("info").textContent = "";
     document.getElementById("capture-button").disabled = true;
     $v.canvas.getContext("2d").clearRect(0, 0, $v.canvas.clientWidth, $v.canvas.clientHeight);
 
@@ -53,13 +56,15 @@ $v.url.addEventListener('input', function(e){
         return false;
     }
 
-    $v.video.src = "?action=proxy&url=" + url;
+    //$v.video.src = "?action=proxy&url=" + url;
+    $v.video.src = url;
 });
 
 $v.video.addEventListener('canplaythrough', function(){
-    document.getElementById("width").value    = $v.video.videoWidth;
-    document.getElementById("height").value   = $v.video.videoHeight;
-    document.getElementById("duration").value = $v.video.duration;
+    document.getElementById("width").value      = $v.video.videoWidth;
+    document.getElementById("height").value     = $v.video.videoHeight;
+    document.getElementById("duration").value   = $v.video.duration;
+    document.getElementById("info").textContent = $v.infostr($v.video.videoWidth, $v.video.videoHeight, $v.video.duration);
     document.getElementById("capture-button").disabled = false;
 
     var pos = $v.objectPosition(640, 360, $v.video.videoWidth, $v.video.videoHeight);
@@ -75,8 +80,11 @@ $v.form.addEventListener('submit', function(){
 
 });
 
-
+$v.video.addEventListener('click', function(event){
+    event.preventDefault();
+    $v.video.paused ? $v.video.play() : $v.video.pause();
 });
+
 
 
 $v.capture = function(){
@@ -134,6 +142,18 @@ $v.objectPosition = function(screenW, screenH, objectW, objectH){
     return result;
 };
 
+$v.infostr = function(width ,height, time){
+    var min = Math.floor(time/60);
+    if(min == 0){
+        var sec = Math.floor(time);
+        return sec + "秒 " + width + "×" + height;
+    }
+    else{
+        var sec = Math.floor(time%min);
+        return min + "分" + sec + "秒 " + width + "×" + height;
+    }
+};
+});
 </script>
 
 

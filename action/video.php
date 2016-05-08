@@ -91,7 +91,7 @@ to{ transform: translate(-1280px, 275px); }
 <video id="video" src="http://127.0.0.1/netvideo/doc/1.mp4" width="640" height="360" autoplay loop controls></video>
 </div>
 <form id="comment-form">
-<input type="text" id="comment-input" autofocus autocomplete="off"><input type="submit" id="comment-button" value="コメント">
+<input type="text" id="comment-input" autofocus autocomplete="off" spellcheck="false"><input type="submit" id="comment-button" value="コメント">
 </form>
 
 
