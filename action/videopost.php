@@ -1,5 +1,4 @@
 <?php
-$設定['DBドライバ'] = "sqlite:./video.db";
 
 //存在確認
 if(!isset($_POST['url']))      { エラー("動画URLが存在しません"); }
@@ -12,8 +11,8 @@ if(!isset($_POST['thumbnail'])){ エラー("サムネイルが存在しません
 
 
 //加工
-$_POST['width']    = floor($_POST['width']);
-$_POST['height']   = floor($_POST['height']);
+$_POST['width']  = floor($_POST['width']);
+$_POST['height'] = floor($_POST['height']);
 
 
 //詳細確認
@@ -22,10 +21,10 @@ if(!自然数なら($_POST['height']))  { エラー("縦サイズが不適切で
 
 if(!is_numeric($_POST['duration']) or $_POST['duration'] < 0) { エラー("動画時間が不適切です"); }
 
-if(mb_strlen($_POST['url'],"UTF-8")    > 2000)   { エラー("URLが長すぎます"); }
-if(mb_strlen($_POST['userid'],"UTF-8") > 250)    { エラー("ユーザIDが長すぎます"); }
-if(mb_strlen($_POST['title'],"UTF-8")  > 250)    { エラー("タイトルが長すぎます"); }
-if(mb_strlen($_POST['text'],"UTF-8")   > 1024*10){ エラー("本文が長すぎます"); }
+if(mb_strlen($_POST['url'],"UTF-8")    > 2000) { エラー("URLが長すぎます"); }
+if(mb_strlen($_POST['userid'],"UTF-8") > 250)  { エラー("ユーザIDが長すぎます"); }
+if(mb_strlen($_POST['title'],"UTF-8")  > 250)  { エラー("タイトルが長すぎます"); }
+if(mb_strlen($_POST['text'],"UTF-8")   > 10000){ エラー("本文が長すぎます"); }
 
 if(!preg_match("/https*:\/\/.+/i", $_POST['url'])) { エラー("URLが不適切です"); }
 
@@ -80,7 +79,7 @@ $設定['URL'] = "?action=video&id={$設定['動画ID']}";
 <head>
 <meta charset="utf-8">
 <title>投稿成功</title>
-<script>window.onload = function(){ setTimeout(function(){ location.replace("<?= $設定['URL'] ?>"); }, 0); };</script>
+<script>window.onload = function(){ setTimeout(function(){ location.href = "<?= $設定['URL'] ?>"; }, 0); };</script>
 </head>
 <body></body>
 </html>

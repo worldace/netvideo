@@ -23,6 +23,12 @@ $設定['DBドライバ'] = "sqlite:" . DBパス作成();
 );
 
 
+//カウントアップ
+データベース接続("sqlite:{$設定['DBファイル']}");
+データベース更新("update 動画 set コメント数 = コメント数 + 1 where 動画ID = {$_POST['id']}");
+
+
+
 function DBパス作成(){
     $ymd  = date('Y/md', $_POST['path']);
     $path = "{$設定['contentディレクトリ']}/{$ymd}/{$_POST['id']}.db";

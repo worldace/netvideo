@@ -94,15 +94,15 @@ function データベース実行($sql, $bindvalue = array()){
 }
 
 
-function データベース取得($sql, $bindvalue = array()){
+function データベース取得($sql, $bindvalue = array(), $mode = PDO::FETCH_ASSOC){
     $db = データベース接続();
     if(!$bindvalue){
-        return $db->query($sql)->fetchAll();
+        return $db->query($sql)->fetchAll($mode);
     }
     else{
         $stmt = $db->prepare($sql);
         $stmt -> execute($bindvalue);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll($mode);
     }
 }
 
