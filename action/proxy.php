@@ -19,10 +19,8 @@ $meta = stream_get_meta_data($fp);
 foreach($meta['wrapper_data'] as $value){
     if(preg_match("/^HTTP\/\d\.\d\s+20\d\s/i", $value)){
         $flag = true;
-        header($value);
     }
-    if(!$flag){ continue; }
-    header($value);
+    if($flag){ header($value); }
 }
 if(!$flag){ error(); }
 
