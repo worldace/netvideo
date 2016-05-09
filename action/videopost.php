@@ -33,7 +33,7 @@ if(!preg_match("/https*:\/\/.+/i", $_POST['url'])) { エラー("URLが不適切�
 
 
 //ディレクトリ作成
-$dir = 年月日ディレクトリ作成($設定['contentディレクトリ'], $_SERVER['REQUEST_TIME']);
+$dir = 年月日ディレクトリ作成($設定['uploadディレクトリ'], $_SERVER['REQUEST_TIME']);
 if(!$dir){ エラー("ディレクトリが作成できません"); }
 
 

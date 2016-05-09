@@ -20,7 +20,7 @@
 
 $設定['テーブル定義:動画'] = array(
 "動画ID"       => "integer primary key auto_increment",
-"動画URL"      => "varchar(2000) not null",
+"動画URL"      => "varchar(500) not null",
 "横サイズ"     => "smallint unsigned not null",
 "縦サイズ"     => "smallint unsigned not null",
 "動画時間"     => "float unsigned not null",

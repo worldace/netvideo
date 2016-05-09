@@ -31,7 +31,7 @@ $設定['DBドライバ'] = "sqlite:" . DBパス作成();
 
 function DBパス作成(){
     $ymd  = date('Y/md', $_POST['path']);
-    $path = "{$設定['contentディレクトリ']}/{$ymd}/{$_POST['id']}.db";
+    $path = "{$設定['uploadディレクトリ']}/{$ymd}/{$_POST['id']}.db";
     if(!is_file($path)){ exit; }
     return $path;
 }
