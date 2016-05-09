@@ -53,7 +53,7 @@ $設定['動画ID'] = データベース追加("
     values (?, ?, ?, ?, {$_POST['width']}, {$_POST['height']}, {$_POST['duration']}, {$_SERVER['REQUEST_TIME']})",
     array($_POST['url'], $_POST['userid'], $_POST['title'], $_POST['text'])
 );
-if(!自然数なら($設定['動画ID'])){ エラー("動画データベースに追加できません"); }
+if(!$設定['動画ID']){ エラー("動画データベースに追加できません"); }
 
 
 //サムネイルファイル作成
