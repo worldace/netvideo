@@ -27,14 +27,14 @@ $reqest = array(
 $fp = @fopen($_GET['url'], 'rb', false, stream_context_create($reqest));
 if(!$fp){ error(); }
 
+$response_header = array();
 $meta = stream_get_meta_data($fp);
-foreach($meta['wrapper_data'] as $value){
-    if(preg_match("|^HTTP/[\d\.]+\s+20\d\s|i", $value)){
-        $flag = true;
-    }
-    if($flag){ header($value); }
+foreach(array_reverse($meta['wrapper_data']) as $value){
+    array_unshift($response_header, $value);
+    if(preg_match("|^HTTP/|i", $value)){ break; }
 }
-if(!$flag){ error(); }
+foreach($response_header as $header){ header($header); }
+
 
 
 while(ob_get_level()){ ob_end_clean(); }
