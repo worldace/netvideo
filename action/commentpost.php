@@ -1,16 +1,10 @@
 <?php
 
-//存在確認
-if(!isset($_POST['comment'])){ exit; }
-if(!isset($_POST['id']))     { exit; }
-if(!isset($_POST['time']))   { exit; }
-if(!isset($_POST['path']))   { exit; }
-
-//詳細確認
+//確認
 if(!自然数なら($_POST['id']))  { exit; }
 if(!自然数なら($_POST['path'])){ exit; }
-
 if(!is_numeric($_POST['time']) or $_POST['time'] < 0){ exit; }
+if($_POST['comment'] == ""){ exit; }
 if(mb_strlen($_POST['comment'], "UTF-8") > 64) { exit; }
 
 

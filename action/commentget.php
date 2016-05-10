@@ -14,6 +14,8 @@ if(!自然数なら($_POST['num'])) { exit; }
 $設定['DBドライバ'] = "sqlite:" . DBパス作成();
 $検索結果 = データベース取得("select コメント,動画時間,投稿時間 from コメント order by コメントID desc limit {$_POST['num']}", null, PDO::FETCH_NUM);
 
+if(!$検索結果){ $検索結果 = null; }
+
 //出力
 header("Content-Type: application/json; charset=utf-8");
 print json_encode($検索結果);

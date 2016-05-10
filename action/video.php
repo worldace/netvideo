@@ -88,7 +88,7 @@ to{ transform: translate(-1280px, 275px); }
 <body>
 
 <div id="video-screen">
-<video id="video" src="http://127.0.0.1/netvideo/doc/1.mp4" width="640" height="360" autoplay loop controls></video>
+<video id="video" src="http://127.0.0.1/1.mp4" width="640" height="360" autoplay loop controls></video>
 </div>
 <form id="comment-form">
 <input type="text" id="comment-input" autofocus autocomplete="off" spellcheck="false"><input type="submit" id="comment-button" value="コメント">
@@ -212,7 +212,7 @@ $v.comment.release = function(comments, lane){
 };
 
 $v.comment.out = function(){
-    var comments = $v.screen.getElementsByClassName("comment");
+    var comments = $v.screen.querySelectorAll(".comment");
 
     for(var i = comments.length-1; i >= 0; i--){
         var comment_pos = comments[i].getBoundingClientRect();
@@ -224,28 +224,28 @@ $v.comment.out = function(){
 };
 
 $v.comment.clear = function(){
-    var comments = $v.screen.getElementsByClassName("comment");
+    var comments = $v.screen.querySelectorAll(".comment");
     for(var i = comments.length-1; i >= 0; i--){
         $v.screen.removeChild(comments[i]);
     }
 };
 
 $v.comment.pause = function(){
-    var comments = document.getElementsByClassName("comment");
+    var comments = document.querySelectorAll(".comment");
     for(var i = 0; i < comments.length; i++){
         comments[i].style.animationPlayState = "paused";
     }
 };
 
 $v.comment.run = function(){
-    var comments = $v.screen.getElementsByClassName("comment");
+    var comments = $v.screen.querySelectorAll(".comment");
     for(var i = 0; i < comments.length; i++){
         comments[i].style.animationPlayState = "running";
     }
 };
 
 $v.comment.lane = function(){
-    var comments = $v.screen.getElementsByClassName("comment");
+    var comments = $v.screen.querySelectorAll(".comment");
     var lane = [true,true,true,true,true,true,true,true,true,true,true,true];
 
     for(var i = 0; i < comments.length; i++){
@@ -260,9 +260,15 @@ $v.comment.lane = function(){
 
 $v.post = function(url, param){
     var body = "";
-    for(var key in param){
-        if(!param.hasOwnProperty(key)){ continue; }
-        body += encodeURIComponent(key) + "=" + encodeURIComponent(param[key]) + "&";
+
+    if(param instanceof FormData){
+        body = param;
+    }
+    else{
+        for(var key in param){
+            if(!param.hasOwnProperty(key)){ continue; }
+            body += encodeURIComponent(key) + "=" + encodeURIComponent(param[key]) + "&";
+        }
     }
 
     var xhr = new XMLHttpRequest();
@@ -326,7 +332,7 @@ $v.comment.form.addEventListener('submit', function(event){
 
     $v.comment.input.value = "";
     $v.comment.input.focus();
-    $v.post('?action=commentpost', {id:1, text:text, time:"123456789"});
+    $v.post('?action=commentpost', {id:1, text:text, time:"123456789"});//new FormData($v.comment.form)
 });
 
 });

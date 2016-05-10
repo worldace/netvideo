@@ -1,30 +1,24 @@
 <?php
 
-//存在確認
-if(!isset($_POST['url']))      { エラー("動画URLが存在しません"); }
-if(!isset($_POST['width']))    { エラー("横サイズが存在しません"); }
-if(!isset($_POST['height']))   { エラー("縦サイズが存在しません"); }
-if(!isset($_POST['duration'])) { エラー("動画時間が存在しません"); }
-if(!isset($_POST['userid']))   { エラー("ユーザIDが存在しません"); }
-if(!isset($_POST['title']))    { エラー("タイトルが存在しません"); }
-if(!isset($_POST['thumbnail'])){ エラー("サムネイルが存在しません"); }
+//確認
+if(!$_POST['url'])      { エラー("動画URLが存在しません"); }
+if(!$_POST['userid'])   { エラー("ユーザIDが存在しません"); }
+if(!$_POST['title'])    { エラー("タイトルが存在しません"); }
+if(!$_POST['thumbnail']){ エラー("サムネイルが存在しません"); }
 
-
-//加工
 $_POST['width']  = floor($_POST['width']);
 $_POST['height'] = floor($_POST['height']);
+if(!自然数なら($_POST['width']))   { エラー("横サイズが不適切です"); }
+if(!自然数なら($_POST['height']))  { エラー("縦サイズが不適切です"); }
+if(!is_numeric($_POST['duration']) or $_POST['duration'] < 0) { エラー("動画時間が不適切です"); }
 
 
 //詳細確認
-if(!自然数なら($_POST['width']))   { エラー("横サイズが不適切です"); }
-if(!自然数なら($_POST['height']))  { エラー("縦サイズが不適切です"); }
 
-if(!is_numeric($_POST['duration']) or $_POST['duration'] < 0) { エラー("動画時間が不適切です"); }
-
-if(mb_strlen($_POST['url'],"UTF-8")    > 2000) { エラー("URLが長すぎます"); }
+if(mb_strlen($_POST['text'],"UTF-8")   > 10000){ エラー("本文が長すぎます"); }
 if(mb_strlen($_POST['userid'],"UTF-8") > 250)  { エラー("ユーザIDが長すぎます"); }
 if(mb_strlen($_POST['title'],"UTF-8")  > 250)  { エラー("タイトルが長すぎます"); }
-if(mb_strlen($_POST['text'],"UTF-8")   > 10000){ エラー("本文が長すぎます"); }
+if(mb_strlen($_POST['url'],"UTF-8")    > 500)  { エラー("URLが長すぎます"); }
 
 if(!preg_match("/https*:\/\/.+/i", $_POST['url'])) { エラー("URLが不適切です"); }
 
