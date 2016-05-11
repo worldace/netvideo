@@ -55,7 +55,7 @@ function error(){
 function is_sameorigin($url){
     $query = parse_url($url); //$query['scheme'] $query['host'] $query['port']
  
-    if(!isset($query['port'])){
+    if($query['port'] == ""){
         $query['port'] = ($query['scheme'] == "http") ? 80 : 443;
     }
 

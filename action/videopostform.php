@@ -18,7 +18,7 @@
 <table>
 <tr><td>動画ファイルのURL</td><td><input type="text" name="url" id="url" autocomplete="off" spellcheck="false"></td></tr>
 
-<tr><td>サムネイル</td><td><canvas id="canvas" width="192" height="108"></canvas></td></tr>
+<tr><td>サムネイル</td><td><canvas id="canvas" width="256" height="144"></canvas></td></tr>
 <tr><td>動画情報</td><td id="info"></td></tr>
 <tr><td>タイトル</td><td><input type="text" name="title" id="title" spellcheck="false"></td></tr>
 <tr><td>コメント</td><td><textarea name="text" id="text" spellcheck="false"></textarea></td></tr>
