@@ -352,7 +352,13 @@ document.getElementById("controller-play-toggle").addEventListener('click', func
 
 
 document.getElementById("controller-volume-toggle").addEventListener('click', function(e){
-    $v.video.volume = $v.video.volume ? 0 : 0.5;
+    if($v.video.muted){
+        $v.video.muted = false;
+        $v.video.volume = 0.5;
+    }
+    else{
+        $v.video.volume = $v.video.volume ? 0 : 0.5;
+    }
 });
 
 document.getElementById("controller-comment-toggle").addEventListener('click', function(e){
@@ -376,6 +382,7 @@ document.getElementById("controller-time-seek").addEventListener('click', functi
 
 
 document.getElementById("controller-volume-seek").addEventListener('click', function(event){
+    $v.video.muted = false;
     var percent = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
     $v.video.volume = percent;
 });
