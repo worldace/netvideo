@@ -501,6 +501,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     padding:6px 6px 3px 12px;
     font-size:14px;
     vertical-align:middle;
+    ime-mode: active;
 }
 .comment-submit{
     width: 20%;
