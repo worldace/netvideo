@@ -31,6 +31,7 @@ if(!$fp){ error(); }
 $response_header = array();
 $meta = stream_get_meta_data($fp);
 foreach(array_reverse($meta['wrapper_data']) as $value){
+    if(preg_match("/^Set-Cookie/i", $value)){ continue; }
     array_unshift($response_header, $value);
     if(preg_match("|^HTTP/|i", $value)){ break; }
 }

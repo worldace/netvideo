@@ -55,7 +55,6 @@ $v.url.addEventListener('input', function(e){
         $v.video.src = "";
         return false;
     }
-
     $v.video.src = "?action=proxy&url=" + encodeURIComponent(url);
 });
 
