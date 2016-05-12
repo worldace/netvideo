@@ -1,9 +1,17 @@
 <?php
-function parts_player(){
+//======================================================
+// ■プレーヤー部品
+// 
+// 呼び出し元: ../action/php/function.php 部品()
+//======================================================
+
+
+function parts_player($video = array()){
+
     return <<<━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 <div id="video-player" class="video-player"
 ><div id="video-screen" class="video-screen"
-><video id="video" src="http://127.0.0.1/1.mp4" width="640" height="360" autoplay loop controls></video
+><video id="video" src="{$video['動画URL']}" width="640" height="360" loop controls></video
 ></div
 ><div id="video-controller" class="video-controller"
 ><div class="controller-wrap"
@@ -17,8 +25,10 @@ function parts_player(){
 ><img id="controller-screen-toggle" class="controller-img" width="20" height="20" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAAA0klEQVQ4y2NsaGhgIBcwka2TgYGBhaCK4zyhq4q1+JCFnu1unH2MKJstv6yedeUT+c7+urZ/xzNyNZun1ntIkaUZrvPTlYk9qO5nIl5n/9oPX9f291z59PTyVMKaj5+0kuH5BNcJ9/+cE4YQNiMliQR7PJun1ntIfbrSG7f2iyEezVBnH+cR4D55HtWffDqR2YRtPn5SoGdFvk5x6A6vLIY5G5BDiHhnS3ls2wBhEaMTe2gTqRO7Zj6dUHOY/0nWzMAg5bFtGjH6KYpnigoDijQDAEFsWdMJ3UD+AAAAAElFTkSuQmCC"
 ></div
 ><form id="comment-form" class="comment-form"
-><input id="comment-input" class="comment-input" type="text" name="text" value="" autocomplete="off" spellcheck="false"
+><input id="comment-input" class="comment-input" type="text" name="comment" value="" autocomplete="off" spellcheck="false"
 ><input id="comment-submit" class="comment-submit" type="submit" value="コメントする"
+><input type="hidden" name="id" value="{$video['動画ID']}"
+><input type="hidden" name="path" value="{$video['投稿時間']}"
 ></form
 ></div
 ></div>
@@ -204,6 +214,50 @@ $v.comment.lane = function(){
     return lane;
 };
 
+$v.video.getPosition = function(screenW, screenH, objectW, objectH){
+    var result = {};
+    var marginW = screenW - objectW;
+    var marginH = screenH - objectH;
+
+    //オブジェクトのサイズ決め
+    if((marginW >= 0 && marginH >= 0) || (marginW <= 0 && marginH <= 0)){
+        if(marginW < marginH){
+            result.w = screenW;
+            result.h = screenW / objectW * objectH;
+        }
+        else{
+            result.w = screenH / objectH * objectW;
+            result.h = screenH;
+        }
+    }
+    else if(marginW <= 0){
+        result.w = screenW;
+        result.h = screenW / objectW * objectH;
+    }
+    else if(marginH <= 0){
+        result.w = screenH / objectH * objectW;
+        result.h = screenH;
+    }
+    
+    //オブジェクトの位置決め
+    if(screenW == result.w){
+        result.x = 0;
+        result.y = (screenH / 2) - (result.h / 2);
+    }
+    else{
+        result.x = (screenW / 2) - (result.w / 2);
+        result.y = 0;
+    }
+    
+    result.w = Math.floor(result.w);
+    result.h = Math.floor(result.h);
+    result.x = Math.floor(result.x);
+    result.y = Math.floor(result.y);
+    
+    return result;
+};
+
+
 $v.post = function(url, param){
     var body = "";
 
@@ -263,6 +317,15 @@ $v.video.addEventListener('canplaythrough', function(){
 
     //ボリュームのシークセット
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
+
+    //動画の位置セット
+    var pos = $v.video.getPosition($v.screen.pos.right - $v.screen.pos.left, $v.screen.pos.bottom - $v.screen.pos.top, $v.video.videoWidth, $v.video.videoHeight);
+    $v.video.setAttribute("width",  pos.w);
+    $v.video.setAttribute("height", pos.h);
+    $v.video.style.left = pos.x + "px";
+    $v.video.style.top  = pos.y + "px";
+    
+    $v.video.play();
 });
 
 

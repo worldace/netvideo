@@ -307,6 +307,7 @@ function 自然数なら($num){
 
 
 function h($str){
+    if(!$str){ return; }
     return htmlspecialchars($str, ENT_QUOTES, "UTF-8");
 }
 
