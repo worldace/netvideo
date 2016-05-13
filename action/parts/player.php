@@ -39,6 +39,9 @@ function parts_player($video){
 
 $js=<<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
 var $v = {};
+
+$v.isPosted = true;
+
 $v.comment = {};
 $v.comment.list = [];
 $v.comment.display = true;
@@ -299,8 +302,11 @@ $v.controller.timeTotal     = document.getElementById("controller-time-total");
 
 
 $v.video.addEventListener('canplaythrough', function(){
-    //コメントゲット(ここではなくもっと早く起動すべき)
-    $v.comment.get();
+    if($v.isPosted){
+        $v.comment.get();//コメントゲット(ここではなくもっと早く起動すべき)
+        document.getElementById("comment-form-input").disabled  = false;
+        document.getElementById("comment-form-submit").disabled = false;
+    }
     
     //コントローラのバッファ位置セット
     $v.controller.setBuffer();
@@ -318,8 +324,6 @@ $v.video.addEventListener('canplaythrough', function(){
     $v.video.style.left = pos.x + "px";
     $v.video.style.top  = pos.y + "px";
     
-    document.getElementById("comment-form-input").disabled  = false;
-    document.getElementById("comment-form-submit").disabled = false;
 });
 
 
