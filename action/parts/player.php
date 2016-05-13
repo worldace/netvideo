@@ -263,11 +263,7 @@ $v.controller.setBuffer = function(){
 
     var buffer = $v.video.buffered;
 
-    if(buffer.length == 0){ //ファイルを全て読み込み済み(多分)
-        $v.controller.timeSeekbar.style.backgroundPosition = 0;
-        $v.controller.timeSeekbar.style.backgroundSize = seekbar_width + "px";
-    }
-    else if(buffer.length == 1){
+    if(buffer.length == 1){
         var buffer_start = buffer.start(0);
         var buffer_end   = buffer.end(0);
 
@@ -305,6 +301,9 @@ $v.controller.timeTotal     = document.getElementById("controller-time-total");
 $v.video.addEventListener('canplaythrough', function(){
     //コメントゲット(ここではなくもっと早く起動すべき)
     $v.comment.get();
+    
+    //コントローラのバッファ位置セット
+    $v.controller.setBuffer();
     
     //コントローラの時間セット
     $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
