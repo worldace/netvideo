@@ -1,5 +1,4 @@
 <?php
-
 //確認
 if(!自然数なら($_POST['id']))  { exit; }
 if(!自然数なら($_POST['path'])){ exit; }
@@ -26,6 +25,8 @@ $設定['DBドライバ'] = "sqlite:" . DBパス作成();
 
 
 function DBパス作成(){
+    global $設定;
+
     $ymd  = date('Y/md', $_POST['path']);
     $path = "{$設定['uploadディレクトリ']}/{$ymd}/{$_POST['id']}.db";
     if(!is_file($path)){ exit; }

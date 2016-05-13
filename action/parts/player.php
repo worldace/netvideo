@@ -46,9 +46,10 @@ $v.video  = document.getElementById("video");
 $v.screen = document.getElementById("video-screen");
 $v.screen.pos = $v.screen.getBoundingClientRect();
 
-$v.comment = {}
+$v.comment = {};
+$v.comment.list = [];
 $v.comment.display = true;
-$v.comment.form   = document.getElementById("comment-form");
+$v.comment.form    = document.getElementById("comment-form");
 
 $v.controller = {};
 $v.controller.parts = {
@@ -68,86 +69,6 @@ $v.controller.timeCurrent   = document.getElementById("controller-time-current")
 $v.controller.timeTotal     = document.getElementById("controller-time-total");
 
 
-$v.comment.list = [
-    [
-        ["000000000000000000000000000000000"],
-        ["00000000000000"],
-        ["000000000000000000000"],
-        ["0000000000000"],
-        ["000000000000000000000000000"],
-        ["0", 0.21],
-    ],
-    [
-        ["1111111111111111"],
-    ],
-    [
-        ["22222222"],
-    ],
-    [
-        ["33333333"],
-    ],
-    [
-    ],
-    [
-        ["55555555555"],
-        ["55555555555"],
-        ["55555555555"],
-        ["55555555555"],
-    ],
-    [
-        ["66666666666"],
-    ],
-    [
-        ["あああああああああああ"],
-        ["あああああ"],
-        ["あああああああああああ"],
-        ["あああああ"],
-        ["あああああああああ"],
-    ],
-    [
-        ["いいいいいいいいいいいいいい"],
-        ["いいいいいいいいいいいいいい"],
-        ["いいいいいいいいいいいいいい"],
-        ["いいいいいいいいいいいいいい"],
-    ],
-    [
-        ["うううううううううう"],
-        ["うううううううううう"],
-        ["うううううううううう"],
-    ],
-    [
-        ["ええええええええええええええええ"],
-        ["ええええええええええええええええ"],
-    ],
-    [
-        ["おおおおおおおおおおおおおおおおおおおおおおおおおお"],
-    ],
-    [
-        ["あああああああああああ"],
-        ["ああああああ"],
-        ["あああああああああああ"],
-        ["あああ"],
-        ["あああああああああああ"],
-    ],
-    [
-        ["いいいいいいいいいいいいいい"],
-        ["いいいいいいいいいいいいいい"],
-        ["いいいいいいいいいいいいいい"],
-        ["いいいいいいいいいいいいいい"],
-    ],
-    [
-        ["うううううううううう"],
-        ["うううううううううう"],
-        ["うううううううううう"],
-    ],
-    [
-        ["ええええええええええええええええ"],
-        ["ええええええええええええええええ"],
-    ],
-    [
-        ["おおおおおおおおおおおおおおおおおおおおおおおおおお"],
-    ],
-];
 
 $v.comment.release = function(comments, lane){
     for(var i = 0; i < comments.length; i++){
@@ -294,6 +215,7 @@ $v.get = function(url, callback){
     xhr.addEventListener("load", function(){
         if(xhr.status == 200) { callback(xhr); }
     });
+    xhr.timeout = 20000;
     xhr.send();
 };
 
@@ -309,11 +231,11 @@ $v.post = function(url, param){
             if(!param.hasOwnProperty(key)){ continue; }
             body += encodeURIComponent(key) + "=" + encodeURIComponent(param[key]) + "&";
         }
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
     }
 
     var xhr = new XMLHttpRequest();
     xhr.open('POST', url);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
     xhr.timeout = 20000;
     xhr.send(body);
 };
