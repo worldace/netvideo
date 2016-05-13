@@ -17,10 +17,10 @@ function parts_player($video){
 ><div class="controller-wrap"
 ><img id="controller-play-toggle" class="controller-img" width="20" height="20" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAAAuklEQVQ4y2NsaGhgIBcwka0TRTN3cGF9fWEwz3niNbOgcvl0ijfoMDzb4ZV10tyQPGdLeWzbUF8Yyn3yPBmaIY7QKtm2oT7VioIAk3Ktr68vDBYgSzM0JPKxhiULMZqhJmCEJanxLOWBFBDE2wwFT3cGzDlhSLLmT1cm9q/9wMCAiH/iND/b3Tj7GKYwIc2frvVEVH3FkdrwaP50pTdu7RdDBtzpFLtmWKgQSN7omjFDBQ9gHASFARkAAAB5PwlcqrFmAAAAAElFTkSuQmCC"
 ><span id="controller-time-current" class="controller-time controller-time-current">00:00</span
-><div id="controller-time-seek" class="controller-seek controller-time-seek"><div id="controller-time-seekbar" class="controller-seekbar"><span id="controller-time-seeker" class="controller-seeker"></span></div></div
+><div id="controller-time-seek" class="controller-seek controller-time-seek"><div id="controller-time-seekbar" class="controller-seekbar controller-time-seekbar"><span id="controller-time-seeker" class="controller-seeker"></span></div></div
 ><span id="controller-time-total" class="controller-time controller-time-total">00:00</span
 ><img id="controller-volume-toggle" class="controller-img" width="20" height="20" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAABuElEQVQ4y72UsU7jQBCGfxBdfCuL0kE8gFkKV47TWQhhpUKyIh1NGggFFMbCfZLmCuQoUEBjaK6KQJauihxFiA57KwosHuBEtkSWLw9whXM+FDm6QHFT7Yz22393/tEutdttfDaWP01+AC6ZdZU9LQqHQt2sTHeHTDTWZWPwo2XXS++OWJ5H3p7KdPM4SzU18XsdozYaE9npf8v5lXkkyVMmun2LkjTuNvZruBlsH57pPT8pUJ4hc9mAE3r63d263B9yQqfvXwEQsurNYLtceH8mun1r/edFz+ug2TL2jnFwF2tW9UxnfvKPbmtq4oScUOug8nT+zCFtnODhdQKyKi9klRZ5AceXso44SSGsbSF+Sxf1ORTqVQm/xg+gIsHk9R50lSwEh0x0mzLho+tIOdmUkCYx9DUB6dsLgKWZ2Q4rzWBHmiZ81PEes2XJtB2KuNtw6FWwI8Tdhj9RZpW1yDOGfEbctFsOJeNhw7nXXU0CZ/5EKR4SLfIM/NXPfPaBkOlu36KEB18voc6Bc/62/JJXSqYdtAjAg9oRU5WsWAxnfO9922wyHu5eRwr+kAUN+1D8l8+gMH4D4qKxk5B4zcwAAAAASUVORK5CYII="
-><div id="controller-volume-seek" class="controller-seek controller-volume-seek"><div id="controller-volume-seekbar" class="controller-seekbar"><span id="controller-volume-seeker" class="controller-seeker"></span></div></div
+><div id="controller-volume-seek" class="controller-seek controller-volume-seek"><div id="controller-volume-seekbar" class="controller-seekbar controller-volume-seekbar"><span id="controller-volume-seeker" class="controller-seeker"></span></div></div
 ><img id="controller-comment-toggle" class="controller-img" width="20" height="20" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAABgUlEQVQ4y2NsaGhgIBcwka2TgYGBBVPo+EmBnhX5OnzIYp+u9Mat/WKIT/Nxi9Qd7lLY7ODTKd6gw8DA8Gx34+xj6M4+flIguLAeh04kIOVaX18YzHMeoRmbO/EAPp3iRRD9TAwMDAz5oUTrhOmPzIZqLtBFcu2z3R5eu59CQ2miR++1TwwMDAwMT3cGeOx8huR+bfOT55nZOQNCoizE2KFad4Q3MJr/mfpTLUbs8eT0ueJi7y6LGFn9OdS/6Y/sk3M/1BxUeCEq//94sZ7J0vzDky8IA626HI+fFOixlGLg04rMZzh+0ipSh49ByjyY5/xxnlArhBO/PNnLwNDQ0NB9+eN/UsHHq92e/kwMDAx7yuZf+URSgH26Mrvqq7khEwMDg6X5h5IIaCARA57uhKY2ZgcHBwYGBlmZx+cOHkQKD1zg2Q6v2M0M0HSKSJ7HTwoEF+LRBUuY5ogUjpS2kZLK050Bc04YMhACUM3cwYU7IFqhNhDWycDAwDhghQFFmgFoMLfsYBAAkAAAAABJRU5ErkJggg=="
 ><img id="controller-screen-toggle" class="controller-img" width="20" height="20" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAAA0klEQVQ4y2NsaGhgIBcwka2TgYGBhaCK4zyhq4q1+JCFnu1unH2MKJstv6yedeUT+c7+urZ/xzNyNZun1ntIkaUZrvPTlYk9qO5nIl5n/9oPX9f291z59PTyVMKaj5+0kuH5BNcJ9/+cE4YQNiMliQR7PJun1ntIfbrSG7f2iyEezVBnH+cR4D55HtWffDqR2YRtPn5SoGdFvk5x6A6vLIY5G5BDiHhnS3ls2wBhEaMTe2gTqRO7Zj6dUHOY/0nWzMAg5bFtGjH6KYpnigoDijQDAEFsWdMJ3UD+AAAAAElFTkSuQmCC"
 ></div
@@ -39,13 +39,6 @@ function parts_player($video){
 
 $js=<<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
 var $v = {};
-
-document.addEventListener('DOMContentLoaded', function(){
-
-$v.video  = document.getElementById("video");
-$v.screen = document.getElementById("video-screen");
-$v.screen.pos = $v.screen.getBoundingClientRect();
-
 $v.comment = {};
 $v.comment.list = [];
 $v.comment.display = true;
@@ -60,14 +53,6 @@ $v.controller.parts = {
     commentoff: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAABHElEQVQ4y2NsaGhgIBcwka2TgYGBBVPo+EmBnhX5OnzIYp+u9Mat/WKIT/Nxi9Qd7lLY7ODTKd6gw8DA8Gx34+xj6M4+flIguLAeh04kIOVaX18YzHMeoRmbO/EAPp3iRRD9TAwMDAz5oUTrhOmPzIZqLtAl5Fos7tc2P3me6fhJARkekvUyMPDIODMwWZp/ePKFDM1fnuxlYGJgYLjy7hPJej99uALx856y+VdI0/7pyuyqr+aGTAwMDJbmH0oidj8lWuvTndDUxuzg4MDAwCAr8/jcwYM/1BxUePFrfLbDK3YzAzSdIpLn8ZMCwYV4dMESpjkihSOlbaSk8nRnwJwThgyEAFQzd3DhDohWqA2EdTIwMDAOWGFAkWYA9HtacJiFfLAAAAAASUVORK5CYII=",
     fullscreen: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAAA0klEQVQ4y2NsaGhgIBcwka2TgYGBhaCK4zyhq4q1+JCFnu1unH2MKJstv6yedeUT+c7+urZ/xzNyNZun1ntIkaUZrvPTlYk9qO5nIl5n/9oPX9f291z59PTyVMKaj5+0kuH5BNcJ9/+cE4YQNiMliQR7PJun1ntIfbrSG7f2iyEezVBnH+cR4D55HtWffDqR2YRtPn5SoGdFvk5x6A6vLIY5G5BDiHhnS3ls2wBhEaMTe2gTqRO7Zj6dUHOY/0nWzMAg5bFtGjH6KYpnigoDijQDAEFsWdMJ3UD+AAAAAElFTkSuQmCC"
 };
-$v.controller.timeSeekbar   = document.getElementById("controller-time-seekbar");
-$v.controller.timeSeeker    = document.getElementById("controller-time-seeker");
-$v.controller.volumeSeekbar = document.getElementById("controller-volume-seekbar");
-$v.controller.volumeSeeker  = document.getElementById("controller-volume-seeker");
-$v.controller.timeCurrent   = document.getElementById("controller-time-current");
-$v.controller.timeTotal     = document.getElementById("controller-time-total");
-
-
 
 $v.comment.release = function(comments, lane){
     for(var i = 0; i < comments.length; i++){
@@ -214,7 +199,7 @@ $v.get = function(url, callback){
     xhr.addEventListener("load", function(){
         if(xhr.status == 200) { callback(xhr); }
     });
-    xhr.timeout = 20000;
+    xhr.timeout = 30000;
     xhr.send();
 };
 
@@ -272,6 +257,46 @@ $v.controller.setTime = function(time, element){
 };
 
 
+$v.controller.setBuffer = function(seekbar){
+    var seekbar_pos   = seekbar.getBoundingClientRect();
+    var seekbar_width = seekbar_pos.right - seekbar_pos.left;
+
+    var buffer = $v.video.buffered;
+    if(buffer.length == 1){
+        var buffer_start = buffer.start(buffer.length - 1);
+        var buffer_end   = buffer.end(buffer.length - 1);
+
+        var start_pos = buffer_start / $v.video.duration * seekbar_width;
+        var end_pos   = buffer_end / $v.video.duration * seekbar_width;
+        
+        seekbar.style.backgroundPosition = start_pos + "px";
+        seekbar.style.backgroundSize = end_pos + "px";
+    }
+    else{
+        seekbar.style.backgroundPosition = 0;
+        seekbar.style.backgroundSize = 0;
+    }
+};
+
+
+
+document.addEventListener('DOMContentLoaded', function(){
+
+$v.video  = document.getElementById("video");
+$v.screen = document.getElementById("video-screen");
+$v.screen.pos = $v.screen.getBoundingClientRect();
+
+$v.controller.timeSeekbar   = document.getElementById("controller-time-seekbar");
+$v.controller.timeSeeker    = document.getElementById("controller-time-seeker");
+$v.controller.volumeSeekbar = document.getElementById("controller-volume-seekbar");
+$v.controller.volumeSeeker  = document.getElementById("controller-volume-seeker");
+$v.controller.timeCurrent   = document.getElementById("controller-time-current");
+$v.controller.timeTotal     = document.getElementById("controller-time-total");
+
+
+
+
+
 $v.video.addEventListener('canplaythrough', function(){
     //コメントゲット(ここではなくもっと早く起動すべき)
     $v.comment.get();
@@ -302,6 +327,9 @@ $v.video.addEventListener('timeupdate', function(){
         //コントローラの時間シークセット
         $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, sec_now/$v.video.duration);
 
+        //コントローラのバッファセット
+        $v.controller.setBuffer($v.controller.timeSeekbar);
+
         //欄外のコメント削除
         $v.comment.out();
 
@@ -312,8 +340,6 @@ $v.video.addEventListener('timeupdate', function(){
         
         $v.video.beforeTime = sec_now;
     }
-
-    document.getElementById("info").textContent = $v.video.currentTime;
 });
 
 $v.video.addEventListener('seeking', function(){
@@ -360,15 +386,16 @@ document.getElementById("comment-form").addEventListener('submit', function(even
 
     var input = document.getElementById("comment-form-input");
     var text  = input.value.trim();
+    var time  = $v.video.currentTime;
     if(text == ""){ return; }
     if(text.length > 64){ return; } //maxlength属性はどうしようか
     
     var formdata = new FormData(this);
-    formdata.append("time", $v.video.currentTime);
+    formdata.append("time", time);
     $v.post('?action=commentpost', formdata);
 
-    if(Math.floor($v.video.currentTime+1) in $v.comment.list){
-        $v.comment.list[Math.floor($v.video.currentTime+1)].unshift([text, $v.video.currentTime, Math.floor(Date.now()/1000)]);
+    if(Math.floor(time+1) in $v.comment.list){
+        $v.comment.list[Math.floor(time+1)].unshift([text, time+1, Math.floor(Date.now()/1000)]);
     }
 
     input.value = "";
@@ -506,6 +533,12 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     border-radius: 2px;
     width: 100%;
     top: 7px;
+}
+.controller-time-seekbar{
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAICAIAAABcT7kVAAAAFUlEQVQI12N0WX+DgYGBiYGBgSQKAGI2AdswIf1pAAAAAElFTkSuQmCC");
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size : 0 0;
 }
 .controller-seeker{
     position: absolute;
