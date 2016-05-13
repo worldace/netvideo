@@ -25,8 +25,8 @@ function parts_player($video){
 ><img id="controller-screen-toggle" class="controller-img" width="20" height="20" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAAA0klEQVQ4y2NsaGhgIBcwka2TgYGBhaCK4zyhq4q1+JCFnu1unH2MKJstv6yedeUT+c7+urZ/xzNyNZun1ntIkaUZrvPTlYk9qO5nIl5n/9oPX9f291z59PTyVMKaj5+0kuH5BNcJ9/+cE4YQNiMliQR7PJun1ntIfbrSG7f2iyEezVBnH+cR4D55HtWffDqR2YRtPn5SoGdFvk5x6A6vLIY5G5BDiHhnS3ls2wBhEaMTe2gTqRO7Zj6dUHOY/0nWzMAg5bFtGjH6KYpnigoDijQDAEFsWdMJ3UD+AAAAAElFTkSuQmCC"
 ></div
 ><form id="comment-form" class="comment-form"
-><input id="comment-form-input" class="comment-form-input" type="text" name="comment" value="" autocomplete="off" spellcheck="false"
-><input id="comment-form-submit" class="comment-form-submit" type="submit" value="コメントする"
+><input id="comment-form-input" class="comment-form-input" type="text" name="comment" value="" autocomplete="off" spellcheck="false" disabled
+><input id="comment-form-submit" class="comment-form-submit" type="submit" value="コメントする" disabled
 ><input id="comment-form-id" type="hidden" name="id" value="{$video['動画ID']}"
 ><input id="comment-form-path" type="hidden" name="path" value="{$video['投稿時間']}"
 ></form
@@ -315,6 +315,9 @@ $v.video.addEventListener('canplaythrough', function(){
     $v.video.style.top  = pos.y + "px";
     
     $v.video.play();
+    
+    document.getElementById("comment-form-input").disabled  = false;
+    document.getElementById("comment-form-submit").disabled = false;
 });
 
 
@@ -326,9 +329,6 @@ $v.video.addEventListener('timeupdate', function(){
         
         //コントローラの時間シークセット
         $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, sec_now/$v.video.duration);
-
-        //コントローラのバッファセット
-        $v.controller.setBuffer();
 
         //欄外のコメント削除
         $v.comment.out();
@@ -369,6 +369,10 @@ $v.video.addEventListener('volumechange', function(){
         document.getElementById("controller-volume-toggle").setAttribute("src", $v.controller.parts.volume);
         $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
     }
+});
+
+$v.video.addEventListener('progress', function(){
+    $v.controller.setBuffer();
 });
 
 $v.video.addEventListener('click', function(event){
@@ -514,7 +518,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     text-align: left;
 }
 .controller-img{
-    margin: 0 2px;
+    margin: 0 3px;
     padding: 0;
     border: none;
 }
