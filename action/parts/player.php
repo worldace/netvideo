@@ -6,7 +6,7 @@
 //======================================================
 
 
-function parts_player($video = array()){
+function parts_player($video){
 
     return <<<━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 <div id="video-player" class="video-player"
@@ -49,7 +49,6 @@ $v.screen.pos = $v.screen.getBoundingClientRect();
 $v.comment = {};
 $v.comment.list = [];
 $v.comment.display = true;
-$v.comment.form    = document.getElementById("comment-form");
 
 $v.controller = {};
 $v.controller.parts = {
@@ -107,7 +106,7 @@ $v.comment.clear = function(){
 };
 
 $v.comment.pause = function(){
-    var comments = document.querySelectorAll(".comment");
+    var comments = $v.screen.querySelectorAll(".comment");
     for(var i = 0; i < comments.length; i++){
         comments[i].style.animationPlayState = "paused";
     }
@@ -164,7 +163,7 @@ $v.comment.get = function(){
 }
 
 
-$v.video.getPosition = function(screenW, screenH, objectW, objectH){
+$v.getObjectPosition = function(screenW, screenH, objectW, objectH){
     var result = {};
     var marginW = screenW - objectW;
     var marginH = screenH - objectH;
@@ -274,7 +273,7 @@ $v.controller.setTime = function(time, element){
 
 
 $v.video.addEventListener('canplaythrough', function(){
-    //コメントゲット
+    //コメントゲット(ここではなくもっと早く起動すべき)
     $v.comment.get();
     
     //コントローラの時間セット
@@ -284,7 +283,7 @@ $v.video.addEventListener('canplaythrough', function(){
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
 
     //動画の位置セット
-    var pos = $v.video.getPosition($v.screen.pos.right - $v.screen.pos.left, $v.screen.pos.bottom - $v.screen.pos.top, $v.video.videoWidth, $v.video.videoHeight);
+    var pos = $v.getObjectPosition($v.screen.pos.right - $v.screen.pos.left, $v.screen.pos.bottom - $v.screen.pos.top, $v.video.videoWidth, $v.video.videoHeight);
     $v.video.setAttribute("width",  pos.w);
     $v.video.setAttribute("height", pos.h);
     $v.video.style.left = pos.x + "px";
@@ -355,7 +354,8 @@ $v.video.addEventListener('dblclick', function(event){
     event.preventDefault();//ieで最大化してしまう
 });
 
-$v.comment.form.addEventListener('submit', function(event){
+
+document.getElementById("comment-form").addEventListener('submit', function(event){
     event.preventDefault();
 
     var input = document.getElementById("comment-form-input");
@@ -367,13 +367,15 @@ $v.comment.form.addEventListener('submit', function(event){
     formdata.append("time", $v.video.currentTime);
     $v.post('?action=commentpost', formdata);
 
+    if(Math.floor($v.video.currentTime+1) in $v.comment.list){
+        $v.comment.list[Math.floor($v.video.currentTime+1)].unshift([text, $v.video.currentTime, Math.floor(Date.now()/1000)]);
+    }
+
     input.value = "";
     input.focus();
+    
+    return false;
 });
-
-
-
-
 
 
 document.getElementById("controller-play-toggle").addEventListener('click', function(e){
