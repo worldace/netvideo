@@ -262,7 +262,12 @@ $v.controller.setBuffer = function(){
     var seekbar_width = seekbar_pos.right - seekbar_pos.left;
 
     var buffer = $v.video.buffered;
-    if(buffer.length == 1){
+
+    if(buffer.length == 0){ //ファイルを全て読み込み済み(多分)
+        $v.controller.timeSeekbar.style.backgroundPosition = 0;
+        $v.controller.timeSeekbar.style.backgroundSize = seekbar_width + "px";
+    }
+    else if(buffer.length == 1){
         var buffer_start = buffer.start(0);
         var buffer_end   = buffer.end(0);
 
@@ -272,7 +277,7 @@ $v.controller.setBuffer = function(){
         $v.controller.timeSeekbar.style.backgroundPosition = start_pos + "px";
         $v.controller.timeSeekbar.style.backgroundSize = end_pos + "px";
     }
-    else{
+    else{ //複数バッファには非対応
         $v.controller.timeSeekbar.style.backgroundPosition = 0;
         $v.controller.timeSeekbar.style.backgroundSize = 0;
     }
