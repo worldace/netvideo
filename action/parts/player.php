@@ -25,10 +25,10 @@ function parts_player($video = array()){
 ><img id="controller-screen-toggle" class="controller-img" width="20" height="20" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAAA0klEQVQ4y2NsaGhgIBcwka2TgYGBhaCK4zyhq4q1+JCFnu1unH2MKJstv6yedeUT+c7+urZ/xzNyNZun1ntIkaUZrvPTlYk9qO5nIl5n/9oPX9f291z59PTyVMKaj5+0kuH5BNcJ9/+cE4YQNiMliQR7PJun1ntIfbrSG7f2iyEezVBnH+cR4D55HtWffDqR2YRtPn5SoGdFvk5x6A6vLIY5G5BDiHhnS3ls2wBhEaMTe2gTqRO7Zj6dUHOY/0nWzMAg5bFtGjH6KYpnigoDijQDAEFsWdMJ3UD+AAAAAElFTkSuQmCC"
 ></div
 ><form id="comment-form" class="comment-form"
-><input id="comment-input" class="comment-input" type="text" name="comment" value="" autocomplete="off" spellcheck="false"
-><input id="comment-submit" class="comment-submit" type="submit" value="コメントする"
-><input type="hidden" name="id" value="{$video['動画ID']}"
-><input type="hidden" name="path" value="{$video['投稿時間']}"
+><input id="comment-form-input" class="comment-form-input" type="text" name="comment" value="" autocomplete="off" spellcheck="false"
+><input id="comment-form-submit" class="comment-form-submit" type="submit" value="コメントする"
+><input id="comment-form-id" type="hidden" name="id" value="{$video['動画ID']}"
+><input id="comment-form-path" type="hidden" name="path" value="{$video['投稿時間']}"
 ></form
 ></div
 ></div>
@@ -49,7 +49,6 @@ $v.screen.pos = $v.screen.getBoundingClientRect();
 $v.comment = {}
 $v.comment.display = true;
 $v.comment.form   = document.getElementById("comment-form");
-$v.comment.input  = document.getElementById("comment-input");
 
 $v.controller = {};
 $v.controller.parts = {
@@ -214,6 +213,36 @@ $v.comment.lane = function(){
     return lane;
 };
 
+$v.comment.get = function(){
+    var num;
+    var id   = document.getElementById("comment-form-id");
+    var path = document.getElementById("comment-form-path");
+
+    //動画時間によって取得件数を変化させる(未完)
+    var totaltime = Math.floor($v.video.duration);
+
+    var url = "?action=commentget" + "&id=" + id + "&path=" + path + "&num=" + num;
+    $v.get(url, function(xhr){
+        var comments = JSON.parse(xhr.responseText);
+        if(!comments){ return; }
+
+        //動画時間＋1の箱を作成する [[], [], [], ...]
+        var box = new Array(totaltime+1); 
+        for(var i = 0; i < box.length; i++){
+            box[i] = [];
+        }
+        //箱にコメントを詰める
+        for(var i = 0; i < comments.length; i++){
+            var index = Math.floor(comments[i][1]);
+            if(index >= 0 && index <= totaltime){
+                box[index].array_push(comments[i]);
+            }
+        }
+        $v.comment.list = box;
+    });
+}
+
+
 $v.video.getPosition = function(screenW, screenH, objectW, objectH){
     var result = {};
     var marginW = screenW - objectW;
@@ -255,6 +284,17 @@ $v.video.getPosition = function(screenW, screenH, objectW, objectH){
     result.y = Math.floor(result.y);
     
     return result;
+};
+
+
+$v.get = function(url, callback){
+    var xhr = new XMLHttpRequest();
+
+    xhr.open("GET", url);
+    xhr.addEventListener("load", function(){
+        if(xhr.status == 200) { callback(xhr); }
+    });
+    xhr.send();
 };
 
 
@@ -393,15 +433,17 @@ $v.video.addEventListener('dblclick', function(event){
 $v.comment.form.addEventListener('submit', function(event){
     event.preventDefault();
 
-    var text = $v.comment.input.value.trim();
+    var input = document.getElementById("comment-form-input");
+    var text  = input.value.trim();
     if(text == ""){ return; }
-    //文字数制限
-    //IDチェック
-    //動画時間チェック
+    if(text.length > 64){ return; } //maxlength属性はどうしようか
+    
+    var formdata = new FormData(this);
+    formdata.append("time", $v.video.currentTime);
+    $v.post('?action=commentpost', formdata);
 
-    $v.comment.input.value = "";
-    $v.comment.input.focus();
-    $v.post('?action=commentpost', {id:1, text:text, time:"123456789"});//new FormData($v.comment.form)
+    input.value = "";
+    input.focus();
 });
 
 
@@ -563,7 +605,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     position: absolute;
     top:29px;
 }
-.comment-input{
+.comment-form-input{
     width: 80%;
     height: 24px;
     box-shadow: 3px 3px 3px rgba(200,200,200,0.2) inset;
@@ -573,7 +615,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     vertical-align:middle;
     ime-mode: active;
 }
-.comment-submit{
+.comment-form-submit{
     width: 20%;
     height: 24px;
     text-decoration: none;
