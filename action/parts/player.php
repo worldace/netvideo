@@ -135,9 +135,9 @@ $v.comment.lane = function(){
 };
 
 $v.comment.get = function(){
-    var num;
-    var id   = document.getElementById("comment-form-id");
-    var path = document.getElementById("comment-form-path");
+    var num = 1000;
+    var id   = document.getElementById("comment-form-id").value;
+    var path = document.getElementById("comment-form-path").value;
 
     //動画時間によって取得件数を変化させる(未完)
     var totaltime = Math.floor($v.video.duration);
@@ -156,7 +156,7 @@ $v.comment.get = function(){
         for(var i = 0; i < comments.length; i++){
             var index = Math.floor(comments[i][1]);
             if(index >= 0 && index <= totaltime){
-                box[index].array_push(comments[i]);
+                box[index].push(comments[i]);
             }
         }
         $v.comment.list = box;
@@ -274,6 +274,9 @@ $v.controller.setTime = function(time, element){
 
 
 $v.video.addEventListener('canplaythrough', function(){
+    //コメントゲット
+    $v.comment.get();
+    
     //コントローラの時間セット
     $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
 
