@@ -11,7 +11,7 @@ function parts_player($video){
     return <<<━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 <div id="video-player" class="video-player"
 ><div id="video-screen" class="video-screen"
-><video id="video" src="{$video['動画URL']}" width="640" height="360" loop controls></video
+><video id="video" src="{$video['動画URL']}" width="640" height="360" loop autoplay></video
 ></div
 ><div id="video-controller" class="video-controller"
 ><div class="controller-wrap"
@@ -263,8 +263,8 @@ $v.controller.setBuffer = function(){
 
     var buffer = $v.video.buffered;
     if(buffer.length == 1){
-        var buffer_start = buffer.start(buffer.length - 1);
-        var buffer_end   = buffer.end(buffer.length - 1);
+        var buffer_start = buffer.start(0);
+        var buffer_end   = buffer.end(0);
 
         var start_pos = buffer_start / $v.video.duration * seekbar_width;
         var end_pos   = buffer_end / $v.video.duration * seekbar_width;
@@ -313,8 +313,6 @@ $v.video.addEventListener('canplaythrough', function(){
     $v.video.setAttribute("height", pos.h);
     $v.video.style.left = pos.x + "px";
     $v.video.style.top  = pos.y + "px";
-    
-    $v.video.play();
     
     document.getElementById("comment-form-input").disabled  = false;
     document.getElementById("comment-form-submit").disabled = false;
