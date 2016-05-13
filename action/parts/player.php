@@ -257,8 +257,8 @@ $v.controller.setTime = function(time, element){
 };
 
 
-$v.controller.setBuffer = function(seekbar){
-    var seekbar_pos   = seekbar.getBoundingClientRect();
+$v.controller.setBuffer = function(){
+    var seekbar_pos   = $v.controller.timeSeekbar.getBoundingClientRect();
     var seekbar_width = seekbar_pos.right - seekbar_pos.left;
 
     var buffer = $v.video.buffered;
@@ -269,12 +269,12 @@ $v.controller.setBuffer = function(seekbar){
         var start_pos = buffer_start / $v.video.duration * seekbar_width;
         var end_pos   = buffer_end / $v.video.duration * seekbar_width;
         
-        seekbar.style.backgroundPosition = start_pos + "px";
-        seekbar.style.backgroundSize = end_pos + "px";
+        $v.controller.timeSeekbar.style.backgroundPosition = start_pos + "px";
+        $v.controller.timeSeekbar.style.backgroundSize = end_pos + "px";
     }
     else{
-        seekbar.style.backgroundPosition = 0;
-        seekbar.style.backgroundSize = 0;
+        $v.controller.timeSeekbar.style.backgroundPosition = 0;
+        $v.controller.timeSeekbar.style.backgroundSize = 0;
     }
 };
 
@@ -328,7 +328,7 @@ $v.video.addEventListener('timeupdate', function(){
         $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, sec_now/$v.video.duration);
 
         //コントローラのバッファセット
-        $v.controller.setBuffer($v.controller.timeSeekbar);
+        $v.controller.setBuffer();
 
         //欄外のコメント削除
         $v.comment.out();
