@@ -126,7 +126,7 @@ $v.comment.get = function(){
     //動画時間によって取得件数を変化させる(未完)
     var totaltime = Math.floor($v.video.duration);
 
-    var url = "?action=commentget" + "&id=" + id + "&path=" + path + "&num=" + num;
+    var url = "?action=commentget" + "&id=" + id + "&path=" + path + "&num=" + num + "&nocache=" + Date.now();
     $v.get(url, function(xhr){
         var comments = JSON.parse(xhr.responseText);
         if(!comments){ return; }
