@@ -25,7 +25,7 @@ function DBパス作成(){
     return $path;
 }
 
-function json_print($json = null){
+function json_print($json = array()){
     header("Content-Type: application/json; charset=utf-8");
     print json_encode($json);
     exit;

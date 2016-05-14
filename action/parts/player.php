@@ -300,7 +300,7 @@ $v.controller.timeTotal     = document.getElementById("controller-time-total");
 
 
 
-$v.video.addEventListener('canplaythrough', function(){
+$v.video.addEventListener('loadedmetadata', function(){
     if(!$v.isNotPosted){
         $v.comment.get();//コメントゲット(ここではなくもっと早く起動すべき)
         document.getElementById("comment-form-input").disabled  = false;
@@ -476,6 +476,7 @@ document.getElementById("controller-volume-seek").addEventListener('click', func
 $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
 .video-player{
     width: 640px;
+    z-index: 10;
 }
 .video-screen{
     background-color: #000;
@@ -612,7 +613,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     position: absolute;
     font-size: 24px;
     line-height: 1;
-    z-index: 2;
+    z-index: 20;
     color: #fff;
     text-shadow: -1px -1px #000, 1px -1px #000,	-1px 1px #000, 1px 1px #000;
     animation-name: lane0;
