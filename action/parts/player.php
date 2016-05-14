@@ -252,8 +252,8 @@ $v.controller.setTime = function(time, element){
     var min = Math.floor(time/60);
     var sec = Math.floor(time-min*60);
 
-    min = ('0' + min).slice(-2); //ゼロパディング(2桁)
-    sec = ('0' + sec).slice(-2);
+    sec = ('0' + sec).slice(-2); //ゼロパディング(2桁)
+    if(min < 100){ min = ('0' + min).slice(-2); }
 
     element.textContent = min + ":" + sec;
 };
