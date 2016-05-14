@@ -40,8 +40,6 @@ function parts_player($video){
 $js=<<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
 var $v = {};
 
-$v.isPosted = true;
-
 $v.comment = {};
 $v.comment.list = [];
 $v.comment.display = true;
@@ -125,28 +123,29 @@ $v.comment.get = function(){
     var num = 1000;
     var id   = document.getElementById("comment-form-id").value;
     var path = document.getElementById("comment-form-path").value;
-
-    //動画時間によって取得件数を変化させる(未完)
     var totaltime = Math.floor($v.video.duration);
+
+    //動画時間＋1の箱を作成する [[], [], [], ...]
+    $v.comment.list = new Array(totaltime+1); 
+    for(var i = 0; i < $v.comment.list.length; i++){
+        $v.comment.list[i] = [];
+    }
+
+    //動画時間によって取得件数(num)を変化させる(未完)
 
     var url = "?action=commentget" + "&id=" + id + "&path=" + path + "&num=" + num + "&nocache=" + Date.now();
     $v.get(url, function(xhr){
-        var comments = JSON.parse(xhr.responseText);
+        //JSON変換
+        try{ var comments = JSON.parse(xhr.responseText); } catch(e){}
         if(!comments){ return; }
 
-        //動画時間＋1の箱を作成する [[], [], [], ...]
-        var box = new Array(totaltime+1); 
-        for(var i = 0; i < box.length; i++){
-            box[i] = [];
-        }
         //箱にコメントを詰める
         for(var i = 0; i < comments.length; i++){
             var index = Math.floor(comments[i][1]);
             if(index >= 0 && index <= totaltime){
-                box[index].push(comments[i]);
+                $v.comment.list[index].push(comments[i]);
             }
         }
-        $v.comment.list = box;
     });
 }
 
@@ -302,7 +301,7 @@ $v.controller.timeTotal     = document.getElementById("controller-time-total");
 
 
 $v.video.addEventListener('canplaythrough', function(){
-    if($v.isPosted){
+    if(!$v.isNotPosted){
         $v.comment.get();//コメントゲット(ここではなくもっと早く起動すべき)
         document.getElementById("comment-form-input").disabled  = false;
         document.getElementById("comment-form-submit").disabled = false;
@@ -389,6 +388,12 @@ $v.video.addEventListener('click', function(event){
 $v.video.addEventListener('dblclick', function(event){
     event.preventDefault();//ieで最大化してしまう
 });
+
+
+$v.video.addEventListener('error', function(){
+    //http://www.html5.jp/tag/elements/video.html
+});
+
 
 
 document.getElementById("comment-form").addEventListener('submit', function(event){
