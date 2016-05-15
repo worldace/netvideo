@@ -230,7 +230,6 @@ $v.comment.laneCheck = function(){
 
 
 $v.comment.get = function(){
-    var num = 2000;
     var id   = document.getElementById("comment-form-id").value;
     var path = document.getElementById("comment-form-path").value;
     var totaltime = Math.floor($v.video.duration);
@@ -241,7 +240,8 @@ $v.comment.get = function(){
         $v.comment.list.push([]);
     }
 
-    //動画時間によって取得件数(num)を変化させる(未完)
+    //動画時間によって取得件数(num)を変化させる(適当)
+    var num = totaltime * 6;
 
     var url = "?action=commentget" + "&id=" + id + "&path=" + path + "&num=" + num + "&nocache=" + Date.now();
     $v.get(url, function(xhr){
