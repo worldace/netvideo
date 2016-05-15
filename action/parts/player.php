@@ -62,9 +62,16 @@ $v.comment.release = function(comments, lane){
 
             var comment = document.createElement("span");
             comment.textContent = comments[i][0];
-            comment.setAttribute("class", "comment");
+            comment.classList.add('comment');
             comment.setAttribute("data-lane", j);
-            comment.style.animationName = "lane" + j;
+            if(!$v.screen.isFullScreen){
+                comment.classList.add('comment-normal-lane');
+                comment.style.animationName = "lane" + j;
+            }
+            else{
+                comment.classList.add('comment-full-lane');
+                comment.style.animationName = "fulllane" + j;
+            }
             $v.screen.insertBefore(comment, $v.screen.firstChild);
             lane[j] = false;
             break;
@@ -107,13 +114,29 @@ $v.comment.run = function(){
 
 $v.comment.laneBuild = function(){
     
-    for(var i = 0; i < 12; i++){ //12レーン、各25px
-        var keyframe = "";
-        keyframe += "@keyframes lane" + i + "{\n";
-        keyframe += "from{transform:translate(640px," + i*25 + "px);}\n";
-        keyframe += "to{transform:translate(-1280px," + i*25 + "px);}\n}\n";
-        document.styleSheets[0].insertRule(keyframe, 0);
+    /* 通常スクリーン用レーンCSS 640*360 12レーン、各25px */
+    for(var i = 0; i < 12; i++){
+        var css = "";
+        css += "@keyframes lane" + i + "{";
+        css += "from{transform:translate(640px," + i*25 + "px);}";
+        css += "to{transform:translate(-1280px," + i*25 + "px);}}";
+        document.styleSheets[0].insertRule(css, 0);
     }
+    /* フルスクリーン用レーンCSS screen.width*screen.height 12レーン 各?px  */
+    var height = Math.floor(screen.height * 0.8 / 12); //←ここが決め打ちすぎる。要熟考
+    for(var i = 0; i < 12; i++){
+        var css = "";
+        css += "@keyframes fulllane" + i + "{";
+        css += "from{transform:translate(" + screen.width + "px," + i*height + "px);}";
+        css += "to{transform:translate(-" + screen.width*2 + "px," + i*height + "px);}}";
+        document.styleSheets[0].insertRule(css, 0);
+    }
+
+    /* フルスクリーン用コメントCSS */
+    var speed  = 1920 / 8; //1920pxを8秒掛けて移動(ノーマルレーン)
+    
+    css  = ".comment-full-lane{font-size:" + height + "px;}";
+    document.styleSheets[0].insertRule(css, 0);
 };
 
 $v.comment.laneCheck = function(){
@@ -487,6 +510,7 @@ $v.screen.fullscreenEvent = function(){
         $v.video.style.left = pos.x + "px";
         $v.video.style.top  = pos.y + "px";
     }
+    $v.comment.clear();
 };
 
 
@@ -635,17 +659,18 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 
 .comment{
     position: absolute;
-    font-size: 24px;
     line-height: 1;
     z-index: 20;
     color: #fff;
     text-shadow: -1px -1px #000, 1px -1px #000,	-1px 1px #000, 1px 1px #000;
-    animation-name: lane0;
     animation-fill-mode: forwards;
     animation-timing-function: linear;
     animation-duration: 8s;
-
 }
+.comment-normal-lane{
+    font-size: 24px;
+}
+
 
 #video-screen:-ms-fullscreen{
     position: absolute;
@@ -675,54 +700,4 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 	left: 0;
  	top: 0;
 }
-/*
-@keyframes lane0 {
-from{ transform: translate(640px, 0); }
-to{ transform: translate(-1280px, 0); }
-}
-@keyframes lane1 {
-from{ transform: translate(640px, 25px); }
-to{ transform: translate(-1280px, 25px); }
-}
-@keyframes lane2 {
-from{ transform: translate(640px, 50px); }
-to{ transform: translate(-1280px, 50px); }
-}
-@keyframes lane3 {
-from{ transform: translate(640px, 75px); }
-to{ transform: translate(-1280px, 75px); }
-}
-@keyframes lane4 {
-from{ transform: translate(640px, 100px); }
-to{ transform: translate(-1280px, 100px); }
-}
-@keyframes lane5 {
-from{ transform: translate(640px, 125px); }
-to{ transform: translate(-1280px, 125px); }
-}
-@keyframes lane6 {
-from{ transform: translate(640px, 150px); }
-to{ transform: translate(-1280px, 150px); }
-}
-@keyframes lane7 {
-from{ transform: translate(640px, 175px); }
-to{ transform: translate(-1280px, 175px); }
-}
-@keyframes lane8 {
-from{ transform: translate(640px, 200px); }
-to{ transform: translate(-1280px, 200px); }
-}
-@keyframes lane9 {
-from{ transform: translate(640px, 225px); }
-to{ transform: translate(-1280px, 225px); }
-}
-@keyframes lane10 {
-from{ transform: translate(640px, 250px); }
-to{ transform: translate(-1280px, 250px); }
-}
-@keyframes lane11 {
-from{ transform: translate(640px, 275px); }
-to{ transform: translate(-1280px, 275px); }
-}
-*/
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━;
