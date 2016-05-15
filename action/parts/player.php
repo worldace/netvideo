@@ -65,7 +65,7 @@ $v.controller.volumeSeeker  = document.getElementById("controller-volume-seeker"
 $v.controller.timeCurrent   = document.getElementById("controller-time-current");
 $v.controller.timeTotal     = document.getElementById("controller-time-total");
 $v.comment.list = [];
-$v.comment.display = true;
+$v.comment.on = true;
 
 
 
@@ -370,7 +370,7 @@ $v.video.addEventListener('timeupdate', function(){
         $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, sec_now/$v.video.duration);
         $v.comment.gc();
         //コメント放出
-        if(sec_now in $v.comment.list && $v.video.paused === false && $v.comment.display === true){
+        if(sec_now in $v.comment.list && $v.video.paused === false && $v.comment.on === true){
             $v.comment.release($v.comment.list[sec_now], $v.comment.laneCheck());
         }
         
@@ -449,13 +449,13 @@ document.getElementById("controller-volume-toggle").addEventListener('click', fu
 });
 
 document.getElementById("controller-comment-toggle").addEventListener('click', function(){
-    if($v.comment.display){
-        $v.comment.display = false;
+    if($v.comment.on){
+        $v.comment.on = false;
         $v.comment.clear();
         this.setAttribute("src", $v.controller.parts.commentoff);
     }
     else{
-        $v.comment.display = true;
+        $v.comment.on = true;
         this.setAttribute("src", $v.controller.parts.commenton);
     }
 });
@@ -509,6 +509,8 @@ document.addEventListener("fullscreenchange",      function(){ $v.screen.fullscr
 
 
 $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+/* box-sizing:border-box 基準 */
+
 .video{
     position: absolute;
 }
