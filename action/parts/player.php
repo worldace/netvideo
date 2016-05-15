@@ -123,6 +123,16 @@ $v.getObjectPosition = function(screenW, screenH, objectW, objectH){
 };
 
 
+$v.video.setPosition = function(screenW, screenH, objectW, objectH){
+    var pos = $v.getObjectPosition(screenW, screenH, objectW, objectH);
+
+    $v.video.setAttribute("width",  pos.w);
+    $v.video.setAttribute("height", pos.h);
+    $v.video.style.left = pos.x + "px";
+    $v.video.style.top  = pos.y + "px";
+};
+
+
 $v.comment.release = function(comments, lane){
     for(var i = 0; i < comments.length; i++){
         for(var j = 0; j < lane.length; j++){
@@ -270,24 +280,39 @@ $v.comment.post = function(){
 
 
 $v.controller.setSeeker = function(seekbar, seeker, percent){
-    var seekbar_pos   = seekbar.getBoundingClientRect();
-    var seeker_pos    = seeker.getBoundingClientRect();
-    var seeker_width  = seeker_pos.right - seeker_pos.left;
-    var seekbar_width = seekbar_pos.right - seekbar_pos.left - seeker_width;
-    var pos = 0;
+    var seekbarPos   = seekbar.getBoundingClientRect();
+    var seekerPos    = seeker.getBoundingClientRect();
+    var seekerWidth  = seekerPos.right - seekerPos.left;
+    var seekbarWidth = seekbarPos.right - seekbarPos.left - seekerWidth;
 
-    if(percent <= 1){//percentが0-1の割合の時
-        pos = seekbar_width * percent;
-    }
-    else{//percentがクリックされた位置の時
-        pos = percent - seekbar_pos.left;
-    }
+    //percentが割合の時(0-1) or percentがクリックされた位置の時
+    var pos = (percent <= 1) ? seekbarWidth*percent : percent-seekbarPos.left;
 
     if(pos < 0){ pos = 0; }
-    if(pos > seekbar_width){ pos = seekbar_width; }
+    if(pos > seekbarWidth){ pos = seekbarWidth; }
 
     seeker.style.left = pos + "px";
-    return pos/seekbar_width;
+    return pos/seekbarWidth;
+};
+
+
+$v.controller.setBuffer = function(){
+    var seekbarPos   = $v.controller.timeSeekbar.getBoundingClientRect();
+    var seekbarWidth = seekbarPos.right - seekbarPos.left;
+
+    var buffer = $v.video.buffered;
+
+    if(buffer.length == 1){
+        var startPos = buffer.start(0) / $v.video.duration * seekbarWidth;
+        var endPos   = buffer.end(0)  / $v.video.duration * seekbarWidth;
+        
+        $v.controller.timeSeekbar.style.backgroundPosition = startPos + "px";
+        $v.controller.timeSeekbar.style.backgroundSize = endPos + "px";
+    }
+    else{ //複数バッファには非対応
+        $v.controller.timeSeekbar.style.backgroundPosition = 0;
+        $v.controller.timeSeekbar.style.backgroundSize = 0;
+    }
 };
 
 
@@ -302,50 +327,17 @@ $v.controller.setTime = function(time, element){
 };
 
 
-$v.controller.setBuffer = function(){
-    var seekbar_pos   = $v.controller.timeSeekbar.getBoundingClientRect();
-    var seekbar_width = seekbar_pos.right - seekbar_pos.left;
-
-    var buffer = $v.video.buffered;
-
-    if(buffer.length == 1){
-        var buffer_start = buffer.start(0);
-        var buffer_end   = buffer.end(0);
-
-        var start_pos = buffer_start / $v.video.duration * seekbar_width;
-        var end_pos   = buffer_end / $v.video.duration * seekbar_width;
-        
-        $v.controller.timeSeekbar.style.backgroundPosition = start_pos + "px";
-        $v.controller.timeSeekbar.style.backgroundSize = end_pos + "px";
-    }
-    else{ //複数バッファには非対応
-        $v.controller.timeSeekbar.style.backgroundPosition = 0;
-        $v.controller.timeSeekbar.style.backgroundSize = 0;
-    }
-};
-
-
 $v.screen.fullscreenEvent = function(){
     var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullScreenElement;
     if(element){
         if(element.id != "video-screen"){ return; }
-
         $v.screen.isFullScreen = true;
-        var pos = $v.getObjectPosition(screen.width, screen.height, $v.video.videoWidth, $v.video.videoHeight);
-        $v.video.setAttribute("width",  pos.w);
-        $v.video.setAttribute("height", pos.h);
-        $v.video.style.left = pos.x + "px";
-        $v.video.style.top  = pos.y + "px";
-        
+        $v.video.setPosition(screen.width, screen.height, $v.video.videoWidth, $v.video.videoHeight);
         document.getElementById("video-screen").appendChild(document.getElementById("video-controller"));
     }
     else{
         $v.screen.isFullScreen = false;
-        var pos = $v.getObjectPosition($v.screen.pos.right - $v.screen.pos.left, $v.screen.pos.bottom - $v.screen.pos.top, $v.video.videoWidth, $v.video.videoHeight);
-        $v.video.setAttribute("width",  pos.w);
-        $v.video.setAttribute("height", pos.h);
-        $v.video.style.left = pos.x + "px";
-        $v.video.style.top  = pos.y + "px";
+        $v.video.setPosition($v.screen.pos.right - $v.screen.pos.left, $v.screen.pos.bottom - $v.screen.pos.top, $v.video.videoWidth, $v.video.videoHeight);
         document.getElementById("video-player").appendChild(document.getElementById("video-controller"));
     }
     $v.comment.clear();
@@ -367,12 +359,7 @@ $v.video.addEventListener('loadedmetadata', function(){
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
 
     //動画の位置セット
-    var pos = $v.getObjectPosition($v.screen.pos.right - $v.screen.pos.left, $v.screen.pos.bottom - $v.screen.pos.top, $v.video.videoWidth, $v.video.videoHeight);
-    $v.video.setAttribute("width",  pos.w);
-    $v.video.setAttribute("height", pos.h);
-    $v.video.style.left = pos.x + "px";
-    $v.video.style.top  = pos.y + "px";
-    
+    $v.video.setPosition($v.screen.pos.right - $v.screen.pos.left, $v.screen.pos.bottom - $v.screen.pos.top, $v.video.videoWidth, $v.video.videoHeight);
 });
 
 
@@ -381,10 +368,7 @@ $v.video.addEventListener('timeupdate', function(){
     if(sec_now !== $v.video.beforeTime){
         $v.controller.setTime(sec_now, $v.controller.timeCurrent);
         $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, sec_now/$v.video.duration);
-
-        //欄外のコメント削除
         $v.comment.out();
-
         //コメント放出
         if(sec_now in $v.comment.list && $v.video.paused === false && $v.comment.display === true){
             $v.comment.release($v.comment.list[sec_now], $v.comment.laneCheck());
