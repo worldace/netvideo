@@ -389,7 +389,7 @@ $v.video.addEventListener('click', function(event){
 });
 
 $v.video.addEventListener('dblclick', function(event){
-    event.preventDefault();//ieで最大化してしまう
+    event.preventDefault();
 });
 
 
