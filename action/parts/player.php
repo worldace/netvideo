@@ -316,7 +316,6 @@ $v.controller.setBuffer = function(){
 document.addEventListener('DOMContentLoaded', function(){
 
 $v.video  = document.getElementById("video");
-$v.player = document.getElementById("video-player");
 $v.screen = document.getElementById("video-screen");
 $v.screen.pos = $v.screen.getBoundingClientRect();
 
@@ -426,12 +425,12 @@ document.getElementById("comment-form").addEventListener('submit', function(even
 });
 
 
-document.getElementById("controller-play-toggle").addEventListener('click', function(e){
+document.getElementById("controller-play-toggle").addEventListener('click', function(){
     $v.video.paused ? $v.video.play() : $v.video.pause();
 });
 
 
-document.getElementById("controller-volume-toggle").addEventListener('click', function(e){
+document.getElementById("controller-volume-toggle").addEventListener('click', function(){
     if($v.video.muted){
         $v.video.muted = false;
         $v.video.volume = 0.5;
@@ -441,7 +440,7 @@ document.getElementById("controller-volume-toggle").addEventListener('click', fu
     }
 });
 
-document.getElementById("controller-comment-toggle").addEventListener('click', function(e){
+document.getElementById("controller-comment-toggle").addEventListener('click', function(){
     if($v.comment.display){
         $v.comment.display = false;
         $v.comment.clear();
