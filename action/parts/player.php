@@ -11,7 +11,7 @@ function parts_player($video){
     return <<<━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 <div id="video-player" class="video-player"
 ><div id="video-screen" class="video-screen"
-><video id="video" src="{$video['動画URL']}" width="640" height="360" loop autoplay></video
+><video id="video" class="video" src="{$video['動画URL']}" loop autoplay></video
 ></div
 ><div id="video-controller" class="video-controller"
 ><div class="controller-wrap"
@@ -105,7 +105,18 @@ $v.comment.run = function(){
     }
 };
 
-$v.comment.lane = function(){
+$v.comment.laneBuild = function(){
+    
+    for(var i = 0; i < 12; i++){ //12レーン、各25px
+        var keyframe = "";
+        keyframe += "@keyframes lane" + i + "{\n";
+        keyframe += "from{transform:translate(640px," + i*25 + "px);}\n";
+        keyframe += "to{transform:translate(-1280px," + i*25 + "px);}\n}\n";
+        document.styleSheets[0].insertRule(keyframe, 0);
+    }
+};
+
+$v.comment.laneCheck = function(){
     var comments = $v.screen.querySelectorAll(".comment");
     var lane = [true,true,true,true,true,true,true,true,true,true,true,true];
 
@@ -119,6 +130,7 @@ $v.comment.lane = function(){
     return lane;
 };
 
+
 $v.comment.get = function(){
     var num = 1000;
     var id   = document.getElementById("comment-form-id").value;
@@ -126,9 +138,9 @@ $v.comment.get = function(){
     var totaltime = Math.floor($v.video.duration);
 
     //動画時間＋1の箱を作成する [[], [], [], ...]
-    $v.comment.list = new Array(totaltime+1); 
-    for(var i = 0; i < $v.comment.list.length; i++){
-        $v.comment.list[i] = [];
+    $v.comment.list = []; 
+    for(var i = 0; i < totaltime+1; i++){
+        $v.comment.list.push([]);
     }
 
     //動画時間によって取得件数(num)を変化させる(未完)
@@ -151,45 +163,22 @@ $v.comment.get = function(){
 
 
 $v.getObjectPosition = function(screenW, screenH, objectW, objectH){
-    var result = {};
-    var marginW = screenW - objectW;
-    var marginH = screenH - objectH;
+    var result  = {};
+    var screenR = screenW / screenH;
+    var objectR = objectW / objectH;
+    var scale;
 
-    //オブジェクトのサイズ決め
-    if((marginW >= 0 && marginH >= 0) || (marginW <= 0 && marginH <= 0)){
-        if(marginW < marginH){
-            result.w = screenW;
-            result.h = screenW / objectW * objectH;
-        }
-        else{
-            result.w = screenH / objectH * objectW;
-            result.h = screenH;
-        }
-    }
-    else if(marginW <= 0){
-        result.w = screenW;
-        result.h = screenW / objectW * objectH;
-    }
-    else if(marginH <= 0){
-        result.w = screenH / objectH * objectW;
-        result.h = screenH;
-    }
-    
-    //オブジェクトの位置決め
-    if(screenW == result.w){
-        result.x = 0;
-        result.y = (screenH / 2) - (result.h / 2);
+    if(screenR > 1){
+        scale = (objectR < screenR) ? screenH/objectH : screenW/objectW;
     }
     else{
-        result.x = (screenW / 2) - (result.w / 2);
-        result.y = 0;
+        scale = (objectR > screenR) ? screenW/objectW : screenH/objectH;
     }
-    
-    result.w = Math.floor(result.w);
-    result.h = Math.floor(result.h);
-    result.x = Math.floor(result.x);
-    result.y = Math.floor(result.y);
-    
+    result.w = Math.floor(objectW * scale);
+    result.h = Math.floor(objectH * scale);
+    result.x = Math.floor((screenW / 2) - (result.w / 2));
+    result.y = Math.floor((screenH / 2) - (result.h / 2));
+
     return result;
 };
 
@@ -286,6 +275,7 @@ $v.controller.setBuffer = function(){
 document.addEventListener('DOMContentLoaded', function(){
 
 $v.video  = document.getElementById("video");
+$v.player = document.getElementById("video-player");
 $v.screen = document.getElementById("video-screen");
 $v.screen.pos = $v.screen.getBoundingClientRect();
 
@@ -303,17 +293,13 @@ $v.controller.timeTotal     = document.getElementById("controller-time-total");
 $v.video.addEventListener('loadedmetadata', function(){
     if(!$v.isNotPosted){
         $v.comment.get();//コメントゲット(ここではなくもっと早く起動すべき)
+        $v.comment.laneBuild();
         document.getElementById("comment-form-input").disabled  = false;
         document.getElementById("comment-form-submit").disabled = false;
     }
     
-    //コントローラのバッファ位置セット
     $v.controller.setBuffer();
-    
-    //コントローラの時間セット
     $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
-
-    //ボリュームのシークセット
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
 
     //動画の位置セット
@@ -329,10 +315,7 @@ $v.video.addEventListener('loadedmetadata', function(){
 $v.video.addEventListener('timeupdate', function(){
     var sec_now = Math.floor($v.video.currentTime);
     if(sec_now !== $v.video.beforeTime){
-        //コントローラの現在時間セット
         $v.controller.setTime(sec_now, $v.controller.timeCurrent);
-        
-        //コントローラの時間シークセット
         $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, sec_now/$v.video.duration);
 
         //欄外のコメント削除
@@ -340,7 +323,7 @@ $v.video.addEventListener('timeupdate', function(){
 
         //コメント放出
         if(sec_now in $v.comment.list && $v.video.paused === false && $v.comment.display === true){
-            $v.comment.release($v.comment.list[sec_now], $v.comment.lane());
+            $v.comment.release($v.comment.list[sec_now], $v.comment.laneCheck());
         }
         
         $v.video.beforeTime = sec_now;
@@ -391,7 +374,7 @@ $v.video.addEventListener('dblclick', function(event){
 
 
 $v.video.addEventListener('error', function(){
-    //http://www.html5.jp/tag/elements/video.html
+    // http://www.html5.jp/tag/elements/video.html
 });
 
 
@@ -462,6 +445,50 @@ document.getElementById("controller-volume-seek").addEventListener('click', func
 });
 
 
+document.getElementById("controller-screen-toggle").addEventListener('click', function(){
+    if(!$v.screen.isFullScreen){
+        if     ($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
+        else if($v.screen.mozRequestFullscreen)   { $v.screen.mozRequestFullscreen(); }
+        else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
+        else if($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
+    }
+    else{
+        if     ($v.screen.webkitCancelFullScreen){ $v.screen.webkitCancelFullScreen(); }
+        else if($v.screen.mozCancelFullScreen)   { $v.screen.mozCancelFullScreen(); }
+        else if($v.screen.msExitFullscreen)      { $v.screen.msExitFullscreen(); }
+        else if($v.screen.cancelFullScreen)      { $v.screen.cancelFullScreen(); }
+    }
+});
+
+document.addEventListener("MSFullscreenChange",  function(){ $v.screen.fullscreenEvent(); });
+document.addEventListener("webkitfullscreenchan",function(){ $v.screen.fullscreenEvent(); });
+document.addEventListener("mozfullscreenchange", function(){ $v.screen.fullscreenEvent(); });
+document.addEventListener("fullscreenchange",    function(){ $v.screen.fullscreenEvent(); });
+
+
+$v.screen.fullscreenEvent = function(){
+    var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullScreenElement;
+    
+    if(element){
+        if(element.id != "video-screen"){ return; }
+
+        $v.screen.isFullScreen = true;
+        var pos = $v.getObjectPosition(screen.width, screen.height, $v.video.videoWidth, $v.video.videoHeight);
+        $v.video.setAttribute("width",  pos.w);
+        $v.video.setAttribute("height", pos.h);
+        $v.video.style.left = pos.x + "px";
+        $v.video.style.top  = pos.y + "px";
+        
+    }
+    else{
+        $v.screen.isFullScreen = false;
+        var pos = $v.getObjectPosition($v.screen.pos.right - $v.screen.pos.left, $v.screen.pos.bottom - $v.screen.pos.top, $v.video.videoWidth, $v.video.videoHeight);
+        $v.video.setAttribute("width",  pos.w);
+        $v.video.setAttribute("height", pos.h);
+        $v.video.style.left = pos.x + "px";
+        $v.video.style.top  = pos.y + "px";
+    }
+};
 
 
 
@@ -474,13 +501,12 @@ document.getElementById("controller-volume-seek").addEventListener('click', func
 
 
 $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
-.video-player{
-    width: 640px;
-    z-index: 10;
+.video{
+    position: absolute;
 }
 .video-screen{
     background-color: #000;
-    width: 100%;
+    width: 640px;
     height: 360px;
     overflow: hidden;
     white-space : nowrap;
@@ -499,7 +525,6 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     line-height: 1;
     color: white;
     text-decoration: none;
-    /*border-radius: 5px;*/
     background: #47494f;
     border-color: #2f3034 #2f3034 #232427;
     background-image: linear-gradient(to bottom, #55585f, #47494f 66%, #3d3f44);
@@ -577,7 +602,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 }
 
 .comment-form{
-    width: 640px;
+    width: 100%;
     position: absolute;
     top:29px;
 }
@@ -623,6 +648,12 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 
 }
 
+#video-screen:-ms-fullscreen{
+    position: absolute;
+    width :100%;
+    height :100%;
+}
+/*
 @keyframes lane0 {
 from{ transform: translate(640px, 0); }
 to{ transform: translate(-1280px, 0); }
@@ -671,5 +702,5 @@ to{ transform: translate(-1280px, 250px); }
 from{ transform: translate(640px, 275px); }
 to{ transform: translate(-1280px, 275px); }
 }
-
+*/
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━;
