@@ -38,13 +38,17 @@ function parts_player($video){
 
 
 $js=<<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+
 var $v = {};
 
-$v.comment = {};
-$v.comment.list = [];
-$v.comment.display = true;
+document.addEventListener('DOMContentLoaded', function(){
 
+$v.video  = document.getElementById("video");
+$v.screen = document.getElementById("video-screen");
+$v.comment = {};
 $v.controller = {};
+
+$v.screen.pos = $v.screen.getBoundingClientRect();
 $v.controller.parts = {
     play:       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAAAuklEQVQ4y2NsaGhgIBcwka0TRTN3cGF9fWEwz3niNbOgcvl0ijfoMDzb4ZV10tyQPGdLeWzbUF8Yyn3yPBmaIY7QKtm2oT7VioIAk3Ktr68vDBYgSzM0JPKxhiULMZqhJmCEJanxLOWBFBDE2wwFT3cGzDlhSLLmT1cm9q/9wMCAiH/iND/b3Tj7GKYwIc2frvVEVH3FkdrwaP50pTdu7RdDBtzpFLtmWKgQSN7omjFDBQ9gHASFARkAAAB5PwlcqrFmAAAAAElFTkSuQmCC",
     pause:      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAAAPElEQVQ4y2NsaGhgIBcwka2TgYGBhYGB4fhJq7nbXKVRJT5dmdi/9gMeKUptHtU8qnlUMxbAOGCFAUWaAUd8Eyn9ZkIkAAAAAElFTkSuQmCC",
@@ -54,6 +58,14 @@ $v.controller.parts = {
     commentoff: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAABHElEQVQ4y2NsaGhgIBcwka2TgYGBBVPo+EmBnhX5OnzIYp+u9Mat/WKIT/Nxi9Qd7lLY7ODTKd6gw8DA8Gx34+xj6M4+flIguLAeh04kIOVaX18YzHMeoRmbO/EAPp3iRRD9TAwMDAz5oUTrhOmPzIZqLtAl5Fos7tc2P3me6fhJARkekvUyMPDIODMwWZp/ePKFDM1fnuxlYGJgYLjy7hPJej99uALx856y+VdI0/7pyuyqr+aGTAwMDJbmH0oidj8lWuvTndDUxuzg4MDAwCAr8/jcwYM/1BxUePFrfLbDK3YzAzSdIpLn8ZMCwYV4dMESpjkihSOlbaSk8nRnwJwThgyEAFQzd3DhDohWqA2EdTIwMDAOWGFAkWYA9HtacJiFfLAAAAAASUVORK5CYII=",
     fullscreen: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAAA0klEQVQ4y2NsaGhgIBcwka2TgYGBhaCK4zyhq4q1+JCFnu1unH2MKJstv6yedeUT+c7+urZ/xzNyNZun1ntIkaUZrvPTlYk9qO5nIl5n/9oPX9f291z59PTyVMKaj5+0kuH5BNcJ9/+cE4YQNiMliQR7PJun1ntIfbrSG7f2iyEezVBnH+cR4D55HtWffDqR2YRtPn5SoGdFvk5x6A6vLIY5G5BDiHhnS3ls2wBhEaMTe2gTqRO7Zj6dUHOY/0nWzMAg5bFtGjH6KYpnigoDijQDAEFsWdMJ3UD+AAAAAElFTkSuQmCC"
 };
+$v.controller.timeSeekbar   = document.getElementById("controller-time-seekbar");
+$v.controller.timeSeeker    = document.getElementById("controller-time-seeker");
+$v.controller.volumeSeekbar = document.getElementById("controller-volume-seekbar");
+$v.controller.volumeSeeker  = document.getElementById("controller-volume-seeker");
+$v.controller.timeCurrent   = document.getElementById("controller-time-current");
+$v.controller.timeTotal     = document.getElementById("controller-time-total");
+$v.comment.list = [];
+$v.comment.display = true;
 
 
 
@@ -313,19 +325,31 @@ $v.controller.setBuffer = function(){
 };
 
 
-document.addEventListener('DOMContentLoaded', function(){
+$v.screen.fullscreenEvent = function(){
+    var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullScreenElement;
+    if(element){
+        if(element.id != "video-screen"){ return; }
 
-$v.video  = document.getElementById("video");
-$v.screen = document.getElementById("video-screen");
-$v.screen.pos = $v.screen.getBoundingClientRect();
-
-$v.controller.timeSeekbar   = document.getElementById("controller-time-seekbar");
-$v.controller.timeSeeker    = document.getElementById("controller-time-seeker");
-$v.controller.volumeSeekbar = document.getElementById("controller-volume-seekbar");
-$v.controller.volumeSeeker  = document.getElementById("controller-volume-seeker");
-$v.controller.timeCurrent   = document.getElementById("controller-time-current");
-$v.controller.timeTotal     = document.getElementById("controller-time-total");
-
+        $v.screen.isFullScreen = true;
+        var pos = $v.getObjectPosition(screen.width, screen.height, $v.video.videoWidth, $v.video.videoHeight);
+        $v.video.setAttribute("width",  pos.w);
+        $v.video.setAttribute("height", pos.h);
+        $v.video.style.left = pos.x + "px";
+        $v.video.style.top  = pos.y + "px";
+        
+        document.getElementById("video-screen").appendChild(document.getElementById("video-controller"));
+    }
+    else{
+        $v.screen.isFullScreen = false;
+        var pos = $v.getObjectPosition($v.screen.pos.right - $v.screen.pos.left, $v.screen.pos.bottom - $v.screen.pos.top, $v.video.videoWidth, $v.video.videoHeight);
+        $v.video.setAttribute("width",  pos.w);
+        $v.video.setAttribute("height", pos.h);
+        $v.video.style.left = pos.x + "px";
+        $v.video.style.top  = pos.y + "px";
+        document.getElementById("video-player").appendChild(document.getElementById("video-controller"));
+    }
+    $v.comment.clear();
+};
 
 
 
@@ -490,32 +514,6 @@ document.addEventListener("mozfullscreenchange",   function(){ $v.screen.fullscr
 document.addEventListener("fullscreenchange",      function(){ $v.screen.fullscreenEvent(); });
 
 
-$v.screen.fullscreenEvent = function(){
-    var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullScreenElement;
-    if(element){
-        if(element.id != "video-screen"){ return; }
-
-        $v.screen.isFullScreen = true;
-        var pos = $v.getObjectPosition(screen.width, screen.height, $v.video.videoWidth, $v.video.videoHeight);
-        $v.video.setAttribute("width",  pos.w);
-        $v.video.setAttribute("height", pos.h);
-        $v.video.style.left = pos.x + "px";
-        $v.video.style.top  = pos.y + "px";
-        
-        document.getElementById("video-screen").appendChild(document.getElementById("video-controller"));
-    }
-    else{
-        $v.screen.isFullScreen = false;
-        var pos = $v.getObjectPosition($v.screen.pos.right - $v.screen.pos.left, $v.screen.pos.bottom - $v.screen.pos.top, $v.video.videoWidth, $v.video.videoHeight);
-        $v.video.setAttribute("width",  pos.w);
-        $v.video.setAttribute("height", pos.h);
-        $v.video.style.left = pos.x + "px";
-        $v.video.style.top  = pos.y + "px";
-        document.getElementById("video-player").appendChild(document.getElementById("video-controller"));
-    }
-    $v.comment.clear();
-};
-
 
 
 
@@ -675,28 +673,28 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 }
 
 
-#video-screen:-ms-fullscreen{
+.video-screen:-ms-fullscreen{
     position: absolute;
     width: 100%;
     height: 100%;
 	left: 0;
  	top: 0;
 }
-#video-screen:-webkit-full-screen{
+.video-screen:-webkit-full-screen{
     position: absolute;
     width: 100%;
     height: 100%;
 	left: 0;
  	top: 0;
 }
-#video-screen:-moz-fullscreen{
+.video-screen:-moz-fullscreen{
     position: absolute;
     width: 100%;
     height: 100%;
 	left: 0;
  	top: 0;
 }
-#video-screen:fullscreen{
+.video-screen:fullscreen{
     position: absolute;
     width: 100%;
     height: 100%;
