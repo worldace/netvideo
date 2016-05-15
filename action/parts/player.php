@@ -535,7 +535,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 .video-controller{
     display: block;
     width: 640px;
-    height: 53px;
+    height: 54px;
     line-height: 1;
     color: white;
     text-decoration: none;
@@ -622,17 +622,16 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 }
 .comment-form-input{
     width: 80%;
-    height: 24px;
+    height: 25px;
     box-shadow: 3px 3px 3px rgba(200,200,200,0.2) inset;
     border: 1px solid #888888;
-    padding:6px 6px 3px 12px;
-    font-size:14px;
+    padding:4px 6px 3px 12px;
     vertical-align:middle;
     ime-mode: active;
 }
 .comment-form-submit{
     width: 20%;
-    height: 24px;
+    height: 25px;
     text-decoration: none;
     text-align: center;
     padding: 3px 15px 3px 15px;
