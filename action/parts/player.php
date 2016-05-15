@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
 $v.video  = document.getElementById("video");
 $v.screen = document.getElementById("video-screen");
+$v.controller = document.getElementById("video-controller");
 $v.comment = {};
-$v.controller = {};
 
 $v.screen.pos = $v.screen.getBoundingClientRect();
 $v.controller.parts = {
@@ -230,7 +230,7 @@ $v.comment.laneCheck = function(){
 
 
 $v.comment.get = function(){
-    var num = 1000;
+    var num = 2000;
     var id   = document.getElementById("comment-form-id").value;
     var path = document.getElementById("comment-form-path").value;
     var totaltime = Math.floor($v.video.duration);
@@ -280,13 +280,12 @@ $v.comment.post = function(){
 
 
 $v.controller.setSeeker = function(seekbar, seeker, percent){
-    var seekbarPos   = seekbar.getBoundingClientRect();
-    var seekerPos    = seeker.getBoundingClientRect();
-    var seekerWidth  = seekerPos.right - seekerPos.left;
-    var seekbarWidth = seekbarPos.right - seekbarPos.left - seekerWidth;
+    seekbar.pos = seekbar.getBoundingClientRect();
+    seeker.pos  = seeker.getBoundingClientRect();
+    var seekbarWidth = seekbar.pos.width - seeker.pos.width;
 
     //percentが割合の時(0-1) or percentがクリックされた位置の時
-    var pos = (percent <= 1) ? seekbarWidth*percent : percent-seekbarPos.left;
+    var pos = (percent <= 1) ? seekbarWidth*percent : percent-seekbar.pos.left;
 
     if(pos < 0){ pos = 0; }
     if(pos > seekbarWidth){ pos = seekbarWidth; }
@@ -297,9 +296,7 @@ $v.controller.setSeeker = function(seekbar, seeker, percent){
 
 
 $v.controller.setBuffer = function(){
-    var seekbarPos   = $v.controller.timeSeekbar.getBoundingClientRect();
-    var seekbarWidth = seekbarPos.right - seekbarPos.left;
-
+    var seekbarWidth = $v.controller.timeSeekbar.getBoundingClientRect().width;
     var buffer = $v.video.buffered;
 
     if(buffer.length == 1){
@@ -334,11 +331,18 @@ $v.screen.fullscreenEvent = function(){
         $v.screen.isFullScreen = true;
         $v.video.setPosition(screen.width, screen.height, $v.video.videoWidth, $v.video.videoHeight);
         document.getElementById("video-screen").appendChild(document.getElementById("video-controller"));
+        
+        var controller = $v.controller.getBoundingClientRect();
+        $v.controller.style.top  = screen.height - controller.height + "px";
+        $v.controller.style.left = (screen.width/2) - (controller.width/2)+ "px";
     }
     else{
         $v.screen.isFullScreen = false;
-        $v.video.setPosition($v.screen.pos.right - $v.screen.pos.left, $v.screen.pos.bottom - $v.screen.pos.top, $v.video.videoWidth, $v.video.videoHeight);
+        $v.video.setPosition($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
         document.getElementById("video-player").appendChild(document.getElementById("video-controller"));
+
+        $v.controller.style.top  = 0;
+        $v.controller.style.left = 0;
     }
     $v.comment.clear();
 };
@@ -355,11 +359,11 @@ $v.video.addEventListener('loadedmetadata', function(){
     }
     
     $v.controller.setBuffer();
-    $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
+    $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
 
     //動画の位置セット
-    $v.video.setPosition($v.screen.pos.right - $v.screen.pos.left, $v.screen.pos.bottom - $v.screen.pos.top, $v.video.videoWidth, $v.video.videoHeight);
+    $v.video.setPosition($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 });
 
 

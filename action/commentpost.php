@@ -1,4 +1,5 @@
 <?php
+
 //確認
 if(!自然数なら($_POST['id']))  { exit; }
 if(!自然数なら($_POST['path'])){ exit; }
