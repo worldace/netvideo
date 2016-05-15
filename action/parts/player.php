@@ -55,6 +55,62 @@ $v.controller.parts = {
     fullscreen: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAAA0klEQVQ4y2NsaGhgIBcwka2TgYGBhaCK4zyhq4q1+JCFnu1unH2MKJstv6yedeUT+c7+urZ/xzNyNZun1ntIkaUZrvPTlYk9qO5nIl5n/9oPX9f291z59PTyVMKaj5+0kuH5BNcJ9/+cE4YQNiMliQR7PJun1ntIfbrSG7f2iyEezVBnH+cR4D55HtWffDqR2YRtPn5SoGdFvk5x6A6vLIY5G5BDiHhnS3ls2wBhEaMTe2gTqRO7Zj6dUHOY/0nWzMAg5bFtGjH6KYpnigoDijQDAEFsWdMJ3UD+AAAAAElFTkSuQmCC"
 };
 
+
+
+$v.get = function(url, callback){
+    var xhr = new XMLHttpRequest();
+
+    xhr.open("GET", url);
+    xhr.addEventListener("load", function(){
+        if(xhr.status == 200) { callback(xhr); }
+    });
+    xhr.timeout = 30000;
+    xhr.send();
+};
+
+
+$v.post = function(url, param){
+    var body = "";
+
+    if(param instanceof FormData){
+        body = param;
+    }
+    else{
+        for(var key in param){
+            if(!param.hasOwnProperty(key)){ continue; }
+            body += encodeURIComponent(key) + "=" + encodeURIComponent(param[key]) + "&";
+        }
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+    xhr.timeout = 20000;
+    xhr.send(body);
+};
+
+
+$v.getObjectPosition = function(screenW, screenH, objectW, objectH){
+    var result  = {};
+    var screenR = screenW / screenH;
+    var objectR = objectW / objectH;
+    var scale;
+
+    if(screenR > 1){
+        scale = (objectR < screenR) ? screenH/objectH : screenW/objectW;
+    }
+    else{
+        scale = (objectR > screenR) ? screenW/objectW : screenH/objectH;
+    }
+    result.w = Math.floor(objectW * scale);
+    result.h = Math.floor(objectH * scale);
+    result.x = Math.floor((screenW / 2) - (result.w / 2));
+    result.y = Math.floor((screenH / 2) - (result.h / 2));
+
+    return result;
+};
+
+
 $v.comment.release = function(comments, lane){
     for(var i = 0; i < comments.length; i++){
         for(var j = 0; j < lane.length; j++){
@@ -179,61 +235,27 @@ $v.comment.get = function(){
             }
         }
     });
-}
-
-
-$v.getObjectPosition = function(screenW, screenH, objectW, objectH){
-    var result  = {};
-    var screenR = screenW / screenH;
-    var objectR = objectW / objectH;
-    var scale;
-
-    if(screenR > 1){
-        scale = (objectR < screenR) ? screenH/objectH : screenW/objectW;
-    }
-    else{
-        scale = (objectR > screenR) ? screenW/objectW : screenH/objectH;
-    }
-    result.w = Math.floor(objectW * scale);
-    result.h = Math.floor(objectH * scale);
-    result.x = Math.floor((screenW / 2) - (result.w / 2));
-    result.y = Math.floor((screenH / 2) - (result.h / 2));
-
-    return result;
 };
 
+$v.comment.post = function(){
+    var input = document.getElementById("comment-form-input");
+    var text  = input.value.trim();
+    var time  = $v.video.currentTime;
+    if(text == ""){ return; }
+    if(text.length > 64){ return; } //maxlength属性はどうしようか
+    
+    var formdata = new FormData(document.getElementById("comment-form"));
+    formdata.append("time", time);
+    $v.post('?action=commentpost', formdata);
 
-$v.get = function(url, callback){
-    var xhr = new XMLHttpRequest();
-
-    xhr.open("GET", url);
-    xhr.addEventListener("load", function(){
-        if(xhr.status == 200) { callback(xhr); }
-    });
-    xhr.timeout = 30000;
-    xhr.send();
-};
-
-
-$v.post = function(url, param){
-    var body = "";
-
-    if(param instanceof FormData){
-        body = param;
-    }
-    else{
-        for(var key in param){
-            if(!param.hasOwnProperty(key)){ continue; }
-            body += encodeURIComponent(key) + "=" + encodeURIComponent(param[key]) + "&";
-        }
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+    if(Math.floor(time+1) in $v.comment.list){
+        $v.comment.list[Math.floor(time+1)].unshift([text, time+1, Math.floor(Date.now()/1000)]);
     }
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', url);
-    xhr.timeout = 20000;
-    xhr.send(body);
+    input.value = "";
+    input.focus();
 };
+
 
 $v.controller.setSeeker = function(seekbar, seeker, percent){
     var seekbar_pos   = seekbar.getBoundingClientRect();
@@ -289,7 +311,6 @@ $v.controller.setBuffer = function(){
         $v.controller.timeSeekbar.style.backgroundSize = 0;
     }
 };
-
 
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -401,25 +422,7 @@ $v.video.addEventListener('error', function(){
 
 document.getElementById("comment-form").addEventListener('submit', function(event){
     event.preventDefault();
-
-    var input = document.getElementById("comment-form-input");
-    var text  = input.value.trim();
-    var time  = $v.video.currentTime;
-    if(text == ""){ return; }
-    if(text.length > 64){ return; } //maxlength属性はどうしようか
-    
-    var formdata = new FormData(this);
-    formdata.append("time", time);
-    $v.post('?action=commentpost', formdata);
-
-    if(Math.floor(time+1) in $v.comment.list){
-        $v.comment.list[Math.floor(time+1)].unshift([text, time+1, Math.floor(Date.now()/1000)]);
-    }
-
-    input.value = "";
-    input.focus();
-    
-    return false;
+    $v.comment.post();
 });
 
 
