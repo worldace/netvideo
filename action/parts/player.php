@@ -157,7 +157,7 @@ $v.comment.release = function(comments, lane){
     }
 };
 
-$v.comment.out = function(){
+$v.comment.gc = function(){
     var comments = $v.screen.querySelectorAll(".comment");
 
     for(var i = comments.length-1; i >= 0; i--){
@@ -307,18 +307,18 @@ $v.controller.setBuffer = function(){
         var endPos   = buffer.end(0)  / $v.video.duration * seekbarWidth;
         
         $v.controller.timeSeekbar.style.backgroundPosition = startPos + "px";
-        $v.controller.timeSeekbar.style.backgroundSize = endPos + "px";
+        $v.controller.timeSeekbar.style.backgroundSize     = endPos + "px";
     }
     else{ //複数バッファには非対応
         $v.controller.timeSeekbar.style.backgroundPosition = 0;
-        $v.controller.timeSeekbar.style.backgroundSize = 0;
+        $v.controller.timeSeekbar.style.backgroundSize     = 0;
     }
 };
 
 
 $v.controller.setTime = function(time, element){
-    var min = Math.floor(time/60);
-    var sec = Math.floor(time-min*60);
+    var min = Math.floor(time / 60);
+    var sec = Math.floor(time - min * 60);
 
     sec = ('0' + sec).slice(-2); //ゼロパディング(2桁)
     if(min < 100){ min = ('0' + min).slice(-2); }
@@ -368,7 +368,7 @@ $v.video.addEventListener('timeupdate', function(){
     if(sec_now !== $v.video.beforeTime){
         $v.controller.setTime(sec_now, $v.controller.timeCurrent);
         $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, sec_now/$v.video.duration);
-        $v.comment.out();
+        $v.comment.gc();
         //コメント放出
         if(sec_now in $v.comment.list && $v.video.paused === false && $v.comment.display === true){
             $v.comment.release($v.comment.list[sec_now], $v.comment.laneCheck());
