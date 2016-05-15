@@ -466,17 +466,19 @@ document.getElementById("controller-volume-seek").addEventListener('click', func
 
 
 document.getElementById("controller-screen-toggle").addEventListener('click', function(){
-    if(!$v.screen.isFullScreen){
+    var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullScreenElement;
+
+    if(!element){
         if     ($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
         else if($v.screen.mozRequestFullscreen)   { $v.screen.mozRequestFullscreen(); }
         else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
         else if($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
     }
     else{
-        if     ($v.screen.webkitCancelFullScreen){ $v.screen.webkitCancelFullScreen(); }
-        else if($v.screen.mozCancelFullScreen)   { $v.screen.mozCancelFullScreen(); }
-        else if($v.screen.msExitFullscreen)      { $v.screen.msExitFullscreen(); }
-        else if($v.screen.cancelFullScreen)      { $v.screen.cancelFullScreen(); }
+        if     (document.webkitCancelFullScreen){ document.webkitCancelFullScreen(); }
+        else if(document.mozCancelFullScreen)   { document.mozCancelFullScreen(); }
+        else if(document.msExitFullscreen)      { document.msExitFullscreen(); }
+        else if(document.cancelFullScreen)      { document.cancelFullScreen(); }
     }
 });
 
@@ -498,6 +500,7 @@ $v.screen.fullscreenEvent = function(){
         $v.video.style.left = pos.x + "px";
         $v.video.style.top  = pos.y + "px";
         
+        document.getElementById("video-screen").appendChild(document.getElementById("video-controller"));
     }
     else{
         $v.screen.isFullScreen = false;
@@ -506,6 +509,7 @@ $v.screen.fullscreenEvent = function(){
         $v.video.setAttribute("height", pos.h);
         $v.video.style.left = pos.x + "px";
         $v.video.style.top  = pos.y + "px";
+        document.getElementById("video-player").appendChild(document.getElementById("video-controller"));
     }
     $v.comment.clear();
 };
