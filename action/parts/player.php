@@ -125,15 +125,12 @@ $v.comment.laneBuild = function(){
     /* フルスクリーン用レーンCSS screen.width*screen.height 12レーン 各?px  */
     var height = Math.floor(screen.height * 0.8 / 12); //←ここが決め打ちすぎる。要熟考
     for(var i = 0; i < 12; i++){
-        var css = "";
+        css = "";
         css += "@keyframes fulllane" + i + "{";
         css += "from{transform:translate(" + screen.width + "px," + i*height + "px);}";
         css += "to{transform:translate(-" + screen.width*2 + "px," + i*height + "px);}}";
         document.styleSheets[0].insertRule(css, 0);
     }
-
-    /* フルスクリーン用コメントCSS */
-    var speed  = 1920 / 8; //1920pxを8秒掛けて移動(ノーマルレーン)
     
     css  = ".comment-full-lane{font-size:" + height + "px;}";
     document.styleSheets[0].insertRule(css, 0);
