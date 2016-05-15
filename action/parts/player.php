@@ -313,14 +313,14 @@ $v.controller.setBuffer = function(){
 };
 
 
-$v.controller.getTimeString = function(time){
+$v.controller.setTime = function(time, element){
     var min = Math.floor(time / 60);
     var sec = Math.floor(time - min * 60);
 
     sec = ('0' + sec).slice(-2); //ゼロパディング(2桁)
     if(min < 100){ min = ('0' + min).slice(-2); }
 
-    return min + ":" + sec;
+    element.textContent = min + ":" + sec;
 };
 
 
@@ -360,7 +360,7 @@ $v.video.addEventListener('loadedmetadata', function(){
     
     $v.controller.setBuffer();
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
-    $v.controller.timeTotal.textContent = $v.controller.getTimeString($v.video.duration);
+    $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
 
     //動画の位置セット
     $v.video.setPosition($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
@@ -370,7 +370,7 @@ $v.video.addEventListener('loadedmetadata', function(){
 $v.video.addEventListener('timeupdate', function(){
     var sec_now = Math.floor($v.video.currentTime);
     if(sec_now !== $v.video.beforeTime){
-        $v.controller.timeCurrent.textContent = $v.controller.getTimeString(sec_now);
+        $v.controller.setTime(sec_now, $v.controller.timeCurrent);
         $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, sec_now/$v.video.duration);
         $v.comment.gc();
         //コメント放出
