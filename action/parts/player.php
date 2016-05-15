@@ -460,15 +460,14 @@ document.getElementById("controller-screen-toggle").addEventListener('click', fu
     }
 });
 
-document.addEventListener("MSFullscreenChange",  function(){ $v.screen.fullscreenEvent(); });
-document.addEventListener("webkitfullscreenchan",function(){ $v.screen.fullscreenEvent(); });
-document.addEventListener("mozfullscreenchange", function(){ $v.screen.fullscreenEvent(); });
-document.addEventListener("fullscreenchange",    function(){ $v.screen.fullscreenEvent(); });
+document.addEventListener("MSFullscreenChange",    function(){ $v.screen.fullscreenEvent(); });
+document.addEventListener("webkitfullscreenchange",function(){ $v.screen.fullscreenEvent(); });
+document.addEventListener("mozfullscreenchange",   function(){ $v.screen.fullscreenEvent(); });
+document.addEventListener("fullscreenchange",      function(){ $v.screen.fullscreenEvent(); });
 
 
 $v.screen.fullscreenEvent = function(){
     var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullScreenElement;
-    
     if(element){
         if(element.id != "video-screen"){ return; }
 
@@ -650,8 +649,31 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 
 #video-screen:-ms-fullscreen{
     position: absolute;
-    width :100%;
-    height :100%;
+    width: 100%;
+    height: 100%;
+	left: 0;
+ 	top: 0;
+}
+#video-screen:-webkit-full-screen{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+	left: 0;
+ 	top: 0;
+}
+#video-screen:-moz-fullscreen{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+	left: 0;
+ 	top: 0;
+}
+#video-screen:fullscreen{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+	left: 0;
+ 	top: 0;
 }
 /*
 @keyframes lane0 {
