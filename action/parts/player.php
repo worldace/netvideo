@@ -49,6 +49,8 @@ $v.controller = document.getElementById("video-controller");
 $v.comment = {};
 
 $v.screen.pos = $v.screen.getBoundingClientRect();
+$v.screen.posDefault = $v.screen.pos.concat();
+
 $v.controller.parts = {
     play:       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAAAuklEQVQ4y2NsaGhgIBcwka0TRTN3cGF9fWEwz3niNbOgcvl0ijfoMDzb4ZV10tyQPGdLeWzbUF8Yyn3yPBmaIY7QKtm2oT7VioIAk3Ktr68vDBYgSzM0JPKxhiULMZqhJmCEJanxLOWBFBDE2wwFT3cGzDlhSLLmT1cm9q/9wMCAiH/iND/b3Tj7GKYwIc2frvVEVH3FkdrwaP50pTdu7RdDBtzpFLtmWKgQSN7omjFDBQ9gHASFARkAAAB5PwlcqrFmAAAAAElFTkSuQmCC",
     pause:      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAAAPElEQVQ4y2NsaGhgIBcwka2TgYGBhYGB4fhJq7nbXKVRJT5dmdi/9gMeKUptHtU8qnlUMxbAOGCFAUWaAUd8Eyn9ZkIkAAAAAElFTkSuQmCC",
@@ -197,7 +199,7 @@ $v.comment.laneBuild = function(){
         var css = "";
         css += "@keyframes lane" + i + "{";
         css += "from{transform:translate(640px," + i*25 + "px);}";
-        css += "to{transform:translate(-1280px," + i*25 + "px);}}";
+        css += "to{transform:translate(-3200px," + i*25 + "px);}}";
         document.styleSheets[0].insertRule(css, 0);
     }
     /* フルスクリーン用レーンCSS screen.width*screen.height 12レーン 各?px  */
@@ -206,7 +208,7 @@ $v.comment.laneBuild = function(){
         css = "";
         css += "@keyframes fulllane" + i + "{";
         css += "from{transform:translate(" + screen.width + "px," + i*height + "px);}";
-        css += "to{transform:translate(-" + screen.width*2 + "px," + i*height + "px);}}";
+        css += "to{transform:translate(-" + screen.width*5 + "px," + i*height + "px);}}";
         document.styleSheets[0].insertRule(css, 0);
     }
     
@@ -417,7 +419,7 @@ $v.video.addEventListener('progress', function(){
 
 $v.video.addEventListener('click', function(event){
     event.preventDefault();
-    $v.video.paused ? $v.video.play() : $v.video.pause();
+    //$v.video.paused ? $v.video.play() : $v.video.pause();
 });
 
 $v.video.addEventListener('dblclick', function(event){
@@ -652,10 +654,10 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     line-height: 1;
     z-index: 20;
     color: #fff;
-    text-shadow: -1px -1px #000, 1px -1px #000,	-1px 1px #000, 1px 1px #000;
+    text-shadow: -1px -1px #333, 1px -1px #333,	-1px 1px #333, 1px 1px #333;
     animation-fill-mode: forwards;
     animation-timing-function: linear;
-    animation-duration: 8s;
+    animation-duration: 16s;
 }
 .comment-normal-lane{
     font-size: 24px;
