@@ -49,7 +49,6 @@ $v.controller = document.getElementById("video-controller");
 $v.comment = {};
 
 $v.screen.pos = $v.screen.getBoundingClientRect();
-$v.screen.posDefault = $v.screen.pos.concat();
 
 $v.controller.parts = {
     play:       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAAAuklEQVQ4y2NsaGhgIBcwka0TRTN3cGF9fWEwz3niNbOgcvl0ijfoMDzb4ZV10tyQPGdLeWzbUF8Yyn3yPBmaIY7QKtm2oT7VioIAk3Ktr68vDBYgSzM0JPKxhiULMZqhJmCEJanxLOWBFBDE2wwFT3cGzDlhSLLmT1cm9q/9wMCAiH/iND/b3Tj7GKYwIc2frvVEVH3FkdrwaP50pTdu7RdDBtzpFLtmWKgQSN7omjFDBQ9gHASFARkAAAB5PwlcqrFmAAAAAElFTkSuQmCC",
@@ -223,7 +222,7 @@ $v.comment.laneCheck = function(){
     for(var i = 0; i < comments.length; i++){
         var comment_pos = comments[i].getBoundingClientRect();
 
-        if(comment_pos.right > $v.screen.pos.right){
+        if(comment_pos.right+150 > $v.screen.pos.right){
             lane[comments[i].getAttribute("data-lane")] = false;
         }
     }
@@ -327,6 +326,8 @@ $v.controller.setTime = function(time, element){
 
 
 $v.screen.fullscreenEvent = function(){
+    $v.screen.pos = $v.screen.getBoundingClientRect();
+
     var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullScreenElement;
     if(element){
         if(element.id != "video-screen"){ return; }
