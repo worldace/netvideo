@@ -489,7 +489,7 @@ document.getElementById("controller-screen-toggle").addEventListener('click', fu
 
     if(!element){
         if     ($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
-        else if($v.screen.mozRequestFullscreen)   { $v.screen.mozRequestFullscreen(); }
+        else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
         else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
         else if($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
     }
@@ -670,32 +670,12 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 }
 
 
-.video-screen:-ms-fullscreen{
+.video-screen:-ms-fullscreen, .video-screen:-webkit-full-screen, .video-screen:-moz-full-screen, .video-screen:fullscreen{
     position: absolute;
     width: 100%;
     height: 100%;
 	left: 0;
  	top: 0;
 }
-.video-screen:-webkit-full-screen{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-	left: 0;
- 	top: 0;
-}
-.video-screen:-moz-fullscreen{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-	left: 0;
- 	top: 0;
-}
-.video-screen:fullscreen{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-	left: 0;
- 	top: 0;
-}
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━;
