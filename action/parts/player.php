@@ -375,7 +375,7 @@ $v.video.addEventListener('timeupdate', function(){
     if(sec_now !== $v.video.beforeTime){
         $v.controller.setTime(sec_now, $v.controller.timeCurrent);
         $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, sec_now/$v.video.duration);
-        //$v.comment.gc();
+        $v.comment.gc();
         //コメント放出
         if(sec_now in $v.comment.list && $v.video.paused === false && $v.comment.on === true){
             $v.comment.release($v.comment.list[sec_now], $v.comment.laneCheck());
@@ -383,6 +383,10 @@ $v.video.addEventListener('timeupdate', function(){
         
         $v.video.beforeTime = sec_now;
     }
+});
+
+$v.video.addEventListener('canplaythrough', function(){
+    $v.video.play();
 });
 
 $v.video.addEventListener('seeking', function(){
@@ -628,6 +632,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     height: 25px;
     box-shadow: 3px 3px 3px rgba(200,200,200,0.2) inset;
     border: 1px solid #888888;
+    border-radius: 0;
     padding:4px 6px 3px 12px;
     vertical-align:middle;
     ime-mode: active;
@@ -643,6 +648,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     background-color: #5ba825;
     background: linear-gradient(to bottom, #84be5c 0%, #84be5c 50%, #5ba825 50%, #5ba825 100%);
     border: 1px solid #377d00;
+    border-radius: 0;
     line-height: 1;
     vertical-align: middle;
     font-family: 'MS PGothic', Meiryo, sans-serif;
@@ -651,6 +657,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 
 
 .comment{
+    font-family: 'MS PGothic', Meiryo, sans-serif;
     position: absolute;
     line-height: 1;
     z-index: 20;
