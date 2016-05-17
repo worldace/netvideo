@@ -279,7 +279,6 @@ $v.comment.post = function(){
     }
 
     input.value = "";
-    input.focus();
 };
 
 
