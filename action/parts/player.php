@@ -219,11 +219,14 @@ $v.comment.laneCheck = function(){
     var comments = $v.screen.querySelectorAll(".comment");
     var lane = [true,true,true,true,true,true,true,true,true,true,true,true];
 
-    for(var i = 0; i < comments.length; i++){
+    for(var i = comments.length-1; i >= 0; i--){
         var comment_pos = comments[i].getBoundingClientRect();
 
         if(comment_pos.right+100 > $v.screen.pos.right){
             lane[comments[i].getAttribute("data-lane")] = false;
+        }
+        if(comment_pos.right < $v.screen.pos.left){
+            $v.screen.removeChild(comments[i]);
         }
     }
     return lane;
@@ -375,7 +378,7 @@ $v.video.addEventListener('timeupdate', function(){
     if(sec_now !== $v.video.beforeTime){
         $v.controller.setTime(sec_now, $v.controller.timeCurrent);
         $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, sec_now/$v.video.duration);
-        $v.comment.gc();
+        //$v.comment.gc();
         //コメント放出
         if(sec_now in $v.comment.list && $v.video.paused === false && $v.comment.on === true){
             $v.comment.release($v.comment.list[sec_now], $v.comment.laneCheck());
