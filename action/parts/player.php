@@ -143,13 +143,13 @@ $v.comment.release = function(comments, lane){
             comment.textContent = comments[i][0];
             comment.classList.add('comment');
             comment.setAttribute("data-lane", j);
-            if(!$v.screen.isFullScreen){
-                comment.classList.add('comment-normal-lane');
-                comment.style.animationName = "lane" + j;
-            }
-            else{
+            if($v.screen.isFullscreen()){
                 comment.classList.add('comment-full-lane');
                 comment.style.animationName = "fulllane" + j;
+            }
+            else{
+                comment.classList.add('comment-normal-lane');
+                comment.style.animationName = "lane" + j;
             }
             $v.screen.insertBefore(comment, $v.screen.firstChild);
             lane[j] = false;
@@ -320,32 +320,38 @@ $v.controller.setTime = function(time, element){
     var min = Math.floor(time / 60);
     var sec = Math.floor(time - min * 60);
 
-    sec = ('0' + sec).slice(-2); //ゼロパディング(2桁)
-    if(min < 100){ min = ('0' + min).slice(-2); }
+    if(min < 10){ min = '0' + min; }
+    if(sec < 10){ sec = '0' + sec; }
 
     element.textContent = min + ":" + sec;
 };
 
+$v.screen.isFullscreen = function(){
+    var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullscreenElement;
+    return element ? true : false;
+};
+
+$v.screen.getFullscreenId = function(){
+    var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullscreenElement;
+    return element ? element.id : undefined
+};
 
 $v.screen.fullscreenEvent = function(){
     $v.screen.pos = $v.screen.getBoundingClientRect();
 
-    var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullscreenElement;
-    if(element){
-        if(element.id != "video-screen"){ return; }
-        $v.screen.isFullScreen = true;
+    if($v.screen.isFullscreen()){
+        if($v.screen.getFullscreenId() != "video-screen"){ return; }
         $v.video.setPosition(screen.width, screen.height, $v.video.videoWidth, $v.video.videoHeight);
-        document.getElementById("video-screen").appendChild(document.getElementById("video-controller"));
-        
+ 
+        $v.screen.appendChild($v.controller);
         var controller = $v.controller.getBoundingClientRect();
         $v.controller.style.top  = screen.height - controller.height + "px";
         $v.controller.style.left = (screen.width/2) - (controller.width/2)+ "px";
     }
     else{
-        $v.screen.isFullScreen = false;
         $v.video.setPosition($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
-        document.getElementById("video-player").appendChild(document.getElementById("video-controller"));
 
+        document.getElementById("video-player").appendChild($v.controller);
         $v.controller.style.top  = 0;
         $v.controller.style.left = 0;
     }
@@ -367,7 +373,6 @@ $v.video.addEventListener('loadedmetadata', function(){
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
     $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
 
-    //動画の位置セット
     $v.video.setPosition($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 });
 
@@ -485,9 +490,7 @@ document.getElementById("controller-volume-seek").addEventListener('click', func
 
 
 document.getElementById("controller-screen-toggle").addEventListener('click', function(){
-    var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullscreenElement;
-
-    if(!element){
+    if(!$v.screen.isFullscreen()){
         if     ($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
         else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
         else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
