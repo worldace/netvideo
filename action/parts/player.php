@@ -25,7 +25,7 @@ function parts_player($video){
 ><img id="controller-screen-toggle" class="controller-img" width="20" height="20" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABnRSTlMAgACAAIDTzS+jAAAA0klEQVQ4y2NsaGhgIBcwka2TgYGBhaCK4zyhq4q1+JCFnu1unH2MKJstv6yedeUT+c7+urZ/xzNyNZun1ntIkaUZrvPTlYk9qO5nIl5n/9oPX9f291z59PTyVMKaj5+0kuH5BNcJ9/+cE4YQNiMliQR7PJun1ntIfbrSG7f2iyEezVBnH+cR4D55HtWffDqR2YRtPn5SoGdFvk5x6A6vLIY5G5BDiHhnS3ls2wBhEaMTe2gTqRO7Zj6dUHOY/0nWzMAg5bFtGjH6KYpnigoDijQDAEFsWdMJ3UD+AAAAAElFTkSuQmCC"
 ></div
 ><form id="comment-form" class="comment-form" action="javascript:void 0"
-><input id="comment-form-input" class="comment-form-input" type="text" name="comment" value="" autocomplete="off" spellcheck="false" disabled
+><input id="comment-form-input" class="comment-form-input" type="text" name="comment" value="" autocomplete="off" spellcheck="false" maxlength="60" disabled
 ><input id="comment-form-submit" class="comment-form-submit" type="submit" value="コメントする" disabled
 ><input id="comment-form-id" type="hidden" name="id" value="{$video['動画ID']}"
 ><input id="comment-form-path" type="hidden" name="path" value="{$video['投稿時間']}"
@@ -158,18 +158,6 @@ $v.comment.release = function(comments, lane){
     }
 };
 
-$v.comment.gc = function(){
-    var comments = $v.screen.querySelectorAll(".comment");
-
-    for(var i = comments.length-1; i >= 0; i--){
-        var comment_pos = comments[i].getBoundingClientRect();
-
-        if(comment_pos.right < $v.screen.pos.left){
-            $v.screen.removeChild(comments[i]);
-        }
-    }
-};
-
 $v.comment.clear = function(){
     var comments = $v.screen.querySelectorAll(".comment");
     for(var i = comments.length-1; i >= 0; i--){
@@ -268,7 +256,7 @@ $v.comment.post = function(){
     var text  = input.value.trim();
     var time  = $v.video.currentTime;
     if(text == ""){ return; }
-    if(text.length > 64){ return; } //maxlength属性はどうしようか
+    if(text.length > 64){ return; }
     
     var formdata = new FormData(document.getElementById("comment-form"));
     formdata.append("time", time);
@@ -382,7 +370,6 @@ $v.video.addEventListener('timeupdate', function(){
     if(sec_now !== $v.video.beforeTime){
         $v.controller.setTime(sec_now, $v.controller.timeCurrent);
         $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, sec_now/$v.video.duration);
-        //$v.comment.gc();
         //コメント放出
         if(sec_now in $v.comment.list && $v.video.paused === false && $v.comment.on === true){
             $v.comment.release($v.comment.list[sec_now], $v.comment.laneCheck());
