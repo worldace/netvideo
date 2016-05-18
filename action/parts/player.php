@@ -330,7 +330,7 @@ $v.controller.setTime = function(time, element){
 $v.screen.fullscreenEvent = function(){
     $v.screen.pos = $v.screen.getBoundingClientRect();
 
-    var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullScreenElement;
+    var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullscreenElement;
     if(element){
         if(element.id != "video-screen"){ return; }
         $v.screen.isFullScreen = true;
@@ -485,7 +485,7 @@ document.getElementById("controller-volume-seek").addEventListener('click', func
 
 
 document.getElementById("controller-screen-toggle").addEventListener('click', function(){
-    var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullScreenElement;
+    var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullscreenElement;
 
     if(!element){
         if     ($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
@@ -497,7 +497,7 @@ document.getElementById("controller-screen-toggle").addEventListener('click', fu
         if     (document.webkitCancelFullScreen){ document.webkitCancelFullScreen(); }
         else if(document.mozCancelFullScreen)   { document.mozCancelFullScreen(); }
         else if(document.msExitFullscreen)      { document.msExitFullscreen(); }
-        else if(document.cancelFullScreen)      { document.cancelFullScreen(); }
+        else if(document.exitFullscreen)        { document.exitFullscreen(); }
     }
 });
 
