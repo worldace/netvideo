@@ -289,16 +289,12 @@ $v.controller.setBuffer = function(){
     var seekbarWidth = $v.controller.timeSeekbar.getBoundingClientRect().width;
     var buffer = $v.video.buffered;
 
-    if(buffer.length == 1){
+    if(buffer.length){
         var startPos = buffer.start(0) / $v.video.duration * seekbarWidth;
-        var endPos   = buffer.end(0)  / $v.video.duration * seekbarWidth;
+        var endPos   = buffer.end(buffer.length-1)  / $v.video.duration * seekbarWidth;
         
         $v.controller.timeSeekbar.style.backgroundPosition = startPos + "px";
         $v.controller.timeSeekbar.style.backgroundSize     = endPos + "px";
-    }
-    else{ //複数バッファには非対応
-        $v.controller.timeSeekbar.style.backgroundPosition = 0;
-        $v.controller.timeSeekbar.style.backgroundSize     = 0;
     }
 };
 
@@ -419,19 +415,18 @@ $v.video.addEventListener('dblclick', function(event){
     event.preventDefault();
 });
 
-
 $v.video.addEventListener('error', function(event){
     var error = event.target.error;
 
-    switch(error.code){
+    switch(error.code){ // http://www.html5.jp/tag/elements/video.html
         case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
             alert("動画を読み込めませんでした。\n動画ファイルが存在しないか、未サポートの形式です");
             break;
-        case error.MEDIA_ERR_NETWORK:
-            alert("動画のダウンロードが途中で失敗しました。\nネットワークエラーが発生しました");
-            break;
         case error.MEDIA_ERR_DECODE:
             alert("動画の再生が中止されました。\n動画ファイルが壊れているか、未サポートの形式です");
+            break;
+        case error.MEDIA_ERR_NETWORK:
+            alert("動画のダウンロードが途中で失敗しました。\nネットワークエラーが発生しました");
             break;
         case error.MEDIA_ERR_ABORTED:
             //alert("あなたがビデオ再生を中止しました");
@@ -440,9 +435,7 @@ $v.video.addEventListener('error', function(event){
             alert("未知のエラーが発生しました");
             break;
     }
-    // http://www.html5.jp/tag/elements/video.html
 });
-
 
 
 document.getElementById("comment-form").addEventListener('submit', function(event){
