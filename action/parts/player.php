@@ -107,13 +107,12 @@ $v.getObjectPosition = function(screenW, screenH, objectW, objectH){
     var result  = {};
     var screenR = screenW / screenH;
     var objectR = objectW / objectH;
-    var scale;
 
     if(screenR > 1){
-        scale = (objectR < screenR) ? screenH/objectH : screenW/objectW;
+        var scale = (objectR < screenR) ? screenH/objectH : screenW/objectW;
     }
     else{
-        scale = (objectR > screenR) ? screenW/objectW : screenH/objectH;
+        var scale = (objectR > screenR) ? screenW/objectW : screenH/objectH;
     }
     result.w = Math.floor(objectW * scale);
     result.h = Math.floor(objectH * scale);
@@ -190,7 +189,7 @@ $v.comment.laneBuild = function(){
         document.styleSheets[0].insertRule(css, 0);
     }
     /* フルスクリーン用レーンCSS screen.width*screen.height 12レーン 各?px  */
-    var height = Math.floor(screen.height * 0.8 / 12); //←ここが決め打ちすぎる。要熟考
+    var height = Math.floor(screen.height * 0.8 / 12); //←ここが決め打ちすぎる
     for(var i = 0; i < 12; i++){
         css = "";
         css += "@keyframes fulllane" + i + "{";
@@ -275,7 +274,7 @@ $v.controller.setSeeker = function(seekbar, seeker, percent){
     seeker.pos  = seeker.getBoundingClientRect();
     var seekbarWidth = seekbar.pos.width - seeker.pos.width;
 
-    //percentが割合の時(0-1) or percentがクリックされた位置の時
+    //percentは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
     var pos = (percent <= 1) ? seekbarWidth*percent : percent-seekbar.pos.left;
 
     if(pos < 0){ pos = 0; }
@@ -321,7 +320,7 @@ $v.screen.isFullscreen = function(){
 
 $v.screen.getFullscreenId = function(){
     var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullscreenElement;
-    return element ? element.id : undefined
+    return element ? element.id : undefined;
 };
 
 $v.screen.fullscreenEvent = function(){
@@ -351,7 +350,7 @@ $v.screen.fullscreenEvent = function(){
 
 $v.video.addEventListener('loadedmetadata', function(){
     if(!$v.isNotPosted){
-        $v.comment.get();//コメントゲット(ここではなくもっと早く起動すべき)
+        $v.comment.get();
         $v.comment.laneBuild();
         document.getElementById("comment-form-input").disabled  = false;
         document.getElementById("comment-form-submit").disabled = false;
@@ -414,7 +413,6 @@ $v.video.addEventListener('progress', function(){
 
 $v.video.addEventListener('click', function(event){
     event.preventDefault();
-    //$v.video.paused ? $v.video.play() : $v.video.pause();
 });
 
 $v.video.addEventListener('dblclick', function(event){
@@ -422,7 +420,26 @@ $v.video.addEventListener('dblclick', function(event){
 });
 
 
-$v.video.addEventListener('error', function(){
+$v.video.addEventListener('error', function(event){
+    var error = event.target.error;
+
+    switch(error.code){
+        case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            alert("動画を読み込めませんでした。\n動画ファイルが存在しないか、未サポートの形式です");
+            break;
+        case error.MEDIA_ERR_NETWORK:
+            alert("動画のダウンロードが途中で失敗しました。\nネットワークエラーが発生しました");
+            break;
+        case error.MEDIA_ERR_DECODE:
+            alert("動画の再生が中止されました。\n動画ファイルが壊れているか、未サポートの形式です");
+            break;
+        case error.MEDIA_ERR_ABORTED:
+            //alert("あなたがビデオ再生を中止しました");
+            break;
+        default:
+            alert("未知のエラーが発生しました");
+            break;
+    }
     // http://www.html5.jp/tag/elements/video.html
 });
 
