@@ -146,12 +146,12 @@ $v.comment.release = function(comments, lane){
             comment.setAttribute("data-lane", j);
             if($v.screen.isFullscreen()){
                 comment.classList.add('comment-full-lane');
-                comment.style.animationName = "fulllane" + j;
+                comment.style.animationName = "fulllane";
                 comment.style.top = $v.comment.laneFullHeight * j + "px";
             }
             else{
                 comment.classList.add('comment-normal-lane');
-                comment.style.animationName = "lane" + j;
+                comment.style.animationName = "normallane";
                 comment.style.top = $v.comment.laneNormalHeight * j + "px";
             }
             //ディレイ計算
@@ -190,22 +190,19 @@ $v.comment.run = function(){
 $v.comment.laneBuild = function(){
     
     /* 通常スクリーン用レーンCSS 640*360 12レーン、各25px */
-    for(var i = 0; i < 12; i++){
-        var css = "";
-        css += "@keyframes lane" + i + "{";
-        css += "from{transform:translate(0," + 0 + "px);}";
-        css += "to{transform:translate(-3200px," + 0 + "px);}}";
-        document.styleSheets[0].insertRule(css, 0);
-    }
+    var css = "";
+    css += "@keyframes normallane{";
+    css += "from{transform:translate(0,0);}";
+    css += "to{transform:translate(-3200px,0);}}";
+    document.styleSheets[0].insertRule(css, 0);
+
     /* フルスクリーン用レーンCSS screen.width*screen.height 12レーン 各?px  */
-    for(var i = 0; i < 12; i++){
-        css = "";
-        css += "@keyframes fulllane" + i + "{";
-        css += "from{transform:translate(0," + 0 + "px);}";
-        css += "to{transform:translate(-" + screen.width*5 + "px," + 0 + "px);}}";
-        document.styleSheets[0].insertRule(css, 0);
-    }
-    
+    css = "";
+    css += "@keyframes fulllane{";
+    css += "from{transform:translate(0,0);}";
+    css += "to{transform:translate(-" + screen.width*5 + "px,0);}}";
+    document.styleSheets[0].insertRule(css, 0);
+
     css  = ".comment-full-lane{font-size:" + $v.comment.laneFullHeight + "px;}";
     document.styleSheets[0].insertRule(css, 0);
 };
@@ -677,7 +674,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     text-shadow: -1px -1px #333, 1px -1px #333,	-1px 1px #333, 1px 1px #333;
     animation-fill-mode: forwards;
     animation-timing-function: linear;
-    animation-duration: 12.5s;
+    animation-duration: 14s;
 }
 .comment-normal-lane{
     font-size: 24px;
