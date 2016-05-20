@@ -68,7 +68,8 @@ $v.controller.parts = {
 $v.comment = {};
 $v.comment.list = [];
 $v.comment.on = true;
-
+$v.comment.laneNormalHeight = 25;
+$v.comment.laneFullHeight   = Math.floor(screen.height * 0.8 / 12);
 
 
 $v.get = function(url, callback){
@@ -145,11 +146,18 @@ $v.comment.release = function(comments, lane){
             if($v.screen.isFullscreen()){
                 comment.classList.add('comment-full-lane');
                 comment.style.animationName = "fulllane" + j;
+                comment.style.top = $v.comment.laneFullHeight * j + "px";
             }
             else{
                 comment.classList.add('comment-normal-lane');
                 comment.style.animationName = "lane" + j;
+                comment.style.top = $v.comment.laneNormalHeight * j + "px";
             }
+            //ディレイ計算
+            var delay = comments[i][1] - $v.video.currentTime;
+            delay = (delay <= 0) ? 0 : delay.toFixed(3)*1000; //ms変換
+            comment.style.animationDelay = delay + "ms";
+
             $v.screen.insertBefore(comment, $v.screen.firstChild);
             lane[j] = false;
             break;
@@ -184,21 +192,20 @@ $v.comment.laneBuild = function(){
     for(var i = 0; i < 12; i++){
         var css = "";
         css += "@keyframes lane" + i + "{";
-        css += "from{transform:translate(640px," + i*25 + "px);}";
-        css += "to{transform:translate(-3200px," + i*25 + "px);}}";
+        css += "from{transform:translate(0," + 0 + "px);}";
+        css += "to{transform:translate(-3200px," + 0 + "px);}}";
         document.styleSheets[0].insertRule(css, 0);
     }
     /* フルスクリーン用レーンCSS screen.width*screen.height 12レーン 各?px  */
-    var height = Math.floor(screen.height * 0.8 / 12); //←ここが決め打ちすぎる
     for(var i = 0; i < 12; i++){
         css = "";
         css += "@keyframes fulllane" + i + "{";
-        css += "from{transform:translate(" + screen.width + "px," + i*height + "px);}";
-        css += "to{transform:translate(-" + screen.width*5 + "px," + i*height + "px);}}";
+        css += "from{transform:translate(0," + 0 + "px);}";
+        css += "to{transform:translate(-" + screen.width*5 + "px," + 0 + "px);}}";
         document.styleSheets[0].insertRule(css, 0);
     }
     
-    css  = ".comment-full-lane{font-size:" + height + "px;}";
+    css  = ".comment-full-lane{font-size:" + $v.comment.laneFullHeight + "px;}";
     document.styleSheets[0].insertRule(css, 0);
 };
 
@@ -662,13 +669,14 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 .comment{
     font-family: 'MS PGothic', Meiryo, sans-serif;
     position: absolute;
+    left: 100%;
     line-height: 1;
     z-index: 20;
     color: #fff;
     text-shadow: -1px -1px #333, 1px -1px #333,	-1px 1px #333, 1px 1px #333;
     animation-fill-mode: forwards;
     animation-timing-function: linear;
-    animation-duration: 16s;
+    animation-duration: 12.5s;
 }
 .comment-normal-lane{
     font-size: 24px;
