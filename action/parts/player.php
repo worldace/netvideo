@@ -243,7 +243,7 @@ $v.comment.get = function(){
 
         //箱にコメントを詰める
         for(var i = 0; i < comments.length; i++){
-            var index = Math.floor(comments[i][1]);
+            var index = Math.floor(comments[i][1]/100);
             if(index >= 0 && index <= totaltime){
                 $v.comment.list[index].push(comments[i]);
             }
@@ -259,7 +259,7 @@ $v.comment.post = function(){
     if(text.length > 64){ return; }
     
     var formdata = new FormData(document.getElementById("comment-form"));
-    formdata.append("time", time);
+    formdata.append("time", time.toFixed(2)*100);
     $v.post('?action=commentpost', formdata);
 
     if(Math.floor(time+1) in $v.comment.list){

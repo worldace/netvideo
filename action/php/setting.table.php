@@ -38,7 +38,7 @@ $設定['テーブル定義:動画'] = array(
 $設定['テーブル定義:コメント'] = array(
 "コメントID"   => "integer primary key auto_increment",
 "コメント"     => "varchar(64) not null",
-"動画時間"     => "float unsigned not null",
+"動画時間"     => "integer unsigned not null",
 "投稿時間"     => "integer unsigned not null",
 );
 
