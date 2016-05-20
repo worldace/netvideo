@@ -305,6 +305,12 @@ function 自然数なら($num){
     else{ return false; }
 }
 
+function 整数なら($num){
+    if (preg_match("/^0$/", $num)){ return true; }
+    if (preg_match("/^[1-9][0-9]*$/", $num)){ return true; }
+    else{ return false; }
+}
+
 
 function h($str){
     if(!$str){ return; }

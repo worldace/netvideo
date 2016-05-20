@@ -3,7 +3,7 @@
 //確認
 if(!自然数なら($_POST['id']))  { exit; }
 if(!自然数なら($_POST['path'])){ exit; }
-if(!自然数なら($_POST['time'])){ exit; }
+if(!整数なら($_POST['time'])){ exit; }
 if($_POST['comment'] == ""){ exit; }
 if(mb_strlen($_POST['comment'], "UTF-8") > 64) { exit; }
 
