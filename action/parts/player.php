@@ -84,22 +84,21 @@ $v.get = function(url, callback){
 
 
 $v.post = function(url, param){
-    var body = "";
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+    xhr.timeout = 20000;
 
     if(param instanceof FormData){
-        body = param;
+        var body = param;
     }
     else{
+        var body = "";
         for(var key in param){
             if(!param.hasOwnProperty(key)){ continue; }
             body += encodeURIComponent(key) + "=" + encodeURIComponent(param[key]) + "&";
         }
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
     }
-
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', url);
-    xhr.timeout = 20000;
     xhr.send(body);
 };
 
