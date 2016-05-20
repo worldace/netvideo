@@ -135,6 +135,7 @@ $v.video.setPosition = function(screenW, screenH, objectW, objectH){
 
 
 $v.comment.release = function(comments, lane){
+    var time = $v.video.currentTime;
     for(var i = 0; i < comments.length; i++){
         for(var j = 0; j < lane.length; j++){
             if(lane[j] === false){ continue; }
@@ -154,7 +155,7 @@ $v.comment.release = function(comments, lane){
                 comment.style.top = $v.comment.laneNormalHeight * j + "px";
             }
             //ディレイ計算
-            var delay = comments[i][1] - $v.video.currentTime;
+            var delay = comments[i][1] - time;
             delay = (delay <= 0) ? 0 : delay.toFixed(3)*1000; //ms変換
             comment.style.animationDelay = delay + "ms";
 
