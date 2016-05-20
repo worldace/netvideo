@@ -44,12 +44,17 @@ var $v = {};
 document.addEventListener('DOMContentLoaded', function(){
 
 $v.video  = document.getElementById("video");
-$v.screen = document.getElementById("video-screen");
-$v.controller = document.getElementById("video-controller");
-$v.comment = {};
 
+$v.screen     = document.getElementById("video-screen");
 $v.screen.pos = $v.screen.getBoundingClientRect();
 
+$v.controller               = document.getElementById("video-controller");
+$v.controller.timeSeekbar   = document.getElementById("controller-time-seekbar");
+$v.controller.timeSeeker    = document.getElementById("controller-time-seeker");
+$v.controller.volumeSeekbar = document.getElementById("controller-volume-seekbar");
+$v.controller.volumeSeeker  = document.getElementById("controller-volume-seeker");
+$v.controller.timeCurrent   = document.getElementById("controller-time-current");
+$v.controller.timeTotal     = document.getElementById("controller-time-total");
 $v.controller.parts = {
     play:       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNTc2IDkyN2wtMTMyOCA3MzhxLTIzIDEzLTM5LjUgM3QtMTYuNS0zNnYtMTQ3MnEwLTI2IDE2LjUtMzZ0MzkuNSAzbDEzMjggNzM4cTIzIDEzIDIzIDMxdC0yMyAzMXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=",
     pause:      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNjY0IDE5MnYxNDA4cTAgMjYtMTkgNDV0LTQ1IDE5aC01MTJxLTI2IDAtNDUtMTl0LTE5LTQ1di0xNDA4cTAtMjYgMTktNDV0NDUtMTloNTEycTI2IDAgNDUgMTl0MTkgNDV6bS04OTYgMHYxNDA4cTAgMjYtMTkgNDV0LTQ1IDE5aC01MTJxLTI2IDAtNDUtMTl0LTE5LTQ1di0xNDA4cTAtMjYgMTktNDV0NDUtMTloNTEycTI2IDAgNDUgMTl0MTkgNDV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+",
@@ -60,12 +65,7 @@ $v.controller.parts = {
     fullscreen: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04ODMgMTA1NnEwIDEzLTEwIDIzbC0zMzIgMzMyIDE0NCAxNDRxMTkgMTkgMTkgNDV0LTE5IDQ1LTQ1IDE5aC00NDhxLTI2IDAtNDUtMTl0LTE5LTQ1di00NDhxMC0yNiAxOS00NXQ0NS0xOSA0NSAxOWwxNDQgMTQ0IDMzMi0zMzJxMTAtMTAgMjMtMTB0MjMgMTBsMTE0IDExNHExMCAxMCAxMCAyM3ptNzgxLTg2NHY0NDhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTE0NC0xNDQtMzMyIDMzMnEtMTAgMTAtMjMgMTB0LTIzLTEwbC0xMTQtMTE0cS0xMC0xMC0xMC0yM3QxMC0yM2wzMzItMzMyLTE0NC0xNDRxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDQ0OHEyNiAwIDQ1IDE5dDE5IDQ1eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg=="
 };
 
-$v.controller.timeSeekbar   = document.getElementById("controller-time-seekbar");
-$v.controller.timeSeeker    = document.getElementById("controller-time-seeker");
-$v.controller.volumeSeekbar = document.getElementById("controller-volume-seekbar");
-$v.controller.volumeSeeker  = document.getElementById("controller-volume-seeker");
-$v.controller.timeCurrent   = document.getElementById("controller-time-current");
-$v.controller.timeTotal     = document.getElementById("controller-time-total");
+$v.comment = {};
 $v.comment.list = [];
 $v.comment.on = true;
 
@@ -446,7 +446,7 @@ document.getElementById("comment-form").addEventListener('submit', function(even
     $v.comment.post();
 });
 
-document.getElementById("comment-form-input").addEventListener('focusin', function(event){
+document.getElementById("comment-form-input").addEventListener('focus', function(event){
     $v.video.pause();
 });
 
