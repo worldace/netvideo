@@ -145,14 +145,14 @@ $v.comment.release = function(comments, lane){
             comment.classList.add('comment');
             comment.setAttribute("data-lane", j);
             if($v.screen.isFullscreen()){
-                comment.classList.add('comment-full-lane');
                 comment.style.animationName = "fulllane";
                 comment.style.top = $v.comment.laneFullHeight * j + "px";
+                comment.style.fontSize = $v.comment.laneFullHeight-2 + "px";
             }
             else{
-                comment.classList.add('comment-normal-lane');
                 comment.style.animationName = "normallane";
                 comment.style.top = $v.comment.laneNormalHeight * j + "px";
+                comment.style.fontSize = $v.comment.laneNormalHeight-2 + "px";
             }
             //ディレイ計算
             var delay = comments[i][1] - time;
@@ -192,18 +192,15 @@ $v.comment.laneBuild = function(){
     /* 通常スクリーン用レーンCSS 640*360 12レーン、各25px */
     var css = "";
     css += "@keyframes normallane{";
-    css += "from{transform:translate(0,0);}";
-    css += "to{transform:translate(-3200px,0);}}";
+    css += "from{transform:translateX(0);}";
+    css += "to{transform:translateX(-3200px);}}";
     document.styleSheets[0].insertRule(css, 0);
 
     /* フルスクリーン用レーンCSS screen.width*screen.height 12レーン 各?px  */
     css = "";
     css += "@keyframes fulllane{";
-    css += "from{transform:translate(0,0);}";
-    css += "to{transform:translate(-" + screen.width*5 + "px,0);}}";
-    document.styleSheets[0].insertRule(css, 0);
-
-    css  = ".comment-full-lane{font-size:" + $v.comment.laneFullHeight + "px;}";
+    css += "from{transform:translateX(0);}";
+    css += "to{transform:translateX(-" + screen.width*5 + "px);}}";
     document.styleSheets[0].insertRule(css, 0);
 };
 
@@ -674,10 +671,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     text-shadow: -1px -1px #333, 1px -1px #333,	-1px 1px #333, 1px 1px #333;
     animation-fill-mode: forwards;
     animation-timing-function: linear;
-    animation-duration: 14s;
-}
-.comment-normal-lane{
-    font-size: 24px;
+    animation-duration: 15s;
 }
 
 
