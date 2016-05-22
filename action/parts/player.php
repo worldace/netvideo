@@ -359,6 +359,10 @@ $v.video.addEventListener('loadedmetadata', function(){
     $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
 
     $v.video.setPosition($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+});
+
+
+$v.video.addEventListener('canplaythrough', function(){
     $v.video.play();
 });
 
