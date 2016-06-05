@@ -8,8 +8,8 @@ ob_start();
 register_shutdown_function(function(){
     global $設定;
     if($設定['追加css'] or $設定['追加js']){
-        $css = implode($設定['追加css'], "\n");
-        $js  = implode($設定['追加js'], "\n");
+        $css = @implode($設定['追加css'], "\n");
+        $js  = @implode($設定['追加js'], "\n");
         $buf = ob_get_contents();
         ob_end_clean();
         
