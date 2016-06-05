@@ -104,7 +104,7 @@ $v.post = function(url, param){
 };
 
 
-$v.getObjectPosition = function(screenW, screenH, objectW, objectH){
+$v.objectFit = function(screenW, screenH, objectW, objectH){
     var result  = {};
     var screenR = screenW / screenH;
     var objectR = objectW / objectH;
@@ -124,8 +124,8 @@ $v.getObjectPosition = function(screenW, screenH, objectW, objectH){
 };
 
 
-$v.video.setPosition = function(screenW, screenH, objectW, objectH){
-    var pos = $v.getObjectPosition(screenW, screenH, objectW, objectH);
+$v.video.fit = function(screenW, screenH, objectW, objectH){
+    var pos = $v.objectFit(screenW, screenH, objectW, objectH);
 
     $v.video.setAttribute("width",  pos.w);
     $v.video.setAttribute("height", pos.h);
@@ -326,7 +326,7 @@ $v.screen.fullscreenEvent = function(){
 
     if($v.screen.isFullscreen()){
         if($v.screen.getFullscreenId() != "video-screen"){ return; }
-        $v.video.setPosition(screen.width, screen.height, $v.video.videoWidth, $v.video.videoHeight);
+        $v.video.fit(screen.width, screen.height, $v.video.videoWidth, $v.video.videoHeight);
  
         $v.screen.appendChild($v.controller);
         var controller = $v.controller.getBoundingClientRect();
@@ -334,7 +334,7 @@ $v.screen.fullscreenEvent = function(){
         $v.controller.style.left = (screen.width/2) - (controller.width/2)+ "px";
     }
     else{
-        $v.video.setPosition($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 
         document.getElementById("video-player").appendChild($v.controller);
         $v.controller.style.top  = 0;
@@ -358,7 +358,7 @@ $v.video.addEventListener('loadedmetadata', function(){
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
     $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
 
-    $v.video.setPosition($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+    $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 });
 
 
