@@ -2,6 +2,7 @@
 
 include('./setting.php');
 include('./action/php/function.php');
+include('./action/php/boot.php');
 
 switch($_GET['action']){
     case 'index'         : include('./action/index.php');         break;

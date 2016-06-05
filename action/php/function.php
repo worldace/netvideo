@@ -8,7 +8,6 @@
 
 function 部品(){
     global $設定;
-    static $実行記録;
     $css = $js = "";
 
     $引数   = func_get_args();
@@ -17,17 +16,10 @@ function 部品(){
     include_once("{$設定['actionディレクトリ']}/parts/{$部品名}.php");
     $html = call_user_func_array("parts_${部品名}", $引数);
     
-    if(!$実行記録[$部品名]){
-        $実行記録[$部品名] = true;
+    if($css){ $設定['追加css'][$部品名] = $css; }
+    if($js) { $設定['追加js'][$部品名]  = $js; }
 
-        if($css){ $css = "<style>\n{$css}\n</style>\n"; }
-        if($js) { $js  = "<script>\n{$js}\n</script>\n"; }
-
-        return $css . $html . $js;
-    }
-    else{
-        return $html;
-    }
+    return $html;
 }
 
 
