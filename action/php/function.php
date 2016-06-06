@@ -23,7 +23,7 @@ function 部品(){
 }
 
 
-function 部品初期化(){
+function 部品初期化(){ //部品()を使用する時は出力前に必ず部品初期化()を行うこと
     ob_start();
     register_shutdown_function(function(){
         global $設定;
