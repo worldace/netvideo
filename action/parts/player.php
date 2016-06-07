@@ -146,12 +146,12 @@ $v.comment.release = function(comments, lane){
             comment.setAttribute("data-lane", j);
             if($v.screen.isFullscreen()){
                 comment.style.animationName = "fulllane";
-                comment.style.top = $v.comment.laneFullHeight*j+$v.comment.laneFullHeight/5 + "px";
+                comment.style.top = $v.comment.laneFullHeight*j+$v.comment.laneFullHeight/6 + "px";
                 comment.style.fontSize = $v.comment.laneFullHeight*0.9 + "px";
             }
             else{
                 comment.style.animationName = "normallane";
-                comment.style.top = $v.comment.laneNormalHeight*j+$v.comment.laneNormalHeight/5 + "px";
+                comment.style.top = $v.comment.laneNormalHeight*j+$v.comment.laneNormalHeight/6 + "px";
                 comment.style.fontSize = $v.comment.laneNormalHeight*0.9 + "px";
             }
             //ディレイ計算
