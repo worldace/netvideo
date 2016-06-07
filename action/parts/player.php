@@ -312,12 +312,12 @@ $v.controller.setTime = function(time, element){
 };
 
 $v.screen.isFullscreen = function(){
-    var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullscreenElement;
+    var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
     return element ? true : false;
 };
 
 $v.screen.getFullscreenId = function(){
-    var element = document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.fullscreenElement;
+    var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
     return element ? element.id : undefined;
 };
 
@@ -499,23 +499,23 @@ document.getElementById("controller-volume-seek").addEventListener('click', func
 
 document.getElementById("controller-screen-toggle").addEventListener('click', function(){
     if(!$v.screen.isFullscreen()){
-        if     ($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
-        else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
+        if     ($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
         else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
-        else if($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
+        else if($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
+        else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
     }
     else{
-        if     (document.webkitCancelFullScreen){ document.webkitCancelFullScreen(); }
-        else if(document.mozCancelFullScreen)   { document.mozCancelFullScreen(); }
+        if     (document.exitFullscreen)        { document.exitFullscreen(); }
         else if(document.msExitFullscreen)      { document.msExitFullscreen(); }
-        else if(document.exitFullscreen)        { document.exitFullscreen(); }
+        else if(document.webkitCancelFullScreen){ document.webkitCancelFullScreen(); }
+        else if(document.mozCancelFullScreen)   { document.mozCancelFullScreen(); }
     }
 });
 
+document.addEventListener("fullscreenchange",      function(){ $v.screen.fullscreenEvent(); });
 document.addEventListener("MSFullscreenChange",    function(){ $v.screen.fullscreenEvent(); });
 document.addEventListener("webkitfullscreenchange",function(){ $v.screen.fullscreenEvent(); });
 document.addEventListener("mozfullscreenchange",   function(){ $v.screen.fullscreenEvent(); });
-document.addEventListener("fullscreenchange",      function(){ $v.screen.fullscreenEvent(); });
 
 
 
