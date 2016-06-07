@@ -318,7 +318,7 @@ $v.screen.isFullscreen = function(){
 
 $v.screen.getFullscreenId = function(){
     var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-    return element ? element.id : undefined;
+    return element.id;
 };
 
 $v.screen.fullscreenEvent = function(){
