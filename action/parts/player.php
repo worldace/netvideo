@@ -44,6 +44,7 @@ var $v = $v || {};
 document.addEventListener('DOMContentLoaded', function(){
 
 $v.video  = document.getElementById("video");
+$v.player = document.getElementById("video-player");
 
 $v.screen     = document.getElementById("video-screen");
 $v.screen.pos = $v.screen.getBoundingClientRect();
@@ -64,6 +65,9 @@ $v.controller.parts = {
     commentoff: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0xNzkyLDc5MnEwLDE3NCAtMTIwLDMyMS41dC0zMjYsMjMzdC00NTAsODUuNXEtNzAsMCAtMTQ1LC04cS0xOTgsMTc1IC00NjAsMjQycS00OSwxNCAtMTE0LDIycS0xNywyIC0zMC41LC05dC0xNy41LC0yOWwwLC0xcS0zLC00IC0wLjUsLTEydDIsLTEwdDQuNSwtOS41bDYsLTlsNywtOC41bDgsLTlxNywtOCAzMSwtMzQuNXQzNC41LC0zOHQzMSwtMzkuNXQzMi41LC01MXQyNywtNTl0MjYsLTc2cS0xNTcsLTg5IC0yNDcuNSwtMjIwdC05MC41LC0yODFxMCwtMTMwIDcxLC0yNDguNXQxOTEsLTIwNC41MDA3OTN0Mjg2LC0xMzYuNDk5Nzg2dDM0OCwtNTAuNDk5ODE3cTI0NCwwIDQ1MCw4NS40OTk2OHQzMjYsMjMzLjAwMDM4MXQxMjAsMzIxLjUwMDMzNnoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=",
     fullscreen: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04ODMgMTA1NnEwIDEzLTEwIDIzbC0zMzIgMzMyIDE0NCAxNDRxMTkgMTkgMTkgNDV0LTE5IDQ1LTQ1IDE5aC00NDhxLTI2IDAtNDUtMTl0LTE5LTQ1di00NDhxMC0yNiAxOS00NXQ0NS0xOSA0NSAxOWwxNDQgMTQ0IDMzMi0zMzJxMTAtMTAgMjMtMTB0MjMgMTBsMTE0IDExNHExMCAxMCAxMCAyM3ptNzgxLTg2NHY0NDhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTE0NC0xNDQtMzMyIDMzMnEtMTAgMTAtMjMgMTB0LTIzLTEwbC0xMTQtMTE0cS0xMC0xMC0xMC0yM3QxMC0yM2wzMzItMzMyLTE0NC0xNDRxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDQ0OHEyNiAwIDQ1IDE5dDE5IDQ1eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg=="
 };
+$v.controller.timeSeeker.isDragging   = false;
+$v.controller.volumeSeeker.isDragging = false;
+
 
 $v.comment = {};
 $v.comment.list = [];
@@ -336,7 +340,7 @@ $v.screen.fullscreenEvent = function(){
     else{
         $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 
-        document.getElementById("video-player").appendChild($v.controller);
+        $v.player.appendChild($v.controller);
         $v.controller.style.top  = 0;
         $v.controller.style.left = 0;
     }
@@ -371,7 +375,9 @@ $v.video.addEventListener('timeupdate', function(){
     var sec_now = Math.floor($v.video.currentTime);
     if(sec_now !== $v.video.beforeTime){
         $v.controller.setTime(sec_now, $v.controller.timeCurrent);
-        $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, sec_now/$v.video.duration);
+        if(!$v.controller.timeSeeker.isDragging){
+            $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, sec_now/$v.video.duration);
+        }
         //コメント放出
         if(sec_now in $v.comment.list && $v.video.paused === false && $v.comment.on === true){
             $v.comment.release($v.comment.list[sec_now], $v.comment.laneCheck());
@@ -444,6 +450,33 @@ $v.video.addEventListener('error', function(event){
     }
 });
 
+$v.controller.timeSeeker.addEventListener('mousedown', function(event){
+    $v.controller.timeSeeker.isDragging = true;
+});
+$v.controller.volumeSeeker.addEventListener('mousedown', function(event){
+    $v.controller.volumeSeeker.isDragging = true;
+});
+
+$v.player.addEventListener('mouseup', function(event){
+    if($v.controller.timeSeeker.isDragging){
+        $v.controller.timeSeeker.isDragging = false;
+        var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
+        $v.video.currentTime = $v.video.duration * percent;
+    }
+    else if($v.controller.volumeSeeker.isDragging){
+        $v.controller.volumeSeeker.isDragging = false;
+        var percent = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
+        $v.video.volume = percent;
+    }
+});
+$v.player.addEventListener('mousemove', function(event){
+    if($v.controller.timeSeeker.isDragging){
+        $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
+    }
+    else if($v.controller.volumeSeeker.isDragging){
+        $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
+    }
+});
 
 document.getElementById("comment-form").addEventListener('submit', function(event){
     event.preventDefault();
