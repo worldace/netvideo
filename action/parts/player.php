@@ -128,20 +128,6 @@ $v.objectFit = function(screenW, screenH, objectW, objectH){
 };
 
 
-$v.eventName = function(eventName){
-    switch(eventName){
-        case "mousedown":
-            return ("onmousedown" in window) ? "mousedown" : "touchstart";
-        case "mouseup":
-            return ("onmouseup" in window) ? "mouseup" : "touchend";
-        case "mousemove":
-            return ("onmousemove" in window) ? "mousemove" : "touchmove";
-        default:
-            return eventName;
-    }
-};
-
-
 $v.video.fit = function(screenW, screenH, objectW, objectH){
     var pos = $v.objectFit(screenW, screenH, objectW, objectH);
 
@@ -465,13 +451,13 @@ $v.video.addEventListener('error', function(event){
 });
 
 
-$v.controller.timeSeeker.addEventListener($v.eventName('mousedown'), function(event){
+$v.controller.timeSeeker.addEventListener('mousedown', function(event){
     $v.controller.timeSeeker.isDragging = true;
 });
-$v.controller.volumeSeeker.addEventListener($v.eventName('mousedown'), function(event){
+$v.controller.volumeSeeker.addEventListener('mousedown', function(event){
     $v.controller.volumeSeeker.isDragging = true;
 });
-$v.player.addEventListener($v.eventName('mouseup'), function(event){
+$v.player.addEventListener('mouseup', function(event){
     if($v.controller.timeSeeker.isDragging){
         $v.controller.timeSeeker.isDragging = false;
         var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
@@ -483,7 +469,7 @@ $v.player.addEventListener($v.eventName('mouseup'), function(event){
         $v.video.volume = percent;
     }
 });
-$v.player.addEventListener($v.eventName('mousemove'), function(event){
+$v.player.addEventListener('mousemove', function(event){
     if($v.controller.timeSeeker.isDragging){
         $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
     }
