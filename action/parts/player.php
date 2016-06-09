@@ -315,6 +315,11 @@ $v.controller.setTime = function(time, element){
     element.textContent = min + ":" + sec;
 };
 
+$v.controller.timeSeeker.mousemoveEvent = function(event, seek){
+    if(!$v.controller.timeSeeker.isDragging){ return; }
+    var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
+    if(seek){ $v.video.currentTime = $v.video.duration * percent; }
+};
 
 $v.controller.volumeSeeker.mousemoveEvent = function(event){
     if(!$v.controller.volumeSeeker.isDragging){ return; }
@@ -460,30 +465,25 @@ $v.video.addEventListener('error', function(event){
 
 $v.controller.timeSeeker.addEventListener('mousedown', function(event){
     $v.controller.timeSeeker.isDragging = true;
-    $v.controller.timeSeeker.mousemove = function(event){
-        if(!$v.controller.timeSeeker.isDragging){ return; }
-        $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
-    };
-    $v.player.addEventListener('mousemove', $v.controller.timeSeeker.mousemove);
+    document.addEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
 });
 
-$v.player.addEventListener('mouseup', function(event){
-    if(!$v.controller.timeSeeker.isDragging){ return; }
+document.addEventListener('mouseup', function(event){
+    $v.controller.timeSeeker.mousemoveEvent(event, true);
     $v.controller.timeSeeker.isDragging = false;
-    $v.player.removeEventListener('mousemove', $v.controller.timeSeeker.mousemove);
-    $v.video.currentTime = $v.video.duration * $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
+    document.removeEventListener('mousemove', $v.controller.timeSeeker.mousemove);
 });
 
 
 $v.controller.volumeSeeker.addEventListener('mousedown', function(event){
     $v.controller.volumeSeeker.isDragging = true;
-    $v.player.addEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
+    document.addEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
 });
 
-$v.player.addEventListener('mouseup', function(event){
+document.addEventListener('mouseup', function(event){
     $v.controller.volumeSeeker.mousemoveEvent(event);
     $v.controller.volumeSeeker.isDragging = false;
-    $v.player.removeEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
+    document.removeEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
 });
 
 
