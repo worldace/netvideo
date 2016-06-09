@@ -463,40 +463,6 @@ $v.video.addEventListener('error', function(event){
 });
 
 
-$v.controller.timeSeeker.addEventListener('mousedown', function(event){
-    $v.controller.timeSeeker.isDragging = true;
-    document.addEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
-});
-
-document.addEventListener('mouseup', function(event){
-    $v.controller.timeSeeker.mousemoveEvent(event, true);
-    $v.controller.timeSeeker.isDragging = false;
-    document.removeEventListener('mousemove', $v.controller.timeSeeker.mousemove);
-});
-
-
-$v.controller.volumeSeeker.addEventListener('mousedown', function(event){
-    $v.controller.volumeSeeker.isDragging = true;
-    document.addEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
-});
-
-document.addEventListener('mouseup', function(event){
-    $v.controller.volumeSeeker.mousemoveEvent(event);
-    $v.controller.volumeSeeker.isDragging = false;
-    document.removeEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
-});
-
-
-document.getElementById("comment-form").addEventListener('submit', function(event){
-    event.preventDefault();
-    $v.video.play();
-    $v.comment.post();
-});
-
-document.getElementById("comment-form-input").addEventListener('focus', function(event){
-    $v.video.pause();
-});
-
 document.getElementById("controller-play-toggle").addEventListener('click', function(){
     $v.video.paused ? $v.video.play() : $v.video.pause();
 });
@@ -531,11 +497,34 @@ document.getElementById("controller-time-seek").addEventListener('click', functi
 
 });
 
+$v.controller.timeSeeker.addEventListener('mousedown', function(event){
+    $v.controller.timeSeeker.isDragging = true;
+    document.addEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
+});
+
+document.addEventListener('mouseup', function(event){
+    $v.controller.timeSeeker.mousemoveEvent(event, true);
+    $v.controller.timeSeeker.isDragging = false;
+    document.removeEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
+});
+
 
 document.getElementById("controller-volume-seek").addEventListener('click', function(event){
     $v.video.muted = false;
     var percent = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
     $v.video.volume = percent;
+});
+
+
+$v.controller.volumeSeeker.addEventListener('mousedown', function(event){
+    $v.controller.volumeSeeker.isDragging = true;
+    document.addEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
+});
+
+document.addEventListener('mouseup', function(event){
+    $v.controller.volumeSeeker.mousemoveEvent(event);
+    $v.controller.volumeSeeker.isDragging = false;
+    document.removeEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
 });
 
 
@@ -560,6 +549,15 @@ document.addEventListener("webkitfullscreenchange",function(){ $v.screen.fullscr
 document.addEventListener("mozfullscreenchange",   function(){ $v.screen.fullscreenEvent(); });
 
 
+document.getElementById("comment-form").addEventListener('submit', function(event){
+    event.preventDefault();
+    $v.video.play();
+    $v.comment.post();
+});
+
+document.getElementById("comment-form-input").addEventListener('focus', function(event){
+    $v.video.pause();
+});
 
 
 
