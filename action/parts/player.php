@@ -315,6 +315,13 @@ $v.controller.setTime = function(time, element){
     element.textContent = min + ":" + sec;
 };
 
+
+$v.controller.volumeSeeker.mousemoveEvent = function(event){
+    if(!$v.controller.volumeSeeker.isDragging){ return; }
+    $v.video.volume = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
+};
+
+
 $v.screen.isFullscreen = function(){
     var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
     return element ? true : false;
@@ -453,30 +460,32 @@ $v.video.addEventListener('error', function(event){
 
 $v.controller.timeSeeker.addEventListener('mousedown', function(event){
     $v.controller.timeSeeker.isDragging = true;
+    $v.controller.timeSeeker.mousemove = function(event){
+        if(!$v.controller.timeSeeker.isDragging){ return; }
+        $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
+    };
+    $v.player.addEventListener('mousemove', $v.controller.timeSeeker.mousemove);
 });
+
+$v.player.addEventListener('mouseup', function(event){
+    if(!$v.controller.timeSeeker.isDragging){ return; }
+    $v.controller.timeSeeker.isDragging = false;
+    $v.player.removeEventListener('mousemove', $v.controller.timeSeeker.mousemove);
+    $v.video.currentTime = $v.video.duration * $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
+});
+
+
 $v.controller.volumeSeeker.addEventListener('mousedown', function(event){
     $v.controller.volumeSeeker.isDragging = true;
+    $v.player.addEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
 });
+
 $v.player.addEventListener('mouseup', function(event){
-    if($v.controller.timeSeeker.isDragging){
-        $v.controller.timeSeeker.isDragging = false;
-        var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
-        $v.video.currentTime = $v.video.duration * percent;
-    }
-    else if($v.controller.volumeSeeker.isDragging){
-        $v.controller.volumeSeeker.isDragging = false;
-        var percent = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
-        $v.video.volume = percent;
-    }
+    $v.controller.volumeSeeker.mousemoveEvent(event);
+    $v.controller.volumeSeeker.isDragging = false;
+    $v.player.removeEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
 });
-$v.player.addEventListener('mousemove', function(event){
-    if($v.controller.timeSeeker.isDragging){
-        $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
-    }
-    else if($v.controller.volumeSeeker.isDragging){
-        $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
-    }
-});
+
 
 document.getElementById("comment-form").addEventListener('submit', function(event){
     event.preventDefault();
