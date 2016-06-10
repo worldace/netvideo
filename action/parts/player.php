@@ -338,7 +338,7 @@ $v.screen.fullscreenEvent = function(){
         $v.screen.appendChild($v.controller);
         var controller = $v.controller.getBoundingClientRect();
         $v.controller.style.top  = screen.height - controller.height + "px";
-        $v.controller.style.left = (screen.width/2) - (controller.width/2)+ "px";
+        $v.controller.style.left = (screen.width/2) - (controller.width/2) + "px";
     }
     else{
         $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
