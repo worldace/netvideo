@@ -432,18 +432,19 @@ $v.video.addEventListener('dblclick', function(event){
 });
 
 $v.video.addEventListener('error', function(event){
+    var error = event.target.error;
 
-    switch(event.target.error.code){ // http://www.html5.jp/tag/elements/video.html
-        case MEDIA_ERR_SRC_NOT_SUPPORTED:
+    switch(error.code){ // http://www.html5.jp/tag/elements/video.html
+        case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
             alert("動画ファイルが存在しないか、未サポートの形式です");
             break;
-        case MEDIA_ERR_DECODE:
+        case error.MEDIA_ERR_DECODE:
             alert("動画ファイルが壊れているか、未サポートの形式です");
             break;
-        case MEDIA_ERR_NETWORK:
+        case error.MEDIA_ERR_NETWORK:
             alert("動画のダウンロードが途中で失敗しました");
             break;
-        case MEDIA_ERR_ABORTED:
+        case error.MEDIA_ERR_ABORTED:
             //alert("動画の再生が中止されました");
             break;
         default:
