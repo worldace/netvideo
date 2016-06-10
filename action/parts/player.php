@@ -43,7 +43,9 @@ var $v = $v || {};
 
 document.addEventListener('DOMContentLoaded', function(){
 
+
 $v.video  = document.getElementById("video");
+
 $v.player = document.getElementById("video-player");
 
 $v.screen     = document.getElementById("video-screen");
@@ -192,15 +194,12 @@ $v.comment.run = function(){
 };
 
 $v.comment.laneBuild = function(){
-    
-    /* 通常スクリーン用レーンCSS 640*360 12レーン、各25px */
     var css = "";
     css += "@keyframes normallane{";
     css += "from{transform:translateX(0);}";
     css += "to{transform:translateX(-3200px);}}";
     document.styleSheets[0].insertRule(css, 0);
 
-    /* フルスクリーン用レーンCSS screen.width*screen.height 12レーン 各?px  */
     css = "";
     css += "@keyframes fulllane{";
     css += "from{transform:translateX(0);}";
@@ -229,27 +228,22 @@ $v.comment.laneCheck = function(){
 $v.comment.get = function(){
     var id   = document.getElementById("comment-form-id").value;
     var path = document.getElementById("comment-form-path").value;
-    var totaltime = Math.floor($v.video.duration);
+    var time = Math.floor($v.video.duration);
+    var num  = time * 6; //コメント取得件数(num)
 
-    //動画時間＋1の箱を作成する [[], [], [], ...]
+    //動画時間＋1の箱を作成 [[], [], [], ...]
     $v.comment.list = []; 
-    for(var i = 0; i < totaltime+1; i++){
+    for(var i = 0; i < time+1; i++){
         $v.comment.list.push([]);
     }
 
-    //動画時間によって取得件数(num)を変化させる(適当)
-    var num = totaltime * 6;
-
     var url = "?action=commentget" + "&id=" + id + "&path=" + path + "&num=" + num + "&nocache=" + Date.now();
     $v.get(url, function(xhr){
-        //JSON変換
-        try{ var comments = JSON.parse(xhr.responseText); } catch(e){}
-        if(!comments){ return; }
+        try{ var comments = JSON.parse(xhr.responseText); } catch(e){ return; }
 
-        //箱にコメントを詰める
         for(var i = 0; i < comments.length; i++){
             var index = Math.floor(comments[i][1]/100);
-            if(index >= 0 && index <= totaltime){
+            if(index >= 0 && index <= time){
                 $v.comment.list[index].push(comments[i]);
             }
         }
@@ -260,8 +254,8 @@ $v.comment.post = function(){
     var input = document.getElementById("comment-form-input");
     var text  = input.value.trim();
     var time  = $v.video.currentTime;
-    if(text == ""){ return; }
-    if(text.length > 64){ return; }
+
+    if(text == "" || text.length > 64){ return; }
     
     var formdata = new FormData(document.getElementById("comment-form"));
     formdata.append("time", time.toFixed(2)*100);
@@ -441,19 +435,18 @@ $v.video.addEventListener('dblclick', function(event){
 });
 
 $v.video.addEventListener('error', function(event){
-    var error = event.target.error;
 
-    switch(error.code){ // http://www.html5.jp/tag/elements/video.html
-        case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+    switch(event.target.error.code){ // http://www.html5.jp/tag/elements/video.html
+        case MEDIA_ERR_SRC_NOT_SUPPORTED:
             alert("動画ファイルが存在しないか、未サポートの形式です");
             break;
-        case error.MEDIA_ERR_DECODE:
+        case MEDIA_ERR_DECODE:
             alert("動画ファイルが壊れているか、未サポートの形式です");
             break;
-        case error.MEDIA_ERR_NETWORK:
+        case MEDIA_ERR_NETWORK:
             alert("動画のダウンロードが途中で失敗しました");
             break;
-        case error.MEDIA_ERR_ABORTED:
+        case MEDIA_ERR_ABORTED:
             //alert("動画の再生が中止されました");
             break;
         default:
