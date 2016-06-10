@@ -354,7 +354,7 @@ $v.screen.fullscreenEvent = function(){
 
 
 $v.video.addEventListener('loadedmetadata', function(){
-    if(!$v.isNotPosted){
+    if(!$v.isUnregistered){
         $v.comment.get();
         $v.comment.laneBuild();
         document.getElementById("comment-form-input").disabled  = false;
@@ -375,18 +375,18 @@ $v.video.addEventListener('canplaythrough', function(){
 
 
 $v.video.addEventListener('timeupdate', function(){
-    var sec_now = Math.floor($v.video.currentTime);
-    if(sec_now !== $v.video.beforeTime){
-        $v.controller.setTime(sec_now, $v.controller.timeCurrent);
+    var sec = Math.floor($v.video.currentTime);
+    if(sec !== $v.video.prevSec){
+        $v.controller.setTime(sec, $v.controller.timeCurrent);
         if(!$v.controller.timeSeeker.isMoving){
-            $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, sec_now/$v.video.duration);
+            $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, $v.video.currentTime/$v.video.duration);
         }
         //コメント放出
-        if(sec_now in $v.comment.list && $v.video.paused === false && $v.comment.on === true){
-            $v.comment.release($v.comment.list[sec_now], $v.comment.laneCheck());
+        if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on === true){
+            $v.comment.release($v.comment.list[sec], $v.comment.laneCheck());
         }
         
-        $v.video.beforeTime = sec_now;
+        $v.video.prevSec = sec;
     }
 });
 
