@@ -39,10 +39,10 @@ function parts_player($video){
 
 $js=<<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
 
-var $v = $v || {};
 
 document.addEventListener('DOMContentLoaded', function(){
 
+var $v = $v || {};
 
 $v.video  = document.getElementById("video");
 
