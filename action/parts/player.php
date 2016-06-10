@@ -621,6 +621,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     margin: 0 3px;
     padding: 0;
     border: none;
+	cursor: pointer;
 }
 .controller-seek{
     display: inline-block;
@@ -694,6 +695,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     line-height: 1;
     vertical-align: middle;
     font-family: 'MS PGothic', Meiryo, sans-serif;
+	cursor: pointer;
 }
 
 
