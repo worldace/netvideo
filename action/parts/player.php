@@ -153,7 +153,7 @@ $v.comment.release = function(comments, lane){
             if($v.screen.isFullscreen()){
                 comment.style.animationName = "fulllane";
                 comment.style.top = $v.comment.laneFullHeight*j+$v.comment.laneFullHeight/6 + "px";
-                comment.style.fontSize = $v.comment.laneFullHeight*0.9 + "px";
+                comment.style.fontSize = $v.comment.laneFullHeight*0.8 + "px";
             }
             else{
                 comment.style.animationName = "normallane";
@@ -709,6 +709,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     animation-fill-mode: forwards;
     animation-timing-function: linear;
     animation-duration: 15s;
+    opacity: 0.8;
 }
 
 
