@@ -330,11 +330,11 @@ $v.screen.getFullscreenId = function(){
 };
 
 $v.screen.fullscreenEvent = function(){
-    $v.screen.pos = $v.screen.getBoundingClientRect();
-
     if($v.screen.isFullscreen()){
         if($v.screen.getFullscreenId() != "video-screen"){ return; }
-        $v.video.fit(screen.width, screen.height, $v.video.videoWidth, $v.video.videoHeight);
+
+        $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11でheightが正常に取得できないので手動設定
+        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
  
         $v.screen.appendChild($v.controller);
         var controller = $v.controller.getBoundingClientRect();
@@ -342,6 +342,7 @@ $v.screen.fullscreenEvent = function(){
         $v.controller.style.left = (screen.width/2) - (controller.width/2) + "px";
     }
     else{
+        $v.screen.pos = $v.screen.getBoundingClientRect();
         $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 
         $v.player.appendChild($v.controller);
@@ -708,7 +709,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     text-shadow: -1px -1px #333, 1px -1px #333,	-1px 1px #333, 1px 1px #333;
     animation-fill-mode: forwards;
     animation-timing-function: linear;
-    animation-duration: 15s;
+    animation-duration: 16s;
     opacity: 0.8;
 }
 
