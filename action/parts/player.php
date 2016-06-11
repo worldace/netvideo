@@ -333,9 +333,9 @@ $v.screen.fullscreenEvent = function(){
     if($v.screen.isFullscreen()){
         if($v.screen.getFullscreenId() != "video-screen"){ return; }
 
-        $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11でheightが正常に取得できないので手動設定
+        $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
         $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
- 
+
         $v.screen.appendChild($v.controller);
         var controller = $v.controller.getBoundingClientRect();
         $v.controller.style.top  = screen.height - controller.height + "px";
