@@ -383,7 +383,7 @@ $v.video.addEventListener('loadedmetadata', function(){
         document.getElementById("comment-form-input").disabled  = false;
         document.getElementById("comment-form-submit").disabled = false;
     }
-    
+
     $v.controller.setBuffer();
     $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
 
@@ -509,12 +509,14 @@ document.getElementById("controller-comment-toggle").addEventListener('click', f
 
 
 document.getElementById("controller-time-seek").addEventListener('click', function(event){
+    if(!$v.video.duration){ return; }
     var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
     $v.video.currentTime = $v.video.duration * percent;
 
 });
 
 $v.controller.timeSeeker.addEventListener('mousedown', function(event){
+    if(!$v.video.duration){ return; }
     $v.controller.timeSeeker.isMoving = true;
     document.addEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
     document.addEventListener('mouseup', function mouseupEvent(event){
@@ -734,7 +736,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     animation-fill-mode: forwards;
     animation-timing-function: linear;
     animation-duration: 17s;
-    opacity: 0.7;
+    opacity: 0.75;
 }
 
 
