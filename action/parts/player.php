@@ -109,6 +109,19 @@ $v.post = function(url, param){
     xhr.send(body);
 };
 
+$v.deparam = function(str){
+    if(!(typeof str === 'string' || str instanceof String)){ return {}; }
+    str = str.replace(/^\?/, "");
+    var result = {};
+    var query  = str.split('&');
+    for(var i = 0; i < query.length; i++){
+        var name  = decodeURIComponent(query[i].split('=')[0]);
+        var value = decodeURIComponent(query[i].split('=')[1]);
+        result[name] = value;
+    }
+    return result;
+};
+
 $v.save = function(name, value){
     try{ window.localStorage.setItem(name, value); } catch(e){}
 };
