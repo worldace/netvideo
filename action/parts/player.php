@@ -52,12 +52,18 @@ $v.screen     = document.getElementById("video-screen");
 $v.screen.pos = $v.screen.getBoundingClientRect();
 
 $v.controller               = document.getElementById("video-controller");
+$v.controller.timeSeek      = document.getElementById("controller-time-seek");
 $v.controller.timeSeekbar   = document.getElementById("controller-time-seekbar");
 $v.controller.timeSeeker    = document.getElementById("controller-time-seeker");
+$v.controller.volumeSeek    = document.getElementById("controller-volume-seek");
 $v.controller.volumeSeekbar = document.getElementById("controller-volume-seekbar");
 $v.controller.volumeSeeker  = document.getElementById("controller-volume-seeker");
 $v.controller.timeCurrent   = document.getElementById("controller-time-current");
 $v.controller.timeTotal     = document.getElementById("controller-time-total");
+$v.controller.playToggle    = document.getElementById("controller-play-toggle");
+$v.controller.volumeToggle  = document.getElementById("controller-volume-toggle");
+$v.controller.commentToggle = document.getElementById("controller-comment-toggle");
+$v.controller.screenToggle  = document.getElementById("controller-screen-toggle");
 $v.controller.parts = {
     play:       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNTc2IDkyN2wtMTMyOCA3MzhxLTIzIDEzLTM5LjUgM3QtMTYuNS0zNnYtMTQ3MnEwLTI2IDE2LjUtMzZ0MzkuNSAzbDEzMjggNzM4cTIzIDEzIDIzIDMxdC0yMyAzMXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=",
     pause:      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNjY0IDE5MnYxNDA4cTAgMjYtMTkgNDV0LTQ1IDE5aC01MTJxLTI2IDAtNDUtMTl0LTE5LTQ1di0xNDA4cTAtMjYgMTktNDV0NDUtMTloNTEycTI2IDAgNDUgMTl0MTkgNDV6bS04OTYgMHYxNDA4cTAgMjYtMTkgNDV0LTQ1IDE5aC01MTJxLTI2IDAtNDUtMTl0LTE5LTQ1di0xNDA4cTAtMjYgMTktNDV0NDUtMTloNTEycTI2IDAgNDUgMTl0MTkgNDV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+",
@@ -68,13 +74,16 @@ $v.controller.parts = {
     fullscreen: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04ODMgMTA1NnEwIDEzLTEwIDIzbC0zMzIgMzMyIDE0NCAxNDRxMTkgMTkgMTkgNDV0LTE5IDQ1LTQ1IDE5aC00NDhxLTI2IDAtNDUtMTl0LTE5LTQ1di00NDhxMC0yNiAxOS00NXQ0NS0xOSA0NSAxOWwxNDQgMTQ0IDMzMi0zMzJxMTAtMTAgMjMtMTB0MjMgMTBsMTE0IDExNHExMCAxMCAxMCAyM3ptNzgxLTg2NHY0NDhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTE0NC0xNDQtMzMyIDMzMnEtMTAgMTAtMjMgMTB0LTIzLTEwbC0xMTQtMTE0cS0xMC0xMC0xMC0yM3QxMC0yM2wzMzItMzMyLTE0NC0xNDRxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDQ0OHEyNiAwIDQ1IDE5dDE5IDQ1eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==",
     setting:    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMTUyIDg5NnEwLTEwNi03NS0xODF0LTE4MS03NS0xODEgNzUtNzUgMTgxIDc1IDE4MSAxODEgNzUgMTgxLTc1IDc1LTE4MXptNTEyLTEwOXYyMjJxMCAxMi04IDIzdC0yMCAxM2wtMTg1IDI4cS0xOSA1NC0zOSA5MSAzNSA1MCAxMDcgMTM4IDEwIDEyIDEwIDI1dC05IDIzcS0yNyAzNy05OSAxMDh0LTk0IDcxcS0xMiAwLTI2LTlsLTEzOC0xMDhxLTQ0IDIzLTkxIDM4LTE2IDEzNi0yOSAxODYtNyAyOC0zNiAyOGgtMjIycS0xNCAwLTI0LjUtOC41dC0xMS41LTIxLjVsLTI4LTE4NHEtNDktMTYtOTAtMzdsLTE0MSAxMDdxLTEwIDktMjUgOS0xNCAwLTI1LTExLTEyNi0xMTQtMTY1LTE2OC03LTEwLTctMjMgMC0xMiA4LTIzIDE1LTIxIDUxLTY2LjV0NTQtNzAuNXEtMjctNTAtNDEtOTlsLTE4My0yN3EtMTMtMi0yMS0xMi41dC04LTIzLjV2LTIyMnEwLTEyIDgtMjN0MTktMTNsMTg2LTI4cTE0LTQ2IDM5LTkyLTQwLTU3LTEwNy0xMzgtMTAtMTItMTAtMjQgMC0xMCA5LTIzIDI2LTM2IDk4LjUtMTA3LjV0OTQuNS03MS41cTEzIDAgMjYgMTBsMTM4IDEwN3E0NC0yMyA5MS0zOCAxNi0xMzYgMjktMTg2IDctMjggMzYtMjhoMjIycTE0IDAgMjQuNSA4LjV0MTEuNSAyMS41bDI4IDE4NHE0OSAxNiA5MCAzN2wxNDItMTA3cTktOSAyNC05IDEzIDAgMjUgMTAgMTI5IDExOSAxNjUgMTcwIDcgOCA3IDIyIDAgMTItOCAyMy0xNSAyMS01MSA2Ni41dC01NCA3MC41cTI2IDUwIDQxIDk4bDE4MyAyOHExMyAyIDIxIDEyLjV0OCAyMy41eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg=="
 };
-$v.controller.timeSeeker.isMoving = false;
 
 $v.comment = {};
 $v.comment.list = [];
 $v.comment.on = true;
 $v.comment.laneNormalHeight = 25;
 $v.comment.laneFullHeight   = Math.floor(screen.height * 0.8 / 12);
+
+$v.form        = document.getElementById("comment-form");
+$v.form.input  = document.getElementById("comment-form-input");
+$v.form.submit = document.getElementById("comment-form-submit");
 
 
 
@@ -85,8 +94,8 @@ $v.video.addEventListener('loadedmetadata', function(){
     if(!$v.isUnregistered){
         $v.comment.get();
         $v.comment.laneBuild();
-        document.getElementById("comment-form-input").disabled  = false;
-        document.getElementById("comment-form-submit").disabled = false;
+        $v.form.input.disabled  = false;
+        $v.form.submit.disabled = false;
     }
 
     $v.controller.setBuffer();
@@ -128,21 +137,21 @@ $v.video.addEventListener('ended', function(){
 
 $v.video.addEventListener('pause', function(){
     $v.comment.pause();
-    document.getElementById("controller-play-toggle").setAttribute("src", $v.controller.parts.play);
+    $v.controller.playToggle.setAttribute("src", $v.controller.parts.play);
 });
 
 $v.video.addEventListener('play', function(){
     $v.comment.run();
-    document.getElementById("controller-play-toggle").setAttribute("src", $v.controller.parts.pause);
+    $v.controller.playToggle.setAttribute("src", $v.controller.parts.pause);
 });
 
 $v.video.addEventListener('volumechange', function(){
     if(!$v.video.volume || $v.video.muted){
-        document.getElementById("controller-volume-toggle").setAttribute("src", $v.controller.parts.mute);
+        $v.controller.volumeToggle.setAttribute("src", $v.controller.parts.mute);
         $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, 0);
     }
     else{
-        document.getElementById("controller-volume-toggle").setAttribute("src", $v.controller.parts.volume);
+        $v.controller.volumeToggle.setAttribute("src", $v.controller.parts.volume);
         $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
         $v.save("volume", $v.video.volume);
     }
@@ -182,11 +191,11 @@ $v.video.addEventListener('error', function(event){
     }
 });
 
-document.getElementById("controller-play-toggle").addEventListener('click', function(){
+$v.controller.playToggle.addEventListener('click', function(){
     $v.video.paused ? $v.video.play() : $v.video.pause();
 });
 
-document.getElementById("controller-volume-toggle").addEventListener('click', function(){
+$v.controller.volumeToggle.addEventListener('click', function(){
     if($v.video.muted){
         $v.video.muted = false;
         $v.video.volume = 0.5;
@@ -196,7 +205,7 @@ document.getElementById("controller-volume-toggle").addEventListener('click', fu
     }
 });
 
-document.getElementById("controller-comment-toggle").addEventListener('click', function(){
+$v.controller.commentToggle.addEventListener('click', function(){
     if($v.comment.on){
         $v.comment.on = false;
         $v.comment.clear();
@@ -208,7 +217,7 @@ document.getElementById("controller-comment-toggle").addEventListener('click', f
     }
 });
 
-document.getElementById("controller-time-seek").addEventListener('click', function(event){
+$v.controller.timeSeek.addEventListener('click', function(event){
     if(!$v.video.duration){ return; }
     var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
     $v.video.currentTime = $v.video.duration * percent;
@@ -227,10 +236,9 @@ $v.controller.timeSeeker.addEventListener('mousedown', function(event){
     });
 });
 
-document.getElementById("controller-volume-seek").addEventListener('click', function(event){
+$v.controller.volumeSeek.addEventListener('click', function(event){
     $v.video.muted = false;
-    var percent = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
-    $v.video.volume = percent;
+    $v.video.volume = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
 });
 
 
@@ -242,7 +250,7 @@ $v.controller.volumeSeeker.addEventListener('mousedown', function(event){
     });
 });
 
-document.getElementById("controller-screen-toggle").addEventListener('click', function(){
+$v.controller.screenToggle.addEventListener('click', function(){
     if(!$v.screen.isFullscreen()){
         if     ($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
         else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
@@ -262,13 +270,13 @@ document.addEventListener("MSFullscreenChange",    function(){ $v.screen.fullscr
 document.addEventListener("webkitfullscreenchange",function(){ $v.screen.fullscreenEvent(); });
 document.addEventListener("mozfullscreenchange",   function(){ $v.screen.fullscreenEvent(); });
 
-document.getElementById("comment-form").addEventListener('submit', function(event){
+$v.form.addEventListener('submit', function(event){
     event.preventDefault();
     $v.video.play();
     $v.comment.post();
 });
 
-document.getElementById("comment-form-input").addEventListener('focus', function(event){
+$v.form.input.addEventListener('focus', function(event){
     $v.video.pause();
 });
 
@@ -429,13 +437,12 @@ $v.comment.get = function(){
 };
 
 $v.comment.post = function(){
-    var input = document.getElementById("comment-form-input");
-    var text  = input.value.trim();
+    var text  = $v.form.input.value.trim();
     var time  = $v.video.currentTime;
 
     if(text == "" || text.length > 64){ return; }
     
-    var formdata = new FormData(document.getElementById("comment-form"));
+    var formdata = new FormData($v.form);
     formdata.append("time", time.toFixed(2)*100);
     $v.post('?action=commentpost', formdata);
 
@@ -443,7 +450,17 @@ $v.comment.post = function(){
         $v.comment.list[Math.floor(time+1)].unshift([text, time+1, Math.floor(Date.now()/1000)]);
     }
 
-    input.value = "";
+    $v.form.input.value = "";
+};
+
+$v.controller.setTime = function(time, element){
+    var min = Math.floor(time / 60);
+    var sec = Math.floor(time - min * 60);
+
+    if(min < 10){ min = '0' + min; }
+    if(sec < 10){ sec = '0' + sec; }
+
+    element.textContent = min + ":" + sec;
 };
 
 $v.controller.setSeeker = function(seekbar, seeker, percent){
@@ -472,16 +489,6 @@ $v.controller.setBuffer = function(){
         $v.controller.timeSeekbar.style.backgroundPosition = startPos + "px";
         $v.controller.timeSeekbar.style.backgroundSize     = endPos + "px";
     }
-};
-
-$v.controller.setTime = function(time, element){
-    var min = Math.floor(time / 60);
-    var sec = Math.floor(time - min * 60);
-
-    if(min < 10){ min = '0' + min; }
-    if(sec < 10){ sec = '0' + sec; }
-
-    element.textContent = min + ":" + sec;
 };
 
 $v.controller.timeSeeker.mousemoveEvent = function(event, seek){
