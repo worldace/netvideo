@@ -414,12 +414,12 @@ $v.comment.laneCheck = function(){
 $v.comment.get = function(){
     var id   = document.getElementById("comment-form-id").value;
     var path = document.getElementById("comment-form-path").value;
-    var time = Math.floor($v.video.duration);
-    var num  = time * 4; //コメント取得件数(num)
+    var sec  = Math.floor($v.video.duration);
+    var num  = sec * 4; //コメント取得件数(num)
 
     //動画時間＋1の箱を作成 [[], [], [], ...]
     $v.comment.list = []; 
-    for(var i = 0; i < time+1; i++){
+    for(var i = 0; i < sec+1; i++){
         $v.comment.list.push([]);
     }
 
@@ -429,7 +429,7 @@ $v.comment.get = function(){
 
         for(var i = 0; i < comments.length; i++){
             var index = Math.floor(comments[i][1]/100);
-            if(index >= 0 && index <= time){
+            if(index in $v.comment.list){
                 $v.comment.list[index].push(comments[i]);
             }
         }
@@ -437,17 +437,17 @@ $v.comment.get = function(){
 };
 
 $v.comment.post = function(){
-    var text  = $v.form.input.value.trim();
-    var time  = $v.video.currentTime;
+    var text = $v.form.input.value.trim();
+    var sec  = $v.video.currentTime;
 
     if(text == "" || text.length > 64){ return; }
     
     var formdata = new FormData($v.form);
-    formdata.append("time", time.toFixed(2)*100);
+    formdata.append("time", sec.toFixed(2)*100);
     $v.post('?action=commentpost', formdata);
 
-    if(Math.floor(time+1) in $v.comment.list){
-        $v.comment.list[Math.floor(time+1)].unshift([text, time+1, Math.floor(Date.now()/1000)]);
+    if(Math.floor(sec+1) in $v.comment.list){
+        $v.comment.list[Math.floor(sec+1)].unshift([text, sec+1, Math.floor(Date.now()/1000)]);
     }
 
     $v.form.input.value = "";
@@ -478,6 +478,15 @@ $v.controller.setSeeker = function(seekbar, seeker, percent){
     return pos/seekbarWidth;
 };
 
+$v.controller.timeSeeker.mousemoveEvent = function(event, seek){
+    var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
+    if(seek){ $v.video.currentTime = $v.video.duration * percent; }
+};
+
+$v.controller.volumeSeeker.mousemoveEvent = function(event){
+    $v.video.volume = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
+};
+
 $v.controller.setBuffer = function(){
     var seekbarWidth = $v.controller.timeSeekbar.getBoundingClientRect().width;
     var buffer = $v.video.buffered;
@@ -489,15 +498,6 @@ $v.controller.setBuffer = function(){
         $v.controller.timeSeekbar.style.backgroundPosition = startPos + "px";
         $v.controller.timeSeekbar.style.backgroundSize     = endPos + "px";
     }
-};
-
-$v.controller.timeSeeker.mousemoveEvent = function(event, seek){
-    var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
-    if(seek){ $v.video.currentTime = $v.video.duration * percent; }
-};
-
-$v.controller.volumeSeeker.mousemoveEvent = function(event){
-    $v.video.volume = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
 };
 
 
