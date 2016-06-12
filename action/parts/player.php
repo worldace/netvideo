@@ -64,6 +64,9 @@ $v.controller.playToggle    = document.getElementById("controller-play-toggle");
 $v.controller.volumeToggle  = document.getElementById("controller-volume-toggle");
 $v.controller.commentToggle = document.getElementById("controller-comment-toggle");
 $v.controller.screenToggle  = document.getElementById("controller-screen-toggle");
+$v.controller.form          = document.getElementById("comment-form");
+$v.controller.input         = document.getElementById("comment-form-input");
+$v.controller.submit        = document.getElementById("comment-form-submit");
 $v.controller.parts = {
     play:       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNTc2IDkyN2wtMTMyOCA3MzhxLTIzIDEzLTM5LjUgM3QtMTYuNS0zNnYtMTQ3MnEwLTI2IDE2LjUtMzZ0MzkuNSAzbDEzMjggNzM4cTIzIDEzIDIzIDMxdC0yMyAzMXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=",
     pause:      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNjY0IDE5MnYxNDA4cTAgMjYtMTkgNDV0LTQ1IDE5aC01MTJxLTI2IDAtNDUtMTl0LTE5LTQ1di0xNDA4cTAtMjYgMTktNDV0NDUtMTloNTEycTI2IDAgNDUgMTl0MTkgNDV6bS04OTYgMHYxNDA4cTAgMjYtMTkgNDV0LTQ1IDE5aC01MTJxLTI2IDAtNDUtMTl0LTE5LTQ1di0xNDA4cTAtMjYgMTktNDV0NDUtMTloNTEycTI2IDAgNDUgMTl0MTkgNDV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+",
@@ -81,10 +84,6 @@ $v.comment.on = true;
 $v.comment.laneNormalHeight = 25;
 $v.comment.laneFullHeight   = Math.floor(screen.height * 0.8 / 12);
 
-$v.form        = document.getElementById("comment-form");
-$v.form.input  = document.getElementById("comment-form-input");
-$v.form.submit = document.getElementById("comment-form-submit");
-
 
 
 
@@ -94,8 +93,8 @@ $v.video.addEventListener('loadedmetadata', function(){
     if(!$v.isUnregistered){
         $v.comment.get();
         $v.comment.laneBuild();
-        $v.form.input.disabled  = false;
-        $v.form.submit.disabled = false;
+        $v.controller.input.disabled  = false;
+        $v.controller.submit.disabled = false;
     }
 
     $v.controller.setBuffer();
@@ -107,9 +106,11 @@ $v.video.addEventListener('loadedmetadata', function(){
     $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 });
 
+
 $v.video.addEventListener('canplaythrough', function(){
     $v.video.play();
 });
+
 
 $v.video.addEventListener('timeupdate', function(){
     var sec = Math.floor($v.video.currentTime);
@@ -127,23 +128,33 @@ $v.video.addEventListener('timeupdate', function(){
     }
 });
 
-$v.video.addEventListener('seeking', function(){
-    $v.comment.clear();
+
+$v.video.addEventListener('play', function(){
+    $v.comment.run();
+    $v.controller.playToggle.setAttribute("src", $v.controller.parts.pause);
 });
 
-$v.video.addEventListener('ended', function(){
-    $v.comment.clear();
-});
 
 $v.video.addEventListener('pause', function(){
     $v.comment.pause();
     $v.controller.playToggle.setAttribute("src", $v.controller.parts.play);
 });
 
-$v.video.addEventListener('play', function(){
-    $v.comment.run();
-    $v.controller.playToggle.setAttribute("src", $v.controller.parts.pause);
+
+$v.video.addEventListener('progress', function(){
+    $v.controller.setBuffer();
 });
+
+
+$v.video.addEventListener('seeking', function(){
+    $v.comment.clear();
+});
+
+
+$v.video.addEventListener('ended', function(){
+    $v.comment.clear();
+});
+
 
 $v.video.addEventListener('volumechange', function(){
     if(!$v.video.volume || $v.video.muted){
@@ -157,17 +168,16 @@ $v.video.addEventListener('volumechange', function(){
     }
 });
 
-$v.video.addEventListener('progress', function(){
-    $v.controller.setBuffer();
-});
 
 $v.video.addEventListener('click', function(event){
     event.preventDefault();
 });
 
+
 $v.video.addEventListener('dblclick', function(event){
     event.preventDefault();
 });
+
 
 $v.video.addEventListener('error', function(event){
     var error = event.target.error;
@@ -191,31 +201,11 @@ $v.video.addEventListener('error', function(event){
     }
 });
 
+
 $v.controller.playToggle.addEventListener('click', function(){
     $v.video.paused ? $v.video.play() : $v.video.pause();
 });
 
-$v.controller.volumeToggle.addEventListener('click', function(){
-    if($v.video.muted){
-        $v.video.muted = false;
-        $v.video.volume = 0.5;
-    }
-    else{
-        $v.video.volume = $v.video.volume ? 0 : 0.5;
-    }
-});
-
-$v.controller.commentToggle.addEventListener('click', function(){
-    if($v.comment.on){
-        $v.comment.on = false;
-        $v.comment.clear();
-        this.setAttribute("src", $v.controller.parts.commentoff);
-    }
-    else{
-        $v.comment.on = true;
-        this.setAttribute("src", $v.controller.parts.commenton);
-    }
-});
 
 $v.controller.timeSeek.addEventListener('click', function(event){
     if(!$v.video.duration){ return; }
@@ -223,6 +213,7 @@ $v.controller.timeSeek.addEventListener('click', function(event){
     $v.video.currentTime = $v.video.duration * percent;
 
 });
+
 
 $v.controller.timeSeeker.addEventListener('mousedown', function(event){
     if(!$v.video.duration){ return; }
@@ -235,6 +226,7 @@ $v.controller.timeSeeker.addEventListener('mousedown', function(event){
         $v.controller.timeSeeker.isMoving = false;
     });
 });
+
 
 $v.controller.volumeSeek.addEventListener('click', function(event){
     $v.video.muted = false;
@@ -249,6 +241,31 @@ $v.controller.volumeSeeker.addEventListener('mousedown', function(event){
         document.removeEventListener('mouseup', mouseupEvent);
     });
 });
+
+
+$v.controller.volumeToggle.addEventListener('click', function(){
+    if($v.video.muted){
+        $v.video.muted = false;
+        $v.video.volume = 0.5;
+    }
+    else{
+        $v.video.volume = $v.video.volume ? 0 : 0.5;
+    }
+});
+
+
+$v.controller.commentToggle.addEventListener('click', function(){
+    if($v.comment.on){
+        $v.comment.on = false;
+        $v.comment.clear();
+        this.setAttribute("src", $v.controller.parts.commentoff);
+    }
+    else{
+        $v.comment.on = true;
+        this.setAttribute("src", $v.controller.parts.commenton);
+    }
+});
+
 
 $v.controller.screenToggle.addEventListener('click', function(){
     if(!$v.screen.isFullscreen()){
@@ -265,18 +282,21 @@ $v.controller.screenToggle.addEventListener('click', function(){
     }
 });
 
+
 document.addEventListener("fullscreenchange",      function(){ $v.screen.fullscreenEvent(); });
 document.addEventListener("MSFullscreenChange",    function(){ $v.screen.fullscreenEvent(); });
 document.addEventListener("webkitfullscreenchange",function(){ $v.screen.fullscreenEvent(); });
 document.addEventListener("mozfullscreenchange",   function(){ $v.screen.fullscreenEvent(); });
 
-$v.form.addEventListener('submit', function(event){
+
+$v.controller.form.addEventListener('submit', function(event){
     event.preventDefault();
     $v.video.play();
     $v.comment.post();
 });
 
-$v.form.input.addEventListener('focus', function(event){
+
+$v.controller.input.addEventListener('focus', function(event){
     $v.video.pause();
 });
 
@@ -294,38 +314,6 @@ $v.video.fit = function(screenW, screenH, objectW, objectH){
     $v.video.style.top  = pos.y + "px";
 };
 
-$v.screen.isFullscreen = function(){
-    var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-    return element ? true : false;
-};
-
-$v.screen.getFullscreenId = function(){
-    var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-    return element.id;
-};
-
-$v.screen.fullscreenEvent = function(){
-    if($v.screen.isFullscreen()){
-        if($v.screen.getFullscreenId() != "video-screen"){ return; }
-
-        $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
-        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
-
-        $v.screen.appendChild($v.controller);
-        var controller = $v.controller.getBoundingClientRect();
-        $v.controller.style.top  = screen.height - controller.height + "px";
-        $v.controller.style.left = (screen.width/2) - (controller.width/2) + "px";
-    }
-    else{
-        $v.screen.pos = $v.screen.getBoundingClientRect();
-        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
-
-        $v.player.appendChild($v.controller);
-        $v.controller.style.top  = 0;
-        $v.controller.style.left = 0;
-    }
-    $v.comment.clear();
-};
 
 $v.comment.release = function(comments, lane){
     var time = $v.video.currentTime;
@@ -359,12 +347,14 @@ $v.comment.release = function(comments, lane){
     }
 };
 
+
 $v.comment.clear = function(){
     var comments = $v.screen.querySelectorAll(".comment");
     for(var i = comments.length-1; i >= 0; i--){
         $v.screen.removeChild(comments[i]);
     }
 };
+
 
 $v.comment.pause = function(){
     var comments = $v.screen.querySelectorAll(".comment");
@@ -373,12 +363,14 @@ $v.comment.pause = function(){
     }
 };
 
+
 $v.comment.run = function(){
     var comments = $v.screen.querySelectorAll(".comment");
     for(var i = 0; i < comments.length; i++){
         comments[i].style.animationPlayState = "running";
     }
 };
+
 
 $v.comment.laneBuild = function(){
     var css = "";
@@ -393,6 +385,7 @@ $v.comment.laneBuild = function(){
     css += "to{transform:translateX(-" + screen.width*5 + "px);}}";
     document.styleSheets[0].insertRule(css, 0);
 };
+
 
 $v.comment.laneCheck = function(){
     var comments = $v.screen.querySelectorAll(".comment");
@@ -410,6 +403,7 @@ $v.comment.laneCheck = function(){
     }
     return lane;
 };
+
 
 $v.comment.get = function(){
     var id   = document.getElementById("comment-form-id").value;
@@ -436,13 +430,14 @@ $v.comment.get = function(){
     });
 };
 
+
 $v.comment.post = function(){
-    var text = $v.form.input.value.trim();
+    var text = $v.controller.input.value.trim();
     var sec  = $v.video.currentTime;
 
     if(text == "" || text.length > 64){ return; }
     
-    var formdata = new FormData($v.form);
+    var formdata = new FormData($v.controller.form);
     formdata.append("time", sec.toFixed(2)*100);
     $v.post('?action=commentpost', formdata);
 
@@ -450,8 +445,9 @@ $v.comment.post = function(){
         $v.comment.list[Math.floor(sec+1)].unshift([text, sec+1, Math.floor(Date.now()/1000)]);
     }
 
-    $v.form.input.value = "";
+    $v.controller.input.value = "";
 };
+
 
 $v.controller.setTime = function(time, element){
     var min = Math.floor(time / 60);
@@ -462,6 +458,7 @@ $v.controller.setTime = function(time, element){
 
     element.textContent = min + ":" + sec;
 };
+
 
 $v.controller.setSeeker = function(seekbar, seeker, percent){
     seekbar.pos = seekbar.getBoundingClientRect();
@@ -478,14 +475,17 @@ $v.controller.setSeeker = function(seekbar, seeker, percent){
     return pos/seekbarWidth;
 };
 
+
 $v.controller.timeSeeker.mousemoveEvent = function(event, seek){
     var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
     if(seek){ $v.video.currentTime = $v.video.duration * percent; }
 };
 
+
 $v.controller.volumeSeeker.mousemoveEvent = function(event){
     $v.video.volume = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
 };
+
 
 $v.controller.setBuffer = function(){
     var seekbarWidth = $v.controller.timeSeekbar.getBoundingClientRect().width;
@@ -501,13 +501,45 @@ $v.controller.setBuffer = function(){
 };
 
 
-
-
-
-
-$v.type = function(target){
-    return Object.prototype.toString.call(target).replace(/^\[object (.+)\]$/, '$1').toLowerCase();
+$v.screen.isFullscreen = function(){
+    var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+    return element ? true : false;
 };
+
+
+$v.screen.getFullscreenId = function(){
+    var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+    return element.id;
+};
+
+
+$v.screen.fullscreenEvent = function(){
+    if($v.screen.isFullscreen()){
+        if($v.screen.getFullscreenId() != "video-screen"){ return; }
+
+        $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
+        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+
+        $v.screen.appendChild($v.controller);
+        var controller = $v.controller.getBoundingClientRect();
+        $v.controller.style.top  = screen.height - controller.height + "px";
+        $v.controller.style.left = (screen.width/2) - (controller.width/2) + "px";
+    }
+    else{
+        $v.screen.pos = $v.screen.getBoundingClientRect();
+        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+
+        $v.player.appendChild($v.controller);
+        $v.controller.style.top  = 0;
+        $v.controller.style.left = 0;
+    }
+    $v.comment.clear();
+};
+
+
+
+
+
 
 $v.get = function(url, callback){
     var xhr = new XMLHttpRequest();
@@ -516,14 +548,15 @@ $v.get = function(url, callback){
     xhr.addEventListener("load", function(){
         if(xhr.status == 200) { callback(xhr); }
     });
-    xhr.timeout = 30000;
+    xhr.timeout = 180*1000;
     xhr.send();
 };
+
 
 $v.post = function(url, param){
     var xhr = new XMLHttpRequest();
     xhr.open('POST', url);
-    xhr.timeout = 20000;
+    xhr.timeout = 180*1000;
 
     if(param instanceof FormData){
         var body = param;
@@ -539,6 +572,7 @@ $v.post = function(url, param){
     xhr.send(body);
 };
 
+
 $v.deparam = function(str){
     if($v.type(str) != 'string'){ return {}; }
     str = str.replace(/^\?/, "");
@@ -552,13 +586,16 @@ $v.deparam = function(str){
     return result;
 };
 
+
 $v.save = function(name, value){
     try{ window.localStorage.setItem(name, value); } catch(e){}
 };
 
+
 $v.load = function(name){
     try{ return window.localStorage.getItem(name); } catch(e){}
 };
+
 
 $v.objectFit = function(screenW, screenH, objectW, objectH){
     var result  = {};
@@ -577,6 +614,11 @@ $v.objectFit = function(screenW, screenH, objectW, objectH){
     result.y = Math.floor((screenH / 2) - (result.h / 2));
 
     return result;
+};
+
+
+$v.type = function(target){
+    return Object.prototype.toString.call(target).replace(/^\[object (.+)\]$/, '$1').toLowerCase();
 };
 
 
