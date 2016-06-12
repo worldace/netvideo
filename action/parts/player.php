@@ -109,6 +109,14 @@ $v.post = function(url, param){
     xhr.send(body);
 };
 
+$v.save = function(name, value){
+    try{ window.localStorage.setItem(name, value); } catch(e){}
+};
+
+$v.load = function(name){
+    try{ return window.localStorage.getItem(name); } catch(e){}
+};
+
 
 $v.objectFit = function(screenW, screenH, objectW, objectH){
     var result  = {};
@@ -364,8 +372,10 @@ $v.video.addEventListener('loadedmetadata', function(){
     }
     
     $v.controller.setBuffer();
-    $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
     $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
+
+    $v.video.volume = Number($v.load("volume")) || 1;
+    $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
 
     $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 });
@@ -418,6 +428,7 @@ $v.video.addEventListener('volumechange', function(){
     else{
         document.getElementById("controller-volume-toggle").setAttribute("src", $v.controller.parts.volume);
         $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
+        $v.save("volume", $v.video.volume);
     }
 });
 
