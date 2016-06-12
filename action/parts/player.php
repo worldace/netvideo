@@ -229,7 +229,7 @@ $v.comment.get = function(){
     var id   = document.getElementById("comment-form-id").value;
     var path = document.getElementById("comment-form-path").value;
     var time = Math.floor($v.video.duration);
-    var num  = time * 6; //コメント取得件数(num)
+    var num  = time * 4; //コメント取得件数(num)
 
     //動画時間＋1の箱を作成 [[], [], [], ...]
     $v.comment.list = []; 
@@ -709,8 +709,8 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     text-shadow: -1px -1px #333, 1px -1px #333,	-1px 1px #333, 1px 1px #333;
     animation-fill-mode: forwards;
     animation-timing-function: linear;
-    animation-duration: 16s;
-    opacity: 0.8;
+    animation-duration: 17s;
+    opacity: 0.7;
 }
 
 
