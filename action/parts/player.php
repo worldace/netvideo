@@ -115,8 +115,8 @@ $v.video.addEventListener('canplaythrough', function(){
 $v.video.addEventListener('timeupdate', function(){
     var sec = Math.floor($v.video.currentTime);
     if(sec !== $v.video.prevSec){
-        $v.controller.setTime(sec, $v.controller.timeCurrent);
         if(!$v.controller.timeSeeker.isDragging){
+            $v.controller.setTime(sec, $v.controller.timeCurrent);
             $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, $v.video.currentTime/$v.video.duration);
         }
         //コメント放出
@@ -258,11 +258,11 @@ $v.controller.commentToggle.addEventListener('click', function(){
     if($v.comment.on){
         $v.comment.on = false;
         $v.comment.clear();
-        this.setAttribute("src", $v.controller.parts.commentoff);
+        $v.controller.commentToggle.setAttribute("src", $v.controller.parts.commentoff);
     }
     else{
         $v.comment.on = true;
-        this.setAttribute("src", $v.controller.parts.commenton);
+        $v.controller.commentToggle.setAttribute("src", $v.controller.parts.commenton);
     }
 });
 
@@ -478,6 +478,7 @@ $v.controller.setSeeker = function(seekbar, seeker, percent){
 
 $v.controller.timeSeeker.mousemoveEvent = function(event, seek){
     var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
+    $v.controller.setTime($v.video.duration * percent, $v.controller.timeCurrent);
     if(seek){ $v.video.currentTime = $v.video.duration * percent; }
 };
 
