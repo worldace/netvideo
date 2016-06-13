@@ -87,224 +87,6 @@ $v.comment.laneFullHeight   = Math.floor(screen.height * 0.8 / 12);
 
 
 
-
-
-$v.video.addEventListener('loadedmetadata', function(){
-    if(!$v.isUnregistered){
-        $v.comment.get();
-        $v.comment.laneBuild();
-        $v.controller.input.disabled  = false;
-        $v.controller.submit.disabled = false;
-    }
-
-    $v.controller.setBuffer();
-    $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
-
-    $v.video.volume = Number($v.load("volume")) || 1;
-    $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
-
-    $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
-});
-
-
-$v.video.addEventListener('canplaythrough', function(){
-    $v.video.play();
-});
-
-
-$v.video.addEventListener('timeupdate', function(){
-    var sec = Math.floor($v.video.currentTime);
-    if(sec !== $v.video.prevSec){
-        if(!$v.controller.timeSeeker.isDragging){
-            $v.controller.setTime(sec, $v.controller.timeCurrent);
-            $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, $v.video.currentTime/$v.video.duration);
-        }
-        //コメント放出
-        if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on === true){
-            $v.comment.release($v.comment.list[sec], $v.comment.laneCheck());
-        }
-        
-        $v.video.prevSec = sec;
-    }
-});
-
-
-$v.video.addEventListener('play', function(){
-    $v.comment.run();
-    $v.controller.playToggle.setAttribute("src", $v.controller.parts.pause);
-});
-
-
-$v.video.addEventListener('pause', function(){
-    $v.comment.pause();
-    $v.controller.playToggle.setAttribute("src", $v.controller.parts.play);
-});
-
-
-$v.video.addEventListener('progress', function(){
-    $v.controller.setBuffer();
-});
-
-
-$v.video.addEventListener('seeking', function(){
-    $v.comment.clear();
-});
-
-
-$v.video.addEventListener('ended', function(){
-    $v.comment.clear();
-});
-
-
-$v.video.addEventListener('volumechange', function(){
-    if(!$v.video.volume || $v.video.muted){
-        $v.controller.volumeToggle.setAttribute("src", $v.controller.parts.mute);
-        $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, 0);
-    }
-    else{
-        $v.controller.volumeToggle.setAttribute("src", $v.controller.parts.volume);
-        $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
-        $v.save("volume", $v.video.volume);
-    }
-});
-
-
-$v.video.addEventListener('click', function(event){
-    event.preventDefault();
-});
-
-
-$v.video.addEventListener('dblclick', function(event){
-    event.preventDefault();
-});
-
-
-$v.video.addEventListener('error', function(event){
-    var error = event.target.error;
-
-    switch(error.code){ // http://www.html5.jp/tag/elements/video.html
-        case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-            alert("動画ファイルが存在しないか、未サポートの形式です");
-            break;
-        case error.MEDIA_ERR_DECODE:
-            alert("動画ファイルが壊れているか、未サポートの形式です");
-            break;
-        case error.MEDIA_ERR_NETWORK:
-            alert("動画のダウンロードが途中で失敗しました");
-            break;
-        case error.MEDIA_ERR_ABORTED:
-            //alert("動画の再生が中止されました");
-            break;
-        default:
-            alert("未知のエラーが発生しました");
-            break;
-    }
-});
-
-
-$v.controller.playToggle.addEventListener('click', function(){
-    $v.video.paused ? $v.video.play() : $v.video.pause();
-});
-
-
-$v.controller.timeSeek.addEventListener('click', function(event){
-    if(!$v.video.duration){ return; }
-    var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
-    $v.video.currentTime = $v.video.duration * percent;
-
-});
-
-
-$v.controller.timeSeeker.addEventListener('mousedown', function(event){
-    if(!$v.video.duration){ return; }
-    $v.controller.timeSeeker.isDragging = true;
-    document.addEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
-    document.addEventListener('mouseup', function mouseupEvent(event){
-        $v.controller.timeSeeker.mousemoveEvent(event, true);
-        document.removeEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
-        document.removeEventListener('mouseup',  mouseupEvent);
-        $v.controller.timeSeeker.isDragging = false;
-    });
-});
-
-
-$v.controller.volumeSeek.addEventListener('click', function(event){
-    $v.video.muted = false;
-    $v.video.volume = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
-});
-
-
-$v.controller.volumeSeeker.addEventListener('mousedown', function(event){
-    document.addEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
-    document.addEventListener('mouseup', function mouseupEvent(event){
-        document.removeEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
-        document.removeEventListener('mouseup', mouseupEvent);
-    });
-});
-
-
-$v.controller.volumeToggle.addEventListener('click', function(){
-    if($v.video.muted){
-        $v.video.muted = false;
-        $v.video.volume = 0.5;
-    }
-    else{
-        $v.video.volume = $v.video.volume ? 0 : 0.5;
-    }
-});
-
-
-$v.controller.commentToggle.addEventListener('click', function(){
-    if($v.comment.on){
-        $v.comment.on = false;
-        $v.comment.clear();
-        $v.controller.commentToggle.setAttribute("src", $v.controller.parts.commentoff);
-    }
-    else{
-        $v.comment.on = true;
-        $v.controller.commentToggle.setAttribute("src", $v.controller.parts.commenton);
-    }
-});
-
-
-$v.controller.screenToggle.addEventListener('click', function(){
-    if(!$v.screen.isFullscreen()){
-        if     ($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
-        else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
-        else if($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
-        else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
-    }
-    else{
-        if     (document.exitFullscreen)        { document.exitFullscreen(); }
-        else if(document.msExitFullscreen)      { document.msExitFullscreen(); }
-        else if(document.webkitCancelFullScreen){ document.webkitCancelFullScreen(); }
-        else if(document.mozCancelFullScreen)   { document.mozCancelFullScreen(); }
-    }
-});
-
-
-document.addEventListener("fullscreenchange",      function(){ $v.screen.fullscreenEvent(); });
-document.addEventListener("MSFullscreenChange",    function(){ $v.screen.fullscreenEvent(); });
-document.addEventListener("webkitfullscreenchange",function(){ $v.screen.fullscreenEvent(); });
-document.addEventListener("mozfullscreenchange",   function(){ $v.screen.fullscreenEvent(); });
-
-
-$v.controller.form.addEventListener('submit', function(event){
-    event.preventDefault();
-    $v.video.play();
-    $v.comment.post();
-});
-
-
-$v.controller.input.addEventListener('focus', function(event){
-    $v.video.pause();
-});
-
-
-
-
-
-
 $v.video.fit = function(screenW, screenH, objectW, objectH){
     var pos = $v.objectFit(screenW, screenH, objectW, objectH);
 
@@ -618,6 +400,219 @@ $v.type = function(target){
     return Object.prototype.toString.call(target).replace(/^\[object (.+)\]$/, '$1').toLowerCase();
 };
 
+
+
+
+$v.video.addEventListener('loadedmetadata', function(){
+    if(!$v.isUnregistered){
+        $v.comment.get();
+        $v.comment.laneBuild();
+        $v.controller.input.disabled  = false;
+        $v.controller.submit.disabled = false;
+    }
+
+    $v.controller.setBuffer();
+    $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
+
+    $v.video.volume = Number($v.load("volume")) || 1;
+    $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
+
+    $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+});
+
+
+$v.video.addEventListener('canplaythrough', function(){
+    $v.video.play();
+});
+
+
+$v.video.addEventListener('timeupdate', function(){
+    var sec = Math.floor($v.video.currentTime);
+    if(sec !== $v.video.prevSec){
+        if(!$v.controller.timeSeeker.isDragging){
+            $v.controller.setTime(sec, $v.controller.timeCurrent);
+            $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, $v.video.currentTime/$v.video.duration);
+        }
+        //コメント放出
+        if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on === true){
+            $v.comment.release($v.comment.list[sec], $v.comment.laneCheck());
+        }
+        
+        $v.video.prevSec = sec;
+    }
+});
+
+
+$v.video.addEventListener('play', function(){
+    $v.comment.run();
+    $v.controller.playToggle.setAttribute("src", $v.controller.parts.pause);
+});
+
+
+$v.video.addEventListener('pause', function(){
+    $v.comment.pause();
+    $v.controller.playToggle.setAttribute("src", $v.controller.parts.play);
+});
+
+
+$v.video.addEventListener('progress', function(){
+    $v.controller.setBuffer();
+});
+
+
+$v.video.addEventListener('seeking', function(){
+    $v.comment.clear();
+});
+
+
+$v.video.addEventListener('ended', function(){
+    $v.comment.clear();
+});
+
+
+$v.video.addEventListener('volumechange', function(){
+    if(!$v.video.volume || $v.video.muted){
+        $v.controller.volumeToggle.setAttribute("src", $v.controller.parts.mute);
+        $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, 0);
+    }
+    else{
+        $v.controller.volumeToggle.setAttribute("src", $v.controller.parts.volume);
+        $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
+        $v.save("volume", $v.video.volume);
+    }
+});
+
+
+$v.video.addEventListener('click', function(event){
+    event.preventDefault();
+});
+
+
+$v.video.addEventListener('dblclick', function(event){
+    event.preventDefault();
+});
+
+
+$v.video.addEventListener('error', function(event){
+    var error = event.target.error;
+
+    switch(error.code){ // http://www.html5.jp/tag/elements/video.html
+        case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            alert("動画ファイルが存在しないか、未サポートの形式です");
+            break;
+        case error.MEDIA_ERR_DECODE:
+            alert("動画ファイルが壊れているか、未サポートの形式です");
+            break;
+        case error.MEDIA_ERR_NETWORK:
+            alert("動画のダウンロードが途中で失敗しました");
+            break;
+        case error.MEDIA_ERR_ABORTED:
+            //alert("動画の再生が中止されました");
+            break;
+        default:
+            alert("未知のエラーが発生しました");
+            break;
+    }
+});
+
+
+$v.controller.playToggle.addEventListener('click', function(){
+    $v.video.paused ? $v.video.play() : $v.video.pause();
+});
+
+
+$v.controller.timeSeek.addEventListener('click', function(event){
+    if(!$v.video.duration){ return; }
+    var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
+    $v.video.currentTime = $v.video.duration * percent;
+
+});
+
+
+$v.controller.timeSeeker.addEventListener('mousedown', function(event){
+    if(!$v.video.duration){ return; }
+    $v.controller.timeSeeker.isDragging = true;
+    document.addEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
+    document.addEventListener('mouseup', function mouseupEvent(event){
+        $v.controller.timeSeeker.mousemoveEvent(event, true);
+        document.removeEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
+        document.removeEventListener('mouseup',  mouseupEvent);
+        $v.controller.timeSeeker.isDragging = false;
+    });
+});
+
+
+$v.controller.volumeSeek.addEventListener('click', function(event){
+    $v.video.muted = false;
+    $v.video.volume = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
+});
+
+
+$v.controller.volumeSeeker.addEventListener('mousedown', function(event){
+    document.addEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
+    document.addEventListener('mouseup', function mouseupEvent(event){
+        document.removeEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
+        document.removeEventListener('mouseup', mouseupEvent);
+    });
+});
+
+
+$v.controller.volumeToggle.addEventListener('click', function(){
+    if($v.video.muted){
+        $v.video.muted = false;
+        $v.video.volume = 0.5;
+    }
+    else{
+        $v.video.volume = $v.video.volume ? 0 : 0.5;
+    }
+});
+
+
+$v.controller.commentToggle.addEventListener('click', function(){
+    if($v.comment.on){
+        $v.comment.on = false;
+        $v.comment.clear();
+        $v.controller.commentToggle.setAttribute("src", $v.controller.parts.commentoff);
+    }
+    else{
+        $v.comment.on = true;
+        $v.controller.commentToggle.setAttribute("src", $v.controller.parts.commenton);
+    }
+});
+
+
+$v.controller.screenToggle.addEventListener('click', function(){
+    if(!$v.screen.isFullscreen()){
+        if     ($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
+        else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
+        else if($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
+        else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
+    }
+    else{
+        if     (document.exitFullscreen)        { document.exitFullscreen(); }
+        else if(document.msExitFullscreen)      { document.msExitFullscreen(); }
+        else if(document.webkitCancelFullScreen){ document.webkitCancelFullScreen(); }
+        else if(document.mozCancelFullScreen)   { document.mozCancelFullScreen(); }
+    }
+});
+
+
+document.addEventListener("fullscreenchange",      function(){ $v.screen.fullscreenEvent(); });
+document.addEventListener("MSFullscreenChange",    function(){ $v.screen.fullscreenEvent(); });
+document.addEventListener("webkitfullscreenchange",function(){ $v.screen.fullscreenEvent(); });
+document.addEventListener("mozfullscreenchange",   function(){ $v.screen.fullscreenEvent(); });
+
+
+$v.controller.form.addEventListener('submit', function(event){
+    event.preventDefault();
+    $v.video.play();
+    $v.comment.post();
+});
+
+
+$v.controller.input.addEventListener('focus', function(event){
+    $v.video.pause();
+});
 
 
 
