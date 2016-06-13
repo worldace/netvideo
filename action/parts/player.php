@@ -116,7 +116,7 @@ $v.video.addEventListener('timeupdate', function(){
     var sec = Math.floor($v.video.currentTime);
     if(sec !== $v.video.prevSec){
         $v.controller.setTime(sec, $v.controller.timeCurrent);
-        if(!$v.controller.timeSeeker.isMoving){
+        if(!$v.controller.timeSeeker.isDragging){
             $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, $v.video.currentTime/$v.video.duration);
         }
         //コメント放出
@@ -217,13 +217,13 @@ $v.controller.timeSeek.addEventListener('click', function(event){
 
 $v.controller.timeSeeker.addEventListener('mousedown', function(event){
     if(!$v.video.duration){ return; }
-    $v.controller.timeSeeker.isMoving = true;
+    $v.controller.timeSeeker.isDragging = true;
     document.addEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
     document.addEventListener('mouseup', function mouseupEvent(event){
         $v.controller.timeSeeker.mousemoveEvent(event, true);
         document.removeEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
         document.removeEventListener('mouseup',  mouseupEvent);
-        $v.controller.timeSeeker.isMoving = false;
+        $v.controller.timeSeeker.isDragging = false;
     });
 });
 
@@ -535,10 +535,6 @@ $v.screen.fullscreenEvent = function(){
     }
     $v.comment.clear();
 };
-
-
-
-
 
 
 $v.get = function(url, callback){
