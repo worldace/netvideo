@@ -623,7 +623,7 @@ $v.player.addEventListener('keydown', function(event){
         event.preventDefault();
         $v.controller.input.focus();
     }
-    else if(event.ctrlKey && event.which == 13){ //Ctrl+Enter
+    else if(event.ctrlKey && event.which == 13){ //Ctrl+Enter ※IE11で効かない
         event.preventDefault();
         $v.screen.toggleFullscreen();
     }
@@ -632,30 +632,36 @@ $v.player.addEventListener('keydown', function(event){
         $v.video.paused ? $v.video.play() : $v.video.pause();
     }
     else if((event.ctrlKey && event.which == 39) || (event.shiftKey && event.which == 39)){ //Ctrl+→ or Shift+→
+        if(!$v.video.duration){ return; }
         event.preventDefault();
         var sec = $v.video.currentTime + 30;
         $v.video.currentTime = (sec >= $v.video.duration) ? $v.video.duration : sec;
     }
     else if((event.ctrlKey && event.which == 37) || (event.shiftKey && event.which == 37)){ //Ctrl+← or Shift+←
+        if(!$v.video.duration){ return; }
         event.preventDefault();
         var sec = $v.video.currentTime - 30;
         $v.video.currentTime = (sec <= 0) ? 0 : sec
     }
     else if(event.which == 39){ //→
+        if(!$v.video.duration){ return; }
         event.preventDefault();
         var sec = $v.video.currentTime + 10;
         $v.video.currentTime = (sec >= $v.video.duration) ? $v.video.duration : sec;
     }
     else if(event.which == 37){ //←
+        if(!$v.video.duration){ return; }
         event.preventDefault();
         var sec = $v.video.currentTime - 10;
         $v.video.currentTime = (sec <= 0) ? 0 : sec;
     }
     else if(event.which == 36){ //Home
+        if(!$v.video.duration){ return; }
         event.preventDefault();
         $v.video.currentTime = 0;
     }
     else if(event.which == 35){ //End
+        if(!$v.video.duration){ return; }
         event.preventDefault();
         $v.video.currentTime = $v.video.duration;
     }
