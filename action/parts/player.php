@@ -9,7 +9,7 @@
 function parts_player($video){
 
     return <<<━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-<div id="video-player" class="video-player"
+<div id="video-player" class="video-player" tabindex="1"
 ><div id="video-screen" class="video-screen"
 ><video id="video" class="video" src="{$video['動画URL']}" loop></video
 ></div
@@ -25,8 +25,8 @@ function parts_player($video){
 ><img id="controller-screen-button" class="controller-img" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04ODMgMTA1NnEwIDEzLTEwIDIzbC0zMzIgMzMyIDE0NCAxNDRxMTkgMTkgMTkgNDV0LTE5IDQ1LTQ1IDE5aC00NDhxLTI2IDAtNDUtMTl0LTE5LTQ1di00NDhxMC0yNiAxOS00NXQ0NS0xOSA0NSAxOWwxNDQgMTQ0IDMzMi0zMzJxMTAtMTAgMjMtMTB0MjMgMTBsMTE0IDExNHExMCAxMCAxMCAyM3ptNzgxLTg2NHY0NDhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTE0NC0xNDQtMzMyIDMzMnEtMTAgMTAtMjMgMTB0LTIzLTEwbC0xMTQtMTE0cS0xMC0xMC0xMC0yM3QxMC0yM2wzMzItMzMyLTE0NC0xNDRxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDQ0OHEyNiAwIDQ1IDE5dDE5IDQ1eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg=="
 ></div
 ><form id="comment-form" class="comment-form" action="javascript:void 0"
-><input id="comment-form-input" class="comment-form-input" type="text" name="comment" value="" autocomplete="off" spellcheck="false" maxlength="60" disabled
-><input id="comment-form-submit" class="comment-form-submit" type="submit" value="コメントする" disabled
+><input id="comment-form-input" class="comment-form-input" type="text" name="comment" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
+><input id="comment-form-submit" class="comment-form-submit" type="submit" value="コメントする" tabindex="3" disabled
 ><input id="comment-form-id" type="hidden" name="id" value="{$video['動画ID']}"
 ><input id="comment-form-path" type="hidden" name="path" value="{$video['投稿時間']}"
 ></form
@@ -606,6 +606,7 @@ $v.controller.form.addEventListener('submit', function(event){
     event.preventDefault();
     $v.video.play();
     $v.comment.post();
+    $v.player.focus();
 });
 
 
@@ -686,6 +687,9 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 
 .video{
     position: absolute;
+}
+.video-player:focus{
+    outline: none;
 }
 .video-screen{
     background-color: #000;
