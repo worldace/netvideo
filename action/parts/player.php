@@ -288,6 +288,22 @@ $v.screen.isFullscreen = function(){
 };
 
 
+$v.screen.toggleFullscreen = function(){
+    if(!$v.screen.isFullscreen()){
+        if     ($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
+        else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
+        else if($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
+        else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
+    }
+    else{
+        if     (document.exitFullscreen)        { document.exitFullscreen(); }
+        else if(document.msExitFullscreen)      { document.msExitFullscreen(); }
+        else if(document.webkitCancelFullScreen){ document.webkitCancelFullScreen(); }
+        else if(document.mozCancelFullScreen)   { document.mozCancelFullScreen(); }
+    }
+};
+
+
 $v.screen.fullscreenEvent = function(){
     if($v.screen.isFullscreen()){
         $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
@@ -576,18 +592,7 @@ $v.controller.commentButton.addEventListener('click', function(){
 
 
 $v.controller.screenButton.addEventListener('click', function(){
-    if(!$v.screen.isFullscreen()){
-        if     ($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
-        else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
-        else if($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
-        else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
-    }
-    else{
-        if     (document.exitFullscreen)        { document.exitFullscreen(); }
-        else if(document.msExitFullscreen)      { document.msExitFullscreen(); }
-        else if(document.webkitCancelFullScreen){ document.webkitCancelFullScreen(); }
-        else if(document.mozCancelFullScreen)   { document.mozCancelFullScreen(); }
-    }
+    $v.screen.toggleFullscreen();
 });
 
 
@@ -601,6 +606,7 @@ $v.controller.form.addEventListener('submit', function(event){
     event.preventDefault();
     $v.video.play();
     $v.comment.post();
+    $v.controller.timeSeeker.focus();
 });
 
 
@@ -609,6 +615,62 @@ $v.controller.input.addEventListener('focus', function(event){
 });
 
 
+$v.player.addEventListener('keydown', function(event){
+    if(document.querySelector(":focus").parentNode.getAttribute("id") == "comment-form"){ return true; }
+
+    if(event.ctrlKey && event.which == 32){ //Ctrl+Space
+        event.preventDefault();
+        $v.controller.input.focus();
+    }
+    else if(event.ctrlKey && event.which == 13){ //Ctrl+Enter
+        event.preventDefault();
+        $v.screen.toggleFullscreen();
+    }
+    else if(event.which == 13){ //Enter
+        event.preventDefault();
+        $v.video.paused ? $v.video.play() : $v.video.pause();
+    }
+    else if((event.ctrlKey && event.which == 39) || (event.shiftKey && event.which == 39)){ //Ctrl+→ or Shift+→
+        event.preventDefault();
+        var sec = $v.video.currentTime + 30;
+        $v.video.currentTime = (sec > $v.video.duration) ? $v.video.duration : sec;
+    }
+    else if((event.ctrlKey && event.which == 37) || (event.shiftKey && event.which == 37)){ //Ctrl+← or Shift+←
+        event.preventDefault();
+        var sec = $v.video.currentTime - 30;
+        $v.video.currentTime = (sec < 0) ? 0 : sec
+    }
+    else if(event.which == 39){ //→
+        event.preventDefault();
+        var sec = $v.video.currentTime + 10;
+        $v.video.currentTime = (sec > $v.video.duration) ? $v.video.duration : sec;
+    }
+    else if(event.which == 37){ //←
+        event.preventDefault();
+        var sec = $v.video.currentTime - 10;
+        $v.video.currentTime = (sec < 0) ? 0 : sec;
+    }
+    else if(event.which == 36){ //Home
+        event.preventDefault();
+        $v.video.currentTime = 0;
+    }
+    else if(event.which == 35){ //End
+        event.preventDefault();
+        $v.video.currentTime = $v.video.duration;
+    }
+    else if(event.which == 38){ //↑
+        event.preventDefault();
+        $v.video.muted = false;
+        var volume = ($v.video.volume + 0.1).toFixed(1);
+        $v.video.volume = ($v.video.volume > 1) ? 1 : volume;
+    }
+    else if(event.which == 40){ //↓
+        event.preventDefault();
+        $v.video.muted = false;
+        var volume = ($v.video.volume - 0.1).toFixed(1);
+        $v.video.volume = ($v.video.volume < 0) ? 0 : volume;
+    }
+});
 
 
 });
