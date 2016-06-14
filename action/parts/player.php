@@ -178,18 +178,13 @@ $v.comment.laneBuild = function(){
 
 
 $v.comment.laneCheck = function(){
-    var comments = $v.screen.querySelectorAll(".comment");
     var lane = [true,true,true,true,true,true,true,true,true,true,true,true];
+    var comments = $v.screen.querySelectorAll(".comment");
 
     for(var i = comments.length-1; i >= 0; i--){
-        var comment_pos = comments[i].getBoundingClientRect();
-
-        if(comment_pos.right+100 > $v.screen.pos.right){
-            lane[comments[i].getAttribute("data-lane")] = false;
-        }
-        if(comment_pos.right < $v.screen.pos.left){
-            $v.screen.removeChild(comments[i]);
-        }
+        comments[i].pos = comments[i].getBoundingClientRect();
+        if(comments[i].pos.right > $v.screen.pos.right-100){ lane[comments[i].getAttribute("data-lane")] = false; }
+        if(comments[i].pos.right < $v.screen.pos.left)     { $v.screen.removeChild(comments[i]); }
     }
     return lane;
 };
