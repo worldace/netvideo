@@ -47,6 +47,7 @@ var $v = $v || {};
 $v.video  = document.getElementById("video");
 
 $v.player = document.getElementById("video-player");
+$v.player.focus();
 
 $v.screen     = document.getElementById("video-screen");
 $v.screen.pos = $v.screen.getBoundingClientRect();
@@ -618,7 +619,7 @@ $v.controller.input.addEventListener('focus', function(event){
 $v.player.addEventListener('keydown', function(event){
     if(document.querySelector(":focus").parentNode.getAttribute("id") == "comment-form"){ return true; }
 
-    if(event.ctrlKey && event.which == 32){ //Ctrl+Space
+    if(event.which == 32){ //Space
         event.preventDefault();
         $v.controller.input.focus();
     }
@@ -633,22 +634,22 @@ $v.player.addEventListener('keydown', function(event){
     else if((event.ctrlKey && event.which == 39) || (event.shiftKey && event.which == 39)){ //Ctrl+→ or Shift+→
         event.preventDefault();
         var sec = $v.video.currentTime + 30;
-        $v.video.currentTime = (sec > $v.video.duration) ? $v.video.duration : sec;
+        $v.video.currentTime = (sec >= $v.video.duration) ? $v.video.duration : sec;
     }
     else if((event.ctrlKey && event.which == 37) || (event.shiftKey && event.which == 37)){ //Ctrl+← or Shift+←
         event.preventDefault();
         var sec = $v.video.currentTime - 30;
-        $v.video.currentTime = (sec < 0) ? 0 : sec
+        $v.video.currentTime = (sec <= 0) ? 0 : sec
     }
     else if(event.which == 39){ //→
         event.preventDefault();
         var sec = $v.video.currentTime + 10;
-        $v.video.currentTime = (sec > $v.video.duration) ? $v.video.duration : sec;
+        $v.video.currentTime = (sec >= $v.video.duration) ? $v.video.duration : sec;
     }
     else if(event.which == 37){ //←
         event.preventDefault();
         var sec = $v.video.currentTime - 10;
-        $v.video.currentTime = (sec < 0) ? 0 : sec;
+        $v.video.currentTime = (sec <= 0) ? 0 : sec;
     }
     else if(event.which == 36){ //Home
         event.preventDefault();
@@ -662,13 +663,13 @@ $v.player.addEventListener('keydown', function(event){
         event.preventDefault();
         $v.video.muted = false;
         var volume = ($v.video.volume + 0.1).toFixed(1);
-        $v.video.volume = ($v.video.volume > 1) ? 1 : volume;
+        $v.video.volume = ($v.video.volume >= 1) ? 1 : volume;
     }
     else if(event.which == 40){ //↓
         event.preventDefault();
         $v.video.muted = false;
         var volume = ($v.video.volume - 0.1).toFixed(1);
-        $v.video.volume = ($v.video.volume < 0) ? 0 : volume;
+        $v.video.volume = ($v.video.volume <= 0) ? 0 : volume;
     }
 });
 
