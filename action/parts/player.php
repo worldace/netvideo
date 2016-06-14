@@ -372,12 +372,18 @@ $v.deparam = function(str){
 
 
 $v.save = function(name, value){
-    try{ window.localStorage.setItem(name, value); } catch(e){}
+    try{
+        if($v.type(value) == "object" || $v.type(value) == "array"){ value = JSON.stringify(value); }
+        window.localStorage.setItem(name, value);
+    } catch(e){}
 };
 
 
-$v.load = function(name){
-    try{ return window.localStorage.getItem(name); } catch(e){}
+$v.load = function(name, json){
+    try{
+        var str = window.localStorage.getItem(name);
+        return (json) ? JSON.parse(str) : str;
+    } catch(e){}
 };
 
 
