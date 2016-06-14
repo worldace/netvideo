@@ -439,17 +439,15 @@ $v.video.addEventListener('canplaythrough', function(){
 
 $v.video.addEventListener('timeupdate', function(){
     var sec = Math.floor($v.video.currentTime);
-    if(sec !== $v.video.prevSec){
-        if(!$v.controller.timeSeeker.isDragging){
-            $v.controller.setTime(sec, $v.controller.timeCurrent);
-            $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, $v.video.currentTime/$v.video.duration);
-        }
-        //コメント放出
-        if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on === true){
-            $v.comment.release($v.comment.list[sec], $v.comment.laneCheck());
-        }
-        
-        $v.video.prevSec = sec;
+    if(sec === $v.video.prevSec){ return; }
+    $v.video.prevSec = sec;
+
+    if(!$v.controller.timeSeeker.isDragging){
+        $v.controller.setTime(sec, $v.controller.timeCurrent);
+        $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, $v.video.currentTime/$v.video.duration);
+    }
+    if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on === true){
+        $v.comment.release($v.comment.list[sec], $v.comment.laneCheck());
     }
 });
 
