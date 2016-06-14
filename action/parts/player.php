@@ -498,13 +498,13 @@ $v.video.addEventListener('error', function(event){
 
     switch(error.code){ // http://www.html5.jp/tag/elements/video.html
         case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-            alert("動画ファイルが存在しないか、未サポートの形式です");
+            alert("動画ファイルが存在しません");
             break;
         case error.MEDIA_ERR_DECODE:
-            alert("動画ファイルが壊れているか、未サポートの形式です");
+            alert("動画ファイルが未対応の形式です");
             break;
         case error.MEDIA_ERR_NETWORK:
-            alert("動画のダウンロードが途中で失敗しました");
+            alert("動画ファイルのダウンロードが失敗しました");
             break;
         case error.MEDIA_ERR_ABORTED:
             //alert("動画の再生が中止されました");
