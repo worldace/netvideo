@@ -606,7 +606,6 @@ $v.controller.form.addEventListener('submit', function(event){
     event.preventDefault();
     $v.video.play();
     $v.comment.post();
-    $v.controller.timeSeeker.focus();
 });
 
 
@@ -671,6 +670,8 @@ $v.player.addEventListener('keydown', function(event){
         $v.video.volume = ($v.video.volume < 0) ? 0 : volume;
     }
 });
+
+
 
 
 });
