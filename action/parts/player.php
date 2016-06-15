@@ -679,7 +679,7 @@ $v.player.addEventListener('keydown', function(event){
         return true;
     }
 
-    return false;
+    event.preventDefault();
 });
 
 
