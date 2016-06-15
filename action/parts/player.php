@@ -9,8 +9,8 @@
 function parts_player($video){
 
     return <<<━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-<div id="video-player" class="video-player" tabindex="1"
-><div id="video-screen" class="video-screen"
+<div id="video-player" class="video-player"
+><div id="video-screen" class="video-screen" tabindex="1"
 ><video id="video" class="video" src="{$video['動画URL']}" loop></video
 ></div
 ><div id="video-controller" class="video-controller"
@@ -47,10 +47,10 @@ var $v = $v || {};
 $v.video  = document.getElementById("video");
 
 $v.player = document.getElementById("video-player");
-$v.player.focus();
 
 $v.screen     = document.getElementById("video-screen");
 $v.screen.pos = $v.screen.getBoundingClientRect();
+$v.screen.focus();
 
 $v.controller               = document.getElementById("video-controller");
 $v.controller.timeSeek      = document.getElementById("controller-time-seek");
@@ -624,7 +624,7 @@ $v.controller.form.addEventListener('submit', function(event){
     event.preventDefault();
     $v.video.play();
     $v.comment.post();
-    $v.player.focus();
+    $v.screen.focus();
 });
 
 
