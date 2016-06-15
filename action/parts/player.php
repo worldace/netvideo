@@ -96,6 +96,8 @@ $v.player.init = function(width, height){
 
     $v.screen.pos = $v.screen.getBoundingClientRect();
     $v.screen.focus();
+
+    $v.player.style.visibility = "visible";
 };
 
 
@@ -715,6 +717,9 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 
 .video{
     position: absolute;
+}
+.video-player{
+    visibility: hidden;
 }
 .video-screen{
     background-color: #000;
