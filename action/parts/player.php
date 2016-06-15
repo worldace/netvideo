@@ -88,6 +88,11 @@ $v.player.init = function(width, height){
     $v.screen.style.height = height + "px";
     $v.controller.style.width = width + "px";
     $v.controller.timeSeek.style.width = width - 307 + "px";
+    
+    $v.comment.laneBuild();
+
+    $v.player.defaultVolume = Number($v.load("volume")) || 1;
+    $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.player.defaultVolume);
 
     $v.screen.pos = $v.screen.getBoundingClientRect();
     $v.screen.focus();
@@ -445,7 +450,6 @@ $v.type = function(target){
 $v.video.addEventListener('loadedmetadata', function(){
     if(!$v.isUnregistered){
         $v.comment.get();
-        $v.comment.laneBuild();
         $v.controller.input.disabled  = false;
         $v.controller.submit.disabled = false;
     }
@@ -453,7 +457,7 @@ $v.video.addEventListener('loadedmetadata', function(){
     $v.controller.setBuffer();
     $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
 
-    $v.video.volume = Number($v.load("volume")) || 1;
+    $v.video.volume = $v.player.defaultVolume;
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
 
     $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
