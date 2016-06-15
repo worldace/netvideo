@@ -42,15 +42,12 @@ $js=<<<'━━━━━━━━━━━━━━━━━━━━━━━━
 
 document.addEventListener('DOMContentLoaded', function(){
 
-var $v = $v || {};
+var $v = {};
+$v.comment = {};
 
-$v.video  = document.getElementById("video");
-
-$v.player = document.getElementById("video-player");
-
-$v.screen     = document.getElementById("video-screen");
-$v.screen.pos = $v.screen.getBoundingClientRect();
-$v.screen.focus();
+$v.video                    = document.getElementById("video");
+$v.player                   = document.getElementById("video-player");
+$v.screen                   = document.getElementById("video-screen");
 
 $v.controller               = document.getElementById("video-controller");
 $v.controller.timeSeek      = document.getElementById("controller-time-seek");
@@ -68,6 +65,7 @@ $v.controller.screenButton  = document.getElementById("controller-screen-button"
 $v.controller.form          = document.getElementById("comment-form");
 $v.controller.input         = document.getElementById("comment-form-input");
 $v.controller.submit        = document.getElementById("comment-form-submit");
+
 $v.controller.parts = {
     play:       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNTc2IDkyN2wtMTMyOCA3MzhxLTIzIDEzLTM5LjUgM3QtMTYuNS0zNnYtMTQ3MnEwLTI2IDE2LjUtMzZ0MzkuNSAzbDEzMjggNzM4cTIzIDEzIDIzIDMxdC0yMyAzMXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=",
     pause:      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNjY0IDE5MnYxNDA4cTAgMjYtMTkgNDV0LTQ1IDE5aC01MTJxLTI2IDAtNDUtMTl0LTE5LTQ1di0xNDA4cTAtMjYgMTktNDV0NDUtMTloNTEycTI2IDAgNDUgMTl0MTkgNDV6bS04OTYgMHYxNDA4cTAgMjYtMTkgNDV0LTQ1IDE5aC01MTJxLTI2IDAtNDUtMTl0LTE5LTQ1di0xNDA4cTAtMjYgMTktNDV0NDUtMTloNTEycTI2IDAgNDUgMTl0MTkgNDV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+",
@@ -79,13 +77,21 @@ $v.controller.parts = {
     setting:    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMTUyIDg5NnEwLTEwNi03NS0xODF0LTE4MS03NS0xODEgNzUtNzUgMTgxIDc1IDE4MSAxODEgNzUgMTgxLTc1IDc1LTE4MXptNTEyLTEwOXYyMjJxMCAxMi04IDIzdC0yMCAxM2wtMTg1IDI4cS0xOSA1NC0zOSA5MSAzNSA1MCAxMDcgMTM4IDEwIDEyIDEwIDI1dC05IDIzcS0yNyAzNy05OSAxMDh0LTk0IDcxcS0xMiAwLTI2LTlsLTEzOC0xMDhxLTQ0IDIzLTkxIDM4LTE2IDEzNi0yOSAxODYtNyAyOC0zNiAyOGgtMjIycS0xNCAwLTI0LjUtOC41dC0xMS41LTIxLjVsLTI4LTE4NHEtNDktMTYtOTAtMzdsLTE0MSAxMDdxLTEwIDktMjUgOS0xNCAwLTI1LTExLTEyNi0xMTQtMTY1LTE2OC03LTEwLTctMjMgMC0xMiA4LTIzIDE1LTIxIDUxLTY2LjV0NTQtNzAuNXEtMjctNTAtNDEtOTlsLTE4My0yN3EtMTMtMi0yMS0xMi41dC04LTIzLjV2LTIyMnEwLTEyIDgtMjN0MTktMTNsMTg2LTI4cTE0LTQ2IDM5LTkyLTQwLTU3LTEwNy0xMzgtMTAtMTItMTAtMjQgMC0xMCA5LTIzIDI2LTM2IDk4LjUtMTA3LjV0OTQuNS03MS41cTEzIDAgMjYgMTBsMTM4IDEwN3E0NC0yMyA5MS0zOCAxNi0xMzYgMjktMTg2IDctMjggMzYtMjhoMjIycTE0IDAgMjQuNSA4LjV0MTEuNSAyMS41bDI4IDE4NHE0OSAxNiA5MCAzN2wxNDItMTA3cTktOSAyNC05IDEzIDAgMjUgMTAgMTI5IDExOSAxNjUgMTcwIDcgOCA3IDIyIDAgMTItOCAyMy0xNSAyMS01MSA2Ni41dC01NCA3MC41cTI2IDUwIDQxIDk4bDE4MyAyOHExMyAyIDIxIDEyLjV0OCAyMy41eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg=="
 };
 
-$v.comment = {};
-$v.comment.list = [];
-$v.comment.on = true;
-$v.comment.laneNormalHeight = 25;
-$v.comment.laneFullHeight   = Math.floor(screen.height * 0.8 / 12);
 
 
+
+$v.player.init = function(width, height){
+    width  = width  || 640;
+    height = height || 360;
+
+    $v.screen.style.width  = width + "px";
+    $v.screen.style.height = height + "px";
+    $v.controller.style.width = width + "px";
+    $v.controller.timeSeek.style.width = width - 307 + "px";
+
+    $v.screen.pos = $v.screen.getBoundingClientRect();
+    $v.screen.focus();
+};
 
 
 $v.video.fit = function(screenW, screenH, objectW, objectH){
@@ -181,6 +187,9 @@ $v.comment.run = function(){
 
 
 $v.comment.laneBuild = function(){
+    $v.comment.laneNormalHeight = 25;
+    $v.comment.laneFullHeight   = Math.floor(screen.height * 0.8 / 12);
+
     var css = "";
     css += "@keyframes normallane{";
     css += "from{transform:translateX(0);}";
@@ -465,7 +474,7 @@ $v.video.addEventListener('timeupdate', function(){
         $v.controller.setTime(sec, $v.controller.timeCurrent);
         $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, $v.video.currentTime/$v.video.duration);
     }
-    if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on === true){
+    if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on !== false){
         $v.comment.release($v.comment.list[sec], $v.comment.laneCheck());
     }
 });
@@ -622,8 +631,8 @@ document.addEventListener("mozfullscreenchange",   function(){ $v.screen.fullscr
 
 $v.controller.form.addEventListener('submit', function(event){
     event.preventDefault();
-    $v.video.play();
     $v.comment.post();
+    $v.video.play();
     $v.screen.focus();
 });
 
@@ -685,6 +694,11 @@ $v.player.addEventListener('keydown', function(event){
 
 
 
+$v.player.init();
+
+
+
+
 });
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━;
@@ -697,9 +711,6 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 
 .video{
     position: absolute;
-}
-.video-player:focus{
-    outline: none;
 }
 .video-screen{
     background-color: #000;
@@ -714,7 +725,9 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     user-select: none;
     position: relative;
 }
-
+.video-screen:focus{
+    outline: none;
+}
 .video-controller{
     display: block;
     width: 640px;
@@ -776,8 +789,8 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 .controller-time-seekbar{
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAICAIAAABcT7kVAAAAFUlEQVQI12N0WX+DgYGBiYGBgSQKAGI2AdswIf1pAAAAAElFTkSuQmCC");
     background-repeat: no-repeat;
-    background-position: 0 0;
-    background-size : 0 0;
+    background-position: 0;
+    background-size : 0;
 }
 .controller-seeker{
     position: absolute;
@@ -832,8 +845,6 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
 	cursor: pointer;
 }
 
-
-
 .comment{
     font-family: 'MS PGothic', Meiryo, sans-serif;
     position: absolute;
@@ -848,32 +859,31 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     opacity: 0.75;
 }
 
-
 .video-screen:-ms-fullscreen{
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
 	left: 0;
  	top: 0;
 }
 .video-screen:-webkit-full-screen{
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
 	left: 0;
  	top: 0;
 }
 .video-screen:-moz-full-screen{
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
 	left: 0;
  	top: 0;
 }
 .video-screen:fullscreen{
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
 	left: 0;
  	top: 0;
 }
