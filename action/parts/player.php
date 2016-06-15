@@ -639,7 +639,7 @@ $v.player.addEventListener('keydown', function(event){
     if(event.which == 32){ //Space
         $v.controller.input.focus();
     }
-    else if(event.ctrlKey && event.which == 13){ //Ctrl+Enter ※IE11で効かない
+    else if(event.which == 13 && event.ctrlKey){ //Ctrl+Enter ※IE11で効かない
         $v.screen.toggleFullscreen();
     }
     else if(event.which == 13){ //Enter
