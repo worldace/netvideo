@@ -694,7 +694,7 @@ $v.player.addEventListener('keydown', function(event){
 
 
 
-$v.player.init();
+$v.player.init(640, 360);
 
 
 
