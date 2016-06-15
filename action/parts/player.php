@@ -98,6 +98,23 @@ $v.video.fit = function(screenW, screenH, objectW, objectH){
 };
 
 
+$v.video.setTime = function(sec){
+    if(!$v.video.duration){ return; }
+    if(sec < 1){ sec = 0; }
+    if(sec > $v.video.duration){ sec = $v.video.duration; }
+    $v.video.currentTime = sec;
+};
+
+
+$v.video.setVolume = function(volume){
+    volume = volume.toFixed(1);
+    if(volume >= 1){ volume = 1; }
+    if(volume <= 0){ volume = 0; }
+    $v.video.volume = volume;
+    $v.video.muted  = false;
+};
+
+
 $v.video.isSeekable = function(sec){
     for(var i = 0; i < $v.video.seekable.length; i++){
         if(sec >= $v.video.seekable.start(i) && sec <= $v.video.seekable.end(i)){ return true; }
@@ -620,63 +637,49 @@ $v.player.addEventListener('keydown', function(event){
     if(document.querySelector(":focus").parentNode.getAttribute("id") == "comment-form"){ return true; }
 
     if(event.which == 32){ //Space
-        event.preventDefault();
         $v.controller.input.focus();
     }
     else if(event.ctrlKey && event.which == 13){ //Ctrl+Enter ※IE11で効かない
-        event.preventDefault();
         $v.screen.toggleFullscreen();
     }
     else if(event.which == 13){ //Enter
-        event.preventDefault();
         $v.video.paused ? $v.video.play() : $v.video.pause();
     }
-    else if((event.ctrlKey && event.which == 39) || (event.shiftKey && event.which == 39)){ //Ctrl+→ or Shift+→
-        if(!$v.video.duration){ return; }
-        event.preventDefault();
-        var sec = $v.video.currentTime + 30;
-        $v.video.currentTime = (sec >= $v.video.duration) ? $v.video.duration : sec;
+    else if(event.which == 39 && event.ctrlKey){ //Ctrl+→
+        $v.video.setTime($v.video.currentTime + 30);
     }
-    else if((event.ctrlKey && event.which == 37) || (event.shiftKey && event.which == 37)){ //Ctrl+← or Shift+←
-        if(!$v.video.duration){ return; }
-        event.preventDefault();
-        var sec = $v.video.currentTime - 30;
-        $v.video.currentTime = (sec <= 0) ? 0 : sec
+    else if(event.which == 39 && event.shiftKey){ //Shift+→
+        $v.video.setTime($v.video.currentTime + 30);
+    }
+    else if(event.which == 37 && event.ctrlKey){ //Ctrl+←
+        $v.video.setTime($v.video.currentTime - 30);
+    }
+    else if(event.which == 37 && event.shiftKey){ //Shift+←
+        $v.video.setTime($v.video.currentTime - 30);
     }
     else if(event.which == 39){ //→
-        if(!$v.video.duration){ return; }
-        event.preventDefault();
-        var sec = $v.video.currentTime + 10;
-        $v.video.currentTime = (sec >= $v.video.duration) ? $v.video.duration : sec;
+        $v.video.setTime($v.video.currentTime + 10);
     }
     else if(event.which == 37){ //←
-        if(!$v.video.duration){ return; }
-        event.preventDefault();
-        var sec = $v.video.currentTime - 10;
-        $v.video.currentTime = (sec <= 0) ? 0 : sec;
+        $v.video.setTime($v.video.currentTime - 10);
     }
     else if(event.which == 36){ //Home
-        if(!$v.video.duration){ return; }
-        event.preventDefault();
-        $v.video.currentTime = 0;
+        $v.video.setTime(0);
     }
     else if(event.which == 35){ //End
-        if(!$v.video.duration){ return; }
-        event.preventDefault();
-        $v.video.currentTime = $v.video.duration;
+        $v.video.setTime($v.video.duration - 10);
     }
     else if(event.which == 38){ //↑
-        event.preventDefault();
-        $v.video.muted = false;
-        var volume = ($v.video.volume + 0.1).toFixed(1);
-        $v.video.volume = ($v.video.volume >= 1) ? 1 : volume;
+        $v.video.setVolume($v.video.volume + 0.1);
     }
     else if(event.which == 40){ //↓
-        event.preventDefault();
-        $v.video.muted = false;
-        var volume = ($v.video.volume - 0.1).toFixed(1);
-        $v.video.volume = ($v.video.volume <= 0) ? 0 : volume;
+        $v.video.setVolume($v.video.volume - 0.1);
     }
+    else{
+        return true;
+    }
+
+    return false;
 });
 
 
