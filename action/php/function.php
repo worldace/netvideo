@@ -8,16 +8,20 @@
 
 function 部品(){
     global $設定;
-    $css = $js = "";
+    $設定['js']  = "";
+    $設定['css'] = "";
 
     $引数   = func_get_args();
     $部品名 = array_shift($引数);
 
     include_once("{$設定['actionディレクトリ']}/parts/{$部品名}.php");
+    if($js) { $設定['js']  = $js; }
+    if($css){ $設定['css'] = $css; }
+
     $html = call_user_func_array("parts_${部品名}", $引数);
     
-    if($js) { $設定['追加js'][$部品名]  = $js; }
-    if($css){ $設定['追加css'][$部品名] = $css; }
+    if($設定['js']) { $設定['追加js'][$部品名]  = $設定['js']; }
+    if($設定['css']){ $設定['追加css'][$部品名] = $設定['css']; }
 
     return $html;
 }

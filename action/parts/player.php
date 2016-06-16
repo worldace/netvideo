@@ -7,11 +7,16 @@
 
 
 function parts_player($video){
+    global $設定;
+
+    $設定["js"] .= "document.addEventListener('DOMContentLoaded', function(){\n";
+    $設定["js"] .= "\$v.player.init('{$video['動画URL']}', 640, 360);\n";
+    $設定["js"] .= "});";
 
     return <<<━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 <div id="video-player" class="video-player"
 ><div id="video-screen" class="video-screen" tabindex="1"
-><video id="video" class="video" src="{$video['動画URL']}" loop></video
+><video id="video" class="video" loop></video
 ></div
 ><div id="video-controller" class="video-controller"
 ><div class="controller-wrap"
@@ -42,7 +47,7 @@ $js=<<<'━━━━━━━━━━━━━━━━━━━━━━━━
 
 document.addEventListener('DOMContentLoaded', function(){
 
-var $v = {};
+window.$v = {};
 
 $v.comment = {};
 
@@ -81,10 +86,11 @@ $v.controller.parts = {
 
 
 
-$v.player.init = function(width, height){
+$v.player.init = function(url, width, height){
+    $v.video.src = url;
+
     width  = width  || 640;
     height = height || 360;
-
     $v.screen.style.width  = width + "px";
     $v.screen.style.height = height + "px";
     $v.controller.style.width = width + "px";
@@ -711,11 +717,6 @@ $v.player.addEventListener('keydown', function(event){
 window.addEventListener('unload', function(event){
     $v.saveObject("araiplayer", $v.setting);
 });
-
-
-
-
-$v.player.init(640, 360);
 
 
 
