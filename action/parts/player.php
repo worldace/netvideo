@@ -43,6 +43,7 @@ $js=<<<'━━━━━━━━━━━━━━━━━━━━━━━━
 document.addEventListener('DOMContentLoaded', function(){
 
 var $v = {};
+
 $v.comment = {};
 
 $v.video                    = document.getElementById("video");
@@ -233,11 +234,8 @@ $v.comment.get = function(){
     var sec  = Math.floor($v.video.duration);
     var num  = sec * 4; //コメント取得件数(num)
 
-    //動画時間＋1の箱を作成 [[], [], [], ...]
     $v.comment.list = []; 
-    for(var i = 0; i < sec+1; i++){
-        $v.comment.list.push([]);
-    }
+    for(var i = 0; i < sec+1; i++){ $v.comment.list.push([]); } //動画時間＋1の箱を作成 [[], [], [], ...]
 
     var url = "?action=commentget" + "&id=" + id + "&path=" + path + "&num=" + num + "&nocache=" + Date.now();
     $v.get(url, function(xhr){
@@ -253,19 +251,17 @@ $v.comment.get = function(){
 
 $v.comment.post = function(){
     var text = $v.controller.input.value.trim();
-    var sec  = $v.video.currentTime;
-
     if(text == "" || text.length > 64){ return; }
+    $v.controller.input.value = "";
+
+    var sec  = $v.video.currentTime;
+    if(Math.floor(sec+1) in $v.comment.list){
+        $v.comment.list[Math.floor(sec+1)].unshift([text, sec+1, Math.floor(Date.now()/1000)]);
+    }
     
     var formdata = new FormData($v.controller.form);
     formdata.append("time", sec.toFixed(2)*100);
     $v.post('?action=commentpost', formdata);
-
-    if(Math.floor(sec+1) in $v.comment.list){
-        $v.comment.list[Math.floor(sec+1)].unshift([text, sec+1, Math.floor(Date.now()/1000)]);
-    }
-
-    $v.controller.input.value = "";
 };
 
 
@@ -285,8 +281,7 @@ $v.controller.setSeeker = function(seekbar, seeker, percent){
     seeker.pos  = seeker.getBoundingClientRect();
     var seekbarWidth = seekbar.pos.width - seeker.pos.width;
 
-    //percentは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
-    var pos = (percent <= 1) ? seekbarWidth*percent : percent-seekbar.pos.left;
+    var pos = (percent <= 1) ? seekbarWidth*percent : percent-seekbar.pos.left; //percentは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
 
     if(pos < 0){ pos = 0; }
     if(pos > seekbarWidth){ pos = seekbarWidth; }
