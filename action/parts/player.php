@@ -96,9 +96,9 @@ $v.player.init = function(width, height){
     $v.setting.volume = Number($v.setting.volume) || 1;
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.setting.volume);
 
+    $v.player.style.visibility = "visible";
     $v.screen.pos = $v.screen.getBoundingClientRect();
     $v.screen.focus();
-    $v.player.style.visibility = "visible";
 };
 
 
