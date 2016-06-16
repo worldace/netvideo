@@ -88,14 +88,15 @@ $v.player.init = function(width, height){
     $v.screen.style.height = height + "px";
     $v.controller.style.width = width + "px";
     $v.controller.timeSeek.style.width = width - 307 + "px";
-    
-    $v.comment.laneBuild();
-
-    $v.player.defaultVolume = Number($v.load("volume")) || 1;
-    $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.player.defaultVolume);
 
     $v.screen.pos = $v.screen.getBoundingClientRect();
     $v.screen.focus();
+
+    $v.comment.laneBuild();
+
+    $v.setting = $v.loadObject("araiplayer") || {};
+    $v.setting.volume = Number($v.setting.volume) || 1;
+    $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.setting.volume);
 
     $v.player.style.visibility = "visible";
 };
@@ -406,18 +407,18 @@ $v.deparam = function(str){
 };
 
 
-$v.save = function(name, value){
+$v.saveObject = function(name, value){
     try{
-        if($v.type(value) == "object" || $v.type(value) == "array"){ value = JSON.stringify(value); }
-        window.localStorage.setItem(name, value);
+        if($v.type(value) == "object" || $v.type(value) == "array"){
+            window.localStorage.setItem(name, JSON.stringify(value));
+        }
     } catch(e){}
 };
 
 
-$v.load = function(name, json){
+$v.loadObject = function(name){
     try{
-        var str = window.localStorage.getItem(name);
-        return (json) ? JSON.parse(str) : str;
+        return JSON.parse(window.localStorage.getItem(name));
     } catch(e){}
 };
 
@@ -521,7 +522,7 @@ $v.video.addEventListener('volumechange', function(){
     else{
         $v.controller.volumeButton.setAttribute("src", $v.controller.parts.volume);
         $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
-        $v.save("volume", $v.video.volume);
+        $v.setting.volume = $v.video.volume;
     }
 });
 
@@ -698,6 +699,11 @@ $v.player.addEventListener('keydown', function(event){
 });
 
 
+window.addEventListener('unload', function(event){
+    $v.saveObject("araiplayer", $v.setting);
+});
+
+
 
 
 $v.player.init(640, 360);
@@ -865,7 +871,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     animation-fill-mode: forwards;
     animation-timing-function: linear;
     animation-duration: 17s;
-    opacity: 0.75;
+    opacity: 0.8;
 }
 
 .video-screen:-ms-fullscreen{
