@@ -139,8 +139,8 @@ $v.video.isSeekable = function(sec){
 $v.comment.release = function(comments, lane){
     var index = 0;
     for(var i = 0; i < lane.length; i++){
-        if(lane[i] === false){ continue; }
         if(!(index in comments)){ break; }
+        if(lane[i] === false){ continue; }
 
         $v.screen.insertBefore($v.comment.create(comments[index], i), $v.screen.firstChild);
         index++;
