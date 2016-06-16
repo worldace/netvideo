@@ -89,15 +89,14 @@ $v.player.init = function(width, height){
     $v.controller.style.width = width + "px";
     $v.controller.timeSeek.style.width = width - 307 + "px";
 
-    $v.screen.pos = $v.screen.getBoundingClientRect();
-    $v.screen.focus();
-
     $v.comment.laneBuild();
 
     $v.setting = $v.loadObject("araiplayer") || {};
     $v.setting.volume = Number($v.setting.volume) || 1;
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.setting.volume);
 
+    $v.screen.pos = $v.screen.getBoundingClientRect();
+    $v.screen.focus();
     $v.player.style.visibility = "visible";
 };
 
@@ -460,7 +459,7 @@ $v.video.addEventListener('loadedmetadata', function(){
     $v.controller.setBuffer();
     $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
 
-    $v.video.volume = $v.player.defaultVolume;
+    $v.video.volume = $v.setting.volume;
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
 
     $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
