@@ -137,35 +137,38 @@ $v.video.isSeekable = function(sec){
 
 
 $v.comment.release = function(comments, lane){
-    var time = $v.video.currentTime;
-    for(var i = 0; i < comments.length; i++){
-        for(var j = 0; j < lane.length; j++){
-            if(lane[j] === false){ continue; }
+    var index = 0;
+    for(var i = 0; i < lane.length; i++){
+        if(lane[i] === false){ continue; }
+        if(!(index in comments)){ break; }
 
-            var comment = document.createElement("span");
-            comment.textContent = comments[i][0];
-            comment.classList.add('comment');
-            comment.setAttribute("data-lane", j);
-            if($v.screen.isFullscreen()){
-                comment.style.animationName = "fulllane";
-                comment.style.top = $v.comment.laneFullHeight*j+$v.comment.laneFullHeight/6 + "px";
-                comment.style.fontSize = $v.comment.laneFullHeight*0.8 + "px";
-            }
-            else{
-                comment.style.animationName = "normallane";
-                comment.style.top = $v.comment.laneNormalHeight*j+$v.comment.laneNormalHeight/6 + "px";
-                comment.style.fontSize = $v.comment.laneNormalHeight*0.9 + "px";
-            }
-            //ディレイ計算
-            var delay = comments[i][1] - time;
-            delay = (delay <= 0) ? 0 : delay.toFixed(3)*1000; //ms変換
-            comment.style.animationDelay = delay + "ms";
-
-            $v.screen.insertBefore(comment, $v.screen.firstChild);
-            lane[j] = false;
-            break;
-        }
+        $v.screen.insertBefore($v.comment.create(comments[index], i), $v.screen.firstChild);
+        index++;
     }
+};
+
+
+$v.comment.create = function(data, laneNo){
+    var comment = document.createElement("span");
+    comment.textContent = data[0];
+    comment.classList.add('comment');
+    comment.setAttribute("data-lane", laneNo);
+
+   if($v.screen.isFullscreen()){
+        comment.style.animationName = "fulllane";
+        comment.style.top = $v.comment.laneFullHeight*laneNo + $v.comment.laneFullHeight/6 + "px";
+        comment.style.fontSize = $v.comment.laneFullHeight*0.8 + "px";
+    }
+    else{
+        comment.style.animationName = "normallane";
+        comment.style.top = $v.comment.laneNormalHeight*laneNo + $v.comment.laneNormalHeight/6 + "px";
+        comment.style.fontSize = $v.comment.laneNormalHeight*0.9 + "px";
+    }
+    var delay = data[1] - $v.video.currentTime;
+    delay = (delay <= 0) ? 0 : delay.toFixed(3)*1000;
+    comment.style.animationDelay = delay + "ms";
+
+    return comment;
 };
 
 
