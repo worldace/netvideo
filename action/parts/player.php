@@ -420,6 +420,18 @@ $v.loadObject = function(name){
 };
 
 
+$v.extend = function(out){
+    out = out || {};
+    for(var i = 1; i < arguments.length; i++){
+        if(!arguments[i]){ continue; }
+        for(var key in arguments[i]){
+            if(arguments[i].hasOwnProperty(key)){ out[key] = arguments[i][key]; }
+        }
+    }
+    return out;
+};
+
+
 $v.objectFit = function(screenW, screenH, objectW, objectH){
     var result  = {};
     var screenR = screenW / screenH;
