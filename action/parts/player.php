@@ -99,10 +99,11 @@ $v.player.init = function(url, width, height){
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.setting.volume);
 
     $v.player.style.visibility = "visible";
-    if(url){ $v.video.src = url; }
 
     $v.screen.pos = $v.screen.getBoundingClientRect();
     $v.screen.focus();
+
+    if(url){ $v.video.src = url; }
 };
 
 
