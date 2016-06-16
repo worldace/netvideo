@@ -85,8 +85,6 @@ $v.controller.parts = {
 
 
 $v.player.init = function(url, width, height){
-    $v.video.src = url;
-
     width  = width  || 640;
     height = height || 360;
     $v.screen.style.width  = width + "px";
@@ -101,6 +99,8 @@ $v.player.init = function(url, width, height){
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.setting.volume);
 
     $v.player.style.visibility = "visible";
+    if(url){ $v.video.src = url; }
+
     $v.screen.pos = $v.screen.getBoundingClientRect();
     $v.screen.focus();
 };
