@@ -9,9 +9,7 @@
 function parts_player($video){
     global $設定;
 
-    $設定["js"] .= "document.addEventListener('DOMContentLoaded', function(){\n";
-    $設定["js"] .= "\$v.player.init('{$video['動画URL']}', 640, 360);\n";
-    $設定["js"] .= "});";
+    $設定["js"] .= "\$v.player.init('{$video['動画URL']}', 640, 360);\n});";
 
     return <<<━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 <div id="video-player" class="video-player"
@@ -47,7 +45,7 @@ $js=<<<'━━━━━━━━━━━━━━━━━━━━━━━━
 
 document.addEventListener('DOMContentLoaded', function(){
 
-window.$v = {};
+var $v = {};
 
 $v.comment = {};
 
@@ -719,9 +717,7 @@ window.addEventListener('unload', function(event){
 });
 
 
-
-
-});
+//パーツ関数に続く
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━;
 
