@@ -396,14 +396,17 @@ $v.post = function(url, param){
 
 
 $v.deparam = function(str){
-    if($v.type(str) != 'string'){ return {}; }
+    if(str == null){ return {}; }
+    str = String(str);
     str = str.replace(/^\?/, "");
+    str = str.replace(/#.*/, "");
     var result = {};
-    var query  = str.split('&');
-    for(var i = 0; i < query.length; i++){
-        var name  = decodeURIComponent(query[i].split('=')[0]);
-        var value = decodeURIComponent(query[i].split('=')[1]);
-        result[name] = value;
+    var namevalue = str.split('&');
+    for(var i = 0; i < namevalue.length; i++){
+        var name  = namevalue[i].split('=')[0] || "";
+        var value = namevalue[i].split('=')[1] || "";
+        if(name == ""){ continue; }
+        result[decodeURIComponent(name)] = decodeURIComponent(value);
     }
     return result;
 };
