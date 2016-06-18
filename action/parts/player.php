@@ -321,7 +321,7 @@ $v.controller.volumeSeeker.mousemoveEvent = function(event){
 
 $v.screen.isFullscreen = function(){
     var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-    return (element && element.id == "video-screen") ? true : false;
+    return (element && element.id == $v.screen.id) ? true : false;
 };
 
 
@@ -647,10 +647,10 @@ $v.controller.screenButton.addEventListener('click', function(){
 });
 
 
-document.addEventListener("fullscreenchange",      function(){ $v.screen.fullscreenEvent(); });
-document.addEventListener("MSFullscreenChange",    function(){ $v.screen.fullscreenEvent(); });
-document.addEventListener("webkitfullscreenchange",function(){ $v.screen.fullscreenEvent(); });
-document.addEventListener("mozfullscreenchange",   function(){ $v.screen.fullscreenEvent(); });
+document.addEventListener("fullscreenchange",       $v.screen.fullscreenEvent);
+document.addEventListener("MSFullscreenChange",     $v.screen.fullscreenEvent);
+document.addEventListener("webkitfullscreenchange", $v.screen.fullscreenEvent);
+document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent);
 
 
 $v.controller.form.addEventListener('submit', function(event){
