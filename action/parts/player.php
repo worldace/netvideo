@@ -428,15 +428,15 @@ $v.loadObject = function(name){
 };
 
 
-$v.extend = function(out){
-    out = out || {};
+$v.copyObject = function(object){
+    object = object || {};
     for(var i = 1; i < arguments.length; i++){
         if(!arguments[i]){ continue; }
         for(var key in arguments[i]){
-            if(arguments[i].hasOwnProperty(key)){ out[key] = arguments[i][key]; }
+            if(arguments[i].hasOwnProperty(key)){ object[key] = arguments[i][key]; }
         }
     }
-    return out;
+    return object;
 };
 
 
@@ -667,7 +667,7 @@ $v.controller.input.addEventListener('focus', function(event){
 
 
 $v.player.addEventListener('keydown', function(event){
-    if(document.querySelector(":focus").parentNode.getAttribute("id") == "comment-form"){ return true; }
+    if(event.target.tagName.match(/input/i)){ return true; }
 
     if(event.which == 32){ //Space
         $v.controller.input.focus();
