@@ -296,6 +296,17 @@ $v.controller.setSeeker = function(seekbar, seeker, percent){
 };
 
 
+$v.controller.setBuffer = function(){
+    var seekbarWidth = $v.controller.timeSeekbar.getBoundingClientRect().width;
+    var buffer = $v.video.buffered;
+
+    if(buffer.length){
+        $v.controller.timeSeekbar.style.backgroundPosition = buffer.start(0) / $v.video.duration * seekbarWidth + "px";
+        $v.controller.timeSeekbar.style.backgroundSize     = buffer.end(buffer.length-1) / $v.video.duration * seekbarWidth + "px";
+    }
+};
+
+
 $v.controller.timeSeeker.mousemoveEvent = function(event, seekend){
     var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
     $v.controller.setTime($v.video.duration * percent, $v.controller.timeCurrent);
@@ -305,17 +316,6 @@ $v.controller.timeSeeker.mousemoveEvent = function(event, seekend){
 
 $v.controller.volumeSeeker.mousemoveEvent = function(event){
     $v.video.volume = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
-};
-
-
-$v.controller.setBuffer = function(){
-    var seekbarWidth = $v.controller.timeSeekbar.getBoundingClientRect().width;
-    var buffer = $v.video.buffered;
-
-    if(buffer.length){
-        $v.controller.timeSeekbar.style.backgroundPosition = buffer.start(0) / $v.video.duration * seekbarWidth + "px";
-        $v.controller.timeSeekbar.style.backgroundSize     = buffer.end(buffer.length-1) / $v.video.duration * seekbarWidth + "px";
-    }
 };
 
 
@@ -767,6 +767,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     -ms-user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
+    user-select: none;
     position:relative;
 }
 .controller-wrap{
