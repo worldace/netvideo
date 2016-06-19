@@ -314,8 +314,8 @@ $v.controller.timeSeeker.setSeeker = function(percent){
     var seeker  = this;
     var seekbar = this.parentNode;
 
-    seekbar.pos = seekbar.getBoundingClientRect();
     seeker.pos  = seeker.getBoundingClientRect();
+    seekbar.pos = seekbar.getBoundingClientRect();
     var seekbarWidth = seekbar.pos.width - seeker.pos.width;
 
     var pos = (percent <= 1) ? seekbarWidth*percent : percent-seekbar.pos.left; //percentは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
