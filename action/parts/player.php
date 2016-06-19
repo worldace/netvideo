@@ -19,9 +19,9 @@ function parts_player($video){
 ><div id="video-controller" class="video-controller"
 ><div class="controller-wrap"
 ><img id="controller-play-button" class="controller-img" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNTc2IDkyN2wtMTMyOCA3MzhxLTIzIDEzLTM5LjUgM3QtMTYuNS0zNnYtMTQ3MnEwLTI2IDE2LjUtMzZ0MzkuNSAzbDEzMjggNzM4cTIzIDEzIDIzIDMxdC0yMyAzMXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4="
-><span id="controller-time-current" class="controller-time controller-time-current">00:00</span
+><span id="controller-current-time" class="controller-time controller-current-time">00:00</span
 ><div id="controller-time-seek" class="controller-seek controller-time-seek"><div id="controller-time-seekbar" class="controller-seekbar controller-time-seekbar"><span id="controller-time-seeker" class="controller-seeker"></span></div></div
-><span id="controller-time-total" class="controller-time controller-time-total">00:00</span
+><span id="controller-total-time" class="controller-time controller-total-time">00:00</span
 ><img id="controller-volume-button" class="controller-img" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04MzIgMzUydjEwODhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTMzMy0zMzNoLTI2MnEtMjYgMC00NS0xOXQtMTktNDV2LTM4NHEwLTI2IDE5LTQ1dDQ1LTE5aDI2MmwzMzMtMzMzcTE5LTE5IDQ1LTE5dDQ1IDE5IDE5IDQ1em0zODQgNTQ0cTAgNzYtNDIuNSAxNDEuNXQtMTEyLjUgOTMuNXEtMTAgNS0yNSA1LTI2IDAtNDUtMTguNXQtMTktNDUuNXEwLTIxIDEyLTM1LjV0MjktMjUgMzQtMjMgMjktMzUuNSAxMi01Ny0xMi01Ny0yOS0zNS41LTM0LTIzLTI5LTI1LTEyLTM1LjVxMC0yNyAxOS00NS41dDQ1LTE4LjVxMTUgMCAyNSA1IDcwIDI3IDExMi41IDkzdDQyLjUgMTQyem0yNTYgMHEwIDE1My04NSAyODIuNXQtMjI1IDE4OC41cS0xMyA1LTI1IDUtMjcgMC00Ni0xOXQtMTktNDVxMC0zOSAzOS01OSA1Ni0yOSA3Ni00NCA3NC01NCAxMTUuNS0xMzUuNXQ0MS41LTE3My41LTQxLjUtMTczLjUtMTE1LjUtMTM1LjVxLTIwLTE1LTc2LTQ0LTM5LTIwLTM5LTU5IDAtMjYgMTktNDV0NDUtMTlxMTMgMCAyNiA1IDE0MCA1OSAyMjUgMTg4LjV0ODUgMjgyLjV6bTI1NiAwcTAgMjMwLTEyNyA0MjIuNXQtMzM4IDI4My41cS0xMyA1LTI2IDUtMjYgMC00NS0xOXQtMTktNDVxMC0zNiAzOS01OSA3LTQgMjIuNS0xMC41dDIyLjUtMTAuNXE0Ni0yNSA4Mi01MSAxMjMtOTEgMTkyLTIyN3Q2OS0yODktNjktMjg5LTE5Mi0yMjdxLTM2LTI2LTgyLTUxLTctNC0yMi41LTEwLjV0LTIyLjUtMTAuNXEtMzktMjMtMzktNTkgMC0yNiAxOS00NXQ0NS0xOXExMyAwIDI2IDUgMjExIDkxIDMzOCAyODMuNXQxMjcgNDIyLjV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+"
 ><div id="controller-volume-seek" class="controller-seek controller-volume-seek"><div id="controller-volume-seekbar" class="controller-seekbar controller-volume-seekbar"><span id="controller-volume-seeker" class="controller-seeker"></span></div></div
 ><img id="controller-comment-button" class="controller-img" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im02NDAsNzkycTAsLTUzIC0zNy41LC05MC41dC05MC41LC0zNy41dC05MC41LDM3LjV0LTM3LjUsOTAuNXQzNy41LDkwLjV0OTAuNSwzNy41dDkwLjUsLTM3LjV0MzcuNSwtOTAuNXptMzg0LDBxMCwtNTMgLTM3LjUsLTkwLjV0LTkwLjUsLTM3LjV0LTkwLjUsMzcuNXQtMzcuNSw5MC41dDM3LjUsOTAuNXQ5MC41LDM3LjV0OTAuNSwtMzcuNXQzNy41LC05MC41em0zODQsMHEwLC01MyAtMzcuNSwtOTAuNXQtOTAuNSwtMzcuNXQtOTAuNSwzNy41dC0zNy41LDkwLjV0MzcuNSw5MC41dDkwLjUsMzcuNXQ5MC41LC0zNy41dDM3LjUsLTkwLjV6bTM4NCwwcTAsMTc0IC0xMjAsMzIxLjV0LTMyNiwyMzN0LTQ1MCw4NS41cS0xMTAsMCAtMjExLC0xOHEtMTczLDE3MyAtNDM1LDIyOXEtNTIsMTAgLTg2LDEzcS0xMiwxIC0yMiwtNnQtMTMsLTE4cS00LC0xNSAyMCwtMzdxNSwtNSAyMy41LC0yMS41dDI1LjUsLTIzLjV0MjMuNSwtMjUuNXQyNCwtMzEuNXQyMC41LC0zN3QyMCwtNDh0MTQuNSwtNTcuNXQxMi41LC03Mi41cS0xNDYsLTkwIC0yMjkuNSwtMjE2LjV0LTgzLjUsLTI2OS41cTAsLTE3NCAxMjAsLTMyMS41dDMyNiwtMjMzLjAwMDA3NnQ0NTAsLTg1LjUwMDMydDQ1MCw4NS41MDAzMnQzMjYsMjMzLjAwMDA3NnQxMjAsMzIxLjV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+"
@@ -60,8 +60,8 @@ $v.controller.timeSeeker    = document.getElementById("controller-time-seeker");
 $v.controller.volumeSeek    = document.getElementById("controller-volume-seek");
 $v.controller.volumeSeekbar = document.getElementById("controller-volume-seekbar");
 $v.controller.volumeSeeker  = document.getElementById("controller-volume-seeker");
-$v.controller.timeCurrent   = document.getElementById("controller-time-current");
-$v.controller.timeTotal     = document.getElementById("controller-time-total");
+$v.controller.currentTime   = document.getElementById("controller-current-time");
+$v.controller.totalTime     = document.getElementById("controller-total-time");
 $v.controller.playButton    = document.getElementById("controller-play-button");
 $v.controller.volumeButton  = document.getElementById("controller-volume-button");
 $v.controller.commentButton = document.getElementById("controller-comment-button");
@@ -281,7 +281,7 @@ $v.controller.setBuffer = function(){
 };
 
 
-$v.controller.timeCurrent.setTime = function(time){
+$v.controller.currentTime.setTime = function(time){
     var min = Math.floor(time / 60);
     var sec = Math.floor(time - min * 60);
 
@@ -292,7 +292,7 @@ $v.controller.timeCurrent.setTime = function(time){
 };
 
 
-$v.controller.timeTotal.setTime = $v.controller.timeCurrent.setTime;
+$v.controller.totalTime.setTime = $v.controller.currentTime.setTime;
 
 
 $v.controller.timeSeeker.setPosition = function(percent){
@@ -315,7 +315,7 @@ $v.controller.timeSeeker.setPosition = function(percent){
 
 $v.controller.timeSeeker.mousemoveEvent = function(event, seekend){
     var percent = $v.controller.timeSeeker.setPosition(event.clientX);
-    $v.controller.timeCurrent.setTime($v.video.duration * percent);
+    $v.controller.currentTime.setTime($v.video.duration * percent);
     if(seekend){ $v.video.currentTime = $v.video.duration * percent; }
 };
 
@@ -484,7 +484,7 @@ $v.video.addEventListener('loadedmetadata', function(){
     }
 
     $v.controller.setBuffer();
-    $v.controller.timeTotal.setTime($v.video.duration);
+    $v.controller.totalTime.setTime($v.video.duration);
 
     $v.video.volume = $v.setting.volume;
     $v.controller.volumeSeeker.setPosition($v.video.volume);
@@ -504,8 +504,8 @@ $v.video.addEventListener('timeupdate', function(){
     $v.video.prevSec = sec;
 
     if(!$v.controller.timeSeeker.isDragging){
-        $v.controller.timeCurrent.setTime(sec);
         $v.controller.timeSeeker.setPosition($v.video.currentTime/$v.video.duration);
+        $v.controller.currentTime.setTime(sec);
     }
     if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on !== false){
         $v.comment.release($v.comment.list[sec], $v.comment.laneCheck());
@@ -792,11 +792,11 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     display: inline-block;
     width: 35px;
 }
-.controller-time-current{
+.controller-current-time{
     text-align: right;
     
 }
-.controller-time-total{
+.controller-total-time{
     text-align: left;
 }
 .controller-img{
