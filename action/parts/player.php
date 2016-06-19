@@ -9,7 +9,7 @@
 function parts_player($video){
     global $設定;
 
-    $設定["js"] .= "\$v.player.init('{$video['動画URL']}', 640, 360);\n});";
+    $設定["js"] .= "\$v.player.init('{$video['動画URL']}', 640, 360);});";
 
     return <<<━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 <div id="video-player" class="video-player"
@@ -270,17 +270,6 @@ $v.comment.post = function(){
 };
 
 
-$v.controller.setTime = function(time, element){
-    var min = Math.floor(time / 60);
-    var sec = Math.floor(time - min * 60);
-
-    if(min < 10){ min = '0' + min; }
-    if(sec < 10){ sec = '0' + sec; }
-
-    element.textContent = min + ":" + sec;
-};
-
-
 $v.controller.setSeeker = function(seekbar, seeker, percent){
     seekbar.pos = seekbar.getBoundingClientRect();
     seeker.pos  = seeker.getBoundingClientRect();
@@ -307,9 +296,23 @@ $v.controller.setBuffer = function(){
 };
 
 
+$v.controller.timeCurrent.setTime = function(time){
+    var min = Math.floor(time / 60);
+    var sec = Math.floor(time - min * 60);
+
+    if(min < 10){ min = '0' + min; }
+    if(sec < 10){ sec = '0' + sec; }
+
+    this.textContent = min + ":" + sec;
+};
+
+
+$v.controller.timeTotal.setTime = $v.controller.timeCurrent.setTime;
+
+
 $v.controller.timeSeeker.mousemoveEvent = function(event, seekend){
     var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
-    $v.controller.setTime($v.video.duration * percent, $v.controller.timeCurrent);
+    $v.controller.timeCurrent.setTime($v.video.duration * percent);
     if(seekend){ $v.video.currentTime = $v.video.duration * percent; }
 };
 
@@ -475,7 +478,7 @@ $v.video.addEventListener('loadedmetadata', function(){
     }
 
     $v.controller.setBuffer();
-    $v.controller.setTime($v.video.duration, $v.controller.timeTotal);
+    $v.controller.timeTotal.setTime($v.video.duration);
 
     $v.video.volume = $v.setting.volume;
     $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
@@ -495,7 +498,7 @@ $v.video.addEventListener('timeupdate', function(){
     $v.video.prevSec = sec;
 
     if(!$v.controller.timeSeeker.isDragging){
-        $v.controller.setTime(sec, $v.controller.timeCurrent);
+        $v.controller.timeCurrent.setTime(sec);
         $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, $v.video.currentTime/$v.video.duration);
     }
     if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on !== false){
