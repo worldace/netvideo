@@ -96,7 +96,7 @@ $v.player.init = function(url, width, height){
 
     $v.setting = $v.loadObject("araiplayer") || {};
     $v.setting.volume = Number($v.setting.volume) || 1;
-    $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.setting.volume);
+    $v.controller.volumeSeeker.setSeeker($v.setting.volume);
 
     $v.player.style.visibility = "visible";
 
@@ -310,15 +310,36 @@ $v.controller.timeCurrent.setTime = function(time){
 $v.controller.timeTotal.setTime = $v.controller.timeCurrent.setTime;
 
 
+$v.controller.timeSeeker.setSeeker = function(percent){
+    var seeker  = this;
+    var seekbar = this.parentNode;
+
+    seekbar.pos = seekbar.getBoundingClientRect();
+    seeker.pos  = seeker.getBoundingClientRect();
+    var seekbarWidth = seekbar.pos.width - seeker.pos.width;
+
+    var pos = (percent <= 1) ? seekbarWidth*percent : percent-seekbar.pos.left; //percentは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
+
+    if(pos < 0){ pos = 0; }
+    if(pos > seekbarWidth){ pos = seekbarWidth; }
+
+    seeker.style.left = pos + "px";
+    return pos/seekbarWidth;
+};
+
+
 $v.controller.timeSeeker.mousemoveEvent = function(event, seekend){
-    var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
+    var percent = $v.controller.timeSeeker.setSeeker(event.clientX);
     $v.controller.timeCurrent.setTime($v.video.duration * percent);
     if(seekend){ $v.video.currentTime = $v.video.duration * percent; }
 };
 
 
+$v.controller.volumeSeeker.setSeeker = $v.controller.timeSeeker.setSeeker;
+
+
 $v.controller.volumeSeeker.mousemoveEvent = function(event){
-    $v.video.volume = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
+    $v.video.volume = $v.controller.volumeSeeker.setSeeker(event.clientX);
 };
 
 
@@ -481,7 +502,7 @@ $v.video.addEventListener('loadedmetadata', function(){
     $v.controller.timeTotal.setTime($v.video.duration);
 
     $v.video.volume = $v.setting.volume;
-    $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
+    $v.controller.volumeSeeker.setSeeker($v.video.volume);
 
     $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 });
@@ -499,7 +520,7 @@ $v.video.addEventListener('timeupdate', function(){
 
     if(!$v.controller.timeSeeker.isDragging){
         $v.controller.timeCurrent.setTime(sec);
-        $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, $v.video.currentTime/$v.video.duration);
+        $v.controller.timeSeeker.setSeeker($v.video.currentTime/$v.video.duration);
     }
     if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on !== false){
         $v.comment.release($v.comment.list[sec], $v.comment.laneCheck());
@@ -537,11 +558,11 @@ $v.video.addEventListener('ended', function(){
 $v.video.addEventListener('volumechange', function(){
     if(!$v.video.volume || $v.video.muted){
         $v.controller.volumeButton.setAttribute("src", $v.controller.parts.mute);
-        $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, 0);
+        $v.controller.volumeSeeker.setSeeker(0);
     }
     else{
         $v.controller.volumeButton.setAttribute("src", $v.controller.parts.volume);
-        $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, $v.video.volume);
+        $v.controller.volumeSeeker.setSeeker($v.video.volume);
         $v.setting.volume = $v.video.volume;
     }
 });
@@ -587,7 +608,7 @@ $v.controller.playButton.addEventListener('click', function(){
 
 $v.controller.timeSeek.addEventListener('click', function(event){
     if(!$v.video.duration){ return; }
-    var percent = $v.controller.setSeeker($v.controller.timeSeekbar, $v.controller.timeSeeker, event.clientX);
+    var percent = $v.controller.timeSeeker.setSeeker(event.clientX);
     $v.video.currentTime = $v.video.duration * percent;
 
 });
@@ -608,7 +629,7 @@ $v.controller.timeSeeker.addEventListener('mousedown', function(event){
 
 $v.controller.volumeSeek.addEventListener('click', function(event){
     $v.video.muted = false;
-    $v.video.volume = $v.controller.setSeeker($v.controller.volumeSeekbar, $v.controller.volumeSeeker, event.clientX);
+    $v.video.volume = $v.controller.volumeSeeker.setSeeker(event.clientX);
 });
 
 
