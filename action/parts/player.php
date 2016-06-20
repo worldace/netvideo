@@ -161,12 +161,12 @@ $v.comment.create = function(data, laneNo){
     comment.setAttribute("data-lane", laneNo);
 
    if($v.screen.isFullscreen()){
-        comment.style.animationName = "fulllane";
+        comment.style.animationName = $v.player.id + "fulllane";
         comment.style.top = $v.comment.laneFullHeight*laneNo + $v.comment.laneFullHeight/6 + "px";
         comment.style.fontSize = $v.comment.laneFullHeight*0.8 + "px";
     }
     else{
-        comment.style.animationName = "normallane";
+        comment.style.animationName = $v.player.id + "normallane";
         comment.style.top = $v.comment.laneNormalHeight*laneNo + $v.comment.laneNormalHeight/6 + "px";
         comment.style.fontSize = $v.comment.laneNormalHeight*0.9 + "px";
     }
@@ -207,13 +207,13 @@ $v.comment.laneBuild = function(width, height){
     $v.comment.laneFullHeight   = Math.floor(screen.height * 0.8 / 12);
 
     var css = "";
-    css += "@keyframes normallane{";
+    css += "@keyframes " + $v.player.id + "normallane{";
     css += "from{transform:translateX(0);}";
     css += "to{transform:translateX(-" + width*5 + "px);}}";
     document.styleSheets[0].insertRule(css, 0);
 
     css = "";
-    css += "@keyframes fulllane{";
+    css += "@keyframes " + $v.player.id + "fulllane{";
     css += "from{transform:translateX(0);}";
     css += "to{transform:translateX(-" + screen.width*5 + "px);}}";
     document.styleSheets[0].insertRule(css, 0);
