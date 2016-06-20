@@ -92,7 +92,7 @@ $v.player.init = function(url, width, height){
     $v.controller.style.width = width + "px";
     $v.controller.timeSeek.style.width = width - 307 + "px";
 
-    $v.comment.laneBuild();
+    $v.comment.laneBuild(width, height);
 
     $v.setting = $v.loadObject("araiplayer") || {};
     $v.setting.volume = Number($v.setting.volume) || 1;
@@ -202,14 +202,14 @@ $v.comment.run = function(){
 };
 
 
-$v.comment.laneBuild = function(){
-    $v.comment.laneNormalHeight = 25;
+$v.comment.laneBuild = function(width, height){
+    $v.comment.laneNormalHeight = Math.floor(height * 0.8 / 12);
     $v.comment.laneFullHeight   = Math.floor(screen.height * 0.8 / 12);
 
     var css = "";
     css += "@keyframes normallane{";
     css += "from{transform:translateX(0);}";
-    css += "to{transform:translateX(-3200px);}}";
+    css += "to{transform:translateX(-" + width*5 + "px);}}";
     document.styleSheets[0].insertRule(css, 0);
 
     css = "";
