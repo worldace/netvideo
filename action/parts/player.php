@@ -203,7 +203,7 @@ $v.comment.run = function(){
 
 
 $v.comment.laneBuild = function(width, height){
-    $v.comment.laneNormalHeight = Math.floor(height * 0.8 / 12);
+    $v.comment.laneNormalHeight = Math.floor(height * 0.8 / 12) + 1;
     $v.comment.laneFullHeight   = Math.floor(screen.height * 0.8 / 12);
 
     var css = "";
@@ -495,8 +495,6 @@ $v.video.addEventListener('loadedmetadata', function(){
     $v.controller.totalTime.setTime($v.video.duration);
 
     $v.video.volume = $v.setting.volume;
-    $v.controller.volumeSeeker.setPosition($v.video.volume);
-
     $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 });
 
