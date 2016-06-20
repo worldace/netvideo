@@ -437,15 +437,23 @@ $v.loadObject = function(name){
 };
 
 
-$v.copyObject = function(object){
-    object = object || {};
-    for(var i = 1; i < arguments.length; i++){
-        if(!arguments[i]){ continue; }
-        for(var key in arguments[i]){
-            if(arguments[i].hasOwnProperty(key)){ object[key] = arguments[i][key]; }
+$v.extendObject = function(){
+    if(!arguments.length){ return; }
+    if(arguments.lenth == 1){ return arguments[0]; }
+    var destination = Array.prototype.shift.call(arguments);
+    for (var i = 0; i < arguments.length; i++) {
+        var source = arguments[i];
+        for(var property in source){
+            if(source[property] && source[property].constructor && source[property].constructor === Object){
+                destination[property] = destination[property] || {};
+                $v.extendObject(destination[property], source[property]);
+            }
+            else{
+                destination[property] = source[property];
+            }
         }
     }
-    return object;
+    return destination;
 };
 
 
