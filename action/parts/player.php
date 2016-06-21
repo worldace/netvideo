@@ -165,7 +165,7 @@ $v.comment.release = function(comments, lane){
 $v.comment.create = function(data, laneNo){
     var comment = document.createElement("span");
     comment.textContent = data[0];
-    comment.classList.add('comment');
+    comment.setAttribute("class", "comment");
     comment.setAttribute("data-lane", laneNo);
 
    if($v.screen.isFullscreen()){
