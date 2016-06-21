@@ -134,6 +134,14 @@ $v.video.setVolume = function(volume){
 };
 
 
+$v.video.setSpeed = function(speed){
+    speed = speed.toFixed(1);
+    if(speed >= 2){ speed = 2; }
+    if(speed <= 0.5){ speed = 0.5; }
+    $v.video.playbackRate = speed;
+};
+
+
 $v.video.isSeekable = function(sec){
     for(var i = 0; i < $v.video.seekable.length; i++){
         if(sec >= $v.video.seekable.start(i) && sec <= $v.video.seekable.end(i)){ return true; }
@@ -178,30 +186,6 @@ $v.comment.create = function(data, laneNo){
 };
 
 
-$v.comment.clear = function(){
-    var comments = $v.screen.querySelectorAll(".comment");
-    for(var i = comments.length-1; i >= 0; i--){
-        $v.screen.removeChild(comments[i]);
-    }
-};
-
-
-$v.comment.pause = function(){
-    var comments = $v.screen.querySelectorAll(".comment");
-    for(var i = 0; i < comments.length; i++){
-        comments[i].style.animationPlayState = "paused";
-    }
-};
-
-
-$v.comment.run = function(){
-    var comments = $v.screen.querySelectorAll(".comment");
-    for(var i = 0; i < comments.length; i++){
-        comments[i].style.animationPlayState = "running";
-    }
-};
-
-
 $v.comment.laneBuild = function(width, height){
     $v.comment.laneNormalHeight = Math.floor(height * 0.8 / 12) + 1;
     $v.comment.laneFullHeight   = Math.floor(screen.height * 0.8 / 12);
@@ -230,6 +214,30 @@ $v.comment.laneCheck = function(){
         if(comments[i].pos.right < $v.screen.pos.left)     { $v.screen.removeChild(comments[i]); }
     }
     return lane;
+};
+
+
+$v.comment.clear = function(){
+    var comments = $v.screen.querySelectorAll(".comment");
+    for(var i = comments.length-1; i >= 0; i--){
+        $v.screen.removeChild(comments[i]);
+    }
+};
+
+
+$v.comment.pause = function(){
+    var comments = $v.screen.querySelectorAll(".comment");
+    for(var i = 0; i < comments.length; i++){
+        comments[i].style.animationPlayState = "paused";
+    }
+};
+
+
+$v.comment.run = function(){
+    var comments = $v.screen.querySelectorAll(".comment");
+    for(var i = 0; i < comments.length; i++){
+        comments[i].style.animationPlayState = "running";
+    }
 };
 
 
@@ -722,6 +730,18 @@ $v.player.addEventListener('keydown', function(event){
     }
     else if(event.which == 40){ //↓
         $v.video.setVolume($v.video.volume - 0.1);
+    }
+    else if(event.which == 107){ //num+
+        $v.video.setSpeed($v.video.playbackRate + 0.1);
+    }
+    else if(event.which == 187 && event.shiftKey){ //+
+        $v.video.setSpeed($v.video.playbackRate + 0.1);
+    }
+    else if(event.which == 109){ //num-
+        $v.video.setSpeed($v.video.playbackRate - 0.1);
+    }
+    else if(event.which == 189){ //-
+        $v.video.setSpeed($v.video.playbackRate - 0.1);
     }
     else{
         return true;
