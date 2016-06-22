@@ -822,7 +822,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     text-decoration: none;
     background: #47494f;
     border-color: #2f3034 #2f3034 #232427;
-    background-image: linear-gradient(to bottom, #55585f, #47494f 66%, #3d3f44);
+    background-image: linear-gradient(to bottom, #555, #333 66%, #000);
     cursor: default;
     -ms-user-select: none;
     -moz-user-select: none;
