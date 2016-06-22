@@ -9,7 +9,7 @@
 function parts_player($video){
     global $設定;
 
-    $設定["js"] .= "\$v.player.init('{$video['動画URL']}', 640, 360);});";
+    $設定["js"] .= "\$v.player.init('{$video['動画URL']}', 640, 360); });";
 
     return <<<━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 <div id="video-player" class="video-player"
@@ -336,6 +336,25 @@ $v.controller.volumeSeeker.mousemoveEvent = function(event){
 };
 
 
+$v.controller.toggle = function(event){
+    if($v.controller.timeSeeker.isDragging){ return; }
+
+    if($v.controller.style.visibility == "hidden"){
+        event.preventDefault();
+        $v.controller.style.visibility = "visible";
+    }
+    else{
+        var controller = $v.controller.getBoundingClientRect();
+        if(controller.left <= event.clientX && controller.right >= event.clientX){
+            if(controller.top <= event.clientY && controller.bottom >= event.clientY){
+                return;
+            }
+        }
+        $v.controller.style.visibility = "hidden";
+    }
+};
+
+
 $v.screen.isFullscreen = function(){
     var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
     return (element && element.id == $v.screen.id) ? true : false;
@@ -363,6 +382,8 @@ $v.screen.fullscreenEvent = function(){
         $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
         $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 
+        $v.screen.addEventListener('click', $v.controller.toggle);
+
         $v.screen.appendChild($v.controller);
         var controller = $v.controller.getBoundingClientRect();
         $v.controller.style.top  = screen.height - controller.height + "px";
@@ -372,9 +393,12 @@ $v.screen.fullscreenEvent = function(){
         $v.screen.pos = $v.screen.getBoundingClientRect();
         $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 
+        $v.screen.removeEventListener('click', $v.controller.toggle);
+
         $v.player.appendChild($v.controller);
         $v.controller.style.top  = 0;
         $v.controller.style.left = 0;
+        $v.controller.style.visibility = "visible";
     }
     $v.comment.clear();
 };
@@ -690,6 +714,7 @@ $v.controller.input.addEventListener('focus', function(event){
 
 
 $v.player.addEventListener('keydown', function(event){
+    $v.controller.style.visibility = "visible";
     if(event.target.tagName.match(/input/i)){ return true; }
 
     if(event.which == 32){ //Space
@@ -804,6 +829,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     -webkit-user-select: none;
     user-select: none;
     position:relative;
+    visibility:visible;
 }
 .controller-wrap{
     padding: 0 6px;
