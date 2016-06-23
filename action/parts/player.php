@@ -178,6 +178,8 @@ $v.comment.create = function(data, laneNo){
         comment.style.top = $v.comment.laneNormalHeight*laneNo + $v.comment.laneNormalHeight/6 + "px";
         comment.style.fontSize = $v.comment.laneNormalHeight*0.9 + "px";
     }
+    
+
     var delay = data[1] - $v.video.currentTime;
     delay = (delay <= 0) ? 0 : delay.toFixed(3)*1000;
     comment.style.animationDelay = delay + "ms";
@@ -366,13 +368,14 @@ $v.screen.toggleFullscreen = function(){
         if     ($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
         else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
         else if($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
+        else if($v.screen.webkitEnterFullscreen)  { $v.screen.webkitEnterFullscreen(); }
         else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
     }
     else{
-        if     (document.exitFullscreen)        { document.exitFullscreen(); }
-        else if(document.msExitFullscreen)      { document.msExitFullscreen(); }
-        else if(document.webkitCancelFullScreen){ document.webkitCancelFullScreen(); }
-        else if(document.mozCancelFullScreen)   { document.mozCancelFullScreen(); }
+        if     (document.exitFullscreen)      { document.exitFullscreen(); }
+        else if(document.msExitFullscreen)    { document.msExitFullscreen(); }
+        else if(document.webkitExitFullscreen){ document.webkitExitFullscreen(); }
+        else if(document.mozCancelFullScreen) { document.mozCancelFullScreen(); }
     }
 };
 
@@ -592,6 +595,7 @@ $v.video.addEventListener('volumechange', function(){
 
 
 $v.video.addEventListener('click', function(event){
+    if(!$v.video.currentTime){ $v.video.play(); }
     event.preventDefault();
 });
 
