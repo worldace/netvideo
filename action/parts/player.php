@@ -199,7 +199,7 @@ $v.comment.laneCss = function(width){
 
 $v.comment.laneCalc = function(height){
     if(height >= 360){
-        $v.comment.laneCount  = Math.floor(height/360);
+        $v.comment.laneCount  = Math.floor((height-360)/180) + 10;
         $v.comment.laneHeight = height / $v.comment.laneCount * 0.8;
         $v.comment.fontSize   = $v.comment.laneHeight / 6 * 5;
         $v.comment.marginTop  = $v.comment.laneHeight / 6;
@@ -211,8 +211,8 @@ $v.comment.laneCalc = function(height){
 
 
 $v.comment.laneCheck = function(){
-    var lane = [];
-    for(var i = 0; i < $v.comment.laneCount.length; i++){ lane.push(true); }
+    var lane = Array($v.comment.laneCount);
+    for(var i = 0; i < $v.comment.laneCount.length; i++){ lane[i] = true; }
  
     var comments = $v.screen.querySelectorAll(".comment");
     for(var i = comments.length-1; i >= 0; i--){
