@@ -407,6 +407,32 @@ $v.screen.fullscreenEvent = function(){
 };
 
 
+$v.screen.showOsd = function(str){
+    var osd = document.createElement("span");
+    osd.textContent = str;
+    osd.setAttribute("class", "osd");
+    if($v.screen.isFullscreen()){
+        osd.style.fontSize = $v.comment.laneFullHeight*0.8 + "px";
+    }
+    else{
+        osd.style.fontSize = $v.comment.laneNormalHeight*0.9 + "px";
+    }
+
+    $v.screen.clearOsd();
+    $v.screen.appendChild(osd);
+    $v.screen.osdTimer = window.setTimeout($v.screen.clearOsd, 1500);
+};
+
+
+$v.screen.clearOsd = function(){
+    var osd = $v.screen.querySelectorAll(".osd");
+    for(var i = osd.length-1; i >= 0; i--){
+        $v.screen.removeChild(osd[i]);
+    }
+    if($v.screen.osdTimer){ window.clearTimeout($v.screen.osdTimer); }
+};
+
+
 $v.get = function(url, callback){
     var xhr = new XMLHttpRequest();
 
@@ -591,6 +617,11 @@ $v.video.addEventListener('volumechange', function(){
         $v.controller.volumeSeeker.setPosition($v.video.volume);
         $v.setting.volume = $v.video.volume;
     }
+});
+
+
+$v.video.addEventListener('ratechange', function(){
+    $v.screen.showOsd("x" + $v.video.playbackRate.toFixed(1));
 });
 
 
@@ -949,7 +980,14 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     animation-duration: 17s;
     opacity: 0.8;
 }
-
+.osd{
+    font-family: Arial, sans-serif;
+    position: absolute;
+    right: 2%;
+    top: 5%;
+    background-color: #000;
+    color:#0f0;
+}
 .video-screen:-ms-fullscreen{
     position: absolute;
     width: 100% !important;
