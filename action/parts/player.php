@@ -973,7 +973,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     position: absolute;
     left: 100%;
     line-height: 1;
-    z-index: 20;
+    z-index: 2;
     color: #fff;
     text-shadow: -1px -1px #333, 1px -1px #333,	-1px 1px #333, 1px 1px #333;
     animation-fill-mode: forwards;
@@ -988,6 +988,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     top: 5%;
     background-color: #000;
     color:#0f0;
+    z-index: 3;
 }
 .video-screen:-ms-fullscreen{
     position: absolute;
