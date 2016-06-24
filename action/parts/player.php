@@ -201,11 +201,14 @@ $v.comment.laneCalc = function(height){
     if(height >= 360){
         $v.comment.laneCount  = Math.floor((height-360)/180) + 10;
         $v.comment.laneHeight = height / $v.comment.laneCount * 0.8;
-        $v.comment.fontSize   = $v.comment.laneHeight / 6 * 5;
+        $v.comment.fontSize   = $v.comment.laneHeight / 6 * 5; //22.5px以上必要
         $v.comment.marginTop  = $v.comment.laneHeight / 6;
     }
     else{
-        
+        $v.comment.laneCount  = Math.floor(height*0.8/30);
+        $v.comment.laneHeight = 30;
+        $v.comment.fontSize   = 25;
+        $v.comment.marginTop  = 5;
     }
 };
 
