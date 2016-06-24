@@ -92,7 +92,8 @@ $v.player.init = function(url, width, height){
     $v.controller.style.width = width + "px";
     $v.controller.timeSeek.style.width = width - 307 + "px";
 
-    $v.comment.laneBuild(width, height);
+    $v.comment.laneCss(width);
+    $v.comment.laneCalc(height);
 
     $v.setting = $v.loadObject("araiplayer") || {};
     $v.setting.volume = Number($v.setting.volume) || 1;
@@ -169,17 +170,9 @@ $v.comment.create = function(data, laneNo){
     comment.setAttribute("class", "comment");
     comment.setAttribute("data-lane", laneNo);
 
-   if($v.screen.isFullscreen()){
-        comment.style.animationName = $v.player.id + "fulllane";
-        comment.style.top = $v.comment.laneFullHeight*laneNo + $v.comment.laneFullHeight*0.15 + "px";
-        comment.style.fontSize = $v.comment.laneFullHeight*0.85 + "px";
-    }
-    else{
-        comment.style.animationName = $v.player.id + "normallane";
-        comment.style.top = $v.comment.laneNormalHeight*laneNo + $v.comment.laneNormalHeight*0.15 + "px";
-        comment.style.fontSize = $v.comment.laneNormalHeight*0.85 + "px";
-    }
-    
+    comment.style.top = laneNo * $v.comment.laneHeight + $v.comment.marginTop + "px";
+    comment.style.fontSize = $v.comment.fontSize + "px";
+    comment.style.animationName = $v.screen.isFullscreen() ? $v.player.id+"fulllane" : $v.player.id+"normallane";
 
     var delay = data[1] - $v.video.currentTime;
     delay = (delay <= 0) ? 0 : delay.toFixed(3)*1000;
@@ -189,10 +182,7 @@ $v.comment.create = function(data, laneNo){
 };
 
 
-$v.comment.laneBuild = function(width, height){
-    $v.comment.laneNormalHeight = height * 0.8 / 10;
-    $v.comment.laneFullHeight   = screen.height * 0.8 / 10;
-
+$v.comment.laneCss = function(width){
     var css = "";
     css += "@keyframes " + $v.player.id + "normallane{";
     css += "from{transform:translateX(0);}";
@@ -207,10 +197,24 @@ $v.comment.laneBuild = function(width, height){
 };
 
 
-$v.comment.laneCheck = function(){
-    var lane = [true,true,true,true,true,true,true,true,true,true];
-    var comments = $v.screen.querySelectorAll(".comment");
+$v.comment.laneCalc = function(height){
+    if(height >= 360){
+        $v.comment.laneCount  = Math.floor(height/360);
+        $v.comment.laneHeight = height / $v.comment.laneCount * 0.8;
+        $v.comment.fontSize   = $v.comment.laneHeight / 6 * 5;
+        $v.comment.marginTop  = $v.comment.laneHeight / 6;
+    }
+    else{
+        
+    }
+};
 
+
+$v.comment.laneCheck = function(){
+    var lane = [];
+    for(var i = 0; i < $v.comment.laneCount.length; i++){ lane.push(true); }
+ 
+    var comments = $v.screen.querySelectorAll(".comment");
     for(var i = comments.length-1; i >= 0; i--){
         comments[i].pos = comments[i].getBoundingClientRect();
         if(comments[i].pos.right > $v.screen.pos.right-100){ lane[comments[i].getAttribute("data-lane")] = false; }
@@ -404,6 +408,7 @@ $v.screen.fullscreenEvent = function(){
         $v.controller.style.left = 0;
         $v.controller.style.visibility = "visible";
     }
+    $v.comment.laneCalc($v.screen.pos.height);
     $v.comment.clear();
 };
 
@@ -412,12 +417,7 @@ $v.screen.showOsd = function(str){
     var osd = document.createElement("span");
     osd.textContent = str;
     osd.setAttribute("class", "osd");
-    if($v.screen.isFullscreen()){
-        osd.style.fontSize = $v.comment.laneFullHeight*0.85 + "px";
-    }
-    else{
-        osd.style.fontSize = $v.comment.laneNormalHeight*0.85 + "px";
-    }
+    osd.style.fontSize = $v.comment.fontSize + "px";
 
     $v.screen.clearOsd();
     $v.screen.appendChild(osd);
