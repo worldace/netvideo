@@ -135,6 +135,7 @@ $v.video.setVolume = function(volume){
 
 
 $v.video.setSpeed = function(speed){
+    if(!$v.video.duration){ return; }
     speed = speed.toFixed(1);
     if(speed >= 2){ speed = 2; }
     if(speed <= 0.5){ speed = 0.5; }
@@ -170,13 +171,13 @@ $v.comment.create = function(data, laneNo){
 
    if($v.screen.isFullscreen()){
         comment.style.animationName = $v.player.id + "fulllane";
-        comment.style.top = $v.comment.laneFullHeight*laneNo + $v.comment.laneFullHeight/6 + "px";
-        comment.style.fontSize = $v.comment.laneFullHeight*0.8 + "px";
+        comment.style.top = $v.comment.laneFullHeight*laneNo + $v.comment.laneFullHeight*0.15 + "px";
+        comment.style.fontSize = $v.comment.laneFullHeight*0.85 + "px";
     }
     else{
         comment.style.animationName = $v.player.id + "normallane";
-        comment.style.top = $v.comment.laneNormalHeight*laneNo + $v.comment.laneNormalHeight/6 + "px";
-        comment.style.fontSize = $v.comment.laneNormalHeight*0.9 + "px";
+        comment.style.top = $v.comment.laneNormalHeight*laneNo + $v.comment.laneNormalHeight*0.15 + "px";
+        comment.style.fontSize = $v.comment.laneNormalHeight*0.85 + "px";
     }
     
 
@@ -189,8 +190,8 @@ $v.comment.create = function(data, laneNo){
 
 
 $v.comment.laneBuild = function(width, height){
-    $v.comment.laneNormalHeight = Math.floor(height * 0.8 / 12) + 1;
-    $v.comment.laneFullHeight   = Math.floor(screen.height * 0.8 / 12);
+    $v.comment.laneNormalHeight = height * 0.8 / 10;
+    $v.comment.laneFullHeight   = screen.height * 0.8 / 10;
 
     var css = "";
     css += "@keyframes " + $v.player.id + "normallane{";
@@ -207,7 +208,7 @@ $v.comment.laneBuild = function(width, height){
 
 
 $v.comment.laneCheck = function(){
-    var lane = [true,true,true,true,true,true,true,true,true,true,true,true];
+    var lane = [true,true,true,true,true,true,true,true,true,true];
     var comments = $v.screen.querySelectorAll(".comment");
 
     for(var i = comments.length-1; i >= 0; i--){
@@ -412,10 +413,10 @@ $v.screen.showOsd = function(str){
     osd.textContent = str;
     osd.setAttribute("class", "osd");
     if($v.screen.isFullscreen()){
-        osd.style.fontSize = $v.comment.laneFullHeight*0.8 + "px";
+        osd.style.fontSize = $v.comment.laneFullHeight*0.85 + "px";
     }
     else{
-        osd.style.fontSize = $v.comment.laneNormalHeight*0.9 + "px";
+        osd.style.fontSize = $v.comment.laneNormalHeight*0.85 + "px";
     }
 
     $v.screen.clearOsd();
