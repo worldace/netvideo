@@ -92,7 +92,7 @@ $v.player.init = function(url, width, height){
     $v.controller.style.width = width + "px";
     $v.controller.timeSeek.style.width = width - 307 + "px";
 
-    $v.comment.laneCss(width);
+    $v.comment.laneKeyframe(width);
     $v.comment.laneCalc(height);
 
     $v.setting = $v.loadObject("araiplayer") || {};
@@ -182,7 +182,7 @@ $v.comment.create = function(data, laneNo){
 };
 
 
-$v.comment.laneCss = function(width){
+$v.comment.laneKeyframe = function(width){
     var css = "";
     css += "@keyframes " + $v.player.id + "normallane{";
     css += "from{transform:translateX(0);}";
@@ -982,7 +982,7 @@ $css=<<<'━━━━━━━━━━━━━━━━━━━━━━━�
     animation-fill-mode: forwards;
     animation-timing-function: linear;
     animation-duration: 17s;
-    opacity: 0.8;
+    opacity: 0.9;
 }
 .osd{
     font-family: Arial, sans-serif;
