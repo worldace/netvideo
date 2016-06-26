@@ -9,7 +9,7 @@
 function parts_player($video){
     global $設定;
 
-    $設定["js"] .= "\$v.player.init('{$video['動画URL']}', 640, 360); });";
+    $設定["js"] .= "\$v.player.init('{$video['動画URL']}', 640, 360);";
 
     return <<<━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 <div id="video-player" class="video-player"
@@ -43,45 +43,13 @@ function parts_player($video){
 $js=<<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
 
 
-document.addEventListener('DOMContentLoaded', function(){
-
 var $v = {};
 
-$v.comment = {};
-
-$v.video                    = document.getElementById("video");
-$v.player                   = document.getElementById("video-player");
-$v.screen                   = document.getElementById("video-screen");
-
-$v.controller               = document.getElementById("video-controller");
-$v.controller.timeSeek      = document.getElementById("controller-time-seek");
-$v.controller.timeSeekbar   = document.getElementById("controller-time-seekbar");
-$v.controller.timeSeeker    = document.getElementById("controller-time-seeker");
-$v.controller.volumeSeek    = document.getElementById("controller-volume-seek");
-$v.controller.volumeSeekbar = document.getElementById("controller-volume-seekbar");
-$v.controller.volumeSeeker  = document.getElementById("controller-volume-seeker");
-$v.controller.currentTime   = document.getElementById("controller-current-time");
-$v.controller.totalTime     = document.getElementById("controller-total-time");
-$v.controller.playButton    = document.getElementById("controller-play-button");
-$v.controller.volumeButton  = document.getElementById("controller-volume-button");
-$v.controller.commentButton = document.getElementById("controller-comment-button");
-$v.controller.screenButton  = document.getElementById("controller-screen-button");
-$v.controller.form          = document.getElementById("comment-form");
-$v.controller.input         = document.getElementById("comment-form-input");
-$v.controller.submit        = document.getElementById("comment-form-submit");
-
-$v.controller.parts = {
-    play:       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNTc2IDkyN2wtMTMyOCA3MzhxLTIzIDEzLTM5LjUgM3QtMTYuNS0zNnYtMTQ3MnEwLTI2IDE2LjUtMzZ0MzkuNSAzbDEzMjggNzM4cTIzIDEzIDIzIDMxdC0yMyAzMXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=",
-    pause:      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNjY0IDE5MnYxNDA4cTAgMjYtMTkgNDV0LTQ1IDE5aC01MTJxLTI2IDAtNDUtMTl0LTE5LTQ1di0xNDA4cTAtMjYgMTktNDV0NDUtMTloNTEycTI2IDAgNDUgMTl0MTkgNDV6bS04OTYgMHYxNDA4cTAgMjYtMTkgNDV0LTQ1IDE5aC01MTJxLTI2IDAtNDUtMTl0LTE5LTQ1di0xNDA4cTAtMjYgMTktNDV0NDUtMTloNTEycTI2IDAgNDUgMTl0MTkgNDV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+",
-    volume:     "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04MzIgMzUydjEwODhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTMzMy0zMzNoLTI2MnEtMjYgMC00NS0xOXQtMTktNDV2LTM4NHEwLTI2IDE5LTQ1dDQ1LTE5aDI2MmwzMzMtMzMzcTE5LTE5IDQ1LTE5dDQ1IDE5IDE5IDQ1em0zODQgNTQ0cTAgNzYtNDIuNSAxNDEuNXQtMTEyLjUgOTMuNXEtMTAgNS0yNSA1LTI2IDAtNDUtMTguNXQtMTktNDUuNXEwLTIxIDEyLTM1LjV0MjktMjUgMzQtMjMgMjktMzUuNSAxMi01Ny0xMi01Ny0yOS0zNS41LTM0LTIzLTI5LTI1LTEyLTM1LjVxMC0yNyAxOS00NS41dDQ1LTE4LjVxMTUgMCAyNSA1IDcwIDI3IDExMi41IDkzdDQyLjUgMTQyem0yNTYgMHEwIDE1My04NSAyODIuNXQtMjI1IDE4OC41cS0xMyA1LTI1IDUtMjcgMC00Ni0xOXQtMTktNDVxMC0zOSAzOS01OSA1Ni0yOSA3Ni00NCA3NC01NCAxMTUuNS0xMzUuNXQ0MS41LTE3My41LTQxLjUtMTczLjUtMTE1LjUtMTM1LjVxLTIwLTE1LTc2LTQ0LTM5LTIwLTM5LTU5IDAtMjYgMTktNDV0NDUtMTlxMTMgMCAyNiA1IDE0MCA1OSAyMjUgMTg4LjV0ODUgMjgyLjV6bTI1NiAwcTAgMjMwLTEyNyA0MjIuNXQtMzM4IDI4My41cS0xMyA1LTI2IDUtMjYgMC00NS0xOXQtMTktNDVxMC0zNiAzOS01OSA3LTQgMjIuNS0xMC41dDIyLjUtMTAuNXE0Ni0yNSA4Mi01MSAxMjMtOTEgMTkyLTIyN3Q2OS0yODktNjktMjg5LTE5Mi0yMjdxLTM2LTI2LTgyLTUxLTctNC0yMi41LTEwLjV0LTIyLjUtMTAuNXEtMzktMjMtMzktNTkgMC0yNiAxOS00NXQ0NS0xOXExMyAwIDI2IDUgMjExIDkxIDMzOCAyODMuNXQxMjcgNDIyLjV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+",
-    mute:       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im04MzIsMzQ4bDAsMTA4OHEwLDI2IC0xOSw0NXQtNDUsMTl0LTQ1LC0xOWwtMzMzLC0zMzNsLTI2MiwwcS0yNiwwIC00NSwtMTl0LTE5LC00NWwwLC0zODRxMCwtMjYgMTksLTQ1dDQ1LC0xOWwyNjIsMGwzMzMsLTMzM3ExOSwtMTkgNDUsLTE5dDQ1LDE5dDE5LDQ1eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==",
-    commenton:  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im02NDAsNzkycTAsLTUzIC0zNy41LC05MC41dC05MC41LC0zNy41dC05MC41LDM3LjV0LTM3LjUsOTAuNXQzNy41LDkwLjV0OTAuNSwzNy41dDkwLjUsLTM3LjV0MzcuNSwtOTAuNXptMzg0LDBxMCwtNTMgLTM3LjUsLTkwLjV0LTkwLjUsLTM3LjV0LTkwLjUsMzcuNXQtMzcuNSw5MC41dDM3LjUsOTAuNXQ5MC41LDM3LjV0OTAuNSwtMzcuNXQzNy41LC05MC41em0zODQsMHEwLC01MyAtMzcuNSwtOTAuNXQtOTAuNSwtMzcuNXQtOTAuNSwzNy41dC0zNy41LDkwLjV0MzcuNSw5MC41dDkwLjUsMzcuNXQ5MC41LC0zNy41dDM3LjUsLTkwLjV6bTM4NCwwcTAsMTc0IC0xMjAsMzIxLjV0LTMyNiwyMzN0LTQ1MCw4NS41cS0xMTAsMCAtMjExLC0xOHEtMTczLDE3MyAtNDM1LDIyOXEtNTIsMTAgLTg2LDEzcS0xMiwxIC0yMiwtNnQtMTMsLTE4cS00LC0xNSAyMCwtMzdxNSwtNSAyMy41LC0yMS41dDI1LjUsLTIzLjV0MjMuNSwtMjUuNXQyNCwtMzEuNXQyMC41LC0zN3QyMCwtNDh0MTQuNSwtNTcuNXQxMi41LC03Mi41cS0xNDYsLTkwIC0yMjkuNSwtMjE2LjV0LTgzLjUsLTI2OS41cTAsLTE3NCAxMjAsLTMyMS41dDMyNiwtMjMzLjAwMDA3NnQ0NTAsLTg1LjUwMDMydDQ1MCw4NS41MDAzMnQzMjYsMjMzLjAwMDA3NnQxMjAsMzIxLjV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+",
-    commentoff: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0xNzkyLDc5MnEwLDE3NCAtMTIwLDMyMS41dC0zMjYsMjMzdC00NTAsODUuNXEtNzAsMCAtMTQ1LC04cS0xOTgsMTc1IC00NjAsMjQycS00OSwxNCAtMTE0LDIycS0xNywyIC0zMC41LC05dC0xNy41LC0yOWwwLC0xcS0zLC00IC0wLjUsLTEydDIsLTEwdDQuNSwtOS41bDYsLTlsNywtOC41bDgsLTlxNywtOCAzMSwtMzQuNXQzNC41LC0zOHQzMSwtMzkuNXQzMi41LC01MXQyNywtNTl0MjYsLTc2cS0xNTcsLTg5IC0yNDcuNSwtMjIwdC05MC41LC0yODFxMCwtMTMwIDcxLC0yNDguNXQxOTEsLTIwNC41MDA3OTN0Mjg2LC0xMzYuNDk5Nzg2dDM0OCwtNTAuNDk5ODE3cTI0NCwwIDQ1MCw4NS40OTk2OHQzMjYsMjMzLjAwMDM4MXQxMjAsMzIxLjUwMDMzNnoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=",
-    fullscreen: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04ODMgMTA1NnEwIDEzLTEwIDIzbC0zMzIgMzMyIDE0NCAxNDRxMTkgMTkgMTkgNDV0LTE5IDQ1LTQ1IDE5aC00NDhxLTI2IDAtNDUtMTl0LTE5LTQ1di00NDhxMC0yNiAxOS00NXQ0NS0xOSA0NSAxOWwxNDQgMTQ0IDMzMi0zMzJxMTAtMTAgMjMtMTB0MjMgMTBsMTE0IDExNHExMCAxMCAxMCAyM3ptNzgxLTg2NHY0NDhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTE0NC0xNDQtMzMyIDMzMnEtMTAgMTAtMjMgMTB0LTIzLTEwbC0xMTQtMTE0cS0xMC0xMC0xMC0yM3QxMC0yM2wzMzItMzMyLTE0NC0xNDRxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDQ0OHEyNiAwIDQ1IDE5dDE5IDQ1eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==",
-    setting:    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMTUyIDg5NnEwLTEwNi03NS0xODF0LTE4MS03NS0xODEgNzUtNzUgMTgxIDc1IDE4MSAxODEgNzUgMTgxLTc1IDc1LTE4MXptNTEyLTEwOXYyMjJxMCAxMi04IDIzdC0yMCAxM2wtMTg1IDI4cS0xOSA1NC0zOSA5MSAzNSA1MCAxMDcgMTM4IDEwIDEyIDEwIDI1dC05IDIzcS0yNyAzNy05OSAxMDh0LTk0IDcxcS0xMiAwLTI2LTlsLTEzOC0xMDhxLTQ0IDIzLTkxIDM4LTE2IDEzNi0yOSAxODYtNyAyOC0zNiAyOGgtMjIycS0xNCAwLTI0LjUtOC41dC0xMS41LTIxLjVsLTI4LTE4NHEtNDktMTYtOTAtMzdsLTE0MSAxMDdxLTEwIDktMjUgOS0xNCAwLTI1LTExLTEyNi0xMTQtMTY1LTE2OC03LTEwLTctMjMgMC0xMiA4LTIzIDE1LTIxIDUxLTY2LjV0NTQtNzAuNXEtMjctNTAtNDEtOTlsLTE4My0yN3EtMTMtMi0yMS0xMi41dC04LTIzLjV2LTIyMnEwLTEyIDgtMjN0MTktMTNsMTg2LTI4cTE0LTQ2IDM5LTkyLTQwLTU3LTEwNy0xMzgtMTAtMTItMTAtMjQgMC0xMCA5LTIzIDI2LTM2IDk4LjUtMTA3LjV0OTQuNS03MS41cTEzIDAgMjYgMTBsMTM4IDEwN3E0NC0yMyA5MS0zOCAxNi0xMzYgMjktMTg2IDctMjggMzYtMjhoMjIycTE0IDAgMjQuNSA4LjV0MTEuNSAyMS41bDI4IDE4NHE0OSAxNiA5MCAzN2wxNDItMTA3cTktOSAyNC05IDEzIDAgMjUgMTAgMTI5IDExOSAxNjUgMTcwIDcgOCA3IDIyIDAgMTItOCAyMy0xNSAyMS01MSA2Ni41dC01NCA3MC41cTI2IDUwIDQxIDk4bDE4MyAyOHExMyAyIDIxIDEyLjV0OCAyMy41eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg=="
-};
 
 
+
+//■player
+$v.player = document.getElementById("video-player");
 
 
 $v.player.init = function(url, width, height){
@@ -106,6 +74,75 @@ $v.player.init = function(url, width, height){
 
     if(url){ $v.video.src = url; }
 };
+
+
+$v.player.addEventListener('keydown', function(event){
+    $v.controller.style.visibility = "visible";
+    if(event.target.tagName.match(/input/i)){ return true; }
+
+    if(event.which == 32){ //Space
+        $v.controller.input.focus();
+    }
+    else if(event.which == 13 && event.ctrlKey){ //Ctrl+Enter ※IE11で効かない
+        $v.screen.toggleFullscreen();
+    }
+    else if(event.which == 13){ //Enter
+        $v.video.paused ? $v.video.play() : $v.video.pause();
+    }
+    else if(event.which == 39 && event.ctrlKey){ //Ctrl+→
+        $v.video.setTime($v.video.currentTime + 30);
+    }
+    else if(event.which == 39 && event.shiftKey){ //Shift+→
+        $v.video.setTime($v.video.currentTime + 30);
+    }
+    else if(event.which == 37 && event.ctrlKey){ //Ctrl+←
+        $v.video.setTime($v.video.currentTime - 30);
+    }
+    else if(event.which == 37 && event.shiftKey){ //Shift+←
+        $v.video.setTime($v.video.currentTime - 30);
+    }
+    else if(event.which == 39){ //→
+        $v.video.setTime($v.video.currentTime + 10);
+    }
+    else if(event.which == 37){ //←
+        $v.video.setTime($v.video.currentTime - 10);
+    }
+    else if(event.which == 36){ //Home
+        $v.video.setTime(0);
+    }
+    else if(event.which == 35){ //End
+        $v.video.setTime($v.video.duration - 10);
+    }
+    else if(event.which == 38){ //↑
+        $v.video.setVolume($v.video.volume + 0.1);
+    }
+    else if(event.which == 40){ //↓
+        $v.video.setVolume($v.video.volume - 0.1);
+    }
+    else if(event.which == 107){ //num+
+        $v.video.setSpeed($v.video.playbackRate + 0.1);
+    }
+    else if(event.which == 187 && event.shiftKey){ //+
+        $v.video.setSpeed($v.video.playbackRate + 0.1);
+    }
+    else if(event.which == 109){ //num-
+        $v.video.setSpeed($v.video.playbackRate - 0.1);
+    }
+    else if(event.which == 189){ //-
+        $v.video.setSpeed($v.video.playbackRate - 0.1);
+    }
+    else{
+        return true;
+    }
+
+    event.preventDefault();
+});
+
+
+
+
+//■video
+$v.video = document.getElementById("video");
 
 
 $v.video.fit = function(screenW, screenH, objectW, objectH){
@@ -150,6 +187,404 @@ $v.video.isSeekable = function(sec){
     }
     return false;
 };
+
+
+$v.video.addEventListener('loadedmetadata', function(){
+    if(!$v.isUnregistered){
+        $v.comment.get();
+        $v.controller.input.disabled  = false;
+        $v.controller.submit.disabled = false;
+    }
+
+    $v.controller.setBuffer();
+    $v.controller.totalTime.setTime($v.video.duration);
+
+    $v.video.volume = $v.setting.volume;
+    $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+});
+
+
+$v.video.addEventListener('canplaythrough', function(){
+    $v.video.play();
+});
+
+
+$v.video.addEventListener('timeupdate', function(){
+    var sec = Math.floor($v.video.currentTime);
+    if(sec === $v.video.prevSec){ return; }
+    $v.video.prevSec = sec;
+
+    if(!$v.controller.timeSeeker.isDragging){
+        $v.controller.timeSeeker.setPosition($v.video.currentTime/$v.video.duration);
+        $v.controller.currentTime.setTime(sec);
+    }
+    if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on !== false){
+        $v.comment.release($v.comment.list[sec], $v.comment.laneCheck());
+    }
+});
+
+
+$v.video.addEventListener('play', function(){
+    $v.comment.run();
+    $v.controller.playButton.setAttribute("src", $v.controller.parts.pause);
+});
+
+
+$v.video.addEventListener('pause', function(){
+    $v.comment.pause();
+    $v.controller.playButton.setAttribute("src", $v.controller.parts.play);
+});
+
+
+$v.video.addEventListener('progress', function(){
+    $v.controller.setBuffer();
+});
+
+
+$v.video.addEventListener('seeking', function(){
+    $v.comment.clear();
+});
+
+
+$v.video.addEventListener('ended', function(){
+    $v.comment.clear();
+});
+
+
+$v.video.addEventListener('volumechange', function(){
+    if(!$v.video.volume || $v.video.muted){
+        $v.controller.volumeButton.setAttribute("src", $v.controller.parts.mute);
+        $v.controller.volumeSeeker.setPosition(0);
+    }
+    else{
+        $v.controller.volumeButton.setAttribute("src", $v.controller.parts.volume);
+        $v.controller.volumeSeeker.setPosition($v.video.volume);
+        $v.setting.volume = $v.video.volume;
+    }
+});
+
+
+$v.video.addEventListener('ratechange', function(){
+    $v.screen.showOsd("x" + $v.video.playbackRate.toFixed(1));
+});
+
+
+$v.video.addEventListener('click', function(event){
+    if(!$v.video.currentTime){ $v.video.play(); }
+    event.preventDefault();
+});
+
+
+$v.video.addEventListener('dblclick', function(event){
+    event.preventDefault();
+});
+
+
+$v.video.addEventListener('error', function(event){
+    var error = event.target.error;
+
+    switch(error.code){ // http://www.html5.jp/tag/elements/video.html
+        case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            alert("動画ファイルが存在しません");
+            break;
+        case error.MEDIA_ERR_DECODE:
+            alert("動画ファイルが未対応の形式です");
+            break;
+        case error.MEDIA_ERR_NETWORK:
+            alert("動画ファイルのダウンロードが失敗しました");
+            break;
+        case error.MEDIA_ERR_ABORTED:
+            //alert("動画の再生が中止されました");
+            break;
+        default:
+            alert("未知のエラーが発生しました");
+            break;
+    }
+});
+
+
+
+
+
+//■screen
+$v.screen = document.getElementById("video-screen");
+
+
+$v.screen.showOsd = function(str){
+    var osd = document.createElement("span");
+    osd.textContent = str;
+    osd.setAttribute("class", "osd");
+    osd.style.fontSize = $v.comment.fontSize + "px";
+
+    $v.screen.clearOsd();
+    $v.screen.appendChild(osd);
+    $v.screen.osdTimer = window.setTimeout($v.screen.clearOsd, 1500);
+};
+
+
+$v.screen.clearOsd = function(){
+    var osd = $v.screen.querySelectorAll(".osd");
+    for(var i = osd.length-1; i >= 0; i--){
+        $v.screen.removeChild(osd[i]);
+    }
+    if($v.screen.osdTimer){ window.clearTimeout($v.screen.osdTimer); }
+};
+
+
+$v.screen.isFullscreen = function(){
+    var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+    return (element && element.id == $v.screen.id) ? true : false;
+};
+
+
+$v.screen.toggleFullscreen = function(){
+    if(!$v.screen.isFullscreen()){
+        if     ($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
+        else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
+        else if($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
+        else if($v.screen.webkitEnterFullscreen)  { $v.screen.webkitEnterFullscreen(); }
+        else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
+    }
+    else{
+        if     (document.exitFullscreen)      { document.exitFullscreen(); }
+        else if(document.msExitFullscreen)    { document.msExitFullscreen(); }
+        else if(document.webkitExitFullscreen){ document.webkitExitFullscreen(); }
+        else if(document.mozCancelFullScreen) { document.mozCancelFullScreen(); }
+    }
+};
+
+
+$v.screen.fullscreenEvent = function(){
+    if($v.screen.isFullscreen()){
+        $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
+        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+
+        $v.screen.addEventListener('click', $v.controller.toggle);
+
+        $v.screen.appendChild($v.controller);
+        var controller = $v.controller.getBoundingClientRect();
+        $v.controller.style.top  = screen.height - controller.height + "px";
+        $v.controller.style.left = (screen.width/2) - (controller.width/2) + "px";
+    }
+    else{
+        $v.screen.pos = $v.screen.getBoundingClientRect();
+        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+
+        $v.screen.removeEventListener('click', $v.controller.toggle);
+
+        $v.player.appendChild($v.controller);
+        $v.controller.style.top  = 0;
+        $v.controller.style.left = 0;
+        $v.controller.style.visibility = "visible";
+    }
+    $v.comment.laneCalc($v.screen.pos.height);
+    $v.comment.clear();
+};
+
+
+document.addEventListener("fullscreenchange",       $v.screen.fullscreenEvent);
+document.addEventListener("MSFullscreenChange",     $v.screen.fullscreenEvent);
+document.addEventListener("webkitfullscreenchange", $v.screen.fullscreenEvent);
+document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent);
+
+
+
+
+
+//■controller
+$v.controller               = document.getElementById("video-controller");
+$v.controller.timeSeek      = document.getElementById("controller-time-seek");
+$v.controller.timeSeekbar   = document.getElementById("controller-time-seekbar");
+$v.controller.timeSeeker    = document.getElementById("controller-time-seeker");
+$v.controller.volumeSeek    = document.getElementById("controller-volume-seek");
+$v.controller.volumeSeekbar = document.getElementById("controller-volume-seekbar");
+$v.controller.volumeSeeker  = document.getElementById("controller-volume-seeker");
+$v.controller.currentTime   = document.getElementById("controller-current-time");
+$v.controller.totalTime     = document.getElementById("controller-total-time");
+$v.controller.playButton    = document.getElementById("controller-play-button");
+$v.controller.volumeButton  = document.getElementById("controller-volume-button");
+$v.controller.commentButton = document.getElementById("controller-comment-button");
+$v.controller.screenButton  = document.getElementById("controller-screen-button");
+$v.controller.form          = document.getElementById("comment-form");
+$v.controller.input         = document.getElementById("comment-form-input");
+$v.controller.submit        = document.getElementById("comment-form-submit");
+
+$v.controller.parts = {
+    play:       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNTc2IDkyN2wtMTMyOCA3MzhxLTIzIDEzLTM5LjUgM3QtMTYuNS0zNnYtMTQ3MnEwLTI2IDE2LjUtMzZ0MzkuNSAzbDEzMjggNzM4cTIzIDEzIDIzIDMxdC0yMyAzMXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=",
+    pause:      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNjY0IDE5MnYxNDA4cTAgMjYtMTkgNDV0LTQ1IDE5aC01MTJxLTI2IDAtNDUtMTl0LTE5LTQ1di0xNDA4cTAtMjYgMTktNDV0NDUtMTloNTEycTI2IDAgNDUgMTl0MTkgNDV6bS04OTYgMHYxNDA4cTAgMjYtMTkgNDV0LTQ1IDE5aC01MTJxLTI2IDAtNDUtMTl0LTE5LTQ1di0xNDA4cTAtMjYgMTktNDV0NDUtMTloNTEycTI2IDAgNDUgMTl0MTkgNDV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+",
+    volume:     "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04MzIgMzUydjEwODhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTMzMy0zMzNoLTI2MnEtMjYgMC00NS0xOXQtMTktNDV2LTM4NHEwLTI2IDE5LTQ1dDQ1LTE5aDI2MmwzMzMtMzMzcTE5LTE5IDQ1LTE5dDQ1IDE5IDE5IDQ1em0zODQgNTQ0cTAgNzYtNDIuNSAxNDEuNXQtMTEyLjUgOTMuNXEtMTAgNS0yNSA1LTI2IDAtNDUtMTguNXQtMTktNDUuNXEwLTIxIDEyLTM1LjV0MjktMjUgMzQtMjMgMjktMzUuNSAxMi01Ny0xMi01Ny0yOS0zNS41LTM0LTIzLTI5LTI1LTEyLTM1LjVxMC0yNyAxOS00NS41dDQ1LTE4LjVxMTUgMCAyNSA1IDcwIDI3IDExMi41IDkzdDQyLjUgMTQyem0yNTYgMHEwIDE1My04NSAyODIuNXQtMjI1IDE4OC41cS0xMyA1LTI1IDUtMjcgMC00Ni0xOXQtMTktNDVxMC0zOSAzOS01OSA1Ni0yOSA3Ni00NCA3NC01NCAxMTUuNS0xMzUuNXQ0MS41LTE3My41LTQxLjUtMTczLjUtMTE1LjUtMTM1LjVxLTIwLTE1LTc2LTQ0LTM5LTIwLTM5LTU5IDAtMjYgMTktNDV0NDUtMTlxMTMgMCAyNiA1IDE0MCA1OSAyMjUgMTg4LjV0ODUgMjgyLjV6bTI1NiAwcTAgMjMwLTEyNyA0MjIuNXQtMzM4IDI4My41cS0xMyA1LTI2IDUtMjYgMC00NS0xOXQtMTktNDVxMC0zNiAzOS01OSA3LTQgMjIuNS0xMC41dDIyLjUtMTAuNXE0Ni0yNSA4Mi01MSAxMjMtOTEgMTkyLTIyN3Q2OS0yODktNjktMjg5LTE5Mi0yMjdxLTM2LTI2LTgyLTUxLTctNC0yMi41LTEwLjV0LTIyLjUtMTAuNXEtMzktMjMtMzktNTkgMC0yNiAxOS00NXQ0NS0xOXExMyAwIDI2IDUgMjExIDkxIDMzOCAyODMuNXQxMjcgNDIyLjV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+",
+    mute:       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im04MzIsMzQ4bDAsMTA4OHEwLDI2IC0xOSw0NXQtNDUsMTl0LTQ1LC0xOWwtMzMzLC0zMzNsLTI2MiwwcS0yNiwwIC00NSwtMTl0LTE5LC00NWwwLC0zODRxMCwtMjYgMTksLTQ1dDQ1LC0xOWwyNjIsMGwzMzMsLTMzM3ExOSwtMTkgNDUsLTE5dDQ1LDE5dDE5LDQ1eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==",
+    commenton:  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im02NDAsNzkycTAsLTUzIC0zNy41LC05MC41dC05MC41LC0zNy41dC05MC41LDM3LjV0LTM3LjUsOTAuNXQzNy41LDkwLjV0OTAuNSwzNy41dDkwLjUsLTM3LjV0MzcuNSwtOTAuNXptMzg0LDBxMCwtNTMgLTM3LjUsLTkwLjV0LTkwLjUsLTM3LjV0LTkwLjUsMzcuNXQtMzcuNSw5MC41dDM3LjUsOTAuNXQ5MC41LDM3LjV0OTAuNSwtMzcuNXQzNy41LC05MC41em0zODQsMHEwLC01MyAtMzcuNSwtOTAuNXQtOTAuNSwtMzcuNXQtOTAuNSwzNy41dC0zNy41LDkwLjV0MzcuNSw5MC41dDkwLjUsMzcuNXQ5MC41LC0zNy41dDM3LjUsLTkwLjV6bTM4NCwwcTAsMTc0IC0xMjAsMzIxLjV0LTMyNiwyMzN0LTQ1MCw4NS41cS0xMTAsMCAtMjExLC0xOHEtMTczLDE3MyAtNDM1LDIyOXEtNTIsMTAgLTg2LDEzcS0xMiwxIC0yMiwtNnQtMTMsLTE4cS00LC0xNSAyMCwtMzdxNSwtNSAyMy41LC0yMS41dDI1LjUsLTIzLjV0MjMuNSwtMjUuNXQyNCwtMzEuNXQyMC41LC0zN3QyMCwtNDh0MTQuNSwtNTcuNXQxMi41LC03Mi41cS0xNDYsLTkwIC0yMjkuNSwtMjE2LjV0LTgzLjUsLTI2OS41cTAsLTE3NCAxMjAsLTMyMS41dDMyNiwtMjMzLjAwMDA3NnQ0NTAsLTg1LjUwMDMydDQ1MCw4NS41MDAzMnQzMjYsMjMzLjAwMDA3NnQxMjAsMzIxLjV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+",
+    commentoff: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0xNzkyLDc5MnEwLDE3NCAtMTIwLDMyMS41dC0zMjYsMjMzdC00NTAsODUuNXEtNzAsMCAtMTQ1LC04cS0xOTgsMTc1IC00NjAsMjQycS00OSwxNCAtMTE0LDIycS0xNywyIC0zMC41LC05dC0xNy41LC0yOWwwLC0xcS0zLC00IC0wLjUsLTEydDIsLTEwdDQuNSwtOS41bDYsLTlsNywtOC41bDgsLTlxNywtOCAzMSwtMzQuNXQzNC41LC0zOHQzMSwtMzkuNXQzMi41LC01MXQyNywtNTl0MjYsLTc2cS0xNTcsLTg5IC0yNDcuNSwtMjIwdC05MC41LC0yODFxMCwtMTMwIDcxLC0yNDguNXQxOTEsLTIwNC41MDA3OTN0Mjg2LC0xMzYuNDk5Nzg2dDM0OCwtNTAuNDk5ODE3cTI0NCwwIDQ1MCw4NS40OTk2OHQzMjYsMjMzLjAwMDM4MXQxMjAsMzIxLjUwMDMzNnoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=",
+    fullscreen: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04ODMgMTA1NnEwIDEzLTEwIDIzbC0zMzIgMzMyIDE0NCAxNDRxMTkgMTkgMTkgNDV0LTE5IDQ1LTQ1IDE5aC00NDhxLTI2IDAtNDUtMTl0LTE5LTQ1di00NDhxMC0yNiAxOS00NXQ0NS0xOSA0NSAxOWwxNDQgMTQ0IDMzMi0zMzJxMTAtMTAgMjMtMTB0MjMgMTBsMTE0IDExNHExMCAxMCAxMCAyM3ptNzgxLTg2NHY0NDhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTE0NC0xNDQtMzMyIDMzMnEtMTAgMTAtMjMgMTB0LTIzLTEwbC0xMTQtMTE0cS0xMC0xMC0xMC0yM3QxMC0yM2wzMzItMzMyLTE0NC0xNDRxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDQ0OHEyNiAwIDQ1IDE5dDE5IDQ1eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==",
+    setting:    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMTUyIDg5NnEwLTEwNi03NS0xODF0LTE4MS03NS0xODEgNzUtNzUgMTgxIDc1IDE4MSAxODEgNzUgMTgxLTc1IDc1LTE4MXptNTEyLTEwOXYyMjJxMCAxMi04IDIzdC0yMCAxM2wtMTg1IDI4cS0xOSA1NC0zOSA5MSAzNSA1MCAxMDcgMTM4IDEwIDEyIDEwIDI1dC05IDIzcS0yNyAzNy05OSAxMDh0LTk0IDcxcS0xMiAwLTI2LTlsLTEzOC0xMDhxLTQ0IDIzLTkxIDM4LTE2IDEzNi0yOSAxODYtNyAyOC0zNiAyOGgtMjIycS0xNCAwLTI0LjUtOC41dC0xMS41LTIxLjVsLTI4LTE4NHEtNDktMTYtOTAtMzdsLTE0MSAxMDdxLTEwIDktMjUgOS0xNCAwLTI1LTExLTEyNi0xMTQtMTY1LTE2OC03LTEwLTctMjMgMC0xMiA4LTIzIDE1LTIxIDUxLTY2LjV0NTQtNzAuNXEtMjctNTAtNDEtOTlsLTE4My0yN3EtMTMtMi0yMS0xMi41dC04LTIzLjV2LTIyMnEwLTEyIDgtMjN0MTktMTNsMTg2LTI4cTE0LTQ2IDM5LTkyLTQwLTU3LTEwNy0xMzgtMTAtMTItMTAtMjQgMC0xMCA5LTIzIDI2LTM2IDk4LjUtMTA3LjV0OTQuNS03MS41cTEzIDAgMjYgMTBsMTM4IDEwN3E0NC0yMyA5MS0zOCAxNi0xMzYgMjktMTg2IDctMjggMzYtMjhoMjIycTE0IDAgMjQuNSA4LjV0MTEuNSAyMS41bDI4IDE4NHE0OSAxNiA5MCAzN2wxNDItMTA3cTktOSAyNC05IDEzIDAgMjUgMTAgMTI5IDExOSAxNjUgMTcwIDcgOCA3IDIyIDAgMTItOCAyMy0xNSAyMS01MSA2Ni41dC01NCA3MC41cTI2IDUwIDQxIDk4bDE4MyAyOHExMyAyIDIxIDEyLjV0OCAyMy41eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg=="
+};
+
+
+$v.controller.setBuffer = function(){
+    var seekbarWidth = $v.controller.timeSeekbar.getBoundingClientRect().width;
+    var buffer = $v.video.buffered;
+
+    if(buffer.length){
+        $v.controller.timeSeekbar.style.backgroundPosition = buffer.start(0) / $v.video.duration * seekbarWidth + "px";
+        $v.controller.timeSeekbar.style.backgroundSize     = buffer.end(buffer.length-1) / $v.video.duration * seekbarWidth + "px";
+    }
+};
+
+
+$v.controller.currentTime.setTime = function(time){
+    var min = Math.floor(time / 60);
+    var sec = Math.floor(time - min * 60);
+
+    if(min < 10){ min = '0' + min; }
+    if(sec < 10){ sec = '0' + sec; }
+
+    this.textContent = min + ":" + sec;
+};
+
+
+$v.controller.totalTime.setTime = $v.controller.currentTime.setTime;
+
+
+$v.controller.timeSeeker.setPosition = function(percent){
+    var seeker  = this;
+    var seekbar = this.parentNode;
+
+    seeker.pos  = seeker.getBoundingClientRect();
+    seekbar.pos = seekbar.getBoundingClientRect();
+    var seekbarWidth = seekbar.pos.width - seeker.pos.width;
+
+    var pos = (percent <= 1) ? seekbarWidth*percent : percent-seekbar.pos.left; //percentは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
+
+    if(pos < 0){ pos = 0; }
+    if(pos > seekbarWidth){ pos = seekbarWidth; }
+
+    seeker.style.left = pos + "px";
+    return pos/seekbarWidth;
+};
+
+
+$v.controller.timeSeeker.mousemoveEvent = function(event, seekend){
+    var percent = $v.controller.timeSeeker.setPosition(event.clientX);
+    $v.controller.currentTime.setTime($v.video.duration * percent);
+    if(seekend){ $v.video.currentTime = $v.video.duration * percent; }
+};
+
+
+$v.controller.volumeSeeker.setPosition = $v.controller.timeSeeker.setPosition;
+
+
+$v.controller.volumeSeeker.mousemoveEvent = function(event){
+    $v.video.volume = $v.controller.volumeSeeker.setPosition(event.clientX);
+};
+
+
+$v.controller.toggle = function(event){
+    if($v.controller.timeSeeker.isDragging){ return; }
+
+    if($v.controller.style.visibility == "hidden"){
+        event.preventDefault();
+        $v.controller.style.visibility = "visible";
+    }
+    else{
+        var controller = $v.controller.getBoundingClientRect();
+        if(controller.left <= event.clientX && controller.right >= event.clientX){
+            if(controller.top <= event.clientY && controller.bottom >= event.clientY){
+                return;
+            }
+        }
+        $v.controller.style.visibility = "hidden";
+    }
+};
+
+
+$v.controller.playButton.addEventListener('click', function(){
+    $v.video.paused ? $v.video.play() : $v.video.pause();
+});
+
+
+$v.controller.timeSeek.addEventListener('click', function(event){
+    if(!$v.video.duration){ return; }
+    var percent = $v.controller.timeSeeker.setPosition(event.clientX);
+    $v.video.currentTime = $v.video.duration * percent;
+
+});
+
+
+$v.controller.timeSeeker.addEventListener('mousedown', function(event){
+    if(!$v.video.duration){ return; }
+    $v.controller.timeSeeker.isDragging = true;
+    document.addEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
+    document.addEventListener('mouseup', function mouseupEvent(event){
+        $v.controller.timeSeeker.mousemoveEvent(event, true);
+        document.removeEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
+        document.removeEventListener('mouseup',  mouseupEvent);
+        $v.controller.timeSeeker.isDragging = false;
+    });
+});
+
+
+$v.controller.volumeSeek.addEventListener('click', function(event){
+    $v.video.muted = false;
+    $v.video.volume = $v.controller.volumeSeeker.setPosition(event.clientX);
+});
+
+
+$v.controller.volumeSeeker.addEventListener('mousedown', function(event){
+    document.addEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
+    document.addEventListener('mouseup', function mouseupEvent(event){
+        document.removeEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
+        document.removeEventListener('mouseup', mouseupEvent);
+    });
+});
+
+
+$v.controller.volumeButton.addEventListener('click', function(){
+    if($v.video.muted){
+        $v.video.muted = false;
+        $v.video.volume = 0.5;
+    }
+    else{
+        $v.video.volume = $v.video.volume ? 0 : 0.5;
+    }
+});
+
+
+$v.controller.commentButton.addEventListener('click', function(){
+    if($v.comment.on){
+        $v.comment.on = false;
+        $v.comment.clear();
+        $v.controller.commentButton.setAttribute("src", $v.controller.parts.commentoff);
+    }
+    else{
+        $v.comment.on = true;
+        $v.controller.commentButton.setAttribute("src", $v.controller.parts.commenton);
+    }
+});
+
+
+$v.controller.screenButton.addEventListener('click', function(){
+    $v.screen.toggleFullscreen();
+});
+
+
+$v.controller.form.addEventListener('submit', function(event){
+    event.preventDefault();
+    $v.comment.post();
+    $v.video.play();
+    $v.screen.focus();
+});
+
+
+$v.controller.input.addEventListener('focus', function(event){
+    $v.video.pause();
+});
+
+
+
+
+//■comment
+$v.comment = {};
 
 
 $v.comment.release = function(comments, lane){
@@ -288,155 +723,10 @@ $v.comment.post = function(){
 };
 
 
-$v.controller.setBuffer = function(){
-    var seekbarWidth = $v.controller.timeSeekbar.getBoundingClientRect().width;
-    var buffer = $v.video.buffered;
-
-    if(buffer.length){
-        $v.controller.timeSeekbar.style.backgroundPosition = buffer.start(0) / $v.video.duration * seekbarWidth + "px";
-        $v.controller.timeSeekbar.style.backgroundSize     = buffer.end(buffer.length-1) / $v.video.duration * seekbarWidth + "px";
-    }
-};
 
 
-$v.controller.currentTime.setTime = function(time){
-    var min = Math.floor(time / 60);
-    var sec = Math.floor(time - min * 60);
 
-    if(min < 10){ min = '0' + min; }
-    if(sec < 10){ sec = '0' + sec; }
-
-    this.textContent = min + ":" + sec;
-};
-
-
-$v.controller.totalTime.setTime = $v.controller.currentTime.setTime;
-
-
-$v.controller.timeSeeker.setPosition = function(percent){
-    var seeker  = this;
-    var seekbar = this.parentNode;
-
-    seeker.pos  = seeker.getBoundingClientRect();
-    seekbar.pos = seekbar.getBoundingClientRect();
-    var seekbarWidth = seekbar.pos.width - seeker.pos.width;
-
-    var pos = (percent <= 1) ? seekbarWidth*percent : percent-seekbar.pos.left; //percentは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
-
-    if(pos < 0){ pos = 0; }
-    if(pos > seekbarWidth){ pos = seekbarWidth; }
-
-    seeker.style.left = pos + "px";
-    return pos/seekbarWidth;
-};
-
-
-$v.controller.timeSeeker.mousemoveEvent = function(event, seekend){
-    var percent = $v.controller.timeSeeker.setPosition(event.clientX);
-    $v.controller.currentTime.setTime($v.video.duration * percent);
-    if(seekend){ $v.video.currentTime = $v.video.duration * percent; }
-};
-
-
-$v.controller.volumeSeeker.setPosition = $v.controller.timeSeeker.setPosition;
-
-
-$v.controller.volumeSeeker.mousemoveEvent = function(event){
-    $v.video.volume = $v.controller.volumeSeeker.setPosition(event.clientX);
-};
-
-
-$v.controller.toggle = function(event){
-    if($v.controller.timeSeeker.isDragging){ return; }
-
-    if($v.controller.style.visibility == "hidden"){
-        event.preventDefault();
-        $v.controller.style.visibility = "visible";
-    }
-    else{
-        var controller = $v.controller.getBoundingClientRect();
-        if(controller.left <= event.clientX && controller.right >= event.clientX){
-            if(controller.top <= event.clientY && controller.bottom >= event.clientY){
-                return;
-            }
-        }
-        $v.controller.style.visibility = "hidden";
-    }
-};
-
-
-$v.screen.isFullscreen = function(){
-    var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-    return (element && element.id == $v.screen.id) ? true : false;
-};
-
-
-$v.screen.toggleFullscreen = function(){
-    if(!$v.screen.isFullscreen()){
-        if     ($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
-        else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
-        else if($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
-        else if($v.screen.webkitEnterFullscreen)  { $v.screen.webkitEnterFullscreen(); }
-        else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
-    }
-    else{
-        if     (document.exitFullscreen)      { document.exitFullscreen(); }
-        else if(document.msExitFullscreen)    { document.msExitFullscreen(); }
-        else if(document.webkitExitFullscreen){ document.webkitExitFullscreen(); }
-        else if(document.mozCancelFullScreen) { document.mozCancelFullScreen(); }
-    }
-};
-
-
-$v.screen.fullscreenEvent = function(){
-    if($v.screen.isFullscreen()){
-        $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
-        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
-
-        $v.screen.addEventListener('click', $v.controller.toggle);
-
-        $v.screen.appendChild($v.controller);
-        var controller = $v.controller.getBoundingClientRect();
-        $v.controller.style.top  = screen.height - controller.height + "px";
-        $v.controller.style.left = (screen.width/2) - (controller.width/2) + "px";
-    }
-    else{
-        $v.screen.pos = $v.screen.getBoundingClientRect();
-        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
-
-        $v.screen.removeEventListener('click', $v.controller.toggle);
-
-        $v.player.appendChild($v.controller);
-        $v.controller.style.top  = 0;
-        $v.controller.style.left = 0;
-        $v.controller.style.visibility = "visible";
-    }
-    $v.comment.laneCalc($v.screen.pos.height);
-    $v.comment.clear();
-};
-
-
-$v.screen.showOsd = function(str){
-    var osd = document.createElement("span");
-    osd.textContent = str;
-    osd.setAttribute("class", "osd");
-    osd.style.fontSize = $v.comment.fontSize + "px";
-
-    $v.screen.clearOsd();
-    $v.screen.appendChild(osd);
-    $v.screen.osdTimer = window.setTimeout($v.screen.clearOsd, 1500);
-};
-
-
-$v.screen.clearOsd = function(){
-    var osd = $v.screen.querySelectorAll(".osd");
-    for(var i = osd.length-1; i >= 0; i--){
-        $v.screen.removeChild(osd[i]);
-    }
-    if($v.screen.osdTimer){ window.clearTimeout($v.screen.osdTimer); }
-};
-
-
+//■function
 $v.get = function(url, callback){
     var xhr = new XMLHttpRequest();
 
@@ -545,274 +835,6 @@ $v.objectFit = function(screenW, screenH, objectW, objectH){
 $v.type = function(target){
     return Object.prototype.toString.call(target).replace(/^\[object (.+)\]$/, '$1').toLowerCase();
 };
-
-
-
-
-$v.video.addEventListener('loadedmetadata', function(){
-    if(!$v.isUnregistered){
-        $v.comment.get();
-        $v.controller.input.disabled  = false;
-        $v.controller.submit.disabled = false;
-    }
-
-    $v.controller.setBuffer();
-    $v.controller.totalTime.setTime($v.video.duration);
-
-    $v.video.volume = $v.setting.volume;
-    $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
-});
-
-
-$v.video.addEventListener('canplaythrough', function(){
-    $v.video.play();
-});
-
-
-$v.video.addEventListener('timeupdate', function(){
-    var sec = Math.floor($v.video.currentTime);
-    if(sec === $v.video.prevSec){ return; }
-    $v.video.prevSec = sec;
-
-    if(!$v.controller.timeSeeker.isDragging){
-        $v.controller.timeSeeker.setPosition($v.video.currentTime/$v.video.duration);
-        $v.controller.currentTime.setTime(sec);
-    }
-    if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on !== false){
-        $v.comment.release($v.comment.list[sec], $v.comment.laneCheck());
-    }
-});
-
-
-$v.video.addEventListener('play', function(){
-    $v.comment.run();
-    $v.controller.playButton.setAttribute("src", $v.controller.parts.pause);
-});
-
-
-$v.video.addEventListener('pause', function(){
-    $v.comment.pause();
-    $v.controller.playButton.setAttribute("src", $v.controller.parts.play);
-});
-
-
-$v.video.addEventListener('progress', function(){
-    $v.controller.setBuffer();
-});
-
-
-$v.video.addEventListener('seeking', function(){
-    $v.comment.clear();
-});
-
-
-$v.video.addEventListener('ended', function(){
-    $v.comment.clear();
-});
-
-
-$v.video.addEventListener('volumechange', function(){
-    if(!$v.video.volume || $v.video.muted){
-        $v.controller.volumeButton.setAttribute("src", $v.controller.parts.mute);
-        $v.controller.volumeSeeker.setPosition(0);
-    }
-    else{
-        $v.controller.volumeButton.setAttribute("src", $v.controller.parts.volume);
-        $v.controller.volumeSeeker.setPosition($v.video.volume);
-        $v.setting.volume = $v.video.volume;
-    }
-});
-
-
-$v.video.addEventListener('ratechange', function(){
-    $v.screen.showOsd("x" + $v.video.playbackRate.toFixed(1));
-});
-
-
-$v.video.addEventListener('click', function(event){
-    if(!$v.video.currentTime){ $v.video.play(); }
-    event.preventDefault();
-});
-
-
-$v.video.addEventListener('dblclick', function(event){
-    event.preventDefault();
-});
-
-
-$v.video.addEventListener('error', function(event){
-    var error = event.target.error;
-
-    switch(error.code){ // http://www.html5.jp/tag/elements/video.html
-        case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-            alert("動画ファイルが存在しません");
-            break;
-        case error.MEDIA_ERR_DECODE:
-            alert("動画ファイルが未対応の形式です");
-            break;
-        case error.MEDIA_ERR_NETWORK:
-            alert("動画ファイルのダウンロードが失敗しました");
-            break;
-        case error.MEDIA_ERR_ABORTED:
-            //alert("動画の再生が中止されました");
-            break;
-        default:
-            alert("未知のエラーが発生しました");
-            break;
-    }
-});
-
-
-$v.controller.playButton.addEventListener('click', function(){
-    $v.video.paused ? $v.video.play() : $v.video.pause();
-});
-
-
-$v.controller.timeSeek.addEventListener('click', function(event){
-    if(!$v.video.duration){ return; }
-    var percent = $v.controller.timeSeeker.setPosition(event.clientX);
-    $v.video.currentTime = $v.video.duration * percent;
-
-});
-
-
-$v.controller.timeSeeker.addEventListener('mousedown', function(event){
-    if(!$v.video.duration){ return; }
-    $v.controller.timeSeeker.isDragging = true;
-    document.addEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
-    document.addEventListener('mouseup', function mouseupEvent(event){
-        $v.controller.timeSeeker.mousemoveEvent(event, true);
-        document.removeEventListener('mousemove', $v.controller.timeSeeker.mousemoveEvent);
-        document.removeEventListener('mouseup',  mouseupEvent);
-        $v.controller.timeSeeker.isDragging = false;
-    });
-});
-
-
-$v.controller.volumeSeek.addEventListener('click', function(event){
-    $v.video.muted = false;
-    $v.video.volume = $v.controller.volumeSeeker.setPosition(event.clientX);
-});
-
-
-$v.controller.volumeSeeker.addEventListener('mousedown', function(event){
-    document.addEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
-    document.addEventListener('mouseup', function mouseupEvent(event){
-        document.removeEventListener('mousemove', $v.controller.volumeSeeker.mousemoveEvent);
-        document.removeEventListener('mouseup', mouseupEvent);
-    });
-});
-
-
-$v.controller.volumeButton.addEventListener('click', function(){
-    if($v.video.muted){
-        $v.video.muted = false;
-        $v.video.volume = 0.5;
-    }
-    else{
-        $v.video.volume = $v.video.volume ? 0 : 0.5;
-    }
-});
-
-
-$v.controller.commentButton.addEventListener('click', function(){
-    if($v.comment.on){
-        $v.comment.on = false;
-        $v.comment.clear();
-        $v.controller.commentButton.setAttribute("src", $v.controller.parts.commentoff);
-    }
-    else{
-        $v.comment.on = true;
-        $v.controller.commentButton.setAttribute("src", $v.controller.parts.commenton);
-    }
-});
-
-
-$v.controller.screenButton.addEventListener('click', function(){
-    $v.screen.toggleFullscreen();
-});
-
-
-document.addEventListener("fullscreenchange",       $v.screen.fullscreenEvent);
-document.addEventListener("MSFullscreenChange",     $v.screen.fullscreenEvent);
-document.addEventListener("webkitfullscreenchange", $v.screen.fullscreenEvent);
-document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent);
-
-
-$v.controller.form.addEventListener('submit', function(event){
-    event.preventDefault();
-    $v.comment.post();
-    $v.video.play();
-    $v.screen.focus();
-});
-
-
-$v.controller.input.addEventListener('focus', function(event){
-    $v.video.pause();
-});
-
-
-$v.player.addEventListener('keydown', function(event){
-    $v.controller.style.visibility = "visible";
-    if(event.target.tagName.match(/input/i)){ return true; }
-
-    if(event.which == 32){ //Space
-        $v.controller.input.focus();
-    }
-    else if(event.which == 13 && event.ctrlKey){ //Ctrl+Enter ※IE11で効かない
-        $v.screen.toggleFullscreen();
-    }
-    else if(event.which == 13){ //Enter
-        $v.video.paused ? $v.video.play() : $v.video.pause();
-    }
-    else if(event.which == 39 && event.ctrlKey){ //Ctrl+→
-        $v.video.setTime($v.video.currentTime + 30);
-    }
-    else if(event.which == 39 && event.shiftKey){ //Shift+→
-        $v.video.setTime($v.video.currentTime + 30);
-    }
-    else if(event.which == 37 && event.ctrlKey){ //Ctrl+←
-        $v.video.setTime($v.video.currentTime - 30);
-    }
-    else if(event.which == 37 && event.shiftKey){ //Shift+←
-        $v.video.setTime($v.video.currentTime - 30);
-    }
-    else if(event.which == 39){ //→
-        $v.video.setTime($v.video.currentTime + 10);
-    }
-    else if(event.which == 37){ //←
-        $v.video.setTime($v.video.currentTime - 10);
-    }
-    else if(event.which == 36){ //Home
-        $v.video.setTime(0);
-    }
-    else if(event.which == 35){ //End
-        $v.video.setTime($v.video.duration - 10);
-    }
-    else if(event.which == 38){ //↑
-        $v.video.setVolume($v.video.volume + 0.1);
-    }
-    else if(event.which == 40){ //↓
-        $v.video.setVolume($v.video.volume - 0.1);
-    }
-    else if(event.which == 107){ //num+
-        $v.video.setSpeed($v.video.playbackRate + 0.1);
-    }
-    else if(event.which == 187 && event.shiftKey){ //+
-        $v.video.setSpeed($v.video.playbackRate + 0.1);
-    }
-    else if(event.which == 109){ //num-
-        $v.video.setSpeed($v.video.playbackRate - 0.1);
-    }
-    else if(event.which == 189){ //-
-        $v.video.setSpeed($v.video.playbackRate - 0.1);
-    }
-    else{
-        return true;
-    }
-
-    event.preventDefault();
-});
 
 
 window.addEventListener('unload', function(event){
