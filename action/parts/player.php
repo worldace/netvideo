@@ -43,12 +43,12 @@ function parts_player($video){
 $js=<<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
 
 
+//■ $v
 var $v = {};
 
 
 
-
-//■player
+//■ $v.player
 $v.player = document.getElementById("video-player");
 
 
@@ -139,9 +139,13 @@ $v.player.addEventListener('keydown', function(event){
 });
 
 
+window.addEventListener('unload', function(event){
+    $v.saveObject("araiplayer", $v.setting);
+});
 
 
-//■video
+
+//■ $v.video
 $v.video = document.getElementById("video");
 
 
@@ -304,9 +308,7 @@ $v.video.addEventListener('error', function(event){
 
 
 
-
-
-//■screen
+//■ $v.screen
 $v.screen = document.getElementById("video-screen");
 
 
@@ -389,9 +391,7 @@ document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent);
 
 
 
-
-
-//■controller
+//■ $v.controller
 $v.controller               = document.getElementById("video-controller");
 $v.controller.timeSeek      = document.getElementById("controller-time-seek");
 $v.controller.timeSeekbar   = document.getElementById("controller-time-seekbar");
@@ -582,8 +582,7 @@ $v.controller.input.addEventListener('focus', function(event){
 
 
 
-
-//■comment
+//■ $v.comment
 $v.comment = {};
 
 
@@ -724,9 +723,7 @@ $v.comment.post = function(){
 
 
 
-
-
-//■function
+//■ function
 $v.get = function(url, callback){
     var xhr = new XMLHttpRequest();
 
@@ -835,11 +832,6 @@ $v.objectFit = function(screenW, screenH, objectW, objectH){
 $v.type = function(target){
     return Object.prototype.toString.call(target).replace(/^\[object (.+)\]$/, '$1').toLowerCase();
 };
-
-
-window.addEventListener('unload', function(event){
-    $v.saveObject("araiplayer", $v.setting);
-});
 
 
 //パーツ関数に続く
