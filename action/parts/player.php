@@ -42,13 +42,9 @@ function parts_player($video){
 
 $js=<<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
 
-
-//■ $v
 var $v = {};
 
-
-
-//■ $v.player
+//■ player
 $v.player = document.getElementById("video-player");
 
 
@@ -145,7 +141,7 @@ window.addEventListener('unload', function(event){
 
 
 
-//■ $v.video
+//■ video
 $v.video = document.getElementById("video");
 
 
@@ -308,90 +304,148 @@ $v.video.addEventListener('error', function(event){
 
 
 
-//■ $v.screen
-$v.screen = document.getElementById("video-screen");
+//■ comment
+$v.comment = {};
 
 
-$v.screen.showOsd = function(str){
-    var osd = document.createElement("span");
-    osd.textContent = str;
-    osd.setAttribute("class", "osd");
-    osd.style.fontSize = $v.comment.fontSize + "px";
+$v.comment.release = function(comments, lane){
+    var index = 0;
+    for(var i = 0; i < lane.length; i++){
+        if(!(index in comments)){ break; }
+        if(lane[i] === false){ continue; }
 
-    $v.screen.clearOsd();
-    $v.screen.appendChild(osd);
-    $v.screen.osdTimer = window.setTimeout($v.screen.clearOsd, 1500);
-};
-
-
-$v.screen.clearOsd = function(){
-    var osd = $v.screen.querySelectorAll(".osd");
-    for(var i = osd.length-1; i >= 0; i--){
-        $v.screen.removeChild(osd[i]);
-    }
-    if($v.screen.osdTimer){ window.clearTimeout($v.screen.osdTimer); }
-};
-
-
-$v.screen.isFullscreen = function(){
-    var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-    return (element && element.id == $v.screen.id) ? true : false;
-};
-
-
-$v.screen.toggleFullscreen = function(){
-    if(!$v.screen.isFullscreen()){
-        if     ($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
-        else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
-        else if($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
-        else if($v.screen.webkitEnterFullscreen)  { $v.screen.webkitEnterFullscreen(); }
-        else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
-    }
-    else{
-        if     (document.exitFullscreen)      { document.exitFullscreen(); }
-        else if(document.msExitFullscreen)    { document.msExitFullscreen(); }
-        else if(document.webkitExitFullscreen){ document.webkitExitFullscreen(); }
-        else if(document.mozCancelFullScreen) { document.mozCancelFullScreen(); }
+        $v.screen.insertBefore($v.comment.create(comments[index], i), $v.screen.firstChild);
+        index++;
     }
 };
 
 
-$v.screen.fullscreenEvent = function(){
-    if($v.screen.isFullscreen()){
-        $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
-        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+$v.comment.create = function(data, laneNo){
+    var comment = document.createElement("span");
+    comment.textContent = data[0];
+    comment.setAttribute("class", "comment");
+    comment.setAttribute("data-lane", laneNo);
 
-        $v.screen.addEventListener('click', $v.controller.toggle);
+    comment.style.top = laneNo * $v.comment.laneHeight + $v.comment.marginTop + "px";
+    comment.style.fontSize = $v.comment.fontSize + "px";
+    comment.style.animationName = $v.screen.isFullscreen() ? $v.player.id+"fulllane" : $v.player.id+"normallane";
 
-        $v.screen.appendChild($v.controller);
-        var controller = $v.controller.getBoundingClientRect();
-        $v.controller.style.top  = screen.height - controller.height + "px";
-        $v.controller.style.left = (screen.width/2) - (controller.width/2) + "px";
+    var delay = data[1] - $v.video.currentTime;
+    delay = (delay <= 0) ? 0 : delay.toFixed(3)*1000;
+    comment.style.animationDelay = delay + "ms";
+
+    return comment;
+};
+
+
+$v.comment.laneKeyframe = function(width){
+    var css = "";
+    css += "@keyframes " + $v.player.id + "normallane{";
+    css += "from{transform:translateX(0);}";
+    css += "to{transform:translateX(-" + width*5 + "px);}}";
+    document.styleSheets[0].insertRule(css, 0);
+
+    css = "";
+    css += "@keyframes " + $v.player.id + "fulllane{";
+    css += "from{transform:translateX(0);}";
+    css += "to{transform:translateX(-" + screen.width*5 + "px);}}";
+    document.styleSheets[0].insertRule(css, 0);
+};
+
+
+$v.comment.laneCalc = function(height){
+    if(height >= 360){
+        $v.comment.laneCount  = Math.floor((height-360)/180) + 10;
+        $v.comment.laneHeight = height / $v.comment.laneCount * 0.8;
+        $v.comment.fontSize   = $v.comment.laneHeight / 6 * 5; //22.5px以上必要
+        $v.comment.marginTop  = $v.comment.laneHeight / 6;
     }
     else{
-        $v.screen.pos = $v.screen.getBoundingClientRect();
-        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
-
-        $v.screen.removeEventListener('click', $v.controller.toggle);
-
-        $v.player.appendChild($v.controller);
-        $v.controller.style.top  = 0;
-        $v.controller.style.left = 0;
-        $v.controller.style.visibility = "visible";
+        $v.comment.laneCount  = Math.floor(height*0.8/30);
+        $v.comment.laneHeight = 30;
+        $v.comment.fontSize   = 25;
+        $v.comment.marginTop  = 5;
     }
-    $v.comment.laneCalc($v.screen.pos.height);
-    $v.comment.clear();
 };
 
 
-document.addEventListener("fullscreenchange",       $v.screen.fullscreenEvent);
-document.addEventListener("MSFullscreenChange",     $v.screen.fullscreenEvent);
-document.addEventListener("webkitfullscreenchange", $v.screen.fullscreenEvent);
-document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent);
+$v.comment.laneCheck = function(){
+    var lane = Array($v.comment.laneCount);
+    for(var i = 0; i < $v.comment.laneCount.length; i++){ lane[i] = true; }
+ 
+    var comments = $v.screen.querySelectorAll(".comment");
+    for(var i = comments.length-1; i >= 0; i--){
+        comments[i].pos = comments[i].getBoundingClientRect();
+        if(comments[i].pos.right > $v.screen.pos.right-100){ lane[comments[i].getAttribute("data-lane")] = false; }
+        if(comments[i].pos.right < $v.screen.pos.left)     { $v.screen.removeChild(comments[i]); }
+    }
+    return lane;
+};
+
+
+$v.comment.clear = function(){
+    var comments = $v.screen.querySelectorAll(".comment");
+    for(var i = comments.length-1; i >= 0; i--){
+        $v.screen.removeChild(comments[i]);
+    }
+};
+
+
+$v.comment.pause = function(){
+    var comments = $v.screen.querySelectorAll(".comment");
+    for(var i = 0; i < comments.length; i++){
+        comments[i].style.animationPlayState = "paused";
+    }
+};
+
+
+$v.comment.run = function(){
+    var comments = $v.screen.querySelectorAll(".comment");
+    for(var i = 0; i < comments.length; i++){
+        comments[i].style.animationPlayState = "running";
+    }
+};
+
+
+$v.comment.get = function(){
+    var id   = document.getElementById("comment-form-id").value;
+    var path = document.getElementById("comment-form-path").value;
+    var sec  = Math.floor($v.video.duration);
+    var num  = sec * 4; //コメント取得件数(num)
+
+    $v.comment.list = []; 
+    for(var i = 0; i < sec+1; i++){ $v.comment.list.push([]); } //動画時間＋1の箱を作成 [[], [], [], ...]
+
+    var url = "?action=commentget" + "&id=" + id + "&path=" + path + "&num=" + num + "&nocache=" + Date.now();
+    $v.get(url, function(xhr){
+        try{ var comments = JSON.parse(xhr.responseText); } catch(e){ return; }
+
+        for(var i = 0; i < comments.length; i++){
+            var index = Math.floor(comments[i][1]/100);
+            if(index in $v.comment.list){ $v.comment.list[index].push(comments[i]); }
+        }
+    });
+};
+
+
+$v.comment.post = function(){
+    var text = $v.controller.input.value.trim();
+    if(text == "" || text.length > 64){ return; }
+    $v.controller.input.value = "";
+
+    var sec  = $v.video.currentTime;
+    if(Math.floor(sec+1) in $v.comment.list){
+        $v.comment.list[Math.floor(sec+1)].unshift([text, sec+1, Math.floor(Date.now()/1000)]);
+    }
+    
+    var formdata = new FormData($v.controller.form);
+    formdata.append("time", sec.toFixed(2)*100);
+    $v.post('?action=commentpost', formdata);
+};
 
 
 
-//■ $v.controller
+//■ controller
 $v.controller               = document.getElementById("video-controller");
 $v.controller.timeSeek      = document.getElementById("controller-time-seek");
 $v.controller.timeSeekbar   = document.getElementById("controller-time-seekbar");
@@ -582,144 +636,86 @@ $v.controller.input.addEventListener('focus', function(event){
 
 
 
-//■ $v.comment
-$v.comment = {};
+//■ screen
+$v.screen = document.getElementById("video-screen");
 
 
-$v.comment.release = function(comments, lane){
-    var index = 0;
-    for(var i = 0; i < lane.length; i++){
-        if(!(index in comments)){ break; }
-        if(lane[i] === false){ continue; }
+$v.screen.showOsd = function(str){
+    var osd = document.createElement("span");
+    osd.textContent = str;
+    osd.setAttribute("class", "osd");
+    osd.style.fontSize = $v.comment.fontSize + "px";
 
-        $v.screen.insertBefore($v.comment.create(comments[index], i), $v.screen.firstChild);
-        index++;
+    $v.screen.clearOsd();
+    $v.screen.appendChild(osd);
+    $v.screen.osdTimer = window.setTimeout($v.screen.clearOsd, 1500);
+};
+
+
+$v.screen.clearOsd = function(){
+    var osd = $v.screen.querySelectorAll(".osd");
+    for(var i = osd.length-1; i >= 0; i--){
+        $v.screen.removeChild(osd[i]);
     }
+    if($v.screen.osdTimer){ window.clearTimeout($v.screen.osdTimer); }
 };
 
 
-$v.comment.create = function(data, laneNo){
-    var comment = document.createElement("span");
-    comment.textContent = data[0];
-    comment.setAttribute("class", "comment");
-    comment.setAttribute("data-lane", laneNo);
-
-    comment.style.top = laneNo * $v.comment.laneHeight + $v.comment.marginTop + "px";
-    comment.style.fontSize = $v.comment.fontSize + "px";
-    comment.style.animationName = $v.screen.isFullscreen() ? $v.player.id+"fulllane" : $v.player.id+"normallane";
-
-    var delay = data[1] - $v.video.currentTime;
-    delay = (delay <= 0) ? 0 : delay.toFixed(3)*1000;
-    comment.style.animationDelay = delay + "ms";
-
-    return comment;
+$v.screen.isFullscreen = function(){
+    var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+    return (element && element.id == $v.screen.id) ? true : false;
 };
 
 
-$v.comment.laneKeyframe = function(width){
-    var css = "";
-    css += "@keyframes " + $v.player.id + "normallane{";
-    css += "from{transform:translateX(0);}";
-    css += "to{transform:translateX(-" + width*5 + "px);}}";
-    document.styleSheets[0].insertRule(css, 0);
-
-    css = "";
-    css += "@keyframes " + $v.player.id + "fulllane{";
-    css += "from{transform:translateX(0);}";
-    css += "to{transform:translateX(-" + screen.width*5 + "px);}}";
-    document.styleSheets[0].insertRule(css, 0);
-};
-
-
-$v.comment.laneCalc = function(height){
-    if(height >= 360){
-        $v.comment.laneCount  = Math.floor((height-360)/180) + 10;
-        $v.comment.laneHeight = height / $v.comment.laneCount * 0.8;
-        $v.comment.fontSize   = $v.comment.laneHeight / 6 * 5; //22.5px以上必要
-        $v.comment.marginTop  = $v.comment.laneHeight / 6;
+$v.screen.toggleFullscreen = function(){
+    if(!$v.screen.isFullscreen()){
+        if     ($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
+        else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
+        else if($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
+        else if($v.screen.webkitEnterFullscreen)  { $v.screen.webkitEnterFullscreen(); }
+        else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
     }
     else{
-        $v.comment.laneCount  = Math.floor(height*0.8/30);
-        $v.comment.laneHeight = 30;
-        $v.comment.fontSize   = 25;
-        $v.comment.marginTop  = 5;
+        if     (document.exitFullscreen)      { document.exitFullscreen(); }
+        else if(document.msExitFullscreen)    { document.msExitFullscreen(); }
+        else if(document.webkitExitFullscreen){ document.webkitExitFullscreen(); }
+        else if(document.mozCancelFullScreen) { document.mozCancelFullScreen(); }
     }
 };
 
 
-$v.comment.laneCheck = function(){
-    var lane = Array($v.comment.laneCount);
-    for(var i = 0; i < $v.comment.laneCount.length; i++){ lane[i] = true; }
- 
-    var comments = $v.screen.querySelectorAll(".comment");
-    for(var i = comments.length-1; i >= 0; i--){
-        comments[i].pos = comments[i].getBoundingClientRect();
-        if(comments[i].pos.right > $v.screen.pos.right-100){ lane[comments[i].getAttribute("data-lane")] = false; }
-        if(comments[i].pos.right < $v.screen.pos.left)     { $v.screen.removeChild(comments[i]); }
+$v.screen.fullscreenEvent = function(){
+    if($v.screen.isFullscreen()){
+        $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
+        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+
+        $v.screen.addEventListener('click', $v.controller.toggle);
+
+        $v.screen.appendChild($v.controller);
+        var controller = $v.controller.getBoundingClientRect();
+        $v.controller.style.top  = screen.height - controller.height + "px";
+        $v.controller.style.left = (screen.width/2) - (controller.width/2) + "px";
     }
-    return lane;
-};
+    else{
+        $v.screen.pos = $v.screen.getBoundingClientRect();
+        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 
+        $v.screen.removeEventListener('click', $v.controller.toggle);
 
-$v.comment.clear = function(){
-    var comments = $v.screen.querySelectorAll(".comment");
-    for(var i = comments.length-1; i >= 0; i--){
-        $v.screen.removeChild(comments[i]);
+        $v.player.appendChild($v.controller);
+        $v.controller.style.top  = 0;
+        $v.controller.style.left = 0;
+        $v.controller.style.visibility = "visible";
     }
+    $v.comment.laneCalc($v.screen.pos.height);
+    $v.comment.clear();
 };
 
 
-$v.comment.pause = function(){
-    var comments = $v.screen.querySelectorAll(".comment");
-    for(var i = 0; i < comments.length; i++){
-        comments[i].style.animationPlayState = "paused";
-    }
-};
-
-
-$v.comment.run = function(){
-    var comments = $v.screen.querySelectorAll(".comment");
-    for(var i = 0; i < comments.length; i++){
-        comments[i].style.animationPlayState = "running";
-    }
-};
-
-
-$v.comment.get = function(){
-    var id   = document.getElementById("comment-form-id").value;
-    var path = document.getElementById("comment-form-path").value;
-    var sec  = Math.floor($v.video.duration);
-    var num  = sec * 4; //コメント取得件数(num)
-
-    $v.comment.list = []; 
-    for(var i = 0; i < sec+1; i++){ $v.comment.list.push([]); } //動画時間＋1の箱を作成 [[], [], [], ...]
-
-    var url = "?action=commentget" + "&id=" + id + "&path=" + path + "&num=" + num + "&nocache=" + Date.now();
-    $v.get(url, function(xhr){
-        try{ var comments = JSON.parse(xhr.responseText); } catch(e){ return; }
-
-        for(var i = 0; i < comments.length; i++){
-            var index = Math.floor(comments[i][1]/100);
-            if(index in $v.comment.list){ $v.comment.list[index].push(comments[i]); }
-        }
-    });
-};
-
-
-$v.comment.post = function(){
-    var text = $v.controller.input.value.trim();
-    if(text == "" || text.length > 64){ return; }
-    $v.controller.input.value = "";
-
-    var sec  = $v.video.currentTime;
-    if(Math.floor(sec+1) in $v.comment.list){
-        $v.comment.list[Math.floor(sec+1)].unshift([text, sec+1, Math.floor(Date.now()/1000)]);
-    }
-    
-    var formdata = new FormData($v.controller.form);
-    formdata.append("time", sec.toFixed(2)*100);
-    $v.post('?action=commentpost', formdata);
-};
+document.addEventListener("fullscreenchange",       $v.screen.fullscreenEvent);
+document.addEventListener("MSFullscreenChange",     $v.screen.fullscreenEvent);
+document.addEventListener("webkitfullscreenchange", $v.screen.fullscreenEvent);
+document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent);
 
 
 
