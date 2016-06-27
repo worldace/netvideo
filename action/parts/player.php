@@ -376,8 +376,8 @@ $v.comment.laneCheck = function(){
     var comments = $v.screen.querySelectorAll(".comment");
     for(var i = comments.length-1; i >= 0; i--){
         comments[i].pos = comments[i].getBoundingClientRect();
-        if(comments[i].pos.right > $v.screen.pos.right-100){ lane[comments[i].getAttribute("data-lane")] = false; }
-        if(comments[i].pos.right < $v.screen.pos.left)     { $v.screen.removeChild(comments[i]); }
+        if(comments[i].pos.right > $v.screen.pos.right-30){ lane[comments[i].getAttribute("data-lane")] = false; }
+        if(comments[i].pos.right < $v.screen.pos.left)    { $v.screen.removeChild(comments[i]); }
     }
     return lane;
 };
