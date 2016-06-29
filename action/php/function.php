@@ -8,26 +8,28 @@
 
 function 部品(){
     global $設定;
-    $設定['js']  = "";
-    $設定['css'] = "";
 
     $引数   = func_get_args();
     $部品名 = array_shift($引数);
 
     include_once("{$設定['actionディレクトリ']}/parts/{$部品名}.php");
-    if($js) { $設定['js']  = $js; }
-    if($css){ $設定['css'] = $css; }
-
-    $html = call_user_func_array("parts_${部品名}", $引数);
+    if(is_callable($html)){
+        $parts_html = call_user_func_array($html, $引数);
+    }
+    else{
+        $parts_html = $html;
+    }
     
-    if($設定['js']) { $設定['追加js'][$部品名]  = $設定['js']; }
-    if($設定['css']){ $設定['追加css'][$部品名] = $設定['css']; }
+    if($js) { $設定['追加js'][]  = $js; }
+    if($css){ $設定['追加css'][] = $css; }
 
-    return $html;
+    return $parts_html;
 }
 
 
 function 部品初期化(){ //部品()を使用する時は出力前に必ず部品初期化()を行うこと
+    $設定['追加js']  = [];
+    $設定['追加css'] = [];
     ob_start();
     register_shutdown_function(function(){
         global $設定;

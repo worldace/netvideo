@@ -5,11 +5,10 @@
 // 呼び出し元: ../action/php/function.php 部品()
 //======================================================
 
-
-function parts_player($video){
+$html = function($video) use(&$js){
     global $設定;
 
-    $設定["js"] .= "\$v.player.init('{$video['動画URL']}', 640, 360);";
+    $js .= "\$v.player.init('{$video['動画URL']}', 640, 360);";
 
     return <<<━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 <div id="video-player" class="video-player"
@@ -36,7 +35,7 @@ function parts_player($video){
 ></div
 ></div>
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━;
-}
+};
 
 
 
