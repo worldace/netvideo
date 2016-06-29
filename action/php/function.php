@@ -9,6 +9,7 @@
 function 部品(){
     global $設定;
 
+    部品初期化();
     $引数   = func_get_args();
     $部品名 = array_shift($引数);
 
@@ -28,7 +29,11 @@ function 部品(){
 }
 
 
-function 部品初期化(){ //部品()を使用する時は出力前に必ず部品初期化()を行うこと
+function 部品初期化(){
+    static $初期化済み;
+    if($初期化済み){ return; }
+    $初期化済み =  true;
+
     $設定['追加js']  = [];
     $設定['追加css'] = [];
     ob_start();

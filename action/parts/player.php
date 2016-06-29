@@ -385,6 +385,7 @@ $v.comment.laneCheck = function(){
 $v.comment.clear = function(){
     var comments = $v.screen.querySelectorAll(".comment");
     for(var i = comments.length-1; i >= 0; i--){
+        comments[i].style.opacity = 0; //firefox：フルスクリーン時に画面最上部のコメントが消えないことがある対策
         $v.screen.removeChild(comments[i]);
     }
 };
