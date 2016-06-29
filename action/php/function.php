@@ -18,10 +18,10 @@ function 部品(){
         $parts_html = is_callable($html) ? call_user_func_array($html, $引数) : $html;
     }
     if($js){
-        $設定['追加js'][]  = is_callable($js) ? call_user_func_array($js, $引数) : $js;
+        $設定['追加js'][$部品名]  = is_callable($js) ? call_user_func_array($js, $引数) : $js;
     }
     if($css){
-        $設定['追加css'][] = is_callable($css) ? call_user_func_array($css, $引数) : $css;
+        $設定['追加css'][$部品名] = is_callable($css) ? call_user_func_array($css, $引数) : $css;
     }
 
     return $parts_html;
