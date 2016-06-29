@@ -34,8 +34,6 @@ function 部品初期化(){
     if($初期化済み){ return; }
     $初期化済み =  true;
 
-    $設定['追加js']  = [];
-    $設定['追加css'] = [];
     ob_start();
     register_shutdown_function(function(){
         global $設定;
