@@ -15,16 +15,9 @@ function 部品(){
 
     include_once("{$設定['actionディレクトリ']}/parts/{$部品名}.php");
 
-    if($html){
-        $parts_html = is_callable($html) ? call_user_func_array($html, $引数) : $html;
-    }
-    if($js){
-        $設定['追加js'][$部品名]  = is_callable($js) ? call_user_func_array($js, $引数) : $js;
-    }
-    if($css){
-        $設定['追加css'][$部品名] = is_callable($css) ? call_user_func_array($css, $引数) : $css;
-    }
-
+    if($html){ $parts_html               = is_callable($html) ? call_user_func_array($html, $引数) : $html; }
+    if($js)  { $設定['追加js'][$部品名]  = is_callable($js)   ? call_user_func_array($js,   $引数) : $js; }
+    if($css) { $設定['追加css'][$部品名] = is_callable($css)  ? call_user_func_array($css,  $引数) : $css; }
     return $parts_html;
 }
 
