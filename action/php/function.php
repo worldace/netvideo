@@ -13,15 +13,16 @@ function 部品(){
     $部品名 = array_shift($引数);
 
     include_once("{$設定['actionディレクトリ']}/parts/{$部品名}.php");
-    if(is_callable($html)){
-        $parts_html = call_user_func_array($html, $引数);
+
+    if($html){
+        $parts_html = is_callable($html) ? call_user_func_array($html, $引数) : $html;
     }
-    else{
-        $parts_html = $html;
+    if($js){
+        $設定['追加js'][]  = is_callable($js) ? call_user_func_array($js, $引数) : $js;
     }
-    
-    if($js) { $設定['追加js'][]  = $js; }
-    if($css){ $設定['追加css'][] = $css; }
+    if($css){
+        $設定['追加css'][] = is_callable($css) ? call_user_func_array($css, $引数) : $css;
+    }
 
     return $parts_html;
 }
