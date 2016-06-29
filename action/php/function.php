@@ -22,7 +22,7 @@ function 部品(){
     $部品名 = array_shift($引数);
     if($部品名 == "__js__css"){ return [$追加js, $追加css]; }
 
-    require_once("{$部品ディレクトリ}/{$部品名}.php");
+    require("{$部品ディレクトリ}/{$部品名}.php");
 
     if($html){ $parts_html       = is_callable($html) ? call_user_func_array($html,$引数) : $html; }
     if($js)  { $追加js[$部品名]  = is_callable($js)   ? call_user_func_array($js,  $引数) : $js; }
