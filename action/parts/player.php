@@ -421,6 +421,7 @@ $v.comment.get = function(){
         try{ var comments = JSON.parse(xhr.responseText); } catch(e){ return; }
 
         for(var i = 0; i < comments.length; i++){
+            comments[i][0] = comments[i][0].substring(0, 64);
             var index = Math.floor(comments[i][1]/100);
             if(index in $v.comment.list){ $v.comment.list[index].push(comments[i]); }
         }
@@ -724,9 +725,7 @@ $v.get = function(url, callback){
     var xhr = new XMLHttpRequest();
 
     xhr.open("GET", url);
-    xhr.addEventListener("load", function(){
-        if(xhr.status == 200) { callback(xhr); }
-    });
+    xhr.addEventListener("load", function(){ callback(xhr); });
     xhr.timeout = 180*1000;
     xhr.send();
 };
