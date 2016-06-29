@@ -10,27 +10,23 @@ function 部品(){
     global $設定;
     $部品ディレクトリ = "{$設定['actionディレクトリ']}/parts"; //最後のスラッシュは不要
 
-    static $追加js;
-    static $追加css;
     static $初期化済み;
     if(!$初期化済み){
         $初期化済み =  true;
         部品初期化();
     }
 
+    static $追加js;
+    static $追加css;
     $引数   = func_get_args();
     $部品名 = array_shift($引数);
-
     if($部品名 == "__js__css"){ return [$追加js, $追加css]; }
 
-    $部品ファイル = "{$部品ディレクトリ}/{$部品名}.php";
-    if(!file_exists($部品ファイル)){ return; }
+    require_once("{$部品ディレクトリ}/{$部品名}.php");
 
-    require_once($部品ファイル);
-
-    if($html){ $parts_html       = is_callable($html)? call_user_func_array($html,$引数) : $html; }
-    if($js)  { $追加js[$部品名]  = is_callable($js)  ? call_user_func_array($js,  $引数) : $js; }
-    if($css) { $追加css[$部品名] = is_callable($css) ? call_user_func_array($css, $引数) : $css; }
+    if($html){ $parts_html       = is_callable($html) ? call_user_func_array($html,$引数) : $html; }
+    if($js)  { $追加js[$部品名]  = is_callable($js)   ? call_user_func_array($js,  $引数) : $js; }
+    if($css) { $追加css[$部品名] = is_callable($css)  ? call_user_func_array($css, $引数) : $css; }
     return $parts_html;
 }
 
@@ -39,28 +35,28 @@ function 部品初期化(){
     ob_start();
     register_shutdown_function(function(){
         list($追加js, $追加css) = 部品("__js__css");
-        if($追加js or $追加css){
-            $buf = ob_get_contents();
-            ob_end_clean();
-            if($追加js){
-                $js     = implode($追加js, "\n");
-                $js_pos = strrpos($buf,"</body>");
-                if($js_pos !== false){
-                    $buf = substr_replace($buf, "\n<script>\n$js</script>\n", $js_pos, 0); //最後に出現する</body>の前にJSを挿入する
-                }
-            }
-            if($追加css){
-                $css     = implode($追加css, "\n");
-                $css_pos = strpos($buf,"</head>");
-                if($css_pos !== false){
-                    $buf = substr_replace($buf, "\n<style>\n$css</style>\n", $css_pos, 0); //最初に出現する</head>の前にCSSを挿入する
-                }
-            }
-            print $buf;
-        }
-        else{
+        if(!$追加js and !$追加css){
             ob_end_flush();
+            return;
         }
+
+        $buf = ob_get_contents();
+        ob_end_clean();
+        if($追加js){
+            $js_pos = strrpos($buf, "</body>");
+            if($js_pos !== false){
+                $js  = implode($追加js, "\n");
+                $buf = substr_replace($buf, "\n<script>\n$js\n</script>\n", $js_pos, 0); //最後に出現する</body>の前にJSを挿入する
+            }
+        }
+        if($追加css){
+            $css_pos = strpos($buf, "</head>");
+            if($css_pos !== false){
+                $css = implode($追加css, "\n");
+                $buf = substr_replace($buf, "\n<style>\n$css\n</style>\n", $css_pos, 0); //最初に出現する</head>の前にCSSを挿入する
+            }
+        }
+        print $buf;
     });
 }
 
