@@ -32,6 +32,10 @@ function 部品(){
 
 
 function 部品初期化(){
+    static $初期化済み;
+    if($初期化済み){ return; }
+    $初期化済み =  true;
+
     ob_start();
     register_shutdown_function(function(){
         list($追加js, $追加css) = 部品("__js__css");
