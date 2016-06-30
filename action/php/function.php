@@ -8,7 +8,7 @@
 
 function 部品(){
     global $設定;
-    $部品ディレクトリ = "{$設定['actionディレクトリ']}/parts"; //最後のスラッシュは不要
+    $部品ディレクトリ = "{$設定['actionディレクトリ']}/parts"; //部品ファイルが置いてあるディレクトリ。絶対パス推奨。最後のスラッシュは不要
 
     static $初期化済み;
     if(!$初期化済み){
@@ -16,13 +16,29 @@ function 部品(){
         部品初期化();
     }
 
+    $html = $css = $js = $parts_html = null;
     static $追加js;
     static $追加css;
+
     $引数   = func_get_args();
     $部品名 = array_shift($引数);
-    if($部品名 == "__js__css"){ return [$追加js, $追加css]; }
 
-    require("{$部品ディレクトリ}/{$部品名}.php");
+    if($部品名 === null){ throw new Exception('部品名がありません'); }
+    if($部品名 === "__js__css"){ return [$追加js, $追加css]; }
+
+    static $部品キャッシュ;
+    if($部品キャッシュ[$部品名]["読み込み済み"] === true){
+        $html = $部品キャッシュ[$部品名]["html"];
+        $css  = $部品キャッシュ[$部品名]["css"];
+        $js   = $部品キャッシュ[$部品名]["js"];
+    }
+    else{
+        require("{$部品ディレクトリ}/{$部品名}.php");
+        $部品キャッシュ[$部品名]["読み込み済み"] = true;
+        $部品キャッシュ[$部品名]["html"] = $html;
+        $部品キャッシュ[$部品名]["css"]  = $css;
+        $部品キャッシュ[$部品名]["js"]   = $js;
+    }
 
     if($html){ $parts_html       = is_callable($html) ? call_user_func_array($html,$引数) : $html; }
     if($js)  { $追加js[$部品名]  = is_callable($js)   ? call_user_func_array($js,  $引数) : $js; }
