@@ -47,17 +47,23 @@ function 部品初期化(){
         $buf = ob_get_contents();
         ob_end_clean();
         if($追加js){
-            $js_pos = strrpos($buf, "</body>");
+            $js_pos = strripos($buf, "</body>");
+            $js  = implode($追加js, "\n");
             if($js_pos !== false){
-                $js  = implode($追加js, "\n");
                 $buf = substr_replace($buf, "\n<script>\n$js\n</script>\n", $js_pos, 0); //最後に出現する</body>の前にJSを挿入する
+            }
+            else{
+                $buf .= "\n<script>\n$js\n</script>\n";
             }
         }
         if($追加css){
-            $css_pos = strpos($buf, "</head>");
+            $css_pos = stripos($buf, "</head>");
+            $css = implode($追加css, "\n");
             if($css_pos !== false){
-                $css = implode($追加css, "\n");
                 $buf = substr_replace($buf, "\n<style>\n$css\n</style>\n", $css_pos, 0); //最初に出現する</head>の前にCSSを挿入する
+            }
+            else{
+                $buf = "\n<style>\n$css\n</style>\n" . $buf;
             }
         }
         print $buf;
