@@ -124,9 +124,10 @@ function データベース接続($driver = "", $user = "", $pass = ""){
     return $設定['データベース.PDO'];
 }
 
-function データベース実行($SQL文, $割当 = null, $返却タイプ = 0){
+function データベース実行($SQL文, $割当 = null, $トランザクション = false){
     global $設定;
     $pdo  = ($設定['データベース.PDO']) ? $設定['データベース.PDO'] : データベース接続();
+    if($トランザクション === true){ $pdo -> beginTransaction(); }
 
     if($割当){
         $stmt = $pdo -> prepare($SQL文);
@@ -143,7 +144,7 @@ function データベース実行($SQL文, $割当 = null, $返却タイプ = 0)
     else{
         $stmt = $pdo -> query($SQL文);
     }
-    return ($返却タイプ) ? $pdo : $stmt;
+    return $stmt;
 }
 
 function データベース取得($SQL文, $割当 = null, $取得タイプ = PDO::FETCH_ASSOC){
@@ -167,7 +168,11 @@ function データベース件数($SQL文, $割当 = null){
 }
 
 function データベース追加($SQL文, $割当 = null){
-    return データベース実行($SQL文, $割当, 1) -> lastInsertId();
+    データベース実行($SQL文, $割当, true);
+    global $設定;
+    $id = $設定['データベース.PDO'] -> lastInsertId();
+    $設定['データベース.PDO'] -> commit();
+    return $id;
 }
 
 function データベース更新($SQL文, $割当 = null){
