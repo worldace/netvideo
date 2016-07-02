@@ -102,75 +102,80 @@ function エラー($str){
 
 
 function データベース接続($driver = "", $user = "", $pass = ""){
-    static $pdo;
+    global $設定;
 
     if(!$driver){
-        global $設定;
         $driver = $設定['データベース.ドライバ'];
         $user   = $設定['データベース.ユーザ'];
         $pass   = $設定['データベース.パスワード'];
     }
     else{
-        $pdo = null;
+        $設定['データベース.PDO'] = null;
     }
-    if(!isset($pdo)) {
-        $pdo = new PDO($driver, $user, $pass, array(
+    if(!isset($設定['データベース.PDO'])) {
+        $設定['データベース.PDO'] = new PDO($driver, $user, $pass, array(
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
         ));
     }
-    return $pdo;
+    return $設定['データベース.PDO'];
 }
 
-function データベース実行($SQL文, $割当 = array(), $返却タイプ = 0){
-    $pdo  = データベース接続();
-    $stmt = $pdo -> prepare($SQL文);
-    for($i = 1; $i <= count($割当); $i++){
-        if(gettype($割当[$i-1]) === "integer"){ //int型はあらかじめ型変換しておくこと。(int)$value
-            $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_INT);
+function データベース実行($SQL文, $割当 = null, $返却タイプ = 0){
+    global $設定;
+    $pdo  = ($設定['データベース.PDO']) ? $設定['データベース.PDO'] :データベース接続();
+
+    if($割当){
+        $stmt = $pdo -> prepare($SQL文);
+        for($i = 1; $i <= count($割当); $i++){
+            if(gettype($割当[$i-1]) === "integer"){ //int型はあらかじめ型変換しておくこと。(int)$value
+                $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_INT);
+            }
+            else {
+                $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_STR);
+            }
         }
-        else {
-            $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_STR);
-        }
+        $stmt -> execute();
     }
-    $stmt -> execute();
+    else{
+        $stmt = $pdo -> query($SQL文);
+    }
     return ($返却タイプ) ? $pdo : $stmt;
 }
 
-function データベース取得($SQL文, $割当 = array(), $取得タイプ = PDO::FETCH_ASSOC){
+function データベース取得($SQL文, $割当 = null, $取得タイプ = PDO::FETCH_ASSOC){
     return データベース実行($SQL文, $割当) -> fetchAll($取得タイプ);
 }
 
-function データベース行取得($SQL文, $割当 = array()){
+function データベース行取得($SQL文, $割当 = null){
     return データベース実行($SQL文, $割当) -> fetch();
 }
 
-function データベース列取得($SQL文, $割当 = array()){
+function データベース列取得($SQL文, $割当 = null){
     return データベース実行($SQL文, $割当) -> fetchAll(PDO::FETCH_COLUMN);
 }
 
-function データベースセル取得($SQL文, $割当 = array()){
+function データベースセル取得($SQL文, $割当 = null){
     return データベース実行($SQL文, $割当) -> fetchColumn();
 }
 
-function データベース件数($SQL文, $割当 = array()){ //select count(列名) from テーブル名
+function データベース件数($SQL文, $割当 = null){
     return データベース実行($SQL文, $割当) -> fetchColumn();
 }
 
-function データベース追加($SQL文, $割当 = array()){
+function データベース追加($SQL文, $割当 = null){
     return データベース実行($SQL文, $割当, 1) -> lastInsertId();
 }
 
-function データベース更新($SQL文, $割当 = array()){
+function データベース更新($SQL文, $割当 = null){
     return データベース実行($SQL文, $割当) -> rowCount();
 }
 
-function データベース削除($SQL文, $割当 = array()){
+function データベース削除($SQL文, $割当 = null){
     return データベース実行($SQL文, $割当) -> rowCount();
 }
-
 
 function データベース作成($テーブル名, $テーブル定義, $DB名){
     //※$テーブル定義は「キー:列名」「値:型情報」の連想配列。MySQL互換
@@ -194,6 +199,7 @@ function データベース作成($テーブル名, $テーブル定義, $DB名)
         データベース実行("$SQL文 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci");
     }
 }
+
 
 
 function URL作成($querystring = false){
