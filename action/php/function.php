@@ -101,6 +101,7 @@ function エラー($str){
 }
 
 
+// http://musou.s38.xrea.com/php/pdo.html
 function データベース接続($driver = "", $user = "", $pass = ""){
     global $設定;
 
@@ -125,7 +126,7 @@ function データベース接続($driver = "", $user = "", $pass = ""){
 
 function データベース実行($SQL文, $割当 = null, $返却タイプ = 0){
     global $設定;
-    $pdo  = ($設定['データベース.PDO']) ? $設定['データベース.PDO'] :データベース接続();
+    $pdo  = ($設定['データベース.PDO']) ? $設定['データベース.PDO'] : データベース接続();
 
     if($割当){
         $stmt = $pdo -> prepare($SQL文);
@@ -178,7 +179,6 @@ function データベース削除($SQL文, $割当 = null){
 }
 
 function データベース作成($テーブル名, $テーブル定義, $DB名){
-    //※$テーブル定義は「キー:列名」「値:型情報」の連想配列。MySQL互換
     foreach($テーブル定義 as $name => $value){
         $列情報 .= "$name $value,";
     }
