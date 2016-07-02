@@ -8,7 +8,7 @@ if($_POST['comment'] == ""){ exit; }
 if(mb_strlen($_POST['comment'], "UTF-8") > 64) { exit; }
 
 //データベース追加
-$設定['DBドライバ'] = "sqlite:" . DBパス作成();
+$設定['データベース.ドライバ'] = "sqlite:" . DBパス作成();
 
 データベース追加(
     "insert into コメント (コメント, 動画時間, 投稿時間) values (?, {$_POST['time']}, {$_SERVER['REQUEST_TIME']})",

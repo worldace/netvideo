@@ -106,9 +106,9 @@ function データベース接続($driver = "", $user = "", $pass = ""){
 
     if(!$driver){
         global $設定;
-        $driver = $設定['DBドライバ'];
-        $user   = $設定['DBユーザ'];
-        $pass   = $設定['DBパスワード'];
+        $driver = $設定['データベース.ドライバ'];
+        $user   = $設定['データベース.ユーザ'];
+        $pass   = $設定['データベース.パスワード'];
     }
     else{
         $pdo = null;
@@ -172,7 +172,7 @@ function データベース削除($SQL文, $割当 = array()){
 }
 
 
-function データベーステーブル作成($テーブル名, $テーブル定義, $DB名){
+function データベース作成($テーブル名, $テーブル定義, $DB名){
     //※$テーブル定義は「キー:列名」「値:型情報」の連想配列。MySQL互換
     foreach($テーブル定義 as $name => $value){
         $列情報 .= "$name $value,";
@@ -182,7 +182,7 @@ function データベーステーブル作成($テーブル名, $テーブル定
 
     if(!$DB名){
         global $設定;
-        $DB名 = ($設定['DBドライバ']) ? $設定['DBドライバ'] : "sqlite";
+        $DB名 = ($設定['データベース.ドライバ']) ? $設定['データベース.ドライバ'] : "sqlite";
     }
 
     if(preg_match('/^sqlite/i', $DB名)){ //SQLite用
@@ -190,6 +190,7 @@ function データベーステーブル作成($テーブル名, $テーブル定
         データベース実行($SQL文);
     }
     else { //MySQL用
+        $SQL文 = str_replace('autoincrement', 'auto_increment', $SQL文);
         データベース実行("$SQL文 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci");
     }
 }
