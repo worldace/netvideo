@@ -200,6 +200,21 @@ function データベース作成($テーブル名, $テーブル定義, $DB名)
     }
 }
 
+function トランザクション開始(){
+    global $設定;
+    $設定['データベース.PDO'] = ($設定['データベース.PDO']) ? $設定['データベース.PDO'] : データベース接続();
+    $設定['データベース.PDO'] -> beginTransaction();
+}
+
+function トランザクション終了(){
+    global $設定;
+    $設定['データベース.PDO'] -> commit();
+}
+
+function トランザクション失敗(){
+    global $設定;
+    $設定['データベース.PDO'] -> rollBack();
+}
 
 
 function URL作成($querystring = false){
