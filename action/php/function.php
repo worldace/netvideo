@@ -9,12 +9,6 @@ function 部品(){
     global $設定;
     $部品ディレクトリ = "{$設定['actionディレクトリ']}/parts"; //部品ファイルが置いてあるディレクトリ。絶対パス推奨。最後のスラッシュは不要
 
-    static $初期化済み;
-    if(!$初期化済み){
-        $初期化済み =  true;
-        部品初期化();
-    }
-
     $html = $css = $js = $parts_html = null;
     static $追加js;
     static $追加css;
@@ -47,10 +41,6 @@ function 部品(){
 
 
 function 部品初期化(){
-    static $初期化済み;
-    if($初期化済み){ return; }
-    $初期化済み =  true;
-
     ob_start();
     register_shutdown_function(function(){
         list($追加js, $追加css) = 部品("__js__css");
@@ -111,152 +101,96 @@ function エラー($str){
 }
 
 
-function データベース接続($dsn = "", $user = "", $pass = "") {
-    global $設定;
+function データベース接続($driver = "", $user = "", $pass = ""){
     static $pdo;
 
-    if($dsn){
+    if(!$driver){
+        global $設定;
+        $driver = $設定['DBドライバ'];
+        $user   = $設定['DBユーザ'];
+        $pass   = $設定['DBパスワード'];
+    }
+    else{
         $pdo = null;
-        $設定['DBドライバ']   = $dsn;
-        $設定['DBユーザ']     = $user;
-        $設定['DBパスワード'] = $pass;
     }
     if(!isset($pdo)) {
-        $pdo = new PDO($設定['DBドライバ'], $設定['DBユーザ'], $設定['DBパスワード'], array(
+        $pdo = new PDO($driver, $user, $pass, array(
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
-            //PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
         ));
     }
     return $pdo;
 }
 
+function データベース実行($SQL文, $割当 = array(), $返却タイプ = 0){
+    $pdo  = データベース接続();
+    $stmt = $pdo -> prepare($SQL文);
+    for($i = 1; $i <= count($割当); $i++){
+        if(gettype($割当[$i-1]) === "integer"){ //int型はあらかじめ型変換しておくこと。(int)$value
+            $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_INT);
+        }
+        else {
+            $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_STR);
+        }
+    }
+    $stmt -> execute();
+    return ($返却タイプ) ? $pdo : $stmt;
+}
 
-/*
-$bindvalue(配列:プレースホルダに割り当てる変数)は全て文字列型に変換されるので、$bindvalueには文字列型の変数のみ入れる。
-数値型の場合はPHP側で値を検証して、$sql(SQL文)の中で展開させておくこと。(ToDo:独自の数値型プレースホルダーを作った方がよさそう。記号は@)
-*/
-function データベース実行($sql, $bindvalue = array()){
-    $db = データベース接続();
-    if(!$bindvalue){
-        return $db->query($sql);
-    }
-    else{
-        $stmt = $db->prepare($sql);
-        $stmt -> execute($bindvalue);
-        return $stmt;
-    }
+function データベース取得($SQL文, $割当 = array(), $取得タイプ = PDO::FETCH_ASSOC){
+    return データベース実行($SQL文, $割当) -> fetchAll($取得タイプ);
+}
+
+function データベース行取得($SQL文, $割当 = array()){
+    return データベース実行($SQL文, $割当) -> fetch();
+}
+
+function データベース列取得($SQL文, $割当 = array()){
+    return データベース実行($SQL文, $割当) -> fetchAll(PDO::FETCH_COLUMN);
+}
+
+function データベースセル取得($SQL文, $割当 = array()){
+    return データベース実行($SQL文, $割当) -> fetchColumn();
+}
+
+function データベース件数($SQL文, $割当 = array()){ //select count(列名) from テーブル名
+    return データベース実行($SQL文, $割当) -> fetchColumn();
+}
+
+function データベース追加($SQL文, $割当 = array()){
+    return データベース実行($SQL文, $割当, 1) -> lastInsertId();
+}
+
+function データベース更新($SQL文, $割当 = array()){
+    return データベース実行($SQL文, $割当) -> rowCount();
+}
+
+function データベース削除($SQL文, $割当 = array()){
+    return データベース実行($SQL文, $割当) -> rowCount();
 }
 
 
-function データベース取得($sql, $bindvalue = array(), $mode = PDO::FETCH_ASSOC){
-    $db = データベース接続();
-    if(!$bindvalue){
-        return $db->query($sql)->fetchAll($mode);
+function データベーステーブル作成($テーブル名, $テーブル定義, $DB名){
+    //※$テーブル定義は「キー:列名」「値:型情報」の連想配列。MySQL互換
+    foreach($テーブル定義 as $name => $value){
+        $列情報 .= "$name $value,";
     }
-    else{
-        $stmt = $db->prepare($sql);
-        $stmt -> execute($bindvalue);
-        return $stmt->fetchAll($mode);
+    $列情報 = rtrim($列情報, ',');
+    $SQL文 = "create table IF NOT EXISTS $テーブル名 ($列情報)";
+
+    if(!$DB名){
+        global $設定;
+        $DB名 = ($設定['DBドライバ']) ? $設定['DBドライバ'] : "sqlite";
     }
-}
 
-
-function データベース行取得($sql, $bindvalue = array()){
-    $db = データベース接続();
-    if(!$bindvalue){
-        return $db->query($sql)->fetch();
+    if(preg_match('/^sqlite/i', $DB名)){ //SQLite用
+        $SQL文 = str_replace('auto_increment', 'autoincrement', $SQL文);
+        データベース実行($SQL文);
     }
-    else{
-        $stmt = $db->prepare($sql);
-        $stmt -> execute($bindvalue);
-        return $stmt->fetch();
-    }
-}
-
-
-function データベース列取得($sql, $bindvalue = array()){
-    $db = データベース接続();
-    if(!$bindvalue){
-        return $db->query($sql)->fetchAll(PDO::FETCH_COLUMN);
-    }
-    else{
-        $stmt = $db->prepare($sql);
-        $stmt -> execute($bindvalue);
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
-    }
-}
-
-
-function データベースセル取得($sql, $bindvalue = array()){
-    $db = データベース接続();
-    if(!$bindvalue){
-        return $db->query($sql)->fetchColumn();
-    }
-    else{
-        $stmt = $db->prepare($sql);
-        $stmt -> execute($bindvalue);
-        return $stmt->fetchColumn();
-    }
-}
-
-
-function データベース件数($sql, $bindvalue = array()){ //select count(列名) from テーブル名 where ...
-    return データベースセル取得($sql, $bindvalue);
-}
-
-
-function データベース追加($sql, $bindvalue = array()){
-    $db = データベース接続();
-    if(!$bindvalue){
-        $db->query($sql);
-        return $db->lastInsertId();
-    }
-    else{
-        $stmt = $db->prepare($sql);
-        $stmt -> execute($bindvalue);
-        return $db->lastInsertId();
-    }
-}
-
-
-function データベース更新($sql, $bindvalue = array()){
-    $db = データベース接続();
-    if(!$bindvalue){
-        return $db->exec($sql);
-    }
-    else{
-        $stmt = $db->prepare($sql);
-        $stmt -> execute($bindvalue);
-        return $stmt->rowCount();
-    }
-}
-
-
-function データベース削除($sql, $bindvalue = array()){
-    return データベース更新($sql, $bindvalue);
-}
-
-
-function データベーステーブル作成($テーブル名, $テーブル定義, $PDOドライバ){
-    //MySQLとSQLite両対応のテーブル作成
-    //※$テーブル定義は「キー:列名」「値:型情報」の連想配列。MySQL互換であること
-
-    foreach($テーブル定義 as $key => $value){
-        $sql .= "$key $value,";
-    }
-    $sql = rtrim($sql, ',');
-
-    //SQLiteの場合
-    if(preg_match('/^sqlite/i', $PDOドライバ)){
-       $sql = str_replace('auto_increment', 'autoincrement', $sql);
-        データベース実行("create table IF NOT EXISTS $テーブル名 ($sql)");
-    }
-    //MySQLの場合
-    else {
-       $MySQL追加文 = " ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci";
-       データベース実行("create table IF NOT EXISTS $テーブル名 ($sql) $MySQL追加文");
+    else { //MySQL用
+        データベース実行("$SQL文 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci");
     }
 }
 
@@ -283,61 +217,6 @@ function URL作成($querystring = false){
 }
 
 
-function 投稿文字列処理($str, $br = false){
-    $str = trim($str); 
-    $str = str_replace('>', '＞', $str); 
-    $str = str_replace('<', '＜', $str);
-    $str = str_replace('"', '”', $str);
-    //$str = str_replace('&', '＆', $str);
-    $str = str_replace("\0", "", $str);
-
-    //改行処理
-    if($br){ $str = str_replace(array("\r\n","\r","\n"), '<br>', $str); }
-    else   { $str = str_replace(array("\r\n","\r","\n"), '', $str); }
-
-    return $str;
-}
-
-
-function 日付変換($time = 0, $style = 0){
-
-    if(!$time){ $time = $_SERVER['REQUEST_TIME']; }
-
-    $曜日一覧 = array('日','月','火','水','木','金','土');
-    $曜日 = $曜日一覧[date('w', $time)];
-
-    switch($style){
-        case 1  : return date("Y年n月j日({$曜日}) H:i", $time);
-        case 2  : return date("c", $time);
-        case 3  : return date("Y/m/d", $time);
-        case 4  : return $曜日;
-        case 5  : return date("Y年n月j日({$曜日})", $time);
-        case 6  : return date("Y年n月j日", $time);
-        default : return date("Y/m/d H:i", $time);
-    }
-}
-
-
-function 経過時間($time = 0, $format = "Y/m/d H:i"){
-
-    if(!$time){ $time = $_SERVER['REQUEST_TIME']; }
-
-    $曜日一覧 = array('日','月','火','水','木','金','土');
-    $曜日 = $曜日一覧[date('w', $time)];
-    $format = str_replace('__', $曜日, $format);
-
-    $時間差 = $_SERVER['REQUEST_TIME'] - $time;
-    if($時間差 < 1){ $時間差 = 1; }
-    switch($時間差){
-        case $時間差 < 60     : return "{$時間差}秒前";
-        case $時間差 < 3600   : return floor($時間差/60)   . "分前";
-        case $時間差 < 86400  : return floor($時間差/3600) . "時間前";
-        case $時間差 < 604800 : return floor($時間差/86400) . "日前";
-        default: return date($format, $time);
-    }
-}
-
-
 function GETなら(){
     if(strtolower($_SERVER['REQUEST_METHOD']) == 'get'){ return true; }
     else { return false; }
@@ -346,12 +225,6 @@ function GETなら(){
 
 function POSTなら(){
     if(strtolower($_SERVER['REQUEST_METHOD']) == 'post'){ return true; }
-    else { return false; }
-}
-
-
-function Ajaxなら(){
-    if(strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){ return true; }
     else { return false; }
 }
 
@@ -371,41 +244,6 @@ function 整数なら($num){
 function h($str){
     if(!$str){ return; }
     return htmlspecialchars($str, ENT_QUOTES, "UTF-8");
-}
-
-
-function ファイル一覧取得($path = "./"){
-    $ファイル一覧 = array();
-    if(!is_dir($path)){ return array(); }
-
-    $handle = opendir($path);
-    while ($file = readdir($handle)){
-        if(is_file("$path/$file")){
-            $ファイル一覧[] = $file;
-        }
-    }
-    closedir($handle);
-
-    sort($ファイル一覧);
-    return $ファイル一覧;
-}
-
-
-function ディレクトリ一覧取得($path = "./"){
-    $ディレクトリ一覧 = array();
-    if(!is_dir($path)){ return array(); }
-
-    $handle = opendir($path);
-    while ($dir = readdir($handle)){
-        if($dir == "." or $dir == ".."){ continue; }
-        if(is_dir("$path/$dir")){
-            $ディレクトリ一覧[] = $dir;
-        }
-    }
-    closedir($handle);
-
-    sort($ディレクトリ一覧);
-    return $ディレクトリ一覧;
 }
 
 
