@@ -110,27 +110,22 @@ function データベース接続($driver = "", $user = "", $pass = ""){
         $user   = $設定['データベース.ユーザ'];
         $pass   = $設定['データベース.パスワード'];
     }
-    else{
-        $設定['データベース.PDO'] = null;
-    }
-    if(!isset($設定['データベース.PDO'])) {
-        $設定['データベース.PDO'] = new PDO($driver, $user, $pass, array(
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => true,
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
-        ));
-    }
+    $設定['データベース.PDO'] = new PDO($driver, $user, $pass, array(
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => true,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
+    ));
     return $設定['データベース.PDO'];
 }
 
 function データベース実行($SQL文, $割当 = null, $トランザクション = false){
     global $設定;
-    $pdo  = ($設定['データベース.PDO']) ? $設定['データベース.PDO'] : データベース接続();
-    if($トランザクション === true){ $pdo -> beginTransaction(); }
+    if(!isset($設定['データベース.PDO'])){ データベース接続(); }
+    if($トランザクション === true){ $設定['データベース.PDO'] -> beginTransaction(); }
 
     if($割当){
-        $stmt = $pdo -> prepare($SQL文);
+        $stmt = $設定['データベース.PDO'] -> prepare($SQL文);
         for($i = 1; $i <= count($割当); $i++){
             $type = gettype($割当[$i-1]);
             if($type === "integer" or $type === "boolean"){
@@ -143,7 +138,7 @@ function データベース実行($SQL文, $割当 = null, $トランザクシ�
         $stmt -> execute();
     }
     else{
-        $stmt = $pdo -> query($SQL文);
+        $stmt = $設定['データベース.PDO'] -> query($SQL文);
     }
     return $stmt;
 }
@@ -171,7 +166,7 @@ function データベース件数($SQL文, $割当 = null){
 function データベース追加($SQL文, $割当 = null){
     データベース実行($SQL文, $割当);
     global $設定;
-    return  $設定['データベース.PDO'] -> lastInsertId();
+    return $設定['データベース.PDO'] -> lastInsertId();
 }
 
 function データベース更新($SQL文, $割当 = null){
@@ -206,7 +201,7 @@ function データベース作成($テーブル名, $テーブル定義, $DB名 
 
 function トランザクション開始(){
     global $設定;
-    $設定['データベース.PDO'] = ($設定['データベース.PDO']) ? $設定['データベース.PDO'] : データベース接続();
+    if(!isset($設定['データベース.PDO'])){ データベース接続(); }
     $設定['データベース.PDO'] -> beginTransaction();
 }
 
