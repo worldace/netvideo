@@ -3,7 +3,7 @@
 if(!自然数なら($_GET['id'])){ エラー('不正なIDです'); }
 
 $video = データベース行取得("select * from 動画 where id = {$_GET['id']}");
-if(!$video['動画ID']){ エラー('その動画は存在しません'); }
+if(!$video['id']){ エラー('その動画は存在しません'); }
 
 //エスケープ
 $video['動画URL']  = h($video['動画URL']);

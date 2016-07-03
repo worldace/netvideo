@@ -110,14 +110,12 @@ function データベース接続($driver = "", $user = "", $pass = ""){
         $user   = $設定['データベース.ユーザ'];
         $pass   = $設定['データベース.パスワード'];
     }
-    try{
-        $設定['データベース.PDO'] = new PDO($driver, $user, $pass, array(
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => true,
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
-        ));
-    } catch(Exception $e){ print $e->getMessage(); }
+    $設定['データベース.PDO'] = new PDO($driver, $user, $pass, array(
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => true,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
+    ));
 
     return $設定['データベース.PDO'];
 }
