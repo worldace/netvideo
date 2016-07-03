@@ -559,6 +559,11 @@ $v.controller.timeSeek.addEventListener('click', function(event){
 });
 
 
+$v.controller.timeSeek.addEventListener('wheel', function(event){
+    (event.deltaY < 0) ? $v.video.setTime($v.video.currentTime+10) : $v.video.setTime($v.video.currentTime-10);
+});
+
+
 $v.controller.timeSeeker.addEventListener('mousedown', function(event){
     if(!$v.video.duration){ return; }
     $v.controller.timeSeeker.isDragging = true;
@@ -575,6 +580,11 @@ $v.controller.timeSeeker.addEventListener('mousedown', function(event){
 $v.controller.volumeSeek.addEventListener('click', function(event){
     $v.video.muted = false;
     $v.video.volume = $v.controller.setSeeker(event.clientX, $v.controller.volumeSeeker);
+});
+
+
+$v.controller.volumeSeek.addEventListener('wheel', function(event){
+    (event.deltaY < 0) ? $v.video.setVolume($v.video.volume+0.1) : $v.video.setVolume($v.video.volume-0.1);
 });
 
 
