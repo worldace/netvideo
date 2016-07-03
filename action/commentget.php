@@ -6,11 +6,10 @@ if(!自然数なら($_GET['path'])){ json_print(); }
 
 
 //データベース取得
-$設定['データベース.ドライバ'] = "sqlite:" . DBパス作成();
 if(自然数なら($_GET['num'])){ $limit = "limit {$_GET['num']}"; }
 
-$検索結果 = データベース取得("select コメント,動画時間,投稿時間 from コメント order by コメントID desc $limit", null, PDO::FETCH_NUM);
-if(!$検索結果){ json_print(); }
+データベース接続("sqlite:" . DBパス作成());
+$検索結果 = データベース取得("select コメント,動画時間,投稿時間 from コメント order by id desc $limit", null, PDO::FETCH_NUM);
 
 //出力
 json_print($検索結果);

@@ -29,7 +29,7 @@ $html = function($video) use(&$js){
 ><form id="comment-form" class="comment-form" action="javascript:void 0"
 ><input id="comment-form-input" class="comment-form-input" type="text" name="comment" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
 ><input id="comment-form-submit" class="comment-form-submit" type="submit" value="コメントする" tabindex="3" disabled
-><input id="comment-form-id" type="hidden" name="id" value="{$video['動画ID']}"
+><input id="comment-form-id" type="hidden" name="id" value="{$video['id']}"
 ><input id="comment-form-path" type="hidden" name="path" value="{$video['投稿時間']}"
 ></form
 ></div

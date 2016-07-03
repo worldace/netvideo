@@ -7,19 +7,13 @@ if(!整数なら($_POST['time'])){ exit; }
 if($_POST['comment'] == ""){ exit; }
 if(mb_strlen($_POST['comment'], "UTF-8") > 64) { exit; }
 
-//データベース追加
-$設定['データベース.ドライバ'] = "sqlite:" . DBパス作成();
-
-データベース追加(
-    "insert into コメント (コメント, 動画時間, 投稿時間) values (?, {$_POST['time']}, {$_SERVER['REQUEST_TIME']})",
-    array($_POST['comment'])
-);
-
 
 //カウントアップ
-データベース接続("sqlite:{$設定['データベース.ファイル']}");
-データベース更新("update 動画 set コメント数 = コメント数 + 1 where 動画ID = {$_POST['id']}");
+データベース更新("update 動画 set コメント数 = コメント数 + 1 where id = {$_POST['id']}");
 
+//データベース追加
+データベース接続("sqlite:" . DBパス作成());
+データベース追加("insert into コメント (コメント, 動画時間, 投稿時間) values (?, {$_POST['time']}, {$_SERVER['REQUEST_TIME']})", [$_POST['comment']]);
 
 
 function DBパス作成(){
