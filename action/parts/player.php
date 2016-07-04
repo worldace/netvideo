@@ -676,7 +676,6 @@ $v.screen.toggleFullscreen = function(){
         if     ($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
         else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
         else if($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
-        else if($v.screen.webkitEnterFullscreen)  { $v.screen.webkitEnterFullscreen(); }
         else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
     }
     else{
