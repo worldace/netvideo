@@ -103,30 +103,26 @@ function エラー($str){
 
 // http://musou.s38.xrea.com/php/pdo.html
 function データベース接続($driver = "", $user = "", $pass = ""){
-    global $設定;
-
     if(!$driver){
-        $driver = $設定['データベース.ドライバ'];
-        $user   = $設定['データベース.ユーザ'];
-        $pass   = $設定['データベース.パスワード'];
+        $driver = データベース::$標準ドライバ;
+        $user   = データベース::$標準ユーザ;
+        $pass   = データベース::$標準パスワード;
     }
-    $設定['データベース.PDO'] = new PDO($driver, $user, $pass, array(
+    データベース::$pdo = new PDO($driver, $user, $pass, array(
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => true,
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
     ));
-
-    return $設定['データベース.PDO'];
+    return データベース::$pdo;
 }
 
 function データベース実行($SQL文, $割当 = null, $トランザクション = false){
-    global $設定;
-    if(!isset($設定['データベース.PDO'])){ データベース接続(); }
-    if($トランザクション === true){ $設定['データベース.PDO'] -> beginTransaction(); }
+    if(!isset(データベース::$pdo)){ データベース接続(); }
+    if($トランザクション === true){ データベース::$pdo -> beginTransaction(); }
 
     if($割当){
-        $stmt = $設定['データベース.PDO'] -> prepare($SQL文);
+        $stmt = データベース::$pdo -> prepare($SQL文);
         for($i = 1; $i <= count($割当); $i++){
             $type = gettype($割当[$i-1]);
             if($type === "integer" or $type === "boolean"){
@@ -139,7 +135,7 @@ function データベース実行($SQL文, $割当 = null, $トランザクシ�
         $stmt -> execute();
     }
     else{
-        $stmt = $設定['データベース.PDO'] -> query($SQL文);
+        $stmt = データベース::$pdo -> query($SQL文);
     }
     return $stmt;
 }
@@ -166,8 +162,7 @@ function データベース件数($SQL文, $割当 = null){
 
 function データベース追加($SQL文, $割当 = null){
     データベース実行($SQL文, $割当);
-    global $設定;
-    return $設定['データベース.PDO'] -> lastInsertId();
+    return データベース::$pdo -> lastInsertId();
 }
 
 function データベース更新($SQL文, $割当 = null){
@@ -178,44 +173,51 @@ function データベース削除($SQL文, $割当 = null){
     return データベース実行($SQL文, $割当) -> rowCount();
 }
 
-function データベース作成($テーブル名, $テーブル定義, $DB名 = null){
+function データベース作成($テーブル名, $テーブル定義){
     foreach($テーブル定義 as $name => $value){
         $列情報 .= "$name $value,";
     }
     $列情報 = rtrim($列情報, ',');
     $SQL文 = "create table IF NOT EXISTS $テーブル名 ($列情報)";
 
-    if(!$DB名){
-        global $設定;
-        $DB名 = ($設定['データベース.ドライバ']) ? $設定['データベース.ドライバ'] : "sqlite";
-    }
+    $DB名 = (データベース::$標準ドライバ) ? データベース::$標準ドライバ : "sqlite";
 
     if(preg_match('/^sqlite/i', $DB名)){ //SQLite用
         $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
     }
     else { //MySQL用
         $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
-        $SQL文 .= " ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci");
+        $SQL文 .= " ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci";
     }
     データベース実行($SQL文);
 }
 
 function トランザクション開始(){
-    global $設定;
-    if(!isset($設定['データベース.PDO'])){ データベース接続(); }
-    $設定['データベース.PDO'] -> beginTransaction();
+    if(!isset(データベース::$pdo)){ データベース接続(); }
+    データベース::$pdo -> beginTransaction();
 }
 
 function トランザクション終了(){
-    global $設定;
-    $設定['データベース.PDO'] -> commit();
+    データベース::$pdo -> commit();
 }
 
 function トランザクション失敗(){
     global $設定;
-    $設定['データベース.PDO'] -> rollBack();
+    データベース::$pdo -> rollBack();
 }
 
+function データベース設定($driver, $user = null, $pass = null){
+    データベース::$標準ドライバ   = $driver;
+    データベース::$標準ユーザ     = $user;
+    データベース::$標準パスワード = $pass;
+}
+
+class データベース{
+    public static $標準ドライバ;
+    public static $標準ユーザ;
+    public static $標準パスワード;
+    public static $pdo;
+}
 
 function URL作成($querystring = false){
     if($_SERVER["HTTPS"] != 'on') {
