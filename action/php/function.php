@@ -191,13 +191,13 @@ function データベース作成($テーブル名, $テーブル定義, $DB名 
     }
 
     if(preg_match('/^sqlite/i', $DB名)){ //SQLite用
-        $SQL文 = str_replace('auto_increment', 'autoincrement', $SQL文);
-        データベース実行($SQL文);
+        $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
     }
     else { //MySQL用
-        $SQL文 = str_replace('autoincrement', 'auto_increment', $SQL文);
-        データベース実行("$SQL文 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci");
+        $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
+        $SQL文 .= " ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci");
     }
+    データベース実行($SQL文);
 }
 
 function トランザクション開始(){
