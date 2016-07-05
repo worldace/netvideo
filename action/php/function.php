@@ -113,7 +113,7 @@ class データベース{
     private static $pdo;
     private $テーブル;
     private $id列名 = "id";
-    const 件数 = 31;
+    public static $件数 = 31;
 
     public function __construct($table, $driver = null, $user = null, $pass = null){
         $this->テーブル($table);
@@ -325,7 +325,7 @@ class データベース{
         if($引数["順序"] === "小さい順"){ $SQL文 .= " order by {$this->id列名} asc "; }
         else{ $SQL文 .= " order by {$this->id列名} desc "; }
         
-        if(!$引数["件数"]){ $引数["件数"] = self::件数; }
+        if(!$引数["件数"]){ $引数["件数"] = self::$件数; }
         if(!$引数["位置"]){ $引数["位置"] = 0; }
         if($引数["件数"] === "∞"){
             $SQL文 .= " offset ? ";
