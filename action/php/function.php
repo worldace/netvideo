@@ -120,7 +120,7 @@ class データベース{
         if($driver){ $this->接続($driver, $user, $pass); }
         else{
             if(!self::$pdo){ $this->接続(self::$標準ドライバ, self::$標準ユーザ, self::$標準パスワード); }
-            else if(self::$pdo and (self::$現在のドライバ != self::$標準ドライバ)){ $this->接続(self::$標準ドライバ, self::$標準ユーザ, self::$標準パスワード); }
+            else if(self::$現在のドライバ != self::$標準ドライバ){ $this->接続(self::$標準ドライバ, self::$標準ユーザ, self::$標準パスワード); }
         }
         return $this;
     }
