@@ -101,122 +101,261 @@ function エラー($str){
 }
 
 
-// http://musou.s38.xrea.com/php/pdo.html
-function データベース接続($driver = "", $user = "", $pass = ""){
-    if(!$driver){
-        $driver = データベース::$標準ドライバ;
-        $user   = データベース::$標準ユーザ;
-        $pass   = データベース::$標準パスワード;
-    }
-    データベース::$pdo = new PDO($driver, $user, $pass, array(
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => true,
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
-    ));
-    return データベース::$pdo;
+// http://musou.s38.xrea.com/php/pdoclass.html
+function データベース($table, $driver = null, $user = null, $pass = null){
+    return new データベース($table, $driver, $user, $pass);
 }
+class データベース{
+    private static $標準ドライバ;
+    private static $標準ユーザ;
+    private static $標準パスワード;
+    private static $現在のドライバ;
+    private static $pdo;
+    private $テーブル;
+    private $id列名 = "id";
+    const 件数 = 31;
 
-function データベース実行($SQL文, $割当 = null, $トランザクション = false){
-    if(!isset(データベース::$pdo)){ データベース接続(); }
-    if($トランザクション === true){ データベース::$pdo -> beginTransaction(); }
+    public function __construct($table, $driver = null, $user = null, $pass = null){
+        $this->テーブル($table);
+        if($driver){ $this->接続($driver, $user, $pass); }
+        else{
+            if(!self::$pdo){ $this->接続(self::$標準ドライバ, self::$標準ユーザ, self::$標準パスワード); }
+            else if(self::$pdo and (self::$現在のドライバ != self::$標準ドライバ)){ $this->接続(self::$標準ドライバ, self::$標準ユーザ, self::$標準パスワード); }
+        }
+        return $this;
+    }
 
-    if($割当){
-        $stmt = データベース::$pdo -> prepare($SQL文);
-        for($i = 1; $i <= count($割当); $i++){
-            $type = gettype($割当[$i-1]);
-            if($type === "integer" or $type === "boolean"){
-                $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_INT);
+    private function 接続($driver, $user = null, $pass = null){
+        try{
+            self::$pdo = new PDO($driver, $user, $pass, [
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => true,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+            ]);
+        } catch(Exception $e){ print "接続エラー。データベース::設定(ドライバ,ユーザID,パスワード)を再確認してください"; }
+        self::$現在のドライバ = $driver;
+        return $this;
+    }
+    public function 実行($SQL文, array $割当 = null, $トランザクション = false){
+        if($トランザクション === true){ self::$pdo -> beginTransaction(); }
+
+        if($割当){
+            $stmt = self::$pdo -> prepare($SQL文);
+            for($i = 1; $i <= count($割当); $i++){
+                $type = gettype($割当[$i-1]);
+                if($type === "integer" or $type === "boolean"){
+                    $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_INT);
+                }
+                else {
+                    $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_STR);
+                }
             }
-            else {
-                $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_STR);
+            $stmt -> execute();
+        }
+        else{
+            $stmt = self::$pdo -> query($SQL文);
+        }
+        return $stmt;
+    }
+
+    public function 取得($件数 = self::件数, $位置 = 0, array $追加条件 = null, $取得タイプ = PDO::FETCH_ASSOC){
+        if($追加条件){
+            $追加文 = "where {$追加条件[0]}";
+            $割当   = $追加条件[1];
+        }
+        $SQL文 = "select * from {$this->テーブル} $追加文 order by {$this->id列名} desc ";
+        if($件数 === "∞"){
+            $SQL文 .= "offset ?";
+            $割当[] = (int)$位置;
+        }
+        else{
+            $SQL文 .= "limit ? offset ?";
+            $割当[] = (int)$件数;
+            $割当[] = (int)$位置;
+        }
+        return $this -> 実行($SQL文, $割当) -> fetchAll($取得タイプ);
+    }
+
+    public function 行取得($id){
+        $SQL文 = "select * from {$this->テーブル} where {$this->id列名} = ?";
+        return $this -> 実行($SQL文, [(int)$id]) -> fetch();
+    }
+
+    public function 列取得($列, $件数 = self::件数, $位置 = 0){
+        $this->文字列検証($列);
+        $SQL文 = "select {$列} from {$this->テーブル} order by {$this->id列名} desc ";
+        if($件数 === "∞"){
+            $SQL文 .= "offset ?";
+            $割当[] = (int)$位置;
+        }
+        else{
+            $SQL文 .= "limit ? offset ?";
+            $割当[] = (int)$件数;
+            $割当[] = (int)$位置;
+        }
+        return $this -> 実行($SQL文, $割当) -> fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    public function セル取得($id, $列){
+        $this->文字列検証($列);
+        $SQL文 = "select {$列} from {$this->テーブル} where {$this->id列名} = ?";
+        return $this -> 実行($SQL文, [(int)$id]) -> fetchColumn();
+    }
+
+    public function 件数(array $追加条件 = null){
+        if($追加条件){
+            $追加文 = "where {$追加条件[0]}";
+            $割当   = $追加条件[1];
+        }
+        $SQL文 = "select count(*) from {$this->テーブル} $追加文";
+        return $this -> 実行($SQL文, $割当) -> fetchColumn();
+    }
+
+    public function 検索($検索ワード, $列, $件数 = self::件数, $位置 = 0, array $追加条件 = null){
+
+        foreach((array)$検索ワード as $単語){ $割当[] = "%$単語%"; }
+
+        $列 = (array)$列;
+        foreach($列 as $単列){ $this->文字列検証($単列); }
+        if(preg_match("/sqlite/i", self::$標準ドライバ)){
+            $concat文字列 = "(" . implode('||',$列) . ")";
+        }
+        else{
+            $concat文字列 = "concat(" . implode(',',$列) . ")";
+        }
+        $検索SQL = implode(' and ', array_fill(0,count($割当),"$concat文字列 like ?"));
+ 
+        if($追加条件){
+            $追加文 = "and {$追加条件[0]}";
+            if(is_array($追加条件[1])){ $割当 = array_merge($割当, $追加条件[1]); }
+        }
+
+        $SQL文 = "select * from {$this->テーブル} where {$検索SQL} {$追加文} order by {$this->id列名} desc ";
+        if($件数 === "∞"){
+            $SQL文 .= "offset ?";
+            $割当[] = (int)$位置;
+        }
+        else{
+            $SQL文 .= "limit ? offset ?";
+            $割当[] = (int)$件数;
+            $割当[] = (int)$位置;
+        }
+        
+        return $this -> 実行($SQL文, $割当) -> fetchAll();
+    }
+
+    public function 追加(array $data){
+        foreach($data as $name => $value){
+            $this->文字列検証($name);
+            $into文1 .= "{$name},";
+            $into文2 .= "?,";
+            $割当[] = $value;
+        }
+        $into文1 = rtrim($into文1, ',');
+        $into文2 = rtrim($into文2, ',');
+
+        $SQL文 = "insert into {$this->テーブル} ($into文1) values ($into文2)";
+        $this -> 実行($SQL文, $割当);
+        return self::$pdo -> lastInsertId();
+    }
+
+    public function 更新($id, array $data){
+        foreach($data as $name => $value){
+            if(preg_match("/=/", $name)){
+                $set文 .= "{$name},";
+            }
+            else{
+                $this->文字列検証($name);
+                $set文 .= "{$name}=?,";
+                $割当[] = $value;
             }
         }
-        $stmt -> execute();
+        $set文 = rtrim($set文, ',');
+        $割当[] = (int)$id;
+
+        $SQL文 = "update {$this->テーブル} set {$set文} where {$this->id列名} = ?";
+        return $this -> 実行($SQL文, $割当) -> rowCount();
     }
-    else{
-        $stmt = データベース::$pdo -> query($SQL文);
+
+    public function 削除($id){
+        $SQL文 = "delete from {$this->テーブル} where {$this->id列名} = ?";
+        return $this -> 実行($SQL文, [(int)$id]) -> rowCount();
     }
-    return $stmt;
-}
 
-function データベース取得($SQL文, $割当 = null, $取得タイプ = PDO::FETCH_ASSOC){
-    return データベース実行($SQL文, $割当) -> fetchAll($取得タイプ);
-}
+    public function 作成(array $テーブル定義){
+        foreach($テーブル定義 as $name => $value){
+            $this->文字列検証($name);
+            $列情報 .= "$name $value,";
+        }
+        $列情報 = rtrim($列情報, ',');
+        $SQL文 = "create table IF NOT EXISTS {$this->テーブル} ($列情報)";
 
-function データベース行取得($SQL文, $割当 = null){
-    return データベース実行($SQL文, $割当) -> fetch();
-}
-
-function データベース列取得($SQL文, $割当 = null){
-    return データベース実行($SQL文, $割当) -> fetchAll(PDO::FETCH_COLUMN);
-}
-
-function データベースセル取得($SQL文, $割当 = null){
-    return データベース実行($SQL文, $割当) -> fetchColumn();
-}
-
-function データベース件数($SQL文, $割当 = null){
-    return データベース実行($SQL文, $割当) -> fetchColumn();
-}
-
-function データベース追加($SQL文, $割当 = null){
-    データベース実行($SQL文, $割当);
-    return データベース::$pdo -> lastInsertId();
-}
-
-function データベース更新($SQL文, $割当 = null){
-    return データベース実行($SQL文, $割当) -> rowCount();
-}
-
-function データベース削除($SQL文, $割当 = null){
-    return データベース実行($SQL文, $割当) -> rowCount();
-}
-
-function データベース作成($テーブル名, $テーブル定義){
-    foreach($テーブル定義 as $name => $value){
-        $列情報 .= "$name $value,";
+        $DB名 = (self::$標準ドライバ) ? self::$標準ドライバ : "sqlite";
+        if(preg_match('/^sqlite/i', $DB名)){ //SQLite用
+            $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
+        }
+        else { //MySQL用
+            $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
+            $SQL文 .= " ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci";
+        }
+        $this -> 実行($SQL文);
+        return $this;
     }
-    $列情報 = rtrim($列情報, ',');
-    $SQL文 = "create table IF NOT EXISTS $テーブル名 ($列情報)";
 
-    $DB名 = (データベース::$標準ドライバ) ? データベース::$標準ドライバ : "sqlite";
-
-    if(preg_match('/^sqlite/i', $DB名)){ //SQLite用
-        $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
+    public function インデックス作成($列){
+        $this->文字列検証($列);
+        $SQL文  = "create index {$列}インデックス on {$this->テーブル} ($列)";
+        $this -> 実行($SQL文);
+        return $this;
     }
-    else { //MySQL用
-        $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
-        $SQL文 .= " ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci";
+
+    public function トランザクション開始(){
+        self::$pdo -> beginTransaction();
+        return $this;
     }
-    データベース実行($SQL文);
-}
 
-function トランザクション開始(){
-    if(!isset(データベース::$pdo)){ データベース接続(); }
-    データベース::$pdo -> beginTransaction();
-}
+    public function トランザクション終了(){
+        self::$pdo -> commit();
+        return $this;
+    }
 
-function トランザクション終了(){
-    データベース::$pdo -> commit();
-}
+    public function トランザクション失敗(){
+        self::$pdo -> rollBack();
+        return $this;
+    }
 
-function トランザクション失敗(){
-    global $設定;
-    データベース::$pdo -> rollBack();
-}
+    public function テーブル($arg = null){
+        if($arg){
+            $this->文字列検証($arg);
+            $this->テーブル = $arg;
+            return $this;
+        }
+        else{
+            return $this->テーブル;
+        }
+    }
 
-function データベース設定($driver, $user = null, $pass = null){
-    データベース::$標準ドライバ   = $driver;
-    データベース::$標準ユーザ     = $user;
-    データベース::$標準パスワード = $pass;
-}
+    public function id列名($arg = null){
+        if($arg){
+            $this->文字列検証($arg);
+            $this->id列名 = $arg;
+            return $this;
+        }
+        else{
+            return $this->id;
+        }
+    }
 
-class データベース{
-    public static $標準ドライバ;
-    public static $標準ユーザ;
-    public static $標準パスワード;
-    public static $pdo;
+    private function 文字列検証($str){
+        if(preg_match("/[[:cntrl:][:punct:][:space:]]/", $str)){ throw new Exception("引数に不正な文字列"); }
+    }
+
+    public static function 設定($driver, $user = null, $pass = null){
+        self::$標準ドライバ   = $driver;
+        self::$標準ユーザ     = $user;
+        self::$標準パスワード = $pass;
+    }
 }
 
 function URL作成($querystring = false){

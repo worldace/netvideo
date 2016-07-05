@@ -42,11 +42,16 @@ if($imginfo[2] != 3){ //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:PNG�
 
 
 //データベース追加
-$設定['動画ID'] = データベース追加("
-    insert into 動画 (動画URL, ユーザID, タイトル, 本文, 横サイズ, 縦サイズ, 動画時間, 投稿時間) 
-    values (?, ?, ?, ?, {$_POST['width']}, {$_POST['height']}, {$_POST['duration']}, {$_SERVER['REQUEST_TIME']})",
-    array($_POST['url'], $_POST['userid'], $_POST['title'], $_POST['text'])
-);
+設定['動画ID'] = データベース("動画") -> 追加([
+    "動画URL"  => $_POST['url'],
+    "ユーザID" => $_POST['userid'],
+    "タイトル" => $_POST['title'],
+    "本文"     => $_POST['text'],
+    "横サイズ" => (int)$_POST['width'],
+    "縦サイズ" => (int)$_POST['height'],
+    "動画時間" => (int)$_POST['duration'],
+    "投稿時間" => (int)$_SERVER['REQUEST_TIME'],
+]);
 if(!$設定['動画ID']){ エラー("動画データベースに追加できません"); }
 
 
@@ -56,8 +61,7 @@ rename($tmp, "$dir/{$設定['動画ID']}.png");
 
 //コメントデータベース作成
 include_once("{$設定['actionディレクトリ']}/php/setting.table.php");
-データベース接続("sqlite:$dir/{$設定['動画ID']}.db");
-データベース作成("コメント", $設定['テーブル定義:コメント']);
+データベース("コメント", "sqlite:$dir/{$設定['動画ID']}.db") -> 作成($設定['データベース.コメントテーブル定義']);
 
 
 //移動先のURL

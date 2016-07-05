@@ -3,25 +3,20 @@
 //確認
 if(!自然数なら($_GET['id']))  { json_print(); }
 if(!自然数なら($_GET['path'])){ json_print(); }
+$件数 = (自然数なら($_GET['num']) ? $_GET['num'] : "∞";
 
 
-//データベース取得
-if(自然数なら($_GET['num'])){ $limit = "limit {$_GET['num']}"; }
-
-データベース接続("sqlite:" . DBパス作成());
-$検索結果 = データベース取得("select コメント,動画時間,投稿時間 from コメント order by id desc $limit", null, PDO::FETCH_NUM);
-
-//出力
-json_print($検索結果);
+$結果 = データベース("コメント", SQLiteドライバ()) -> 取得($件数, 0, null, PDO::FETCH_NUM);
+json_print($結果);
 
 
-function DBパス作成(){
+function SQLiteドライバ(){
     global $設定;
     
     $ymd  = date('Y/md', $_GET['path']);
     $path = "{$設定['uploadディレクトリ']}/{$ymd}/{$_GET['id']}.db";
     if(!is_file($path)){ json_print(); }
-    return $path;
+    return "sqlite:$path";
 }
 
 function json_print($json = array()){

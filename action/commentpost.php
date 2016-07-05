@@ -8,19 +8,22 @@ if($_POST['comment'] == ""){ exit; }
 if(mb_strlen($_POST['comment'], "UTF-8") > 64) { exit; }
 
 
-//カウントアップ
-データベース更新("update 動画 set コメント数 = コメント数 + 1 where id = {$_POST['id']}");
+データベース("動画") -> 更新($_POST['id'], [
+    "コメント数=コメント数+1" => null,
+]);
 
-//データベース追加
-データベース接続("sqlite:" . DBパス作成());
-データベース追加("insert into コメント (コメント, 動画時間, 投稿時間) values (?, {$_POST['time']}, {$_SERVER['REQUEST_TIME']})", [$_POST['comment']]);
+データベース("コメント", SQLiteドライバ())  -> 追加([
+    "コメント" => $_POST['comment'],
+    "動画時間" => $_POST['time'],
+    "投稿時間" => $_SERVER['REQUEST_TIME'],
+]);
 
 
-function DBパス作成(){
+function SQLiteドライバ(){
     global $設定;
-
-    $ymd  = date('Y/md', $_POST['path']);
-    $path = "{$設定['uploadディレクトリ']}/{$ymd}/{$_POST['id']}.db";
-    if(!is_file($path)){ exit; }
-    return $path;
+    
+    $ymd  = date('Y/md', $_GET['path']);
+    $path = "{$設定['uploadディレクトリ']}/{$ymd}/{$_GET['id']}.db";
+    if(!is_file($path)){ exit(); }
+    return "sqlite:$path";
 }

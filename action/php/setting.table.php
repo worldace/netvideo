@@ -2,7 +2,7 @@
 //======================================================
 // ■データベースのテーブル定義 SQLite/MySQL共用
 // 
-// 呼び出し元: ./install.php
+// 呼び出し元: ../videopost.php
 //======================================================
 
 
@@ -18,7 +18,7 @@
 「autoincrement」ではなく「auto_increment」なので注意
 */
 
-$設定['テーブル定義:動画'] = array(
+$設定['データベース.動画テーブル定義'] = array(
 "id"           => "integer primary key auto_increment",
 "動画URL"      => "varchar(500) not null",
 "横サイズ"     => "smallint unsigned not null",
@@ -35,7 +35,7 @@ $設定['テーブル定義:動画'] = array(
 );
 
 
-$設定['テーブル定義:コメント'] = array(
+$設定['データベース.コメントテーブル定義'] = array(
 "id"           => "integer primary key auto_increment",
 "コメント"     => "varchar(64) not null",
 "動画時間"     => "integer unsigned not null",
