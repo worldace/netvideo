@@ -41,7 +41,6 @@ if($imginfo[2] != 3){ //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:PNG�
 }
 
 
-//データベース追加
 設定['動画ID'] = データベース("動画") -> 追加([
     "動画URL"  => $_POST['url'],
     "ユーザID" => $_POST['userid'],
@@ -52,7 +51,7 @@ if($imginfo[2] != 3){ //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:PNG�
     "動画時間" => (int)$_POST['duration'],
     "投稿時間" => (int)$_SERVER['REQUEST_TIME'],
 ]);
-if(!$設定['動画ID']){ エラー("動画データベースに追加できません"); }
+if(!$設定['動画ID']){ エラー("データベースに登録できません"); }
 
 
 //サムネイルファイル作成
@@ -60,7 +59,7 @@ rename($tmp, "$dir/{$設定['動画ID']}.png");
 
 
 //コメントデータベース作成
-include_once("{$設定['actionディレクトリ']}/php/setting.table.php");
+include("{$設定['actionディレクトリ']}/php/setting.table.php");
 データベース("コメント", "sqlite:$dir/{$設定['動画ID']}.db") -> 作成($設定['データベース.コメントテーブル定義']);
 
 

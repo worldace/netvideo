@@ -137,6 +137,7 @@ class データベース{
         self::$現在のドライバ = $driver;
         return $this;
     }
+
     public function 実行($SQL文, array $割当 = null, $トランザクション = false){
         if($トランザクション === true){ self::$pdo -> beginTransaction(); }
 
@@ -159,21 +160,9 @@ class データベース{
         return $stmt;
     }
 
-    public function 取得($件数 = self::件数, $位置 = 0, array $追加条件 = null, $取得タイプ = PDO::FETCH_ASSOC){
-        if($追加条件){
-            $追加文 = "where {$追加条件[0]}";
-            $割当   = $追加条件[1];
-        }
-        $SQL文 = "select * from {$this->テーブル} $追加文 order by {$this->id列名} desc ";
-        if($件数 === "∞"){
-            $SQL文 .= "offset ?";
-            $割当[] = (int)$位置;
-        }
-        else{
-            $SQL文 .= "limit ? offset ?";
-            $割当[] = (int)$件数;
-            $割当[] = (int)$位置;
-        }
+    public function 取得(array $条件 = null, $取得タイプ = PDO::FETCH_ASSOC){
+        list($追加文, $割当) = $this->追加SQL文($条件, "where");
+        $SQL文 = "select * from {$this->テーブル} $追加文";
         return $this -> 実行($SQL文, $割当) -> fetchAll($取得タイプ);
     }
 
@@ -182,18 +171,10 @@ class データベース{
         return $this -> 実行($SQL文, [(int)$id]) -> fetch();
     }
 
-    public function 列取得($列, $件数 = self::件数, $位置 = 0){
+    public function 列取得($列, array $条件 = null){
         $this->文字列検証($列);
-        $SQL文 = "select {$列} from {$this->テーブル} order by {$this->id列名} desc ";
-        if($件数 === "∞"){
-            $SQL文 .= "offset ?";
-            $割当[] = (int)$位置;
-        }
-        else{
-            $SQL文 .= "limit ? offset ?";
-            $割当[] = (int)$件数;
-            $割当[] = (int)$位置;
-        }
+        list($追加文, $割当) = $this->追加SQL文($条件, "where");
+        $SQL文 = "select {$列} from {$this->テーブル} $追加文 ";
         return $this -> 実行($SQL文, $割当) -> fetchAll(PDO::FETCH_COLUMN);
     }
 
@@ -203,18 +184,15 @@ class データベース{
         return $this -> 実行($SQL文, [(int)$id]) -> fetchColumn();
     }
 
-    public function 件数(array $追加条件 = null){
-        if($追加条件){
-            $追加文 = "where {$追加条件[0]}";
-            $割当   = $追加条件[1];
-        }
+    public function 件数(array $条件 = null){
+        if($条件['条件文']){ $追加文 = "where {$条件['条件文']}"; }
         $SQL文 = "select count(*) from {$this->テーブル} $追加文";
-        return $this -> 実行($SQL文, $割当) -> fetchColumn();
+        return $this -> 実行($SQL文, $条件['割当']) -> fetchColumn();
     }
 
-    public function 検索($検索ワード, $列, $件数 = self::件数, $位置 = 0, array $追加条件 = null){
+    public function 検索($検索ワード, $列, array $条件 = null){
 
-        foreach((array)$検索ワード as $単語){ $割当[] = "%$単語%"; }
+        foreach((array)$検索ワード as $単語){ $割当1[] = "%$単語%"; }
 
         $列 = (array)$列;
         foreach($列 as $単列){ $this->文字列検証($単列); }
@@ -224,23 +202,12 @@ class データベース{
         else{
             $concat文字列 = "concat(" . implode(',',$列) . ")";
         }
-        $検索SQL = implode(' and ', array_fill(0,count($割当),"$concat文字列 like ?"));
- 
-        if($追加条件){
-            $追加文 = "and {$追加条件[0]}";
-            if(is_array($追加条件[1])){ $割当 = array_merge($割当, $追加条件[1]); }
-        }
+        $検索SQL = implode(' and ', array_fill(0,count($割当1),"$concat文字列 like ?"));
 
-        $SQL文 = "select * from {$this->テーブル} where {$検索SQL} {$追加文} order by {$this->id列名} desc ";
-        if($件数 === "∞"){
-            $SQL文 .= "offset ?";
-            $割当[] = (int)$位置;
-        }
-        else{
-            $SQL文 .= "limit ? offset ?";
-            $割当[] = (int)$件数;
-            $割当[] = (int)$位置;
-        }
+        list($追加文, $割当2) = $this->追加SQL文($条件, "and");
+        $割当 = array_merge($割当1, $割当2);
+
+        $SQL文 = "select * from {$this->テーブル} where {$検索SQL} {$追加文} ";
         
         return $this -> 実行($SQL文, $割当) -> fetchAll();
     }
@@ -351,12 +318,34 @@ class データベース{
         if(preg_match("/[[:cntrl:][:punct:][:space:]]/", $str)){ throw new Exception("引数に不正な文字列"); }
     }
 
+    private function 追加SQL文(array $引数 = null, $WHEREorAND = "where"){
+        $割当  = (array)$引数['割当'];
+        if($引数["条件"]){ $SQL文 = " $WHEREorAND {$引数['条件']} "; }
+        
+        if($引数["順序"] === "小さい順"){ $SQL文 .= " order by {$this->id列名} asc "; }
+        else{ $SQL文 .= " order by {$this->id列名} desc "; }
+        
+        if(!$引数["件数"]){ $引数["件数"] = self::件数; }
+        if(!$引数["位置"]){ $引数["位置"] = 0; }
+        if($引数["件数"] === "∞"){
+            $SQL文 .= " offset ? ";
+            $割当[] = (int)$引数["位置"];
+        }
+        else{
+            $SQL文 .= " limit ? offset ?";
+            $割当[] = (int)$引数["件数"];
+            $割当[] = (int)$引数["位置"];
+        }
+        return [$SQL文, $割当];
+    }
+
     public static function 設定($driver, $user = null, $pass = null){
         self::$標準ドライバ   = $driver;
         self::$標準ユーザ     = $user;
         self::$標準パスワード = $pass;
     }
 }
+
 
 function URL作成($querystring = false){
     if($_SERVER["HTTPS"] != 'on') {
