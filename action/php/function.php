@@ -298,7 +298,7 @@ class データベース{
         }
     }
 
-    public function id列名($arg = null){
+    public function id($arg = null){
         if($arg){
             $this->文字列検証($arg);
             $this->id列名 = $arg;
