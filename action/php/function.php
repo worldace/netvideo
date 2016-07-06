@@ -185,7 +185,7 @@ class データベース{
     }
 
     public function 件数(array $条件 = null){
-        if($条件['条件文']){ $追加文 = "where {$条件['条件文']}"; }
+        if($条件['式']){ $追加文 = "where {$条件['式']}"; }
         $SQL文 = "select count(*) from {$this->テーブル} $追加文";
         return $this -> 実行($SQL文, $条件['割当']) -> fetchColumn();
     }
@@ -318,23 +318,23 @@ class データベース{
         if(preg_match("/[[:cntrl:][:punct:][:space:]]/", $str)){ throw new Exception("引数に不正な文字列"); }
     }
 
-    private function 追加SQL文(array $引数 = null, $WHEREorAND = "where"){
-        $割当  = (array)$引数['割当'];
-        if($引数["条件"]){ $SQL文 = " $WHEREorAND {$引数['条件']} "; }
+    private function 追加SQL文(array $条件 = null, $WHEREorAND = "where"){
+        $割当  = (array)$条件['割当'];
+        if($条件["式"]){ $SQL文 = " $WHEREorAND {$条件['式']} "; }
         
-        if($引数["順序"] === "小さい順"){ $SQL文 .= " order by {$this->id列名} asc "; }
+        if($条件["順序"] === "小さい順"){ $SQL文 .= " order by {$this->id列名} asc "; }
         else{ $SQL文 .= " order by {$this->id列名} desc "; }
         
-        if(!$引数["件数"]){ $引数["件数"] = self::$件数; }
-        if(!$引数["位置"]){ $引数["位置"] = 0; }
-        if($引数["件数"] === "∞"){
+        if(!$条件["件数"]){ $条件["件数"] = self::$件数; }
+        if(!$条件["位置"]){ $条件["位置"] = 0; }
+        if($条件["件数"] === "∞"){
             $SQL文 .= " offset ? ";
-            $割当[] = (int)$引数["位置"];
+            $割当[] = (int)$条件["位置"];
         }
         else{
             $SQL文 .= " limit ? offset ?";
-            $割当[] = (int)$引数["件数"];
-            $割当[] = (int)$引数["位置"];
+            $割当[] = (int)$条件["件数"];
+            $割当[] = (int)$条件["位置"];
         }
         return [$SQL文, $割当];
     }
