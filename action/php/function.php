@@ -138,9 +138,7 @@ class データベース{
         return $this;
     }
 
-    public function 実行($SQL文, array $割当 = null, $トランザクション = false){
-        if($トランザクション === true){ self::$pdo -> beginTransaction(); }
-
+    public function 実行($SQL文, array $割当 = null){
         if($割当){
             $stmt = self::$pdo -> prepare($SQL文);
             for($i = 1; $i <= count($割当); $i++){
