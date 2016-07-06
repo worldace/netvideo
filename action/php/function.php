@@ -314,7 +314,7 @@ class データベース{
         $割当  = (array)$条件['割当'];
         if($条件["式"]){ $SQL文 = " $WHEREorAND {$条件['式']} "; }
         
-        if($条件["順序"] === "小さい順"){ $SQL文 .= " order by {$this->id列名} asc "; }
+        if($条件["順番"] === "小さい順"){ $SQL文 .= " order by {$this->id列名} asc "; }
         else{ $SQL文 .= " order by {$this->id列名} desc "; }
         
         if(!$条件["件数"]){ $条件["件数"] = self::$件数; }
