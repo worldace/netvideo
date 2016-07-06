@@ -14,8 +14,8 @@ if(mb_strlen($_POST['comment'], "UTF-8") > 64) { exit; }
 
 データベース("コメント", SQLiteドライバ())  -> 追加([
     "コメント" => $_POST['comment'],
-    "動画時間" => $_POST['time'],
-    "投稿時間" => $_SERVER['REQUEST_TIME'],
+    "動画時間" => (int)$_POST['time'],
+    "投稿時間" => (int)$_SERVER['REQUEST_TIME'],
 ]);
 
 

@@ -6,7 +6,7 @@ if(!自然数なら($_GET['path'])){ json_print(); }
 $件数 = (自然数なら($_GET['num']) ? $_GET['num'] : "∞";
 
 
-$結果 = データベース("コメント", SQLiteドライバ()) -> 取得($件数, 0, null, PDO::FETCH_NUM);
+$結果 = データベース("コメント", SQLiteドライバ()) -> 取得(["件数"=>$件数], PDO::FETCH_NUM);
 json_print($結果);
 
 
