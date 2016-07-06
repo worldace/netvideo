@@ -185,7 +185,10 @@ class データベース{
 
     public function 検索($検索ワード, $列, array $条件 = null){
 
-        foreach((array)$検索ワード as $単語){ $割当1[] = "%$単語%"; }
+        foreach((array)$検索ワード as $単語){
+            $単語 = addcslashes($単語, '_%');
+            $割当1[] = "%$単語%";
+        }
 
         $列 = (array)$列;
         foreach($列 as $単列){ $this->文字列検証($単列); }
