@@ -251,8 +251,7 @@ class データベース{
         $列情報 = rtrim($列情報, ',');
         $SQL文 = "create table IF NOT EXISTS {$this->テーブル} ($列情報)";
 
-        $DB名 = (self::$現在のドライバ) ? self::$現在のドライバ : "sqlite";
-        if(preg_match('/^sqlite/i', $DB名)){ //SQLite用
+        if(preg_match('/^sqlite/i', self::$現在のドライバ)){ //SQLite用
             $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
         }
         else { //MySQL用
