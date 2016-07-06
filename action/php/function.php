@@ -153,10 +153,10 @@ class データベース{
         return $stmt;
     }
 
-    public function 取得(array $条件 = null, $取得タイプ = PDO::FETCH_ASSOC){
-        list($追加文, $割当) = $this->追加SQL文($条件, "where");
+    public function 取得(array $条件 = null){
+        list($追加文, $割当, $行タイプ) = $this->追加SQL文($条件, "where");
         $SQL文 = "select * from {$this->テーブル} $追加文";
-        return $this -> 実行($SQL文, $割当) -> fetchAll($取得タイプ);
+        return $this -> 実行($SQL文, $割当) -> fetchAll($行タイプ);
     }
 
     public function 行取得($id){
@@ -197,12 +197,12 @@ class データベース{
         }
         $検索SQL = implode(' and ', array_fill(0,count($割当1),"$concat文字列 like ?"));
 
-        list($追加文, $割当2) = $this->追加SQL文($条件, "and");
+        list($追加文, $割当2, $行タイプ) = $this->追加SQL文($条件, "and");
         $割当 = array_merge($割当1, $割当2);
 
         $SQL文 = "select * from {$this->テーブル} where {$検索SQL} {$追加文} ";
         
-        return $this -> 実行($SQL文, $割当) -> fetchAll();
+        return $this -> 実行($SQL文, $割当) -> fetchAll($行タイプ);
     }
 
     public function 追加(array $data){
@@ -328,7 +328,15 @@ class データベース{
             $割当[] = (int)$条件["件数"];
             $割当[] = (int)$条件["位置"];
         }
-        return [$SQL文, $割当];
+
+        if($条件['行タイプ'] === null){ $行タイプ = PDO::FETCH_ASSOC; }
+        else{
+            if($条件['行タイプ'] === "連想配列"){ $行タイプ = PDO::FETCH_ASSOC; }
+            else if($条件['行タイプ'] === "配列"){ $行タイプ = PDO::FETCH_NUM; }
+            else { $行タイプ = PDO::FETCH_CLASS; }
+        }
+
+        return [$SQL文, $割当, $行タイプ];
     }
 
     public static function 設定($driver, $user = null, $pass = null){
