@@ -139,22 +139,17 @@ class データベース{
     }
 
     public function 実行($SQL文, array $割当 = null){
-        if($割当){
-            $stmt = self::$pdo -> prepare($SQL文);
-            for($i = 1; $i <= count($割当); $i++){
-                $type = gettype($割当[$i-1]);
-                if($type === "integer" or $type === "boolean"){
-                    $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_INT);
-                }
-                else {
-                    $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_STR);
-                }
+        $stmt = self::$pdo -> prepare($SQL文);
+        for($i = 1; $i <= count($割当); $i++){
+            $type = gettype($割当[$i-1]);
+            if($type === "integer" or $type === "boolean"){
+                $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_INT);
             }
-            $stmt -> execute();
+            else {
+                $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_STR);
+            }
         }
-        else{
-            $stmt = self::$pdo -> query($SQL文);
-        }
+        $stmt -> execute();
         return $stmt;
     }
 
