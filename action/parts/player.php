@@ -8,7 +8,7 @@
 
 $html = function($video){
 
-    部品::$追加js["player"] .= "\$v.player.init('{$video['動画URL']}', 640, 360);";
+    部品::$js["player"] .= "\$v.player.init('{$video['動画URL']}', 640, 360);";
 
     return <<<"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 <div id="video-player" class="video-player"

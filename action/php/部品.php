@@ -12,8 +12,8 @@ class 部品{
     private static $初期化済み = false;
     private static $キャッシュ;
     private static $windows;
-    public  static $追加js;
-    public  static $追加css;
+    public  static $js;
+    public  static $css;
 
     public static function 作成($部品名, $引数){
         if($部品名 === null){ throw new Exception('部品名がありません'); }
@@ -34,22 +34,22 @@ class 部品{
             self::$キャッシュ[$部品名]["js"]   = $js;
         }
 
-        if($css) { self::$追加css[$部品名] = is_callable($css) ? call_user_func_array($css, $引数) : $css; }
-        if($js)  { self::$追加js[$部品名]  = is_callable($js)  ? call_user_func_array($js,  $引数) : $js; }
+        if($css) { self::$css[$部品名] = is_callable($css) ? call_user_func_array($css, $引数) : $css; }
+        if($js)  { self::$js[$部品名]  = is_callable($js)  ? call_user_func_array($js,  $引数) : $js; }
 
         return is_callable($html) ? call_user_func_array($html, $引数) : $html;
     }
 
     public static function 終了処理(){
-        if(!self::$追加js and !self::$追加css){
+        if(!self::$js and !self::$css){
             ob_end_flush();
             return;
         }
 
         $buf = ob_get_contents();
         ob_end_clean();
-        if(self::$追加js){
-            $js     = "\n<script>\n" . implode(self::$追加js,"\n") . "\n</script>\n";
+        if(self::$js){
+            $js     = "\n<script>\n" . implode(self::$js,"\n") . "\n</script>\n";
             $js_pos = strripos($buf, "</body>");
             if($js_pos >= 0){
                 $buf = substr_replace($buf, $js, $js_pos, 0); //最後に出現する</body>の前にJSを挿入する
@@ -58,8 +58,8 @@ class 部品{
                 $buf .= $js;
             }
         }
-        if(self::$追加css){
-            $css     = "\n<style>\n " . implode(self::$追加css,"\n") . "\n</style>\n";
+        if(self::$css){
+            $css     = "\n<style>\n " . implode(self::$css,"\n") . "\n</style>\n";
             $css_pos = stripos($buf, "</head>");
             if($css_pos >= 0){
                 $buf = substr_replace($buf, $css, $css_pos, 0); //最初に出現する</head>の前にCSSを挿入する
