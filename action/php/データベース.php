@@ -216,10 +216,18 @@ class データベース{
     private function 追加SQL文(array $条件 = null, $WHEREorAND = "where"){
         $割当  = (array)$条件['割当'];
         if($条件["式"]){ $SQL文 = " $WHEREorAND {$条件['式']} "; }
-        
-        if($条件["順番"] === "小さい順"){ $SQL文 .= " order by {$this->id列名} asc "; }
-        else{ $SQL文 .= " order by {$this->id列名} desc "; }
-        
+
+        if(count($条件["順番"]) === 2){
+            $this->文字列検証($条件["順番"][0]);
+            $順番列 = ($条件["順番"][0]) ? $条件["順番"][0] : $this->id列名;
+            $順番順 = ($条件["順番"][1] == "小さい順") ? "asc" : "desc";
+        }
+        else{
+            $順番列 = $this->id列名;
+            $順番順 = "desc";
+        }
+        $SQL文 .= " order by $順番列 $順番順 ";
+
         if(!$条件["件数"]){ $条件["件数"] = self::$件数; }
         if(!$条件["位置"]){ $条件["位置"] = 0; }
         if($条件["件数"] === "∞"){
