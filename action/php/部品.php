@@ -34,8 +34,8 @@ class 部品{
             self::$キャッシュ[$部品名]["js"]   = $js;
         }
 
-        if($css) { self::$追加css[$部品名] = is_callable($css)  ? call_user_func_array($css, $引数) : $css; }
-        if($js)  { self::$追加js[$部品名]  = is_callable($js)   ? call_user_func_array($js,  $引数) : $js; }
+        if($css) { self::$追加css[$部品名] = is_callable($css) ? call_user_func_array($css, $引数) : $css; }
+        if($js)  { self::$追加js[$部品名]  = is_callable($js)  ? call_user_func_array($js,  $引数) : $js; }
 
         return is_callable($html) ? call_user_func_array($html, $引数) : $html;
     }
