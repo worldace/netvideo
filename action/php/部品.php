@@ -74,8 +74,8 @@ class 部品{
         register_shutdown_function("部品::終了処理");
     }
 
-    public static function 設定($dir = "."){
-        self::$ディレクトリ = $dir;
+    public static function 設定($dir = null){
+        if($dir){ self::$ディレクトリ = $dir; }
         if(!self::$初期化済み){ self::初期化(); }
     }
 }
