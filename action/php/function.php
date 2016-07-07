@@ -87,9 +87,9 @@ function h($str = ""){
 
 
 function クラスローダ($dir){
-    $win = preg_match("/win/i", PHP_OS);
-    spl_autoload_register(function($class) use($dir,$win){
-        if($win){ $class = addslashes(mb_convert_encoding($class, 'SJIS', 'UTF-8')); }
+    $windows = preg_match("/win/i", PHP_OS);
+    spl_autoload_register(function($class) use($dir,$windows){
+        if($windows){ $class = addslashes(mb_convert_encoding($class, 'SJIS', 'UTF-8')); }
         include "{$dir}/{$class}.php";
     });
 }
