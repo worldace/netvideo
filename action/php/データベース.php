@@ -1,5 +1,5 @@
 <?php
-// http://musou.s38.xrea.com/php/pdoclass.html
+// http://musou.s38.xrea.com/php/pdo.html
 
 function データベース($table, $driver = null, $user = null, $pass = null){
     return new データベース($table, $driver, $user, $pass);
