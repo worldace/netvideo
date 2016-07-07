@@ -5,7 +5,11 @@
 // 呼び出し元: ../action/php/function.php 部品()
 //======================================================
 
+
 $html = function($video){
+
+    部品::$追加js["player"] .= "\$v.player.init('{$video['動画URL']}', 640, 360);";
+
     return <<<"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 <div id="video-player" class="video-player"
 ><div id="video-screen" class="video-screen" tabindex="1"
@@ -35,8 +39,7 @@ $html = function($video){
 
 
 
-$js = function($video){
-    $str = <<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+$js = <<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
 
 var $v = {};
 
@@ -829,8 +832,6 @@ $v.type = function(target){
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━;
-    return $str . "\$v.player.init('{$video['動画URL']}', 640, 360);";
-};
 
 
 

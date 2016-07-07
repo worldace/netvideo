@@ -11,6 +11,7 @@ class 部品{
     private static $ディレクトリ = ".";
     private static $初期化済み = false;
     private static $キャッシュ;
+    private static $windows;
     public  static $追加js;
     public  static $追加css;
 
@@ -24,7 +25,9 @@ class 部品{
             $js   = self::$キャッシュ[$部品名]["js"];
         }
         else{
-            require(self::$ディレクトリ . "/{$部品名}.php");
+            $path = self::$ディレクトリ . "/{$部品名}.php";
+            if(self::$windows){ $path = addslashes(mb_convert_encoding($path, 'SJIS', 'UTF-8')); }
+            require $path;
             self::$キャッシュ[$部品名]["読み込み済み"] = true;
             self::$キャッシュ[$部品名]["html"] = $html;
             self::$キャッシュ[$部品名]["css"]  = $css;
@@ -70,6 +73,7 @@ class 部品{
 
     private static function 初期化(){
         self::$初期化済み = true;
+        self::$windows = preg_match("/win/i", PHP_OS);
         ob_start();
         register_shutdown_function("部品::終了処理");
     }

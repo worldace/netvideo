@@ -27,9 +27,5 @@ $video['本文']     = h($video['本文']);
 <?= 部品("player", $video) ?>
 
 
-
-
-
-
 </body>
 </html>
