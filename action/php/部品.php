@@ -14,11 +14,6 @@ class 部品{
     public static  $追加js;
     public static  $追加css;
 
-    public static function 設定($dir = "."){
-        self::$ディレクトリ = $dir;
-        if(!self::$初期化済み){ self::初期化(); }
-    }
-
     public static function 作成($部品名, $引数){
         if($部品名 === null){ throw new Exception('部品名がありません'); }
         if(!self::$初期化済み){ self::初期化(); }
@@ -42,38 +37,45 @@ class 部品{
         return $parts_html;
     }
 
+    public static function 終了処理(){
+        if(!self::$追加js and !self::$追加css){
+            ob_end_flush();
+            return;
+        }
+
+        $buf = ob_get_contents();
+        ob_end_clean();
+        if(self::$追加js){
+            $js     = "\n<script>\n" . implode(self::$追加js,"\n") . "\n</script>\n";
+            $js_pos = strripos($buf, "</body>");
+            if($js_pos >= 0){
+                $buf = substr_replace($buf, $js, $js_pos, 0); //最後に出現する</body>の前にJSを挿入する
+            }
+            else{
+                $buf .= $js;
+            }
+        }
+        if(self::$追加css){
+            $css     = "\n<style>\n " . implode(self::$追加css,"\n") . "\n</style>\n";
+            $css_pos = stripos($buf, "</head>");
+            if($css_pos >= 0){
+                $buf = substr_replace($buf, $css, $css_pos, 0); //最初に出現する</head>の前にCSSを挿入する
+            }
+            else{
+                $buf = $css . $buf;
+            }
+        }
+        print $buf;
+    }
+
     private static function 初期化(){
         self::$初期化済み = true;
         ob_start();
-        register_shutdown_function(function(){
-            if(!部品::$追加js and !部品::$追加css){
-                ob_end_flush();
-                return;
-            }
+        register_shutdown_function("部品::終了処理");
+    }
 
-            $buf = ob_get_contents();
-            ob_end_clean();
-            if(部品::$追加js){
-                $js     = implode(部品::$追加js, "\n");
-                $js_pos = strripos($buf, "</body>");
-                if($js_pos >= 0){
-                    $buf = substr_replace($buf, "\n<script>\n$js\n</script>\n", $js_pos, 0); //最後に出現する</body>の前にJSを挿入する
-                }
-                else{
-                    $buf .= "\n<script>\n$js\n</script>\n";
-                }
-            }
-            if(部品::$追加css){
-                $css     = implode(部品::$追加css, "\n");
-                $css_pos = stripos($buf, "</head>");
-                if($css_pos >= 0){
-                    $buf = substr_replace($buf, "\n<style>\n$css\n</style>\n", $css_pos, 0); //最初に出現する</head>の前にCSSを挿入する
-                }
-                else{
-                    $buf = "\n<style>\n$css\n</style>\n" . $buf;
-                }
-            }
-            print $buf;
-        });
+    public static function 設定($dir = "."){
+        self::$ディレクトリ = $dir;
+        if(!self::$初期化済み){ self::初期化(); }
     }
 }
