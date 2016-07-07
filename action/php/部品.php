@@ -26,7 +26,7 @@ class 部品{
         }
         else{
             $path = self::$ディレクトリ . "/{$部品名}.php";
-            if(self::$windows){ $path = addslashes(mb_convert_encoding($path, 'SJIS', 'UTF-8')); }
+            if(self::$windows){ $path = self::$ディレクトリ . addslashes(mb_convert_encoding("/{$部品名}.php", 'SJIS', 'UTF-8')); }
             require $path;
             self::$キャッシュ[$部品名]["読み込み済み"] = true;
             self::$キャッシュ[$部品名]["html"] = $html;
