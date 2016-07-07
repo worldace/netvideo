@@ -1,5 +1,10 @@
 <?php
 // http://musou.s38.xrea.com/php/pdoclass.html
+
+function データベース($table, $driver = null, $user = null, $pass = null){
+    return new データベース($table, $driver, $user, $pass);
+}
+
 class データベース{
     private static $標準ドライバ;
     private static $標準ユーザ;
@@ -242,9 +247,4 @@ class データベース{
         self::$標準ユーザ     = $user;
         self::$標準パスワード = $pass;
     }
-}
-
-
-function データベース($table, $driver = null, $user = null, $pass = null){
-    return new データベース($table, $driver, $user, $pass);
 }

@@ -27,7 +27,7 @@ if(!preg_match("/https*:\/\/.+/i", $_POST['url'])) { エラー("URLが不適切�
 
 
 //ディレクトリ作成
-$dir = 年月日ディレクトリ作成($設定['uploadディレクトリ'], $_SERVER['REQUEST_TIME']);
+$dir = 年月日ディレクトリ作成($設定['ディレクトリ.upload'], $_SERVER['REQUEST_TIME']);
 if(!$dir){ エラー("ディレクトリが作成できません"); }
 
 
@@ -59,7 +59,7 @@ rename($tmp, "$dir/{$設定['動画ID']}.png");
 
 
 //コメントデータベース作成
-include("{$設定['actionディレクトリ']}/php/setting.table.php");
+include("{$設定['ディレクトリ.action']}/php/setting.table.php");
 データベース("コメント", "sqlite:$dir/{$設定['動画ID']}.db") -> 作成($設定['データベース.コメントテーブル定義']);
 
 

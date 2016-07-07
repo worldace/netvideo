@@ -23,7 +23,7 @@ function SQLiteドライバ(){
     global $設定;
     
     $ymd  = date('Y/md', $_GET['path']);
-    $path = "{$設定['uploadディレクトリ']}/{$ymd}/{$_GET['id']}.db";
+    $path = "{$設定['ディレクトリ.upload']}/{$ymd}/{$_GET['id']}.db";
     if(!is_file($path)){ exit(); }
     return "sqlite:$path";
 }
