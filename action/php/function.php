@@ -151,8 +151,7 @@ function 整数なら($num){
 }
 
 
-function h($str){
-    if(!$str){ return; }
+function h($str = ""){
     return htmlspecialchars($str, ENT_QUOTES, "UTF-8");
 }
 
@@ -167,19 +166,14 @@ function クラスローダ($dir){
 
 
 function ディレクトリ作成($path, $name, $permission = 707){
-    if(is_dir("$path/$name")){ return false; }
-
     mkdir("$path/$name");
     chmod("$path/$name", octdec($permission));
 }
 
 
 function 年月日ディレクトリ作成($dir, $time = 0){
-    if(!$time){
-        if($_SERVER['REQUEST_TIME']){ $time = $_SERVER['REQUEST_TIME']; }
-        else{ $time = time();}
-    }
-    
+    if(!$time){ $time = ($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time(); }
+
     $年 = date('Y', $time);
     $月 = date('m', $time);
     $日 = date('d', $time);
