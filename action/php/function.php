@@ -76,23 +76,28 @@ function 部品初期化(){
 }
 
 
-function テキスト表示($str){
+function テキスト表示($str = ""){
     header("Content-Type: text/plain; charset=UTF-8");
     print $str;
     exit;
 }
 
 
+function JSON表示($json = []){
+    header("Content-Type: application/json; charset=utf-8");
+    print json_encode($json);
+    exit;
+}
+
+
 function リダイレクト($url){
-    $url = str_replace(array("\r\n","\r","\n"), '', $url);
+    $url = preg_replace("/[\r\n]/", "", $url);
     header("Location: $url");
     exit;
 }
 
 
-function エラー($str){
-    global $設定;
-
+function エラー($str = ""){
     header("HTTP/1.0 400 Bad Request");
     header("Content-Type: text/html; charset=UTF-8");
     print $str;
