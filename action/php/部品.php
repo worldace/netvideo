@@ -11,8 +11,8 @@ class 部品{
     private static $ディレクトリ = ".";
     private static $初期化済み = false;
     private static $キャッシュ;
-    public static  $追加js;
-    public static  $追加css;
+    public  static $追加js;
+    public  static $追加css;
 
     public static function 作成($部品名, $引数){
         if($部品名 === null){ throw new Exception('部品名がありません'); }
@@ -31,10 +31,10 @@ class 部品{
             self::$キャッシュ[$部品名]["js"]   = $js;
         }
 
-        if($html){ $parts_html             = is_callable($html) ? call_user_func_array($html,$引数) : $html; }
-        if($js)  { self::$追加js[$部品名]  = is_callable($js)   ? call_user_func_array($js,  $引数) : $js; }
         if($css) { self::$追加css[$部品名] = is_callable($css)  ? call_user_func_array($css, $引数) : $css; }
-        return $parts_html;
+        if($js)  { self::$追加js[$部品名]  = is_callable($js)   ? call_user_func_array($js,  $引数) : $js; }
+
+        return is_callable($html) ? call_user_func_array($html, $引数) : $html;
     }
 
     public static function 終了処理(){
