@@ -23,20 +23,17 @@ if(mb_strlen($_POST['url'],"UTF-8")    > 500)  { エラー("URLが長すぎま�
 if(!preg_match("/https*:\/\/.+/i", $_POST['url'])) { エラー("URLが不適切です"); }
 
 
-//二重投稿防止(URLユニーク)
+//二重投稿防止(未作成、URLユニーク)
 
 
-//ディレクトリ作成
-$年月日 = date('Y', $_SERVER['REQUEST_TIME']) . "/" . date('md', $_SERVER['REQUEST_TIME']);
-ディレクトリ作成($設定['ディレクトリ.upload'], $年月日) or エラー("ディレクトリが作成できません");
+$dir = ディレクトリ作成($設定['ディレクトリ.upload'], date('Y/md')) or エラー("ディレクトリが作成できません");
 
 
 //画像確認
-$tmp = tempnam($dir, "tmp"); //sys_get_temp_dir()は書き込めない可能性があるので使わない
-file_put_contents($tmp, base64_decode($_POST['thumbnail']));
-$imginfo = getimagesize($tmp);
-if($imginfo[2] != 3){ //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:PNGは3、JPEGは2、GIFは1
-    unlink($tmp);
+$tempfile = tempnam($dir, "tmp"); //sys_get_temp_dir()は使わない
+file_put_contents($tempfile, base64_decode($_POST['thumbnail']));
+if(getimagesize($tempfile)[2] != 3){ //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
+    unlink($tempfile);
     エラー("画像フォーマットが取得できません");
 }
 
@@ -55,7 +52,7 @@ if(!$設定['動画ID']){ エラー("データベースに登録できません"
 
 
 //サムネイルファイル作成
-rename($tmp, "$dir/{$設定['動画ID']}.png");
+rename($tempfile, "$dir/{$設定['動画ID']}.png");
 
 
 //コメントデータベース作成

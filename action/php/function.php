@@ -96,5 +96,5 @@ function ディレクトリ作成($path, $name, $permission = 707){
     umask(000);
     $result = mkdir("$path/$name", octdec($permission), true);
     umask($mask);
-    return $result;
+    return ($result) ? "$path/$name" : false;
 }
