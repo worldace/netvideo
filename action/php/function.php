@@ -13,9 +13,16 @@ function テキスト表示($str = ""){
 }
 
 
-function JSON表示($json = []){
-    header("Content-Type: application/json; charset=utf-8");
-    print json_encode($json);
+function JSON表示($json = [], $callback = null){
+    header("Access-Control-Allow-Origin: *");
+    if($callback){ //JSONP
+        header("Content-Type: text/javascript; charset=utf-8");
+        print $callback . "(" . json_encode($json) . ");";
+    }
+    else{ //JSON
+        header("Content-Type: application/json; charset=utf-8");
+        print json_encode($json);
+    }
     exit;
 }
 
@@ -34,7 +41,7 @@ function エラー($str = ""){
 }
 
 
-function 現在のURL($querystring = false){
+function 現在のURL($no_query = true){
     if(filter_input(INPUT_SERVER, 'HTTPS', FILTER_VALIDATE_BOOLEAN)){
         $scheme = "https://";
         if($_SERVER['SERVER_PORT'] != 443){ $port = ":" . $_SERVER['SERVER_PORT']; }
@@ -44,7 +51,7 @@ function 現在のURL($querystring = false){
         if($_SERVER['SERVER_PORT'] != 80) { $port = ":" . $_SERVER['SERVER_PORT']; }
     }
     $url = $scheme . $_SERVER["HTTP_HOST"] . $port . $_SERVER['REQUEST_URI'];
-    if($querystring === false){ $url = preg_replace("/\?.*$/", "", $url); }
+    if($no_query){ $url = preg_replace("/\?.*$/", "", $url); }
     return $url;
 }
 
