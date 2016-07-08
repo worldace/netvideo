@@ -51,26 +51,22 @@ function 現在のURL($querystring = false){
 
 
 function GETなら(){
-    if(strtolower($_SERVER['REQUEST_METHOD']) == 'get'){ return true; }
-    else { return false; }
+    return (strtolower($_SERVER['REQUEST_METHOD']) == 'get') ? true : false;
 }
 
 
 function POSTなら(){
-    if(strtolower($_SERVER['REQUEST_METHOD']) == 'post'){ return true; }
-    else { return false; }
+    return (strtolower($_SERVER['REQUEST_METHOD']) == 'post') ? true : false;
 }
 
 
 function 自然数なら($num){
-    if (preg_match("/^[1-9][0-9]*$/", $num)){ return true; }
-    else{ return false; }
+    return (preg_match("/^[1-9][0-9]*$/", $num)) ? true : false;
 }
 
 function 整数なら($num){
     if (preg_match("/^0$/", $num)){ return true; }
-    if (preg_match("/^[1-9][0-9]*$/", $num)){ return true; }
-    else{ return false; }
+    return (preg_match("/^[1-9][0-9]*$/", $num)) ? true : false;
 }
 
 
