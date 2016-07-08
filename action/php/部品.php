@@ -41,11 +41,6 @@ class 部品{
     }
 
     public static function 終了処理(){
-        if(!self::$js and !self::$css){
-            ob_end_flush();
-            return;
-        }
-
         $buf = ob_get_contents();
         ob_end_clean();
         if(self::$js){
