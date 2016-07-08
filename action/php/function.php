@@ -35,24 +35,17 @@ function エラー($str = ""){
 }
 
 
-function URL作成($querystring = false){
-    if($_SERVER["HTTPS"] != 'on') {
-        $scheme = "http://";
-        if($_SERVER['SERVER_PORT'] != 80) { $port = ":" . $_SERVER['SERVER_PORT']; }
-    }
-    else {
+function 現在のURL($querystring = false){
+    if(filter_input(INPUT_SERVER, 'HTTPS', FILTER_VALIDATE_BOOLEAN)){
         $scheme = "https://";
         if($_SERVER['SERVER_PORT'] != 443){ $port = ":" . $_SERVER['SERVER_PORT']; }
     }
-
-    if($querystring === false){
-        $request_uri = preg_replace("/\?.*$/", "", $_SERVER['REQUEST_URI']);
-        $url = $scheme . $_SERVER["HTTP_HOST"] . $port . $request_uri;
+    else {
+        $scheme = "http://";
+        if($_SERVER['SERVER_PORT'] != 80) { $port = ":" . $_SERVER['SERVER_PORT']; }
     }
-    else{
-        $url = $scheme . $_SERVER["HTTP_HOST"] . $port . $_SERVER['REQUEST_URI'];
-    }
-
+    $url = $scheme . $_SERVER["HTTP_HOST"] . $port . $_SERVER['REQUEST_URI'];
+    if($querystring === false){ $url = preg_replace("/\?.*$/", "", $url); }
     return $url;
 }
 
