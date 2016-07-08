@@ -27,8 +27,8 @@ if(!preg_match("/https*:\/\/.+/i", $_POST['url'])) { エラー("URLが不適切�
 
 
 //ディレクトリ作成
-$dir = 年月日ディレクトリ作成($設定['ディレクトリ.upload'], $_SERVER['REQUEST_TIME']);
-if(!$dir){ エラー("ディレクトリが作成できません"); }
+$年月日 = date('Y', $_SERVER['REQUEST_TIME']) . "/" . date('md', $_SERVER['REQUEST_TIME']);
+ディレクトリ作成($設定['ディレクトリ.upload'], $年月日) or エラー("ディレクトリが作成できません");
 
 
 //画像確認

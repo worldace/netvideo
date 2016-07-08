@@ -94,22 +94,7 @@ function ディレクトリ作成($path, $name, $permission = 707){
     if(!$path or !$name){ return false; }
     $mask = umask();
     umask(000);
-    mkdir("$path/$name", octdec($permission), true);
+    $result = mkdir("$path/$name", octdec($permission), true);
     umask($mask);
-}
-
-
-function 年月日ディレクトリ作成($dir, $time = 0){
-    if(!$time){ $time = ($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time(); }
-
-    $年 = date('Y', $time);
-    $月 = date('m', $time);
-    $日 = date('d', $time);
-    $permission = decoct(fileperms($dir) & 0777);
-
-    ディレクトリ作成($dir, $年, $permission);
-    ディレクトリ作成("$dir/$年", "$月$日", $permission);
-
-    if(!is_dir("$dir/$年/$月$日")){ return false; }
-    return "$dir/$年/$月$日";
+    return $result;
 }
