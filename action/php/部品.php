@@ -11,6 +11,7 @@ class 部品{
     private static $ディレクトリ = ".";
     private static $初期化済み = false;
     private static $キャッシュ;
+    private static $イベント;
     private static $windows;
     public  static $js;
     public  static $css;
@@ -63,6 +64,7 @@ class 部品{
                 $buf = $css . $buf;
             }
         }
+        if(is_callable(self::$イベント['出力前'])){ call_user_func(self::$イベント['出力前'], $buf); }
         print $buf;
     }
 
@@ -73,8 +75,9 @@ class 部品{
         register_shutdown_function("部品::終了処理");
     }
 
-    public static function 設定($dir = null){
+    public static function 設定($dir = null, array $event = null){
         if($dir){ self::$ディレクトリ = $dir; }
+        self::$イベント = $event;
         if(!self::$初期化済み){ self::初期化(); }
     }
 }
