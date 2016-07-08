@@ -32,7 +32,7 @@ $dir = ディレクトリ作成($設定['ディレクトリ.upload'], date('Y/md
 //画像確認
 $tempfile = tempnam($dir, "tmp"); //sys_get_temp_dir()は使わない
 file_put_contents($tempfile, base64_decode($_POST['thumbnail']));
-if(getimagesize($tempfile)[2] != 3){ //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
+if(!(getimagesize($tempfile)[0] > 0)){ //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
     unlink($tempfile);
     エラー("画像フォーマットが取得できません");
 }
