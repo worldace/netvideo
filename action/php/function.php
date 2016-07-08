@@ -7,7 +7,7 @@
 
 
 function テキスト表示($str = ""){
-    header("Content-Type: text/plain; charset=UTF-8");
+    header("Content-Type: text/plain; charset=utf-8");
     print $str;
     exit;
 }
@@ -28,8 +28,7 @@ function リダイレクト($url){
 
 
 function エラー($str = ""){
-    header("HTTP/1.0 400 Bad Request");
-    header("Content-Type: text/html; charset=UTF-8");
+    header('HTTP', true, 500);
     print $str;
     exit;
 }
