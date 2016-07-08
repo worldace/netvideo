@@ -90,11 +90,12 @@ function クラスローダ($dir){
 }
 
 
-function ディレクトリ作成($path, $name, $permission = 707){
-    if(!$path or !$name){ return false; }
+function ディレクトリ作成($path, $permission = 707){
+    if(!$path){ return false; }
+    if(is_dir($path)){ return $path; }
     $mask = umask();
     umask(0);
-    $result = mkdir("$path/$name", octdec($permission), true);
+    $result = mkdir($path, octdec($permission), true);
     umask($mask);
-    return ($result) ? "$path/$name" : false;
+    return ($result) ? $path : false;
 }
