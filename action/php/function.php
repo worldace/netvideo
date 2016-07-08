@@ -92,8 +92,10 @@ function クラスローダ($dir){
 
 function ディレクトリ作成($path, $name, $permission = 707){
     if(!$path or !$name){ return false; }
-    mkdir("$path/$name");
-    chmod("$path/$name", octdec($permission));
+    $mask = umask();
+    umask(000);
+    mkdir("$path/$name", octdec($permission), true);
+    umask($mask);
 }
 
 
