@@ -133,13 +133,12 @@ function ディレクトリ作成($path, $permission = 707){
 }
 
 
-function ディレクトリ削除($dir){
-    if(!$dir or !is_dir($dir)){ return false; }
-    $files = array_diff(scandir($dir), ['.','..']);
-    foreach($files as $file){
-        (is_dir("$dir/$file")) ? ディレクトリ削除("$dir/$file") : unlink("$dir/$file");
+function ディレクトリ削除($path){
+    if(!$path or !is_dir($path)){ return false; }
+    foreach(array_diff(scandir($path), ['.','..']) as $file){
+        (is_dir("$path/$file")) ? ディレクトリ削除("$path/$file") : unlink("$path/$file");
     }
-    return rmdir($dir);
+    return rmdir($path);
 }
 
 

@@ -14,7 +14,6 @@ if(!is_numeric($_POST['duration']) or $_POST['duration'] < 0) { エラー("動�
 
 
 //詳細確認
-
 if(mb_strlen($_POST['text'],"UTF-8")   > 10000){ エラー("本文が長すぎます"); }
 if(mb_strlen($_POST['userid'],"UTF-8") > 250)  { エラー("ユーザIDが長すぎます"); }
 if(mb_strlen($_POST['title'],"UTF-8")  > 250)  { エラー("タイトルが長すぎます"); }
@@ -23,12 +22,14 @@ if(mb_strlen($_POST['url'],"UTF-8")    > 500)  { エラー("URLが長すぎま�
 if(!preg_match("/https*:\/\/.+/i", $_POST['url'])) { エラー("URLが不適切です"); }
 
 
+//画像確認 getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
+if(!getimagesize("data:;base64,".$_POST['thumbnail'])[0]){ エラー("画像フォーマットが取得できません"); }
+
+
 //二重投稿防止(未作成、URLユニーク)
 
 
 
-//画像確認 getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
-getimagesize("data:application/octet-stream;base64,".$_POST['thumbnail'])[0] or エラー("画像フォーマットが取得できません");
 
 
 
