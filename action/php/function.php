@@ -56,6 +56,11 @@ function 現在のURL($no_query = true){
 }
 
 
+function ベースURL($url){
+    return (substr_count($url, "/") === 2) ? $url."/" : dirname($url."a")."/";
+}
+
+
 function GETなら(){
     return (strtolower($_SERVER['REQUEST_METHOD']) == 'get') ? true : false;
 }
@@ -89,17 +94,17 @@ function クラスローダ($dir){
 }
 
 
-function ファイル一覧($path = ".", $pattern = "*"){
-    foreach(glob("$path/$pattern") as $file){
-        if(is_file("$path/$file")){ $list[] = realpath("$path/$file"); }
+function ファイル一覧($path = ".", $pattern = "/./"){
+    foreach(glob("$path/*") as $file){
+        if(is_file("$path/$file" and preg_match($pattern, $file)){ $list[] = realpath("$path/$file"); }
     }
     return (array)$list;
 }
 
 
-function ディレクトリ一覧($path = ".", $pattern = "*"){
-    foreach(glob("$path/$pattern", GLOB_ONLYDIR) as $dir){
-        $list[] = realpath("$path/$dir");
+function ディレクトリ一覧($path = ".", $pattern = "/./"){
+    foreach(glob("$path/*", GLOB_ONLYDIR) as $dir){
+        if(preg_match($pattern, $dir)){ $list[] = realpath("$path/$dir"); }
     }
     return (array)$list;
 }
