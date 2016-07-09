@@ -93,7 +93,7 @@ function ファイル一覧($path = ".", $pattern = "*"){
     foreach(glob("$path/$pattern") as $file){
         if(is_file("$path/$file")){ $list[] = realpath("$path/$file"); }
     }
-    return $list;
+    return (array)$list;
 }
 
 
@@ -101,7 +101,7 @@ function ディレクトリ一覧($path = ".", $pattern = "*"){
     foreach(glob("$path/$pattern", GLOB_ONLYDIR) as $dir){
         $list[] = realpath("$path/$dir");
     }
-    return $list;
+    return (array)$list;
 }
 
 
@@ -113,4 +113,22 @@ function ディレクトリ作成($path, $permission = 707){
     $result = mkdir($path, octdec($permission), true);
     umask($mask);
     return ($result) ? $path : false;
+}
+
+
+function キャッシュ保存($name, $data){
+    $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "-" . $name;
+    file_put_contents($tempfile, serialize($data), LOCK_EX);
+}
+
+
+function キャッシュ取得($name){
+    $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "-" . $name;
+    return (file_exists($tempfile)) ? unserialize(file_get_contents($tempfile)) : false
+}
+
+
+function キャッシュ削除($names){
+    $temp = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "-";
+    foreach((array))$names as $name){ @unlink($temp.$name); }
 }
