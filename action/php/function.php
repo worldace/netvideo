@@ -126,9 +126,3 @@ function キャッシュ取得($name){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "-" . $name;
     return (file_exists($tempfile)) ? unserialize(file_get_contents($tempfile)) : false
 }
-
-
-function キャッシュ削除($names){
-    $temp = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "-";
-    foreach((array))$names as $name){ @unlink($temp.$name); }
-}
