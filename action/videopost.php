@@ -26,16 +26,10 @@ if(!preg_match("/https*:\/\/.+/i", $_POST['url'])) { エラー("URLが不適切�
 //二重投稿防止(未作成、URLユニーク)
 
 
-$dir = ディレクトリ作成($設定['ディレクトリ.upload']."/".date('Y/md')) or エラー("ディレクトリが作成できません");
 
+//画像確認 getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
+getimagesize("data:application/octet-stream;base64,".$_POST['thumbnail'])[0] or エラー("画像フォーマットが取得できません");
 
-//画像確認
-$tempfile = tempnam($dir, "tmp"); //sys_get_temp_dir()は使わない
-file_put_contents($tempfile, base64_decode($_POST['thumbnail']));
-if(!(getimagesize($tempfile)[0] > 0)){ //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
-    unlink($tempfile);
-    エラー("画像フォーマットが取得できません");
-}
 
 
 $設定['動画ID'] = データベース("動画") -> 追加([
@@ -51,9 +45,11 @@ $設定['動画ID'] = データベース("動画") -> 追加([
 if(!$設定['動画ID']){ エラー("データベースに登録できません"); }
 
 
-//サムネイルファイル作成
-rename($tempfile, "$dir/{$設定['動画ID']}.png");
+//ディレクトリ作成
+$dir = ディレクトリ作成($設定['ディレクトリ.upload']."/".date('Y/md')) or エラー("ディレクトリが作成できません");
 
+//サムネイルファイル作成
+file_put_contents("$dir/{$設定['動画ID']}.png", base64_decode($_POST['thumbnail']), LOCK_EX);
 
 //コメントデータベース作成
 include("{$設定['ディレクトリ.action']}/php/setting.table.php");
