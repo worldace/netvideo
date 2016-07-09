@@ -82,11 +82,26 @@ function h($str = ""){
 
 
 function クラスローダ($dir){
-    $windows = preg_match("/win/i", PHP_OS);
-    spl_autoload_register(function($class) use($dir,$windows){
-        if($windows){ $class = addslashes(mb_convert_encoding($class, 'SJIS', 'UTF-8')); }
+    spl_autoload_register(function($class) use($dir){
+        if(preg_match("/win/i", PHP_OS)){ $class = addslashes(mb_convert_encoding($class, 'SJIS', 'UTF-8')); }
         include "{$dir}/{$class}.php";
     });
+}
+
+
+function ファイル一覧($path = ".", $pattern = "*"){
+    foreach(glob("$path/$pattern") as $file){
+        if(is_file("$path/$file")){ $list[] = realpath("$path/$file"); }
+    }
+    return $list;
+}
+
+
+function ディレクトリ一覧($path = ".", $pattern = "*"){
+    foreach(glob("$path/$pattern", GLOB_ONLYDIR) as $dir){
+        $list[] = realpath("$path/$dir");
+    }
+    return $list;
 }
 
 

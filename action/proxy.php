@@ -37,13 +37,8 @@ foreach(array_reverse($meta['wrapper_data']) as $value){
 }
 foreach($response_header as $header){ header($header); }
 
-
-
 while(ob_get_level()){ ob_end_clean(); }
-
-while(!feof($fp)){
-    print fread($fp, 8192);
-}
+while(!feof($fp)){ print fread($fp, 8192); }
 fclose($fp);
 
 
