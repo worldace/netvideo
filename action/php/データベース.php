@@ -2,10 +2,10 @@
 // http://musou.s38.xrea.com/php/pdo.html
 
 class データベース{
-    private static $標準ドライバ;
-    private static $標準ユーザ;
-    private static $標準パスワード;
-    private static $現在のドライバ;
+    private static $標準ドライバー = データベースドライバー;
+    private static $標準ユーザー名 = データベースユーザー名;
+    private static $標準パスワード = データベースパスワード;
+    private static $現在のドライバー;
     private static $pdo;
     private $テーブル;
     private $id列名 = "id";
@@ -15,8 +15,8 @@ class データベース{
         $this->テーブル($table);
         if($driver){ $this->接続($driver, $user, $pass); }
         else{
-            if(!self::$pdo){ $this->接続(self::$標準ドライバ, self::$標準ユーザ, self::$標準パスワード); }
-            else if(self::$現在のドライバ != self::$標準ドライバ){ $this->接続(self::$標準ドライバ, self::$標準ユーザ, self::$標準パスワード); }
+            if(!self::$pdo){ $this->接続(self::$標準ドライバー, self::$標準ユーザー名, self::$標準パスワード); }
+            else if(self::$現在のドライバー != self::$標準ドライバー){ $this->接続(self::$標準ドライバー, self::$標準ユーザー名, self::$標準パスワード); }
         }
         return $this;
     }
@@ -30,7 +30,7 @@ class データベース{
                 PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
             ]);
         } catch(Exception $e){ print "接続エラー。データベース::設定(ドライバ,ユーザID,パスワード)を再確認してください"; }
-        self::$現在のドライバ = $driver;
+        self::$現在のドライバー = $driver;
         return $this;
     }
 
@@ -88,7 +88,7 @@ class データベース{
 
         $列 = (array)$列;
         foreach($列 as $単列){ $this->文字列検証($単列); }
-        if(preg_match("/sqlite/i", self::$現在のドライバ)){
+        if(preg_match("/sqlite/i", self::$現在のドライバー)){
             $concat文字列 = "(" . implode('||',$列) . ")";
         }
         else{
@@ -150,7 +150,7 @@ class データベース{
         $列情報 = rtrim($列情報, ',');
         $SQL文 = "create table IF NOT EXISTS {$this->テーブル} ($列情報)";
 
-        if(preg_match('/^sqlite/i', self::$現在のドライバ)){ //SQLite用
+        if(preg_match('/^sqlite/i', self::$現在のドライバー)){ //SQLite用
             $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
         }
         else { //MySQL用
@@ -244,11 +244,5 @@ class データベース{
         }
 
         return [$SQL文, $割当, $行タイプ];
-    }
-
-    public static function 設定($driver, $user = null, $pass = null){
-        self::$標準ドライバ   = $driver;
-        self::$標準ユーザ     = $user;
-        self::$標準パスワード = $pass;
     }
 }

@@ -92,7 +92,7 @@ class 検証{
     }
 
     private function error($comment = "エラーが発生しました"){
-        call_user_func(self::$コールバック, $comment);
+        if(is_callable(self::$コールバック)){ call_user_func(self::$コールバック, $comment, $this); }
     }
 
     function __call($name, $args){
