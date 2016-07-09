@@ -1,12 +1,6 @@
 <?php
 // http://musou.s38.xrea.com/php/parts.html
 
-function 部品(){
-    $引数   = func_get_args();
-    $部品名 = array_shift($引数);
-    return 部品::作成($部品名, $引数);
-}
-
 class 部品{
     private static $ディレクトリ = ".";
     private static $初期化済み = false;

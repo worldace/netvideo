@@ -6,6 +6,33 @@
 //======================================================
 
 
+function データベース($table, $driver = null, $user = null, $pass = null){
+    return new データベース($table, $driver, $user, $pass);
+}
+
+
+function 部品(){
+    $引数   = func_get_args();
+    $部品名 = array_shift($引数);
+    return 部品::作成($部品名, $引数);
+}
+
+
+function GET検証($key){
+    return new 検証($key, "GET");
+}
+
+
+function POST検証($key){
+    return new 検証($key, "POST");
+}
+
+
+function 検証($value, $method = ""){
+    return new 検証($value, $method);
+}
+
+
 function エラー($str = ""){
     header('HTTP', true, 400);
     print $str;
@@ -108,7 +135,7 @@ function クラスローダ($dir){
 
 function ファイル一覧($path = ".", $pattern = "/./"){
     foreach(glob("$path/*") as $file){
-        if(is_file("$path/$file" and preg_match($pattern, $file)){ $list[] = realpath("$path/$file"); }
+        if(is_file("$path/$file") and preg_match($pattern, $file)){ $list[] = realpath("$path/$file"); }
     }
     return (array)$list;
 }
@@ -150,5 +177,5 @@ function キャッシュ保存($name, $data){
 
 function キャッシュ取得($name){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "-" . $name;
-    return (file_exists($tempfile)) ? unserialize(file_get_contents($tempfile)) : false
+    return (file_exists($tempfile)) ? unserialize(file_get_contents($tempfile)) : false;
 }

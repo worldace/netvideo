@@ -1,15 +1,7 @@
 <?php
 
-
-function GET検証($key){
-    return new 検証($key, "GET");
-}
-function POST検証($key){
-    return new 検証($key, "POST");
-}
-
 class 検証{
-    private static $func = "エラー";
+    public static $コールバック = "エラー";
     private $value;
     private $key;
     private $method;
@@ -100,7 +92,7 @@ class 検証{
     }
 
     private function error($comment = "エラーが発生しました"){
-        call_user_func(self::$func, $comment);
+        call_user_func(self::$コールバック, $comment);
     }
 
     function __call($name, $args){
@@ -111,9 +103,5 @@ class 検証{
         else if(preg_match("/^([０-９]+)(\w*)より大/u", $name, $m)){ $this->より大きい(mb_convert_kana($m[1], "n", "utf-8"), $m[2], $args[0]); }
         else if(preg_match("/^([０-９]+)(\w*)より小/u", $name, $m)){ $this->より小きい(mb_convert_kana($m[1], "n", "utf-8"), $m[2], $args[0]); }
         else { throw new Exception("検証関数に{$name}はありません"); }
-    }
-
-    public static function 設定(callable $func){
-        if($func){ self::$func = $func; }
     }
 }
