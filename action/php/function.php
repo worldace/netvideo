@@ -6,6 +6,13 @@
 //======================================================
 
 
+function エラー($str = ""){
+    header('HTTP', true, 400);
+    print $str;
+    exit;
+}
+
+
 function テキスト表示($str = ""){
     header("Content-Type: text/plain; charset=utf-8");
     print $str;
@@ -34,9 +41,13 @@ function リダイレクト($url){
 }
 
 
-function エラー($str = ""){
-    header('HTTP', true, 500);
-    print $str;
+function ダウンロード($file){
+    header("Content-Type: application/force-download");
+    header("Content-Length: " . filesize($file));
+    header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode(basename($file)));
+
+    while(ob_get_level()){ ob_end_clean(); }
+    readfile($file);
     exit;
 }
 
@@ -118,6 +129,16 @@ function ディレクトリ作成($path, $permission = 707){
     $result = mkdir($path, octdec($permission), true);
     umask($mask);
     return ($result) ? $path : false;
+}
+
+
+function ディレクトリ削除($dir){
+    if(!$dir or !is_dir($dir)){ return false; }
+    $files = array_diff(scandir($dir), ['.','..']);
+    foreach($files as $file){
+        (is_dir("$dir/$file")) ? ディレクトリ削除("$dir/$file") : unlink("$dir/$file");
+    }
+    return rmdir($dir);
 }
 
 
