@@ -19,87 +19,53 @@ class 検証{
     }
     
     public function 必須($comment = ""){
-        if($this->value === null or $this->value === ""){
-            if(!$comment and $this->key){ $comment = "{$this->key}を入力してください"; }
-            $this->失敗($comment);
-        }
-        $this->成功();
+        if(!$comment and $this->key){ $comment = "{$this->key}を入力してください"; }
+        return ($this->value !== null or $this->value !== "") ? $this->成功() : $this->失敗($comment);
     }
 
     public function 数($comment = ""){
-        if(!is_numeric($this->value)){
-            if(!$comment and $this->key){ $comment = "{$this->key}には数値を入力してください"; }
-            $this->失敗($comment);
-        }
-        $this->成功();
+        if(!$comment and $this->key){ $comment = "{$this->key}には数値を入力してください"; }
+        return (is_numeric($this->value)) ? $this->成功() : $this->失敗($comment);
     }
 
     public function 自然数($comment = ""){
-        if(!preg_match("/^[1-9][0-9]*$/", $this->value)){
-            if(!$comment and $this->key){ $comment = "{$this->key}は1以上にしてください"; }
-            $this->失敗($comment);
-        }
-        $this->成功();
+        if(!$comment and $this->key){ $comment = "{$this->key}は1以上にしてください"; }
+        return (preg_match("/^[1-9][0-9]*$/", $this->value)) ? $this->成功() : $this->失敗($comment);
     }
 
     public function URL($comment = ""){
-        if(!preg_match("|^https?://.{4,}|i", $this->value)){
-            if(!$comment and $this->key){ $comment = "{$this->key}にはURLを入力してください"; }
-            $this->失敗($comment);
-        }
-        $this->成功();
+        if(!$comment and $this->key){ $comment = "{$this->key}にはURLを入力してください"; }
+        return (preg_match("|^https?://.{4,}|i", $this->value)) ? $this->成功() : $this->失敗($comment);
     }
 
     private function 字以上($num, $comment = ""){
-        if(mb_strlen($this->value,"UTF-8") < $num){
-            if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以上にしてください"; }
-            $this->失敗($comment);
-        }
-        $this->成功();
+        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以上にしてください"; }
+        return (mb_strlen($this->value,"UTF-8") < $num) ? $this->成功() : $this->失敗($comment);
     }
 
     private function 字以下($num, $comment = ""){
-        if(mb_strlen($this->value,"UTF-8") > $num){
-            if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以内にしてください"; }
-            $this->失敗($comment);
-        }
-        $this->成功();
+        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以内にしてください"; }
+        return (mb_strlen($this->value,"UTF-8") > $num) ? $this->成功() : $this->失敗($comment);
     }
 
     private function 以上($num, $unit = "", $comment = ""){
-        $this->数($comment);
-        if(!($this->value >= $num)){
-            if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}以上にしてください"; }
-            $this->失敗($comment);
-        }
-        $this->成功();
+        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}以上にしてください"; }
+        return (is_numeric($this->value) and ($this->value >= $num)) ? $this->成功() : $this->失敗($comment);
     }
 
     private function 以下($num, $unit = "", $comment = ""){
-        $this->数($comment);
-        if(!($this->value <= $num)){
-            if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}以下にしてください"; }
-            $this->失敗($comment);
-        }
-        $this->成功();
+        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}以下にしてください"; }
+        return (is_numeric($this->value) and ($this->value <= $num)) ? $this->成功() : $this->失敗($comment);
     }
 
     private function より大きい($num, $unit = "", $comment = ""){
-        $this->数($comment);
-        if(!($this->value > $num)){
-            if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}より大きくしてください"; }
-            $this->失敗($comment);
-        }
-        $this->成功();
+        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}より大きくしてください"; }
+        return (is_numeric($this->value) and ($this->value > $num)) ? $this->成功() : $this->失敗($comment);
     }
 
     private function より小さい($num, $unit = "", $comment = ""){
-        $this->数($comment);
-        if(!($this->value < $num)){
-            if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}より小さくしてください"; }
-            $this->失敗($comment);
-        }
-        $this->成功();
+        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}より小さくしてください"; }
+        return (is_numeric($this->value) and ($this->value < $num)) ? $this->成功() : $this->失敗($comment);
     }
 
     private function 成功(){

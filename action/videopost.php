@@ -29,7 +29,7 @@ $設定['動画ID'] = データベース("動画") -> 追加([
     "本文"     => $_POST['text'],
     "横サイズ" => (int)$_POST['width'],
     "縦サイズ" => (int)$_POST['height'],
-    "動画時間" => $_POST['duration'],
+    "動画時間" => (int)$_POST['duration'],
     "投稿時間" => (int)$_SERVER['REQUEST_TIME'],
 ]);
 if(!$設定['動画ID']){ エラー("データベースに登録できません"); }
