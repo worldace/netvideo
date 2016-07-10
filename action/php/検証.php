@@ -79,8 +79,8 @@ class 検証{
     }
 
     function __call($name, $args){
-        if(preg_match("/^([０-９]+)文?字以上$/u", $name, $m)) { $this->字以上(mb_convert_kana($m[1], "n", "utf-8"), $args[0]); }
-        if(preg_match("/^([０-９]+)文?字以/u", $name, $m))    { $this->字以下(mb_convert_kana($m[1], "n", "utf-8"), $args[0]); }
+        if     (preg_match("/^([０-９]+)文?字以上$/u", $name, $m)) { $this->字以上(mb_convert_kana($m[1], "n", "utf-8"), $args[0]); }
+        else if(preg_match("/^([０-９]+)文?字以/u", $name, $m))    { $this->字以下(mb_convert_kana($m[1], "n", "utf-8"), $args[0]); }
         else if(preg_match("/^([０-９]+)(\w*)以上$/u", $name, $m)) { $this->以上(mb_convert_kana($m[1], "n", "utf-8"), $m[2], $args[0]); }
         else if(preg_match("/^([０-９]+)(\w*)以/u", $name, $m))    { $this->以下(mb_convert_kana($m[1], "n", "utf-8"), $m[2], $args[0]); }
         else if(preg_match("/^([０-９]+)(\w*)より大/u", $name, $m)){ $this->より大きい(mb_convert_kana($m[1], "n", "utf-8"), $m[2], $args[0]); }
