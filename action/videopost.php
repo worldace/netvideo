@@ -7,20 +7,11 @@ POST検証("text")     -> ５０００字以内();
 POST検証("width")    -> ０より大きい();
 POST検証("height")   -> ０より大きい();
 POST検証("duration") -> ０より大きい();
+POST検証("thumbnail")-> 画像データ();
 
-
-//画像確認 getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
-if(!getimagesize("data:;base64,".$_POST['thumbnail'])[0]){ エラー("サムネイルが不正です"); }
-
-
-//二重投稿防止(未作成、URLユニーク)
-
-
-
+//ToDo: 二重投稿防止(URLユニーク)
 
 $dir = ディレクトリ作成($設定['ディレクトリ.upload'].date('/Y/md')) or エラー("ディレクトリが作成できません");
-
-
 
 $設定['動画ID'] = データベース("動画") -> 追加([
     "動画URL"  => $_POST['url'],
@@ -35,16 +26,12 @@ $設定['動画ID'] = データベース("動画") -> 追加([
 if(!$設定['動画ID']){ エラー("データベースに登録できません"); }
 
 
-//サムネイルファイル作成
-file_put_contents("$dir/{$設定['動画ID']}.png", base64_decode($_POST['thumbnail']), LOCK_EX);
+file_put_contents("$dir/{$設定['動画ID']}.png", base64_decode($_POST['thumbnail']), LOCK_EX); //サムネイルファイル作成
 
-//コメントデータベース作成
 include("{$設定['ディレクトリ.action']}/php/setting.table.php");
 データベース("コメント", "sqlite:$dir/{$設定['動画ID']}.db") -> 作成($設定['データベース.コメントテーブル定義']);
 
-
 $設定['移動先のURL'] = "?action=video&id={$設定['動画ID']}";
-
 
 
 ?>

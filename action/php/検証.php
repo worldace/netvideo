@@ -38,6 +38,11 @@ class 検証{
         return (preg_match("|^https?://.{4,}|i", $this->value)) ? $this->成功() : $this->失敗($comment);
     }
 
+    public function 画像データ($comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}を取得できませんでした"; }
+        return (getimagesize("data:;base64,".$this->value)[0] > 0) ? $this->成功() : $this->失敗($comment); //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
+    }
+
     private function 字以上($num, $comment = ""){
         if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以上にしてください"; }
         return (mb_strlen($this->value,"UTF-8") < $num) ? $this->成功() : $this->失敗($comment);
