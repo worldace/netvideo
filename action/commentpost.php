@@ -1,11 +1,10 @@
 <?php
 
 //確認
-if(!自然数なら($_POST['id']))  { exit; }
-if(!自然数なら($_POST['path'])){ exit; }
-if(!整数なら($_POST['time'])){ exit; }
-if($_POST['comment'] == ""){ exit; }
-if(mb_strlen($_POST['comment'], "UTF-8") > 64) { exit; }
+POST検証("id")      -> 自然数();
+POST検証("path")    -> 自然数();
+POST検証("time")    -> ０以上();
+POST検証("comment") -> 必須() -> ６４文字以内();
 
 
 データベース("動画") -> 更新($_POST['id'], [

@@ -33,6 +33,11 @@ class 検証{
         return (preg_match("/^[1-9][0-9]*$/", $this->value)) ? $this->成功() : $this->失敗($comment);
     }
 
+    public function 整数($comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}は0以上にしてください"; }
+        return (preg_match("/^(0|[1-9]\d*)$/", $this->value)) ? $this->成功() : $this->失敗($comment);
+    }
+
     public function URL($comment = ""){
         if(!$comment and $this->key){ $comment = "{$this->key}にはURLを入力してください"; }
         return (preg_match("|^https?://.{4,}|i", $this->value)) ? $this->成功() : $this->失敗($comment);
