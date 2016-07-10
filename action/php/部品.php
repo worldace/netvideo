@@ -12,7 +12,7 @@ class 部品{
 
     public static function 作成($部品名, $引数){
         if($部品名 === null){ throw new Exception('部品名がありません'); }
-        if(!self::$初期化済み){ self::初期化(); }
+        if(!self::$初期化済み){ self::初期化実行(); }
 
         if(self::$キャッシュ[$部品名]["読み込み済み"] === true){
             $html = self::$キャッシュ[$部品名]["html"];
@@ -62,7 +62,7 @@ class 部品{
         print $buf;
     }
 
-    private static function 初期化(){
+    private static function 初期化実行(){
         self::$初期化済み = true;
         self::$windows = preg_match("/win/i", PHP_OS);
         ob_start();
@@ -71,6 +71,6 @@ class 部品{
 
     public static function 初期化($dir = null){
         if($dir){ self::$ディレクトリ = $dir; }
-        if(!self::$初期化済み){ self::初期化(); }
+        if(!self::$初期化済み){ self::初期化実行(); }
     }
 }
