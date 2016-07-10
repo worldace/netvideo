@@ -22,8 +22,7 @@ $設定['動画ID'] = データベース("動画") -> 追加([
     "縦サイズ" => (int)$_POST['height'],
     "動画時間" => (int)$_POST['duration'],
     "投稿時間" => (int)$_SERVER['REQUEST_TIME'],
-]);
-if(!$設定['動画ID']){ エラー("データベースに登録できません"); }
+]) or エラー("データベースに登録できません");
 
 
 file_put_contents("$dir/{$設定['動画ID']}.png", base64_decode($_POST['thumbnail']), LOCK_EX); //サムネイルファイル作成

@@ -73,12 +73,12 @@ class 検証{
         return (is_numeric($this->value) and ($this->value < $num)) ? $this->成功() : $this->失敗($comment);
     }
 
-    public function 字以上($num, $comment = ""){ //非文書化
+    public function 文字以上($num, $comment = ""){ //非文書化
         if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以上にしてください"; }
         return (mb_strlen($this->value,"UTF-8") < $num) ? $this->成功() : $this->失敗($comment);
     }
 
-    public function 字以下($num, $comment = ""){ //非文書化
+    public function 文字以下($num, $comment = ""){ //非文書化
         if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以内にしてください"; }
         return (mb_strlen($this->value,"UTF-8") > $num) ? $this->成功() : $this->失敗($comment);
     }
@@ -94,8 +94,8 @@ class 検証{
     }
 
     function __call($name, $args){
-        if     (preg_match("/^([０-９]+)文?字以上$/u", $name, $m)) { return $this->字以上(mb_convert_kana($m[1], "n", "utf-8"), $args[0]); }
-        else if(preg_match("/^([０-９]+)文?字以/u", $name, $m))    { return $this->字以下(mb_convert_kana($m[1], "n", "utf-8"), $args[0]); }
+        if     (preg_match("/^([０-９]+)文?字以上$/u", $name, $m)) { return $this->文字以上(mb_convert_kana($m[1], "n", "utf-8"), $args[0]); }
+        else if(preg_match("/^([０-９]+)文?字以/u", $name, $m))    { return $this->文字以下(mb_convert_kana($m[1], "n", "utf-8"), $args[0]); }
         else if(preg_match("/^([０-９]+)(\w*)以上$/u", $name, $m)) { return $this->以上(mb_convert_kana($m[1], "n", "utf-8"), $m[2], $args[0]); }
         else if(preg_match("/^([０-９]+)(\w*)以/u", $name, $m))    { return $this->以下(mb_convert_kana($m[1], "n", "utf-8"), $m[2], $args[0]); }
         else if(preg_match("/^([０-９]+)(\w*)より大/u", $name, $m)){ return $this->より大きい(mb_convert_kana($m[1], "n", "utf-8"), $m[2], $args[0]); }
