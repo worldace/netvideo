@@ -11,7 +11,7 @@ class 検証{
         $this->mode = $mode;
         if($method){
             $this->key   = $value;
-            $this->value = ($method == "POST") ? $_POST[$value] : $_GET[$value];
+            $this->value = ($method == "POST") ? @$_POST[$value] : @$_GET[$value];
         }
         else{
             $this->value = $value;
@@ -41,8 +41,16 @@ class 検証{
         }
         $this->成功();
     }
-    
-    public function 字以上($num, $comment = ""){
+
+    public function URL($comment = ""){
+        if(!preg_match("|^https?://.{4,}|i", $this->value)){
+            if(!$comment and $this->key){ $comment = "{$this->key}にはURLを入力してください"; }
+            $this->失敗($comment);
+        }
+        $this->成功();
+    }
+
+    private function 字以上($num, $comment = ""){
         if(mb_strlen($this->value,"UTF-8") < $num){
             if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以上にしてください"; }
             $this->失敗($comment);
@@ -50,7 +58,7 @@ class 検証{
         $this->成功();
     }
 
-    public function 字以下($num, $comment = ""){
+    private function 字以下($num, $comment = ""){
         if(mb_strlen($this->value,"UTF-8") > $num){
             if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以内にしてください"; }
             $this->失敗($comment);
@@ -58,8 +66,8 @@ class 検証{
         $this->成功();
     }
 
-    public function 以上($num, $unit = "", $comment = ""){
-        $this->数();
+    private function 以上($num, $unit = "", $comment = ""){
+        $this->数($comment);
         if(!($this->value >= $num)){
             if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}以上にしてください"; }
             $this->失敗($comment);
@@ -67,8 +75,8 @@ class 検証{
         $this->成功();
     }
 
-    public function 以下($num, $unit = "", $comment = ""){
-        $this->数();
+    private function 以下($num, $unit = "", $comment = ""){
+        $this->数($comment);
         if(!($this->value <= $num)){
             if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}以下にしてください"; }
             $this->失敗($comment);
@@ -76,8 +84,8 @@ class 検証{
         $this->成功();
     }
 
-    public function より大きい($num, $unit = "", $comment = ""){
-        $this->数();
+    private function より大きい($num, $unit = "", $comment = ""){
+        $this->数($comment);
         if(!($this->value > $num)){
             if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}より大きくしてください"; }
             $this->失敗($comment);
@@ -85,8 +93,8 @@ class 検証{
         $this->成功();
     }
 
-    public function より小さい($num, $unit = "", $comment = ""){
-        $this->数();
+    private function より小さい($num, $unit = "", $comment = ""){
+        $this->数($comment);
         if(!($this->value < $num)){
             if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}より小さくしてください"; }
             $this->失敗($comment);
