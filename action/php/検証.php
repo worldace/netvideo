@@ -2,11 +2,13 @@
 
 class 検証{
     public static $コールバック = "エラー";
-    private $value;
     private $key;
+    private $value;
+    private $mode;
     private $method;
 
-    public function __construct($value, $method = ""){
+    public function __construct($mode, $value, $method = ""){
+        $this->mode = $mode;
         if($method){
             $this->key   = $value;
             $this->value = ($method == "POST") ? $_POST[$value] : $_GET[$value];
@@ -19,80 +21,87 @@ class 検証{
     public function 必須($comment = ""){
         if($this->value === null or $this->value === ""){
             if(!$comment and $this->key){ $comment = "{$this->key}を入力してください"; }
-            $this->error($comment);
+            $this->失敗($comment);
         }
-        return $this;
+        $this->成功();
     }
 
     public function 数($comment = ""){
         if(!is_numeric($this->value)){
             if(!$comment and $this->key){ $comment = "{$this->key}には数値を入力してください"; }
-            $this->error($comment);
+            $this->失敗($comment);
         }
+        $this->成功();
     }
 
     public function 自然数($comment = ""){
         if(!preg_match("/^[1-9][0-9]*$/", $this->value)){
             if(!$comment and $this->key){ $comment = "{$this->key}は1以上にしてください"; }
-            $this->error($comment);
+            $this->失敗($comment);
         }
-        return $this;
+        $this->成功();
     }
     
     public function 字以上($num, $comment = ""){
         if(mb_strlen($this->value,"UTF-8") < $num){
             if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以上にしてください"; }
-            $this->error($comment);
+            $this->失敗($comment);
         }
-        return $this;
+        $this->成功();
     }
 
     public function 字以下($num, $comment = ""){
         if(mb_strlen($this->value,"UTF-8") > $num){
             if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以内にしてください"; }
-            $this->error($comment);
+            $this->失敗($comment);
         }
-        return $this;
+        $this->成功();
     }
 
     public function 以上($num, $unit = "", $comment = ""){
         $this->数();
         if(!($this->value >= $num)){
             if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}以上にしてください"; }
-            $this->error($comment);
+            $this->失敗($comment);
         }
-        return $this;
+        $this->成功();
     }
 
     public function 以下($num, $unit = "", $comment = ""){
         $this->数();
         if(!($this->value <= $num)){
             if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}以下にしてください"; }
-            $this->error($comment);
+            $this->失敗($comment);
         }
-        return $this;
+        $this->成功();
     }
 
     public function より大きい($num, $unit = "", $comment = ""){
         $this->数();
         if(!($this->value > $num)){
             if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}より大きくしてください"; }
-            $this->error($comment);
+            $this->失敗($comment);
         }
-        return $this;
+        $this->成功();
     }
 
     public function より小さい($num, $unit = "", $comment = ""){
         $this->数();
         if(!($this->value < $num)){
             if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}より小さくしてください"; }
-            $this->error($comment);
+            $this->失敗($comment);
         }
-        return $this;
+        $this->成功();
     }
 
-    private function error($comment = "エラーが発生しました"){
+    private function 成功(){
+        return ($this->mode === "確認") ? true : $this;
+    }
+
+    private function 失敗($comment = "エラーが発生しました"){
+        if($this->mode === "確認"){ return false; }
         if(is_callable(self::$コールバック)){ call_user_func(self::$コールバック, $comment, $this); }
+        return $this;
     }
 
     function __call($name, $args){

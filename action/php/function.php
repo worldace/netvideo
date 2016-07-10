@@ -19,17 +19,22 @@ function 部品(){
 
 
 function GET検証($key){
-    return new 検証($key, "GET");
+    return new 検証("検証", $key, "GET");
 }
 
 
 function POST検証($key){
-    return new 検証($key, "POST");
+    return new 検証("検証", $key, "POST");
 }
 
 
 function 検証($value, $method = ""){
-    return new 検証($value, $method);
+    return new 検証("検証", $value, $method);
+}
+
+
+function 確認($value, $method = ""){
+    return new 検証("確認", $value, $method);
 }
 
 
