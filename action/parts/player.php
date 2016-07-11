@@ -753,6 +753,17 @@ $v.post = function(url, param){
 };
 
 
+$v.param = function(hash){
+    var str = "";
+    for(var name in hash){
+        var value = encodeURIComponent(hash[name]);
+        name = encodeURIComponent(name);
+        str += name + "=" + value + "&";
+    }
+    return str;
+};
+
+
 $v.deparam = function(str){
     if(str == null){ return {}; }
     str = String(str);
