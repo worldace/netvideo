@@ -1,13 +1,14 @@
 <?php
 
 class 検証{
-    public static $コールバック = "エラー";
+    private $エラー関数;
     private $key;
     private $value;
     private $mode;
     private $method;
 
     public function __construct($mode, $value, $method = ""){
+        $this->エラー関数 = (検証エラー関数) ? 検証エラー関数 : "エラー";
         $this->mode = $mode;
         if($method){
             $this->key   = $value;
@@ -33,7 +34,7 @@ class 検証{
         return (preg_match("/^[1-9][0-9]*$/", $this->value)) ? $this->成功() : $this->失敗($comment);
     }
 
-    public function 整数($comment = ""){
+    public function 自然数と0($comment = ""){
         if(!$comment and $this->key){ $comment = "{$this->key}は0以上にしてください"; }
         return (preg_match("/^(0|[1-9]\d*)$/", $this->value)) ? $this->成功() : $this->失敗($comment);
     }
@@ -89,7 +90,7 @@ class 検証{
 
     private function 失敗($comment = "エラーが発生しました"){
         if($this->mode === "確認"){ return false; }
-        if(is_callable(self::$コールバック)){ call_user_func(self::$コールバック, $comment, $this); }
+        if(is_callable(self::$エラー関数)){ call_user_func(self::$エラー関数, $comment, $this); }
         return $this;
     }
 
