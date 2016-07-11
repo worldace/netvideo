@@ -85,6 +85,13 @@ class 検証{
         return (mb_strlen($this->value,"UTF-8") > $num) ? $this->成功() : $this->失敗($comment);
     }
 
+    private function 全角数字変換($num){
+        $num = preg_replace("/^ー/u", "-", $num);
+        $num = preg_replace("/．/u", ".", $num);
+        $num = mb_convert_kana($num, "n", "utf-8");
+        return $num;
+    }
+
     private function 成功(){
         return ($this->mode === "確認") ? true : $this;
     }
@@ -96,14 +103,14 @@ class 検証{
     }
 
     function __call($name, $args){
-        if     (preg_match("/^([０-９]+)文?字以上$/u", $name, $m)) { return $this->文字以上(mb_convert_kana($m[1], "n", "utf-8"), $args[0]); }
-        else if(preg_match("/^([０-９]+)文?字以/u", $name, $m))    { return $this->文字以下(mb_convert_kana($m[1], "n", "utf-8"), $args[0]); }
-        else if(preg_match("/^([０-９]+)(\w*)以上$/u", $name, $m)) { return $this->以上(mb_convert_kana($m[1], "n", "utf-8"), $m[2], $args[0]); }
-        else if(preg_match("/^([０-９]+)(\w*)以/u", $name, $m))    { return $this->以下(mb_convert_kana($m[1], "n", "utf-8"), $m[2], $args[0]); }
-        else if(preg_match("/^([０-９]+)(\w*)より大/u", $name, $m)){ return $this->より大きい(mb_convert_kana($m[1], "n", "utf-8"), $m[2], $args[0]); }
-        else if(preg_match("/^([０-９]+)(\w*)より小/u", $name, $m)){ return $this->より小きい(mb_convert_kana($m[1], "n", "utf-8"), $m[2], $args[0]); }
+        if     (preg_match("/^([０-９]+)文?字以上$/u", $name, $m)) { return $this->文字以上($this->全角数字変換($m[1]), $args[0]); }
+        else if(preg_match("/^([０-９]+)文?字以/u", $name, $m))    { return $this->文字以下($this->全角数字変換($m[1]), $args[0]); }
+        else if(preg_match("/^(ー?[０-９．]+)(\w*)以上$/u", $name, $m)) { return $this->以上($this->全角数字変換($m[1]), $m[2], $args[0]); }
+        else if(preg_match("/^(ー?[０-９．]+)(\w*)以/u", $name, $m))    { return $this->以下($this->全角数字変換($m[1]), $m[2], $args[0]); }
+        else if(preg_match("/^(ー?[０-９．]+)(\w*)より大/u", $name, $m)){ return $this->より大きい($this->全角数字変換($m[1]), $m[2], $args[0]); }
+        else if(preg_match("/^(ー?[０-９．]+)(\w*)より小/u", $name, $m)){ return $this->より小きい($this->全角数字変換($m[1]), $m[2], $args[0]); }
         else {
-            $name = mb_convert_kana($name, "n", "utf-8");
+            if(preg_match("/^(ー?[０-９．]+)$/u", $name)){ $name = $this->全角数字変換($name); }
             return $this->と同じ($name, $args[0]);
         }
     }
