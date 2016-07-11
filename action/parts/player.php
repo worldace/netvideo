@@ -27,10 +27,10 @@ $html = function($video){
 ><img id="controller-screen-button" class="controller-img" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04ODMgMTA1NnEwIDEzLTEwIDIzbC0zMzIgMzMyIDE0NCAxNDRxMTkgMTkgMTkgNDV0LTE5IDQ1LTQ1IDE5aC00NDhxLTI2IDAtNDUtMTl0LTE5LTQ1di00NDhxMC0yNiAxOS00NXQ0NS0xOSA0NSAxOWwxNDQgMTQ0IDMzMi0zMzJxMTAtMTAgMjMtMTB0MjMgMTBsMTE0IDExNHExMCAxMCAxMCAyM3ptNzgxLTg2NHY0NDhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTE0NC0xNDQtMzMyIDMzMnEtMTAgMTAtMjMgMTB0LTIzLTEwbC0xMTQtMTE0cS0xMC0xMC0xMC0yM3QxMC0yM2wzMzItMzMyLTE0NC0xNDRxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDQ0OHEyNiAwIDQ1IDE5dDE5IDQ1eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg=="
 ></div
 ><form id="comment-form" class="comment-form" action="javascript:void 0"
-><input id="comment-form-input" class="comment-form-input" type="text" name="comment" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
+><input id="comment-form-input" class="comment-form-input" type="text" name="コメント" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
 ><input id="comment-form-submit" class="comment-form-submit" type="submit" value="コメントする" tabindex="3" disabled
 ><input id="comment-form-id" type="hidden" name="id" value="{$video['id']}"
-><input id="comment-form-path" type="hidden" name="path" value="{$video['投稿時間']}"
+><input id="comment-form-time" type="hidden" name="動画投稿時間" value="{$video['投稿時間']}"
 ></form
 ></div
 ></div>
@@ -409,14 +409,14 @@ $v.comment.run = function(){
 
 $v.comment.get = function(){
     var id   = document.getElementById("comment-form-id").value;
-    var path = document.getElementById("comment-form-path").value;
+    var time = document.getElementById("comment-form-time").value;
     var sec  = Math.floor($v.video.duration);
     var num  = sec * 4; //コメント取得件数(num)
 
     $v.comment.list = []; 
     for(var i = 0; i < sec+1; i++){ $v.comment.list.push([]); } //動画時間＋1の箱を作成 [[], [], [], ...]
 
-    var url = "?action=commentget" + "&id=" + id + "&path=" + path + "&num=" + num + "&nocache=" + Date.now();
+    var url = "?" + $v.param({"action":"commentget", "id":id, "動画投稿時間":time, "件数":num, "nocache":Date.now()});
     $v.get(url, function(xhr){
         try{ var comments = JSON.parse(xhr.responseText); } catch(e){ return; }
 
@@ -440,7 +440,7 @@ $v.comment.post = function(){
     }
     
     var formdata = new FormData($v.controller.form);
-    formdata.append("time", sec.toFixed(2)*100);
+    formdata.append("動画時間", sec.toFixed(2)*100);
     $v.post('?action=commentpost', formdata);
 };
 
