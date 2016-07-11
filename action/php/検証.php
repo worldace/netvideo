@@ -1,4 +1,5 @@
 <?php
+// http://musou.s38.xrea.com/php/validate.html
 
 class 検証{
     private $エラー関数;
@@ -90,7 +91,7 @@ class 検証{
 
     private function 失敗($comment = "エラーが発生しました"){
         if($this->mode === "確認"){ return false; }
-        if(is_callable(self::$エラー関数)){ call_user_func(self::$エラー関数, $comment, $this); }
+        if(is_callable($this->エラー関数)){ call_user_func($this->エラー関数, $comment, $this); }
         return $this;
     }
 

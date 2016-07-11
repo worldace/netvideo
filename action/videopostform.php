@@ -9,23 +9,23 @@
 </head>
 <body>
 <video id="video" width="640" height="360" loop controls></video>
-<button type="button" onClick="$v.capture()" id="capture-button" disabled>サムネイル撮影</button>
+<button type="button" onClick="$v.capture()" id="撮影ボタン" disabled>サムネイル撮影</button>
 
 <form action="?action=videopost" method="POST" id="form">
 <table>
-<tr><td>動画ファイルのURL</td><td><input type="text" name="url" id="url" autocomplete="off" spellcheck="false"></td></tr>
+<tr><td>動画ファイルのURL</td><td><input type="text" name="動画URL" id="動画URL" autocomplete="off" spellcheck="false"></td></tr>
 
 <tr><td>サムネイル</td><td><canvas id="canvas" width="256" height="144"></canvas></td></tr>
-<tr><td>動画情報</td><td id="info"></td></tr>
-<tr><td>タイトル</td><td><input type="text" name="title" id="title" spellcheck="false"></td></tr>
-<tr><td>コメント</td><td><textarea name="text" id="text" spellcheck="false"></textarea></td></tr>
+<tr><td>動画情報</td><td id="動画情報"></td></tr>
+<tr><td>タイトル</td><td><input type="text" name="タイトル" id="タイトル" spellcheck="false"></td></tr>
+<tr><td>コメント</td><td><textarea name="本文" id="本文" spellcheck="false"></textarea></td></tr>
 <tr><td colspan="2"><input type="submit" value="     この動画を登録する     " id="submit"></td></tr>
 </table>
-<input type="hidden" name="userid" id="userid" value="https://me.yahoo.co.jp/a/">
-<input type="hidden" name="width" id="width" value="">
-<input type="hidden" name="height" id="height" value="">
-<input type="hidden" name="duration" id="duration" value="">
-<input type="hidden" name="thumbnail" id="thumbnail" value="">
+<input type="hidden" name="ユーザid" id="ユーザid" value="https://me.yahoo.co.jp/a/">
+<input type="hidden" name="横サイズ" id="横サイズ" value="">
+<input type="hidden" name="縦サイズ" id="縦サイズ" value="">
+<input type="hidden" name="動画時間" id="動画時間" value="">
+<input type="hidden" name="サムネイル" id="サムネイル" value="">
 </form>
 
 <script>
@@ -35,16 +35,16 @@ document.addEventListener('DOMContentLoaded', function(){
 $v.video  = document.getElementById("video");
 $v.canvas = document.getElementById("canvas");
 $v.form   = document.getElementById("form");
-$v.url    = document.getElementById("url");
-$v.thumbnail  = document.getElementById("thumbnail");
+$v.url    = document.getElementById("動画URL");
+$v.thumbnail  = document.getElementById("サムネイル");
 
 $v.url.addEventListener('input', function(e){
-    document.getElementById("width").value      = "";
-    document.getElementById("height").value     = "";
-    document.getElementById("duration").value   = "";
-    document.getElementById("thumbnail").value  = "";
-    document.getElementById("info").textContent = "";
-    document.getElementById("capture-button").disabled = true;
+    document.getElementById("横サイズ").value    = "";
+    document.getElementById("縦サイズ").value    = "";
+    document.getElementById("動画時間").value    = "";
+    document.getElementById("サムネイル").value  = "";
+    document.getElementById("動画情報").textContent = "";
+    document.getElementById("撮影ボタン").disabled = true;
     $v.canvas.getContext("2d").clearRect(0, 0, $v.canvas.clientWidth, $v.canvas.clientHeight);
 
     var url = this.value.trim();
@@ -56,11 +56,11 @@ $v.url.addEventListener('input', function(e){
 });
 
 $v.video.addEventListener('canplaythrough', function(){
-    document.getElementById("width").value      = $v.video.videoWidth;
-    document.getElementById("height").value     = $v.video.videoHeight;
-    document.getElementById("duration").value   = $v.video.duration;
-    document.getElementById("info").textContent = $v.infostr($v.video.videoWidth, $v.video.videoHeight, $v.video.duration);
-    document.getElementById("capture-button").disabled = false;
+    document.getElementById("横サイズ").value = $v.video.videoWidth;
+    document.getElementById("縦サイズ").value = $v.video.videoHeight;
+    document.getElementById("動画時間").value = $v.video.duration;
+    document.getElementById("動画情報").textContent = $v.infostr($v.video.videoWidth, $v.video.videoHeight, $v.video.duration);
+    document.getElementById("撮影ボタン").disabled = false;
 
     var pos = $v.objectPosition(640, 360, $v.video.videoWidth, $v.video.videoHeight);
     $v.video.style.width   = pos.w + "px";
