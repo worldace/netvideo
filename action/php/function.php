@@ -18,6 +18,11 @@ function 部品(){
 }
 
 
+function 確認($value, $method = ""){
+    return new 検証("確認", $value, $method);
+}
+
+
 function GET検証($key){
     return new 検証("検証", $key, "GET");
 }
@@ -30,11 +35,6 @@ function POST検証($key){
 
 function 検証($value, $method = ""){
     return new 検証("検証", $value, $method);
-}
-
-
-function 確認($value, $method = ""){
-    return new 検証("確認", $value, $method);
 }
 
 
@@ -171,6 +171,15 @@ function ディレクトリ削除($path){
         (is_dir("$path/$file")) ? ディレクトリ削除("$path/$file") : unlink("$path/$file");
     }
     return rmdir($path);
+}
+
+
+function zip作成($zipfile, array $data){
+    $zip = new ZipArchive();
+    if(!$zip->open($zipfile, ZipArchive::CREATE)){ return false; }
+    foreach($data as $name => $value){ $zip->addFromString($name, $value); } //$nameに/を含めるとディレクトリになる
+    $zip->close();
+    return $zipfile;
 }
 
 
