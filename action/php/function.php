@@ -73,7 +73,8 @@ function リダイレクト($url){
 }
 
 
-function ダウンロード($file){
+function ダウンロード($file, $timeout = 0){
+    if(!$timeout){ ini_set("max_execution_time", $timeout); }
     header("Content-Type: application/force-download");
     header("Content-Length: " . filesize($file));
     header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode(basename($file)));
@@ -174,7 +175,7 @@ function ディレクトリ削除($path){
 }
 
 
-function zip作成($zipfile, array $data){
+function zip圧縮($zipfile, array $data){
     $zip = new ZipArchive();
     if(!$zip->open($zipfile, ZipArchive::CREATE)){ return false; }
     foreach($data as $name => $value){ $zip->addFromString($name, $value); } //$nameに/を含めるとディレクトリになる
