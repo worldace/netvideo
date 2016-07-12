@@ -6,8 +6,7 @@
 ini_set("max_execution_time", 3600);
 
 
-if(!isset($_GET['url'])){ error(); }
-if(!preg_match("|^https*://|i", $_GET['url'])){ error(); }
+if(!preg_match("|^https?://|i", $_GET['url'])){ error(); }
 if(is_sameorigin($_GET['url'])){ error(); }
 
 
@@ -25,8 +24,7 @@ $reqest = array(
     )
 );
 
-$fp = @fopen($_GET['url'], 'rb', false, stream_context_create($reqest));
-if(!$fp){ error(); }
+$fp = @fopen($_GET['url'], 'rb', false, stream_context_create($reqest)) or error();
 
 $response_header = array();
 $meta = stream_get_meta_data($fp);
@@ -49,17 +47,12 @@ function error(){
 
 
 function is_sameorigin($url){
-    $query = parse_url($url); //$query['scheme'] $query['host'] $query['port']
- 
-    if($query['port'] == ""){
-        $query['port'] = ($query['scheme'] == "http") ? 80 : 443;
-    }
+    $q = parse_url($url); //$q['scheme'] $q['host'] $q['port']
+    if($q['port'] == ""){ $q['port'] = ($q['scheme'] == "http") ? 80 : 443; }
 
-    $server = array();
-    $server['host'] = $_SERVER['HTTP_HOST'];
-    $server['port'] = $_SERVER['SERVER_PORT'];
-    $server['scheme'] = isset($_SERVER["HTTPS"]) ? "https" : "http";
+    $s['host'] = $_SERVER['HTTP_HOST'];
+    $s['port'] = $_SERVER['SERVER_PORT'];
+    $s['scheme'] = isset($_SERVER["HTTPS"]) ? "https" : "http";
     
-    if(($server['scheme'] == $query['scheme']) and ($server['host'] == $query['host']) and ($server['port'] == $query['port'])){ return true; }
-    else{ return false; }
+    return (($s['scheme'] == $q['scheme']) and ($s['host'] == $q['host']) and ($s['port'] == $q['port'])) ? true : false;
 }
