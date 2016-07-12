@@ -47,12 +47,12 @@ function error(){
 
 
 function is_sameorigin($url){
-    $q = parse_url($url); //$q['scheme'] $q['host'] $q['port']
-    if($q['port'] == ""){ $q['port'] = ($q['scheme'] == "http") ? 80 : 443; }
+    $input = parse_url($url); //$input['scheme'] $input['host'] $input['port']
+    if($input['port'] == ""){ $input['port'] = ($input['scheme'] == "http") ? 80 : 443; }
 
-    $s['host'] = $_SERVER['HTTP_HOST'];
-    $s['port'] = $_SERVER['SERVER_PORT'];
-    $s['scheme'] = isset($_SERVER["HTTPS"]) ? "https" : "http";
-    
-    return (($s['scheme'] == $q['scheme']) and ($s['host'] == $q['host']) and ($s['port'] == $q['port'])) ? true : false;
+    $host   = $_SERVER['HTTP_HOST'];
+    $port   = $_SERVER['SERVER_PORT'];
+    $scheme = (filter_input(INPUT_SERVER, 'HTTPS', FILTER_VALIDATE_BOOLEAN)) ? "https" : "http";
+
+    return (($input['scheme'] == $scheme) and ($input['host'] == $host) and ($input['port'] == $port)) ? true : false;
 }
