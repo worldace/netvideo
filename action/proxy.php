@@ -16,15 +16,9 @@ foreach(getallheaders() as $name => $value){
     $reqest_header .= "$name: $value\r\n";
 }
 
-$reqest = array(
-    'http' => array(
-        'method'  => $_SERVER['REQUEST_METHOD'],
-        'header'  => $reqest_header,
-        'content' => file_get_contents("php://input")
-    )
-);
+$reqest = stream_context_create(['http' => ['method'=>$_SERVER['REQUEST_METHOD'], 'header'=>$reqest_header, 'content'=>file_get_contents("php://input")]]);
 
-$fp = @fopen($_GET['url'], 'rb', false, stream_context_create($reqest)) or error();
+$fp = @fopen($_GET['url'], 'rb', false, $reqest) or error();
 
 $response_header = array();
 $meta = stream_get_meta_data($fp);
