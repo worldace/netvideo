@@ -85,6 +85,12 @@ function ダウンロード($file, $timeout = 0){
 }
 
 
+function POST($url, array $data = [], array $header = []){
+    $request = stream_context_create(['http'=>['method'=>'POST', 'header'=>implode("\r\n", $header), 'content'=>http_build_query($data)]]);
+    return @file_get_contents($url, false, $request);
+}
+
+
 function 現在のURL($no_query = true){
     if(filter_input(INPUT_SERVER, 'HTTPS', FILTER_VALIDATE_BOOLEAN)){
         $scheme = "https://";
@@ -122,6 +128,16 @@ function 自然数なら($num){
 function 整数なら($num){
     if (preg_match("/^0$/", $num)){ return true; }
     return (preg_match("/^[1-9][0-9]*$/", $num)) ? true : false;
+}
+
+
+function 日付($str = '[年]/[月]/[日] [0時]:[0分]', $time = 0){
+	if(!$time){ $time = time(); }
+	$week = ['日','月','火','水','木','金','土'][date('w', $time)];
+    $from = ['[年]','[月]','[0月]','[日]','[0日]','[時]','[0時]','[分]','[0分]','[秒]','[0秒]','[曜日]','[iso]','[rfc]'];
+    $to   = ['Y'   ,'n'   ,'m'    ,'j'   ,'d'    ,'G'   ,'H'    ,'i'   ,'i'    ,'s'   ,'s'    ,$week   ,'c'    ,'r'];
+	$str  = str_ireplace($from, $to, $str);
+	return date($str, $time);
 }
 
 
