@@ -74,7 +74,7 @@ function リダイレクト($url){
 
 
 function ダウンロード($file, $timeout = 0){
-    if(!$timeout){ ini_set("max_execution_time", $timeout); }
+    if($timeout){ ini_set("max_execution_time", $timeout); }
     header("Content-Type: application/force-download");
     header("Content-Length: " . filesize($file));
     header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode(basename($file)));
