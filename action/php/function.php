@@ -81,7 +81,6 @@ function ダウンロード($file, $timeout = 0){
 
     while(ob_get_level()){ ob_end_clean(); }
     readfile($file);
-    exit;
 }
 
 
@@ -91,7 +90,7 @@ function POST($url, array $data = [], array $header = []){
 }
 
 
-function 現在のURL($no_query = true){
+function 現在のURL($no_query = false){
     if(filter_input(INPUT_SERVER, 'HTTPS', FILTER_VALIDATE_BOOLEAN)){
         $scheme = "https://";
         if($_SERVER['SERVER_PORT'] != 443){ $port = ":" . $_SERVER['SERVER_PORT']; }
@@ -121,17 +120,7 @@ function POSTなら(){
 }
 
 
-function 自然数なら($num){
-    return (preg_match("/^[1-9][0-9]*$/", $num)) ? true : false;
-}
-
-function 整数なら($num){
-    if (preg_match("/^0$/", $num)){ return true; }
-    return (preg_match("/^[1-9][0-9]*$/", $num)) ? true : false;
-}
-
-
-function 日付($str = '[年]/[月]/[日] [0時]:[0分]', $time = 0){
+function 日付($str = '[年]/[0月]/[0日] [0時]:[0分]', $time = 0){
 	if(!$time){ $time = time(); }
 	$week = ['日','月','火','水','木','金','土'][date('w', $time)];
     $from = ['[年]','[月]','[0月]','[日]','[0日]','[時]','[0時]','[分]','[0分]','[秒]','[0秒]','[曜日]','[iso]','[rfc]'];
