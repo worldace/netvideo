@@ -73,14 +73,22 @@ function リダイレクト($url){
 }
 
 
-function ダウンロード($file, $timeout = 0){
+function ダウンロード($file, $data = "", $timeout = 0){
     if($timeout){ ini_set("max_execution_time", $timeout); }
+    if($data){
+        $filename = rawurlencode($file);
+        $filesize = strlen($data);
+    }
+    else{
+        $filename = rawurlencode(basename($file));
+        $filesize = filesize($file);
+    }
     header("Content-Type: application/force-download");
-    header("Content-Length: " . filesize($file));
-    header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode(basename($file)));
+    header("Content-Length: $filesize");
+    header("Content-Disposition: attachment; filename*=UTF-8''$filename");
 
     while(ob_get_level()){ ob_end_clean(); }
-    readfile($file);
+    ($data) ? print($data) : readfile($file);
 }
 
 
@@ -111,21 +119,23 @@ function ベースURL($url){
 
 
 function GETなら(){
-    return (strtolower($_SERVER['REQUEST_METHOD']) == 'get') ? true : false;
+    return (strtoupper($_SERVER['REQUEST_METHOD']) === 'GET') ? true : false;
 }
 
 
 function POSTなら(){
-    return (strtolower($_SERVER['REQUEST_METHOD']) == 'post') ? true : false;
+    return (strtoupper($_SERVER['REQUEST_METHOD']) === 'POST') ? true : false;
 }
 
 
-function 日付($str = '[年]/[0月]/[0日] [0時]:[0分]', $time = 0){
+function 日付($time = 0, $str = '[年]/[0月]/[0日] [0時]:[0分]:[0秒]'){
 	if(!$time){ $time = time(); }
 	$week = ['日','月','火','水','木','金','土'][date('w', $time)];
-    $from = ['[年]','[月]','[0月]','[日]','[0日]','[時]','[0時]','[分]','[0分]','[秒]','[0秒]','[曜日]','[iso]','[rfc]'];
-    $to   = ['Y'   ,'n'   ,'m'    ,'j'   ,'d'    ,'G'   ,'H'    ,'i'   ,'i'    ,'s'   ,'s'    ,$week   ,'c'    ,'r'];
-	$str  = str_ireplace($from, $to, $str);
+    $from = ['[年]','[月]','[0月]','[日]','[0日]','[時]','[0時]','[0分]','[0秒]','[曜日]'];
+    $to   = ['Y'   ,'n'   ,'m'    ,'j'   ,'d'    ,'G'   ,'H'    ,'i'    ,'s'    ,$week];
+	$str  = str_replace($from, $to, $str);
+	$str  = str_replace('[分]', ltrim(date('i',$time),"0"), $str);
+	$str  = str_replace('[秒]', ltrim(date('s',$time),"0"), $str);
 	return date($str, $time);
 }
 
