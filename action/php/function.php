@@ -209,3 +209,16 @@ function キャッシュ取得($name){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "-" . $name;
     return (file_exists($tempfile)) ? unserialize(file_get_contents($tempfile)) : false;
 }
+
+
+function uuid() { //uuid v4
+    return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0x0fff)|0x4000,mt_rand(0,0x3fff)|0x8000,mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff));
+}
+
+
+function パスワード用($length = 8, $userfriendly = true){
+    $str = "ABCDEFGHJKLMNPQRSTWXYZabcdefghkmnpqrstwxyz23456789";
+    if(!$userfriendly){ $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"; }
+    $str = str_shuffle($str);
+    return substr($str, 0, $length);
+}

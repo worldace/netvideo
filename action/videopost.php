@@ -1,5 +1,7 @@
 <?php
 
+$_POST['サムネイル'] = base64_decode($_POST['サムネイル']);
+
 POST検証("動画URL")    -> URL();
 POST検証("ユーザid")   -> 必須() -> ２５０字以内();
 POST検証("タイトル")   -> 必須() -> ２５０字以内();
@@ -25,7 +27,7 @@ $設定['動画id'] = データベース("動画") -> 追加([
 ]) or エラー("データベースに登録できません");
 
 
-file_put_contents("$dir/{$設定['動画id']}.png", base64_decode($_POST['サムネイル']), LOCK_EX);
+file_put_contents("$dir/{$設定['動画id']}.png", $_POST['サムネイル'], LOCK_EX);
 
 include("{$設定['ディレクトリ.action']}/php/setting.table.php");
 データベース("コメント", "sqlite:$dir/{$設定['動画id']}.db") -> 作成($設定['データベース.コメントテーブル定義']);

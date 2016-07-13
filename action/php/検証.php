@@ -47,7 +47,7 @@ class 検証{
 
     public function 画像データ($comment = ""){
         if(!$comment and $this->key){ $comment = "{$this->key}を取得できませんでした"; }
-        return (getimagesize("data:;base64,".$this->value)[0] > 0) ? $this->成功() : $this->失敗($comment); //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
+        return (getimagesizefromstring($this->value)[0] > 0) ? $this->成功() : $this->失敗($comment); //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
     }
 
     public function と同じ($value, $comment = ""){ //非文書化
