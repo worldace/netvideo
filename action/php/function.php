@@ -136,6 +136,12 @@ function POSTなら(){
 }
 
 
+function 連想配列なら(array $array){
+    return (array_values($array) !== $array) ? true : false;
+}
+
+
+
 function 日付($time = 0, $str = '[年]/[0月]/[0日] [0時]:[0分]:[0秒]'){
 	if(!$time){ $time = time(); }
 	$week = ['日','月','火','水','木','金','土'][date('w', $time)];
