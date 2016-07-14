@@ -92,16 +92,16 @@ function ダウンロード($file, $data = "", $timeout = 0){
 }
 
 
-function GET送信($url, array $data = [], array $header = []){
-    if($data and preg_match("/\?/", $url)){ $url .= "&" . http_build_query($data, "", "&"); }
-    else if($data){ $url .= "?" . http_build_query($data, "", "&"); }
+function GET送信($url, array $querymap = [], array $header = []){
+    if($querymap and preg_match("/\?/", $url)){ $url .= "&" . http_build_query($querymap, "", "&"); }
+    else if($querymap){ $url .= "?" . http_build_query($querymap, "", "&"); }
     $request = stream_context_create(['http'=>['method'=>'GET', 'header'=>implode("\r\n", $header)]]);
     return @file_get_contents($url, false, $request);
 }
 
 
-function POST送信($url, array $data = [], array $header = []){
-    $request = stream_context_create(['http'=>['method'=>'POST', 'header'=>implode("\r\n", $header), 'content'=>http_build_query($data, "", "&")]]);
+function POST送信($url, array $querymap = [], array $header = []){
+    $request = stream_context_create(['http'=>['method'=>'POST', 'header'=>implode("\r\n", $header), 'content'=>http_build_query($querymap, "", "&")]]);
     return @file_get_contents($url, false, $request);
 }
 
@@ -153,8 +153,8 @@ function h($str = ""){
 }
 
 
-function 自動リンク($str, array $attrs = []){
-    foreach($attrs as $name => $value){ $attr .= " $name=\"$value\""; }
+function 自動リンク($str = "", array $attrmap = []){
+    foreach($attrmap as $name => $value){ $attr .= " $name=\"$value\""; }
     return preg_replace("|(https?://[^[:space:]\r\n]+)|i", "<a href=\"$1\"$attr>$1</a>", $str);
 }
 
@@ -204,10 +204,10 @@ function ディレクトリ削除($path){
 }
 
 
-function zip圧縮($zipfile, array $data){
+function zip圧縮($zipfile, array $filemap){
     $zip = new ZipArchive();
     if(!$zip->open($zipfile, ZipArchive::CREATE)){ return false; }
-    foreach($data as $name => $value){ $zip->addFromString($name, $value); } //$nameに/を含めるとディレクトリになる
+    foreach($filemap as $name => $value){ $zip->addFromString($name, $value); } //$nameに/を含めるとディレクトリになる
     $zip->close();
     return $zipfile;
 }
@@ -235,6 +235,5 @@ function uuid($hyphen = false) { //uuid v4
 function ランダム文字列($length = 8, $userfriendly = true){
     $str = "ABCDEFGHJKLMNPQRSTWXYZabcdefghkmnpqrstwxyz23456789";
     if(!$userfriendly){ $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"; }
-    $str = str_shuffle($str);
-    return substr($str, 0, $length);
+    return substr(str_shuffle($str), 0, $length);
 }
