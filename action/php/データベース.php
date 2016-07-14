@@ -10,6 +10,7 @@ class データベース{
     private $テーブル;
     private $id列名 = "id";
     public static $件数 = 31;
+    public static $行タイプ = PDO::FETCH_ASSOC;
 
     public function __construct($table, $driver = null, $user = null, $pass = null){
         $this->テーブル($table);
@@ -24,7 +25,7 @@ class データベース{
     private function 接続($driver, $user = null, $pass = null){
         try{
             self::$pdo = new PDO($driver, $user, $pass, [
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_DEFAULT_FETCH_MODE => self::$行タイプ,
                 PDO::ATTR_EMULATE_PREPARES => true,
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
@@ -55,9 +56,10 @@ class データベース{
         return $this -> 実行($SQL文, $割当) -> fetchAll($行タイプ);
     }
 
-    public function 行取得($id){
+    public function 行取得($id, array $条件 = null){
+        list($追加文, $割当, $行タイプ) = $this->追加SQL文($条件, "where");
         $SQL文 = "select * from {$this->テーブル} where {$this->id列名} = ?";
-        return $this -> 実行($SQL文, [(int)$id]) -> fetch();
+        return $this -> 実行($SQL文, [(int)$id]) -> fetchAll($行タイプ);
     }
 
     public function 列取得($列, array $条件 = null){
@@ -236,11 +238,11 @@ class データベース{
             $割当[] = (int)$条件["位置"];
         }
 
-        if($条件['行タイプ'] === null){ $行タイプ = PDO::FETCH_ASSOC; }
-        else{
-            if($条件['行タイプ'] === "連想配列"){ $行タイプ = PDO::FETCH_ASSOC; }
+        if($条件['行タイプ']){
+            if($条件['行タイプ'] === "クラス"){ $行タイプ = PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE; }
+            else if($条件['行タイプ'] === "連想配列"){ $行タイプ = PDO::FETCH_ASSOC; }
             else if($条件['行タイプ'] === "配列"){ $行タイプ = PDO::FETCH_NUM; }
-            else { $行タイプ = PDO::FETCH_CLASS; }
+            else { $行タイプ = PDO::FETCH_ASSOC; }
         }
 
         return [$SQL文, $割当, $行タイプ];
