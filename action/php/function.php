@@ -92,8 +92,16 @@ function ダウンロード($file, $data = "", $timeout = 0){
 }
 
 
+function GET送信($url, array $data = [], array $header = []){
+    if($data and preg_match("/\?/", $url)){ $url .= "&" . http_build_query($data, "", "&"); }
+    else if($data){ $url .= "?" . http_build_query($data, "", "&"); }
+    $request = stream_context_create(['http'=>['method'=>'GET', 'header'=>implode("\r\n", $header)]]);
+    return @file_get_contents($url, false, $request);
+}
+
+
 function POST送信($url, array $data = [], array $header = []){
-    $request = stream_context_create(['http'=>['method'=>'POST', 'header'=>implode("\r\n", $header), 'content'=>http_build_query($data)]]);
+    $request = stream_context_create(['http'=>['method'=>'POST', 'header'=>implode("\r\n", $header), 'content'=>http_build_query($data, "", "&")]]);
     return @file_get_contents($url, false, $request);
 }
 
@@ -218,7 +226,7 @@ function uuid($hyphen = false) { //uuid v4
 }
 
 
-function パスワード用($length = 8, $userfriendly = true){
+function ランダム文字列($length = 8, $userfriendly = true){
     $str = "ABCDEFGHJKLMNPQRSTWXYZabcdefghkmnpqrstwxyz23456789";
     if(!$userfriendly){ $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"; }
     $str = str_shuffle($str);
