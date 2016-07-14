@@ -29,8 +29,7 @@ $設定['動画id'] = データベース("動画") -> 追加([
 
 file_put_contents("$dir/{$設定['動画id']}.png", $_POST['サムネイル'], LOCK_EX);
 
-include("{$設定['ディレクトリ.action']}/php/setting.table.php");
-データベース("コメント", "sqlite:$dir/{$設定['動画id']}.db") -> 作成($設定['データベース.コメントテーブル定義']);
+データベース("コメント", "sqlite:$dir/{$設定['動画id']}.db") -> 作成(コメントテーブル::定義);
 
 $設定['移動先のURL'] = "?action=video&id={$設定['動画id']}";
 

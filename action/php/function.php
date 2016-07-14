@@ -92,7 +92,7 @@ function ダウンロード($file, $data = "", $timeout = 0){
 }
 
 
-function POST($url, array $data = [], array $header = []){
+function POST送信($url, array $data = [], array $header = []){
     $request = stream_context_create(['http'=>['method'=>'POST', 'header'=>implode("\r\n", $header), 'content'=>http_build_query($data)]]);
     return @file_get_contents($url, false, $request);
 }
