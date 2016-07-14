@@ -59,7 +59,7 @@ class データベース{
     public function 行取得($id, array $条件 = null){
         list($追加文, $割当, $行タイプ) = $this->追加SQL文($条件, "where");
         $SQL文 = "select * from {$this->テーブル} where {$this->id列名} = ?";
-        return $this -> 実行($SQL文, [(int)$id]) -> fetchAll($行タイプ);
+        return $this -> 実行($SQL文, [(int)$id]) -> fetchAll($行タイプ)[0];
     }
 
     public function 列取得($列, array $条件 = null){
