@@ -40,6 +40,16 @@ class 検証{
         return (preg_match("/^(0|[1-9]\d*)$/", $this->value)) ? $this->成功() : $this->失敗($comment);
     }
 
+    public function 英語($comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}に英語以外の文字が含まれています"; }
+        return (preg_match("/^[A-Za-z]+$/", $this->value)) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 英数字($comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}に英数字以外の文字が含まれています"; }
+        return (preg_match("/^[A-Za-z0-9]+$/", $this->value)) ? $this->成功() : $this->失敗($comment);
+    }
+
     public function URL($comment = ""){
         if(!$comment and $this->key){ $comment = "{$this->key}にはURLを入力してください"; }
         return (preg_match("|^https?://.{4,}|i", $this->value)) ? $this->成功() : $this->失敗($comment);
