@@ -153,6 +153,12 @@ function h($str = ""){
 }
 
 
+function 自動リンク($str, array $attrs = []){
+    foreach($attrs as $name => $value){ $attr .= " $name=\"$value\""; }
+    return preg_replace("|(https?://[^[:space:]\r\n]+)|i", "<a href=\"$1\"$attr>$1</a>", $str);
+}
+
+
 function クラスローダ($dir = __DIR__){
     spl_autoload_register(function($class) use($dir){
         if(preg_match("/win/i", PHP_OS)){ $class = addslashes(mb_convert_encoding($class, 'SJIS', 'UTF-8')); }
