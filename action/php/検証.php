@@ -27,7 +27,7 @@ class 検証{
 
     public function 数($comment = ""){
         if(!$comment and $this->key){ $comment = "{$this->key}には数値を入力してください"; }
-        return (is_numeric($this->value)) ? $this->成功() : $this->失敗($comment);
+        return (is_numeric($this->value) and !preg_match("/^-?0+\d/", $this->value)) ? $this->成功() : $this->失敗($comment);
     }
 
     public function 自然数($comment = ""){
@@ -38,6 +38,11 @@ class 検証{
     public function 自然数と0($comment = ""){
         if(!$comment and $this->key){ $comment = "{$this->key}は0以上にしてください"; }
         return (preg_match("/^(0|[1-9]\d*)$/", $this->value)) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 数字($comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}に数字以外の文字が含まれています"; }
+        return (preg_match("/^[0-9]+$/", $this->value)) ? $this->成功() : $this->失敗($comment);
     }
 
     public function 英語($comment = ""){
