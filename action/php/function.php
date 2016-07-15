@@ -6,6 +6,15 @@
 //======================================================
 
 
+function クラスローダ($dir = __DIR__){
+    spl_autoload_register(function($class) use($dir){
+        if(preg_match("/win/i", PHP_OS)){ $class = addslashes(mb_convert_encoding($class, 'SJIS', 'UTF-8')); }
+        $class = str_replace("_", "/", $class);
+        include "{$dir}/{$class}.php";
+    });
+}
+
+
 function データベース($table, $driver = null, $user = null, $pass = null){
     return new データベース($table, $driver, $user, $pass);
 }
@@ -141,7 +150,6 @@ function 連想配列なら(array $array){
 }
 
 
-
 function 日付($time = 0, $str = '[年]/[0月]/[0日] [0時]:[0分]:[0秒]'){
 	if(!$time){ $time = time(); }
 	$week = ['日','月','火','水','木','金','土'][date('w', $time)];
@@ -154,6 +162,20 @@ function 日付($time = 0, $str = '[年]/[0月]/[0日] [0時]:[0分]:[0秒]'){
 }
 
 
+function 経過時間($time){
+    $時間差 = time() - $time;
+    switch($時間差){
+        case $時間差 < 1        : return "今";
+        case $時間差 < 60       : return "{$時間差}秒前";
+        case $時間差 < 3600     : return floor($時間差/60)."分前";
+        case $時間差 < 86400    : return floor($時間差/3600)."時間前";
+        case $時間差 < 2592000  : return floor($時間差/86400)."日前";
+        case $時間差 < 31104000 : return floor($時間差/2592000)."ヶ月前";
+        default: return floor($時間差/31104000)."年前";
+    }
+}
+
+
 function h($str = ""){
     return htmlspecialchars($str, ENT_QUOTES, "UTF-8");
 }
@@ -162,15 +184,6 @@ function h($str = ""){
 function 自動リンク($str = "", array $attrmap = []){
     foreach($attrmap as $name => $value){ $attr .= " $name=\"$value\""; }
     return preg_replace("|(https?://[^[:space:]\r\n]+)|i", "<a href=\"$1\"$attr>$1</a>", $str);
-}
-
-
-function クラスローダ($dir = __DIR__){
-    spl_autoload_register(function($class) use($dir){
-        if(preg_match("/win/i", PHP_OS)){ $class = addslashes(mb_convert_encoding($class, 'SJIS', 'UTF-8')); }
-        $class = str_replace("_", "/", $class);
-        include "{$dir}/{$class}.php";
-    });
 }
 
 
