@@ -187,17 +187,17 @@ function 自動リンク($str = "", array $attrmap = []){
 }
 
 
-function ファイル一覧($path = ".", $pattern = "/./"){
+function ファイル一覧($path = ".", $pattern = "/./", $fullpath = false){
     foreach(glob("$path/*") as $file){
-        if(is_file("$path/$file") and preg_match($pattern, $file)){ $list[] = realpath("$path/$file"); }
+        if(is_file("$path/$file") and preg_match($pattern, $file)){ $list[] = ($fullpath) ? realpath("$path/$file") : $file; }
     }
     return (array)$list;
 }
 
 
-function ディレクトリ一覧($path = ".", $pattern = "/./"){
+function ディレクトリ一覧($path = ".", $pattern = "/./", $fullpath = false){
     foreach(glob("$path/*", GLOB_ONLYDIR) as $dir){
-        if(preg_match($pattern, $dir)){ $list[] = realpath("$path/$dir"); }
+        if(preg_match($pattern, $dir)){ $list[] = ($fullpath) ? realpath("$path/$dir") : $dir; }
     }
     return (array)$list;
 }
