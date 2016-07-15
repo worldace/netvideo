@@ -2,11 +2,11 @@
 // http://musou.s38.xrea.com/php/validate.html
 
 class 検証{
-    private $エラー関数;
-    private $key;
-    private $value;
-    private $mode;
-    private $method;
+    public $エラー関数;
+    public $key;
+    public $value;
+    public $mode;
+    public $method;
 
     public function __construct($mode, $value, $method = ""){
         $this->エラー関数 = (検証エラー関数) ? 検証エラー関数 : "エラー";
