@@ -170,8 +170,8 @@ function 経過時間($time){
         case $時間差 < 3600     : return floor($時間差/60)."分前";
         case $時間差 < 86400    : return floor($時間差/3600)."時間前";
         case $時間差 < 2592000  : return floor($時間差/86400)."日前";
-        case $時間差 < 31104000 : return floor($時間差/2592000)."ヶ月前";
-        default: return floor($時間差/31104000)."年前";
+        case $時間差 < 31536000 : return floor($時間差/2592000)."ヶ月前";
+        default: return floor($時間差/31536000)."年前";
     }
 }
 
