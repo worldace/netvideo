@@ -15,7 +15,7 @@ POST検証("サムネイル") -> 画像データ();
 
 $dir = ディレクトリ作成($設定['ディレクトリ.upload'].date('/Y/md')) or エラー("ディレクトリが作成できません");
 
-$設定['動画id'] = データベース("動画") -> 追加([
+$id = データベース("動画") -> 追加([
     "動画URL"  => $_POST['動画URL'],
     "ユーザid" => $_POST['ユーザid'],
     "タイトル" => $_POST['タイトル'],
@@ -27,12 +27,9 @@ $設定['動画id'] = データベース("動画") -> 追加([
 ]) or エラー("データベースに登録できません");
 
 
-file_put_contents("$dir/{$設定['動画id']}.png", $_POST['サムネイル'], LOCK_EX);
+file_put_contents("$dir/$id.png", $_POST['サムネイル'], LOCK_EX);
 
-データベース("コメント", "sqlite:$dir/{$設定['動画id']}.db") -> 作成(コメントテーブル::定義);
-
-$設定['移動先のURL'] = "?action=video&id={$設定['動画id']}";
-
+データベース("コメント", "sqlite:$dir/$id.db") -> 作成(コメントテーブル::定義);
 
 ?>
 <!DOCTYPE html>
@@ -40,7 +37,7 @@ $設定['移動先のURL'] = "?action=video&id={$設定['動画id']}";
 <head>
 <meta charset="utf-8">
 <title>投稿成功</title>
-<script>window.onload = function(){ setTimeout(function(){ location.href = "<?= $設定['移動先のURL'] ?>"; }, 0); };</script>
+<script>window.onload = function(){ setTimeout(function(){ location.href = "<?= geturl("?action=video&id=$id") ?>"; }, 0); };</script>
 </head>
 <body></body>
 </html>

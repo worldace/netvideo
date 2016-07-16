@@ -1,5 +1,15 @@
 <?php
 
+
+//ホームページのURL (最後のスラッシュは必要)
+$設定['URL.ホーム'] = "http://127.0.0.1/netvideo/";
+
+//短縮URLを有効にするなら1、無効にするには0
+$設定['URL.短縮'] = 0;
+
+//URLでindex.phpを省略する場合は""、省略しない場合は"index.php"。ディレクトリインデックス
+$設定['URL.dindex'] = "";
+
 //ログインを許可するユーザのOpenID ["OpenID1","OpenID2","OpenID3",...] デフォルトは[]で全ユーザ許可。OpenIDの確認は→http://open.login.yahoo.co.jp/
 $設定['許可ユーザ'] = [];
 
