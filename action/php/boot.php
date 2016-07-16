@@ -23,7 +23,7 @@ function geturl($query = ""){
     $短縮対象id名 = "id";
     
     if(!is_array($query)){
-        if(preg_match("/^\?/", $query)){ parse_str($query, $query); }
+        if(preg_match("/^\?/", $query)){ parse_str(substr($query,1), $query); }
         else{ return $設定['URL.ホーム'] . $query; }
     }
     if($query["action"] === $短縮対象アクション名 and $query[$短縮対象id名] and $設定['URL.短縮']){
