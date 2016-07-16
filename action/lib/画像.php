@@ -1,42 +1,11 @@
 <?php
+//画像::PNGリサイズ(["入力"=>"star.png", "出力"=>"star2.png", "横"=>100, "縦"=>100]);
 
-//画像::JPGリサイズ(["入力"=>"a.jpg", "出力"=>"b.jpg", "横"=>100, "縦"=>100]);
 
 class 画像{
-    
-    public static function リサイズ(array $設定){
-        $設定 = self::判定($設定);
-        if(preg_match("/png/i", $設定['入力フォーマット'])){ return self::PNGリサイズ($設定); }
-        else if(preg_match("/gif/i", $設定['入力フォーマット'])){ return self::GIFリサイズ($設定); }
-        else if(preg_match("/jpe?g/i", $設定['入力フォーマット'])){ return self::JPGリサイズ($設定); }
-        else{ return false; }
-    }
-
-    public static function 判定(array $設定){
-        if(preg_match("/^http/", $設定['入力']) or @is_file($設定['入力'])){
-            $設定["入力タイプ"] = "ファイル";
-            $info = getimagesize($設定['入力'])[2];
-        }
-        else{
-            $設定["入力タイプ"] = "データ";
-            if(preg_match("/^\xFF\xD8/", $設定['入力'])){ $設定["入力フォーマット"] = "jpg"; }
-            else if(preg_match("/^\x89PNG/", $設定['入力'])){ $設定["入力フォーマット"] = "png"; }
-            else if(preg_match("/^GIF8[79]a/", $設定['入力'])){ $設定["入力フォーマット"] = "gif"; }
-            else{
-                $設定["入力タイプ"] = "base64";
-                $info = getimagesize("data:;base64,".$設定['入力'])[2];
-            }
-        }
-        if($info === IMAGETYPE_JPEG){ $設定["入力フォーマット"] = "jpg"; }
-        else if($info === IMAGETYPE_PNG){ $設定["入力フォーマット"] = "png"; }
-        else if($info === IMAGETYPE_GIF){ $設定["入力フォーマット"] = "gif"; }
-        
-        return $設定;
-    }
 
     public static function PNGリサイズ(array $設定){
-        if(preg_match("/データ/u", $設定['入力タイプ'])){ $元画像  = @imagecreatefrompng("data:;base64,". base64_encode($設定['入力'])); }
-        else if(preg_match("/base64/i", $設定['入力タイプ'])){ $元画像  = @imagecreatefrompng("data:;base64,". $設定['入力']); }
+        if(preg_match("/^\x89PNG/", $設定['入力'])){ $元画像  = @imagecreatefrompng("data:;base64,". base64_encode($設定['入力'])); }
         else{ $元画像  = @imagecreatefrompng($設定['入力']); }
         if(!$元画像){ return false; }
 
@@ -49,7 +18,7 @@ class 画像{
 
         if($設定['出力']){
             imagepng($新画像, $設定['出力']);
-            $result = (is_file($設定['出力']) ? $設定['出力'] : false;
+            $result = ($設定['出力']) ? $設定['出力'] : false;
         }
         else{
             ob_start();
@@ -64,8 +33,7 @@ class 画像{
     }
 
     public static function JPGリサイズ(array $設定){
-        if(preg_match("/データ/u", $設定['入力タイプ'])){ $元画像  = @imagecreatefromjpeg("data:;base64,". base64_encode($設定['入力'])); }
-        else if(preg_match("/base64/i", $設定['入力タイプ'])){ $元画像  = @imagecreatefromjpeg("data:;base64,". $設定['入力']); }
+        if(preg_match("/^\xFF\xD8/", $設定['入力'])){ $元画像  = @imagecreatefromjpeg("data:;base64,". base64_encode($設定['入力'])); }
         else{ $元画像  = @imagecreatefromjpeg($設定['入力']); }
         if(!$元画像){ return false; }
 
@@ -75,7 +43,7 @@ class 画像{
 
         if($設定['出力']){
             imagejpeg($新画像, $設定['出力']);
-            $result = (is_file($設定['出力']) ? $設定['出力'] : false;
+            $result = ($設定['出力']) ? $設定['出力'] : false;
         }
         else{
             ob_start();
@@ -94,8 +62,7 @@ class 画像{
     }
 
     public static function GIFリサイズ(array $設定){
-        if(preg_match("/データ/u", $設定['入力タイプ'])){ $元画像  = @imagecreatefromgif("data:;base64,". base64_encode($設定['入力'])); }
-        else if(preg_match("/base64/i", $設定['入力タイプ'])){ $元画像  = @imagecreatefromgif("data:;base64,". $設定['入力']); }
+        if(preg_match("/^GIF8[79]a/", $設定['入力'])){ $元画像  = @imagecreatefromgif("data:;base64,". base64_encode($設定['入力'])); }
         else{ $元画像  = @imagecreatefromgif($設定['入力']); }
         if(!$元画像){ return false; }
 
@@ -109,7 +76,7 @@ class 画像{
 
         if($設定['出力']){
             imagegif($新画像, $設定['出力']);
-            $result = (is_file($設定['出力']) ? $設定['出力'] : false;
+            $result = ($設定['出力']) ? $設定['出力'] : false;
         }
         else{
             ob_start();
