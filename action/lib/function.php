@@ -8,7 +8,7 @@
 
 function クラスローダ($dir = __DIR__){
     spl_autoload_register(function($class) use($dir){
-        if(preg_match("/win/i", PHP_OS)){ $class = addslashes(mb_convert_encoding($class, 'SJIS', 'UTF-8')); }
+        if(preg_match("/^win/i", PHP_OS)){ $class = addslashes(mb_convert_encoding($class, 'SJIS', 'UTF-8')); }
         $class = str_replace("_", "/", $class);
         include "{$dir}/{$class}.php";
     });
@@ -245,7 +245,8 @@ function キャッシュ取得($name){
 
 
 function uuid($hyphen = false) { //uuid v4
-    $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0x0fff)|0x4000,mt_rand(0,0x3fff)|0x8000,mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff));
+    $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+    mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0x0fff)|0x4000,mt_rand(0,0x3fff)|0x8000,mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff));
     if(!$hyphen){ $uuid = str_replace("-", "", $uuid); }
     return $uuid;
 }
