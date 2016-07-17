@@ -18,7 +18,7 @@ class 画像{
 
         if($設定['出力']){
             imagepng($新画像, $設定['出力']);
-            $result = ($設定['出力']) ? $設定['出力'] : false;
+            $result = is_file($設定['出力']) ? $設定['出力'] : false;
         }
         else{
             ob_start();
@@ -43,7 +43,7 @@ class 画像{
 
         if($設定['出力']){
             imagejpeg($新画像, $設定['出力']);
-            $result = ($設定['出力']) ? $設定['出力'] : false;
+            $result = is_file($設定['出力']) ? $設定['出力'] : false;
         }
         else{
             ob_start();
@@ -76,7 +76,7 @@ class 画像{
 
         if($設定['出力']){
             imagegif($新画像, $設定['出力']);
-            $result = ($設定['出力']) ? $設定['出力'] : false;
+            $result = is_file($設定['出力']) ? $設定['出力'] : false;
         }
         else{
             ob_start();

@@ -82,22 +82,22 @@ function リダイレクト($url){
 }
 
 
-function ダウンロード($file, $data = "", $timeout = 0){
+function ダウンロード($filepath, $filename = "", $data = "", $timeout = 0){
     if($timeout){ ini_set("max_execution_time", $timeout); }
     if($data){
-        $filename = rawurlencode($file);
         $filesize = strlen($data);
     }
     else{
-        $filename = rawurlencode(basename($file));
-        $filesize = filesize($file);
+        $filesize = filesize($filepath);
+        if(!$filename){ $filename = basename($filepath); }
     }
+    $filenameE = rawurlencode($filename);
     header("Content-Type: application/force-download");
     header("Content-Length: $filesize");
-    header("Content-Disposition: attachment; filename*=UTF-8''$filename");
+    header("Content-Disposition: attachment; filename=\"$filename\"; filename*=UTF-8''$filenameE");
 
     while(ob_get_level()){ ob_end_clean(); }
-    ($data) ? print($data) : readfile($file);
+    ($data) ? print($data) : readfile($filepath);
 }
 
 
