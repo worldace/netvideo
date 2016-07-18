@@ -435,10 +435,8 @@ $v.comment.post = function(){
     $v.controller.input.value = "";
 
     var sec  = $v.video.currentTime;
-    if(Math.floor(sec+1) in $v.comment.list){
-        $v.comment.list[Math.floor(sec+1)].unshift([text, sec+1, Math.floor(Date.now()/1000)]);
-    }
-    
+    $v.comment.list[Math.floor(sec+1)].unshift([text, sec+1, Math.floor(Date.now()/1000)]);
+
     var formdata = new FormData($v.controller.form);
     formdata.append("動画時間", sec.toFixed(2)*100);
     $v.post('?action=commentpost', formdata);
@@ -756,9 +754,7 @@ $v.post = function(url, param){
 $v.param = function(hash){
     var str = "";
     for(var name in hash){
-        var value = encodeURIComponent(hash[name]);
-        name = encodeURIComponent(name);
-        str += name + "=" + value + "&";
+        str += encodeURIComponent(name) + "=" + encodeURIComponent(hash[name]) + "&";
     }
     return str;
 };
