@@ -255,5 +255,6 @@ function uuid($hyphen = false) { //uuid v4
 function ランダム文字列($length = 8, $userfriendly = true){
     $str = "ABCDEFGHJKLMNPQRSTWXYZabcdefghkmnpqrstwxyz23456789";
     if(!$userfriendly){ $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"; }
+    $str = str_repeat($str, floor($length/2));
     return substr(str_shuffle($str), 0, $length);
 }
