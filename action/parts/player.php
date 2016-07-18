@@ -408,15 +408,19 @@ $v.comment.run = function(){
 
 
 $v.comment.get = function(){
-    var id   = document.getElementById("comment-form-id").value;
-    var time = document.getElementById("comment-form-time").value;
     var sec  = Math.floor($v.video.duration);
-    var num  = sec * 4; //コメント取得件数(num)
 
-    $v.comment.list = []; 
-    for(var i = 0; i < sec+1; i++){ $v.comment.list.push([]); } //動画時間＋1の箱を作成 [[], [], [], ...]
+    $v.comment.list = Array(sec+1);
+    for(var i = 0; i < $v.comment.list.length; i++){ $v.comment.list[i] = []; }
 
-    var url = "?" + $v.param({"action":"commentget", "id":id, "動画投稿時間":time, "件数":num, "nocache":Date.now()});
+    var url = "?" + $v.param({
+        "action"       : "commentget",
+        "id"           : document.getElementById("comment-form-id").value,
+        "動画投稿時間" : document.getElementById("comment-form-time").value,
+        "件数"         : sec * 4,
+        "nocache"      : Date.now()
+    });
+
     $v.get(url, function(xhr){
         try{ var comments = JSON.parse(xhr.responseText); } catch(e){ return; }
 
