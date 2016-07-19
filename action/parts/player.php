@@ -410,7 +410,7 @@ $v.comment.run = function(){
 $v.comment.get = function(){
     var sec  = Math.floor($v.video.duration);
 
-    $v.comment.list = Array(sec+1);
+    $v.comment.list = Array(sec+1); //動画時間+1の箱を作る [[],[],[],[]...]
     for(var i = 0; i < $v.comment.list.length; i++){ $v.comment.list[i] = []; }
 
     var url = "?" + $v.param({
@@ -877,7 +877,7 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
 .video-controller{
     display: block;
     width: 640px;
-    height: 54px;
+    height: 55px;
     line-height: 1;
     color: white;
     text-decoration: none;
@@ -967,7 +967,7 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
 }
 .comment-form-input{
     width: 80%;
-    height: 25px;
+    height: 26px;
     box-shadow: 3px 3px 3px rgba(200,200,200,0.2) inset;
     border: 1px solid #888888;
     border-radius: 0;
@@ -977,7 +977,7 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
 }
 .comment-form-submit{
     width: 20%;
-    height: 25px;
+    height: 26px;
     text-decoration: none;
     text-align: center;
     padding: 3px 15px 3px 15px;
