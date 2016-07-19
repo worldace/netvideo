@@ -825,8 +825,8 @@ $v.objectFit = function(screenW, screenH, objectW, objectH){
     }
     result.w = Math.floor(objectW * scale);
     result.h = Math.floor(objectH * scale);
-    result.x = Math.floor((screenW / 2) - (result.w / 2));
-    result.y = Math.floor((screenH / 2) - (result.h / 2));
+    result.x = Math.floor((screenW / 2) - (objectW * scale / 2));
+    result.y = Math.floor((screenH / 2) - (objectH * scale / 2));
 
     return result;
 };
