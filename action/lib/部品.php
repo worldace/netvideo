@@ -41,7 +41,7 @@ class 部品{
         if(self::$js){
             $js     = "\n<script>\n" . implode(self::$js,"\n") . "\n</script>\n";
             $js_pos = strripos($buf, "</body>");
-            if($js_pos >= 0){
+            if($js_pos !== false){
                 $buf = substr_replace($buf, $js, $js_pos, 0); //最後に出現する</body>の前にJSを挿入する
             }
             else{
@@ -51,7 +51,7 @@ class 部品{
         if(self::$css){
             $css     = "\n<style>\n " . implode(self::$css,"\n") . "\n</style>\n";
             $css_pos = stripos($buf, "</head>");
-            if($css_pos >= 0){
+            if($css_pos !== false){
                 $buf = substr_replace($buf, $css, $css_pos, 0); //最初に出現する</head>の前にCSSを挿入する
             }
             else{
