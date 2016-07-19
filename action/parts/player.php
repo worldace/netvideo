@@ -728,7 +728,7 @@ document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent);
 $v.get = function(url, callback){
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url);
-    xhr.timeout = 180*1000;
+    xhr.timeout = 60*1000;
     if(callback){ xhr.addEventListener("load", function(){ callback(xhr); }); }
     xhr.send();
 };
@@ -737,7 +737,7 @@ $v.get = function(url, callback){
 $v.post = function(url, param, callback){
     var xhr = new XMLHttpRequest();
     xhr.open('POST', url);
-    xhr.timeout = 180*1000;
+    xhr.timeout = 60*1000;
     if(callback){ xhr.addEventListener("load", function(){ callback(xhr); }); }
 
     if(param instanceof FormData){
@@ -783,18 +783,12 @@ $v.deparam = function(str){
 
 
 $v.saveObject = function(name, value){
-    try{
-        if($v.type(value) == "object" || $v.type(value) == "array"){
-            window.localStorage.setItem(name, JSON.stringify(value));
-        }
-    } catch(e){}
+    try{ window.localStorage.setItem(name, JSON.stringify(value)); } catch(e){}
 };
 
 
 $v.loadObject = function(name){
-    try{
-        return JSON.parse(window.localStorage.getItem(name));
-    } catch(e){}
+    try{ return JSON.parse(window.localStorage.getItem(name)); } catch(e){}
 };
 
 
