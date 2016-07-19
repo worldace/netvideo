@@ -29,7 +29,7 @@ function geturl($query = ""){
     
     if(!is_array($query)){
         if(preg_match("/^\?/", $query)){ parse_str(substr($query,1), $query); }
-        else{ return $設定['URL.ホーム'] . $query; }
+        else{ return $設定['URL.ホーム'] . preg_replace("|^/|", "", $query); }
     }
     if($query["action"] === $短縮対象アクション名 and $query[$短縮対象id名] and $設定['URL.短縮']){
         $短縮対象id値 = rawurlencode($query[$短縮対象id名]);
