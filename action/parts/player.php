@@ -727,18 +727,18 @@ document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent);
 //■ function
 $v.get = function(url, callback){
     var xhr = new XMLHttpRequest();
-
     xhr.open("GET", url);
-    xhr.addEventListener("load", function(){ callback(xhr); });
     xhr.timeout = 180*1000;
+    if(callback){ xhr.addEventListener("load", function(){ callback(xhr); }); }
     xhr.send();
 };
 
 
-$v.post = function(url, param){
+$v.post = function(url, param, callback){
     var xhr = new XMLHttpRequest();
     xhr.open('POST', url);
     xhr.timeout = 180*1000;
+    if(callback){ xhr.addEventListener("load", function(){ callback(xhr); }); }
 
     if(param instanceof FormData){
         var body = param;
@@ -755,10 +755,11 @@ $v.post = function(url, param){
 };
 
 
-$v.param = function(hash){
+$v.param = function(param){
     var str = "";
-    for(var name in hash){
-        str += encodeURIComponent(name) + "=" + encodeURIComponent(hash[name]) + "&";
+    for(var key in param){
+        if(!param.hasOwnProperty(key)){ continue; }
+        str += encodeURIComponent(key) + "=" + encodeURIComponent(param[key]) + "&";
     }
     return str;
 };
