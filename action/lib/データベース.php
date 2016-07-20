@@ -2,9 +2,6 @@
 // http://musou.s38.xrea.com/php/pdo.html
 
 class データベース{
-    private static $標準ドライバー = データベースドライバー;
-    private static $標準ユーザー名 = データベースユーザー名;
-    private static $標準パスワード = データベースパスワード;
     private static $現在のドライバー;
     private static $pdo;
     private $テーブル;
@@ -16,8 +13,9 @@ class データベース{
         $this->テーブル($table);
         if($driver){ $this->接続($driver, $user, $pass); }
         else{
-            if(!self::$pdo){ $this->接続(self::$標準ドライバー, self::$標準ユーザー名, self::$標準パスワード); }
-            else if(self::$現在のドライバー != self::$標準ドライバー){ $this->接続(self::$標準ドライバー, self::$標準ユーザー名, self::$標準パスワード); }
+            if(!self::$pdo or (self::$現在のドライバー != $_ENV['データベースドライバー'])){
+                $this->接続($_ENV['データベースドライバー'], $_ENV['データベースユーザー名'], $_ENV['データベースパスワード']);
+            }
         }
         return $this;
     }
