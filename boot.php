@@ -15,10 +15,7 @@
 //■以下アプリ固有関数
 
 //□第1引数
-//"test/index.html"という先頭が?以外の文字列
-//"?action=video&id=10" という先頭が?の文字列
-// ["action"=>"video", "id"=>"10"] という連想配列
-//引数を省略したときはホームURLが返る
+//ホームURLのディレクトリを基準としたパス文字列。引数省略時はホームURLが返る
 
 //□以下の4点の設定が必要
 //$設定['URL.ホーム'] → ホームページのURL
@@ -30,10 +27,9 @@ function URL作成($query = ""){
 
     $base = (preg_replace("|/$|", $設定['URL.ホーム'])) ? $設定['URL.ホーム'] : dirname($設定['URL.ホーム'])."/";
 
-    if(!is_array($query)){
-        if(preg_match("/^\?/", $query)){ parse_str(substr($query,1), $query); }
-        else{ return ($query) ? $base.preg_replace("|^/|","",$query) : $設定['URL.ホーム']; }
-    }
+    if(preg_match("/^\?/", $query)){ parse_str(substr($query,1), $query); }
+    else{ return ($query) ? $base.preg_replace("|^/|","",$query) : $設定['URL.ホーム']; }
+
     if($設定['URL.短縮'] and $query["action"] === $設定['URL.短縮名'] and $query[$設定['URL.短縮値']]){
         $短縮値 = rawurlencode($query[$設定['URL.短縮値']]);
         unset($query["action"]);
