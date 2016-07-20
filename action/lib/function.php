@@ -61,8 +61,8 @@ function テキスト表示($str = ""){
 }
 
 
-function JSON表示($json = [], $callback = null){
-    header("Access-Control-Allow-Origin: *");
+function JSON表示($json = [], $callback = null, $allow_origin = "*"){
+    if($allow_origin){ header("Access-Control-Allow-Origin: $allow_origin"); }
     if($callback){ //JSONP
         header("Content-Type: text/javascript; charset=utf-8");
         print $callback . "(" . json_encode($json) . ");";
