@@ -15,6 +15,6 @@ function SQLiteドライバ(){
     
     $ymd  = date('Y/md', $_GET['動画投稿時間']);
     $path = "{$設定['ディレクトリ.upload']}/{$ymd}/{$_GET['id']}.db";
-    if(!is_file($path)){ エラー(); }
+    if(!is_file($path)){ exit; }
     return "sqlite:$path";
 }

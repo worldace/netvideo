@@ -18,18 +18,19 @@
 //・URLを構成する文字列。"test/index.html"という先頭が?以外の文字列
 //・引数を省略したときはホームURLが返る
 
-//□以下の3点の設定が必要
-//$設定['URL.ホーム'] → ホームページのURL。最後のスラッシュは必要
+//□以下の2点の設定が必要
+//$設定['URL.ホーム'] → ホームページのURL。
 //$設定['URL.短縮']   → 短縮URLを有効にするかどうかの真偽値
-//$設定['URL.dindex'] → URLで index.php を省略する場合は""。省略しない場合は"index.php"
 function geturl($query = ""){
     global $設定;
     $短縮対象アクション名 = "video";
     $短縮対象id名 = "id";
-    
+
+    $base = (preg_replace("|/$|", $設定['URL.ホーム'])) ? $設定['URL.ホーム'] : dirname($設定['URL.ホーム'])."/";
+
     if(!is_array($query)){
         if(preg_match("/^\?/", $query)){ parse_str(substr($query,1), $query); }
-        else{ return $設定['URL.ホーム'] . preg_replace("|^/|", "", $query); }
+        else{ return $base . preg_replace("|^/|", "", $query); }
     }
     if($query["action"] === $短縮対象アクション名 and $query[$短縮対象id名] and $設定['URL.短縮']){
         $短縮対象id値 = rawurlencode($query[$短縮対象id名]);
@@ -37,5 +38,5 @@ function geturl($query = ""){
         unset($query[$短縮対象id名]);
     }
     if(count($query)){ $output_query = "?" . http_build_query($query, "", "&"); }
-    return ($短縮対象id値) ? $設定['URL.ホーム'].$短縮対象id値.$output_query : $設定['URL.ホーム'].$設定['URL.dindex'].$output_query;
+    return ($短縮対象id値) ? $base.$短縮対象id値.$output_query : $設定['URL.ホーム'].$output_query;
 }

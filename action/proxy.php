@@ -3,7 +3,7 @@
 //allow_url_fopenが有効であること。参考:http://doremi.s206.xrea.com/php/tips/http.html
 
 //PHPの実行時間制限(単位は秒、0で無制限)
-ini_set("max_execution_time", 3600);
+ini_set("max_execution_time", 60*60*24);
 
 
 if(!preg_match("|^https?://|i", $_GET['url'])){ error(); }
