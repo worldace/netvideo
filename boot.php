@@ -15,7 +15,7 @@
 //■以下アプリ固有関数
 
 //□第1引数
-//ホームURLのディレクトリを基準としたパス文字列。引数省略時はホームURLが返る
+//ホームページを基準としたパス文字列。引数省略時はホームURLが返る
 
 //□以下の4点の設定が必要
 //$設定['URL.ホーム'] → ホームページのURL
@@ -25,7 +25,7 @@
 function URL作成($query = ""){
     global $設定;
 
-    $base = (preg_replace("|/$|", $設定['URL.ホーム'])) ? $設定['URL.ホーム'] : dirname($設定['URL.ホーム'])."/";
+    $base = (preg_match("|/$|", $設定['URL.ホーム'])) ? $設定['URL.ホーム'] : dirname($設定['URL.ホーム'])."/";
 
     if(preg_match("/^\?/", $query)){ parse_str(substr($query,1), $query); }
     else{ return ($query) ? $base.preg_replace("|^/|","",$query) : $設定['URL.ホーム']; }
