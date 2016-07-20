@@ -61,8 +61,8 @@ function テキスト表示($str = ""){
 }
 
 
-function JSON表示($json = [], $callback = null, $allow_origin = "*"){
-    if($allow_origin){ header("Access-Control-Allow-Origin: $allow_origin"); }
+function JSON表示($json = [], $callback = null, $allow = "*"){
+    if($allow_origin){ header("Access-Control-Allow-Origin: $allow"); }
     if($callback){ //JSONP
         header("Content-Type: text/javascript; charset=utf-8");
         print $callback . "(" . json_encode($json) . ");";
@@ -101,17 +101,21 @@ function ダウンロード($filepath, $filename = "", $data = "", $timeout = 60
 }
 
 
-function GET送信($url, array $querymap = [], array $header = []){
+function GET送信($url, array $querymap = null, array $request_header = null, &$response_header){
     if($querymap and preg_match("/\?/", $url)){ $url .= "&" . http_build_query($querymap, "", "&"); }
     else if($querymap){ $url .= "?" . http_build_query($querymap, "", "&"); }
-    $request = stream_context_create(['http'=>['method'=>'GET', 'header'=>implode("\r\n", $header)]]);
-    return @file_get_contents($url, false, $request);
+    $request = stream_context_create(['http'=>['method'=>'GET', 'header'=>implode("\r\n", (array)$request_header)]]);
+    $response = @file_get_contents($url, false, $request);
+    $response_header = $http_response_header;
+    return $response;
 }
 
 
-function POST送信($url, array $querymap = [], array $header = []){
-    $request = stream_context_create(['http'=>['method'=>'POST', 'header'=>implode("\r\n", $header), 'content'=>http_build_query($querymap, "", "&")]]);
-    return @file_get_contents($url, false, $request);
+function POST送信($url, array $querymap = null, array $request_header = null, &$response_header){
+    $request = stream_context_create(['http'=>['method'=>'POST','header'=>implode("\r\n",(array)$request_header),'content'=>http_build_query((array)$querymap,"","&")]]);
+    $response = @file_get_contents($url, false, $request);
+    $response_header = $http_response_header;
+    return $response;
 }
 
 
@@ -273,7 +277,21 @@ function 連想配列ソート(array &$array){
 }
 
 
-function テンプレート変換($テンプレート, array $変換関係){
-    return preg_replace_callback("|《([^》]*)》|u", function($match) use($変換関係){ return $変換関係[$match[1]]; }, $テンプレート);
+function テンプレート変換($テンプレート, $変換関係){
+    return preg_replace_callback("|《([^》]*)》|u", function($match) use($変換関係){
+        $最初の文字 = substr($match[1], 0, 1);
+        $以降の文字 = substr($match[1], 1);
+        switch($最初の文字){
+            case "&": return htmlspecialchars($変換関係[$以降の文字], ENT_QUOTES, "UTF-8");
+            case "%": return rawurlencode($変換関係[$以降の文字]);
+            case "?":
+                ob_start();
+                eval($以降の文字 . ";");
+                $出力 = ob_get_contents();
+                ob_end_clean();
+                return $出力;
+            default: return $変換関係[$match[1]];
+        }
+    }, $テンプレート);
 }
 
