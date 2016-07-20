@@ -271,3 +271,9 @@ function ランダム文字列($length = 8, $userfriendly = true){
 function 連想配列ソート(array &$array){
     array_multisort(array_values($array), SORT_DESC, array_keys($array), SORT_ASC, $array);
 }
+
+
+function テンプレート変換($テンプレート, array $変換関係){
+    return preg_replace_callback("|《([^》]*)》|u", function($match) use($変換関係){ return $変換関係[$match[1]]; }, $テンプレート);
+}
+
