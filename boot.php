@@ -23,7 +23,7 @@
 //□以下の2点の設定が必要
 //$設定['URL.ホーム'] → ホームページのURL
 //$設定['URL.短縮']   → 短縮URLを有効にするかどうかの真偽値
-function geturl($query = ""){
+function URL取得($query = ""){
     global $設定;
     $短縮対象アクション名 = "video";
     $短縮対象id名 = "id";

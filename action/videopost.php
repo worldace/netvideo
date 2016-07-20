@@ -37,7 +37,7 @@ file_put_contents("$dir/$id.png", $_POST['サムネイル'], LOCK_EX);
 <head>
 <meta charset="utf-8">
 <title>投稿成功</title>
-<script>window.onload = function(){ setTimeout(function(){ location.href = "<?= geturl("?action=video&id=$id") ?>"; }, 0); };</script>
+<script>window.onload = function(){ setTimeout(function(){ location.href = "<?= URL取得("?action=video&id=$id") ?>"; }, 0); };</script>
 </head>
 <body></body>
 </html>
