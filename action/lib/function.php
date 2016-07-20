@@ -101,21 +101,21 @@ function ダウンロード($filepath, $filename = "", $data = "", $timeout = 60
 }
 
 
-function GET送信($url, array $querymap = null, array $request_header = null, &$response_header){
+function GET送信($url, array $querymap = null, array $request = null, &$response){
     if($querymap and preg_match("/\?/", $url)){ $url .= "&" . http_build_query($querymap, "", "&"); }
     else if($querymap){ $url .= "?" . http_build_query($querymap, "", "&"); }
-    $request = stream_context_create(['http'=>['method'=>'GET', 'header'=>implode("\r\n", (array)$request_header)]]);
-    $response = @file_get_contents($url, false, $request);
-    $response_header = $http_response_header;
-    return $response;
+    $request = stream_context_create(['http'=>['method'=>'GET', 'header'=>implode("\r\n", (array)$request)]]);
+    $contents = @file_get_contents($url, false, $request);
+    $response = $http_response_header;
+    return $contents;
 }
 
 
-function POST送信($url, array $querymap = null, array $request_header = null, &$response_header){
-    $request = stream_context_create(['http'=>['method'=>'POST','header'=>implode("\r\n",(array)$request_header),'content'=>http_build_query((array)$querymap,"","&")]]);
-    $response = @file_get_contents($url, false, $request);
-    $response_header = $http_response_header;
-    return $response;
+function POST送信($url, array $querymap = null, array $request = null, &$response){
+    $request = stream_context_create(['http'=>['method'=>'POST', 'header'=>implode("\r\n",(array)$request), 'content'=>http_build_query((array)$querymap,"","&")]]);
+    $contents = @file_get_contents($url, false, $request);
+    $response = $http_response_header;
+    return $contents;
 }
 
 
