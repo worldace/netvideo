@@ -5,7 +5,6 @@
 // 呼び出し元: "./index.php"
 //======================================================
 
-//■起動処理
 
 クラスローダ();
 
@@ -13,7 +12,7 @@
 
 
 
-//■アプリ固有関数
+//■以下アプリ固有関数
 
 //□第1引数
 //・URLを構成するクエリ。"?action=video&id=10" という先頭が?の文字列か、 ["action"=>"video", "id"=>"10"] という連想配列
@@ -23,7 +22,7 @@
 //□以下の2点の設定が必要
 //$設定['URL.ホーム'] → ホームページのURL
 //$設定['URL.短縮']   → 短縮URLを有効にするかどうかの真偽値
-function URL取得($query = ""){
+function URL作成($query = ""){
     global $設定;
     $短縮対象アクション名 = "video";
     $短縮対象id名 = "id";
@@ -32,7 +31,7 @@ function URL取得($query = ""){
 
     if(!is_array($query)){
         if(preg_match("/^\?/", $query)){ parse_str(substr($query,1), $query); }
-        else{ return ($query) ? $base.preg_replace("|^/|", "", $query) : $設定['URL.ホーム']; }
+        else{ return ($query) ? $base.preg_replace("|^/|","",$query) : $設定['URL.ホーム']; }
     }
     if($query["action"] === $短縮対象アクション名 and $query[$短縮対象id名] and $設定['URL.短縮']){
         $短縮対象id値 = rawurlencode($query[$短縮対象id名]);

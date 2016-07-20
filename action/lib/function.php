@@ -243,6 +243,16 @@ function キャッシュ取得($name){
 }
 
 
+function JSON保存($file, $data){
+    file_put_contents($file, "<?php\n".json_encode($data, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES), LOCK_EX);
+}
+
+
+function JSON取得($file){
+    return json_decode(file_get_contents($file,null,null,5), true);
+}
+
+
 function uuid($hyphen = false) { //uuid v4
     $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
     mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0x0fff)|0x4000,mt_rand(0,0x3fff)|0x8000,mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff));
@@ -255,4 +265,9 @@ function ランダム文字列($length = 8, $userfriendly = true){
     if(!$userfriendly){ $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"; }
     $str = str_repeat($str, floor($length/2));
     return substr(str_shuffle($str), 0, $length);
+}
+
+
+function 連想配列ソート(array &$array){
+    array_multisort(array_values($array), SORT_DESC, array_keys($array), SORT_ASC, $array);
 }
