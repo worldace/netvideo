@@ -34,13 +34,13 @@ function URL作成($query = ""){
         if(preg_match("/^\?/", $query)){ parse_str(substr($query,1), $query); }
         else{ return ($query) ? $base.preg_replace("|^/|","",$query) : $設定['URL.ホーム']; }
     }
-    if($query["action"] === $設定['URL.短縮名'] and $query[$設定['URL.短縮値']] and $設定['URL.短縮']){
-        $短縮対象id値 = rawurlencode($query[$設定['URL.短縮値']]);
+    if($設定['URL.短縮'] and $query["action"] === $設定['URL.短縮名'] and $query[$設定['URL.短縮値']]){
+        $短縮値 = rawurlencode($query[$設定['URL.短縮値']]);
         unset($query["action"]);
         unset($query[$設定['URL.短縮値']]);
     }
     if(count($query)){ $output_query = "?" . http_build_query($query, "", "&"); }
-    return ($短縮対象id値) ? $base.$短縮対象id値.$output_query : $設定['URL.ホーム'].$output_query;
+    return ($短縮値) ? $base.$短縮値.$output_query : $設定['URL.ホーム'].$output_query;
 }
 
 
