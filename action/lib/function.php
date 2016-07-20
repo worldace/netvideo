@@ -125,8 +125,7 @@ function 現在のURL($no_query = false){
         if($_SERVER['SERVER_PORT'] != 80) { $port = ":" . $_SERVER['SERVER_PORT']; }
     }
     $url = $scheme . $_SERVER["HTTP_HOST"] . $port . $_SERVER['REQUEST_URI'];
-    if($no_query){ $url = preg_replace("/\?.*$/", "", $url); }
-    return $url;
+    return ($no_query) ? preg_replace("/\?.*$/","",$url) : $url;
 }
 
 

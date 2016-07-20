@@ -2,11 +2,13 @@
 //======================================================
 // ■起動処理とアプリ固有関数
 // 
-// 呼び出し元: "../../index.php"
+// 呼び出し元: "./index.php"
 //======================================================
 
 //■起動処理
+
 クラスローダ();
+
 部品::初期化("{$設定['ディレクトリ.action']}/parts");
 
 
@@ -19,7 +21,7 @@
 //・引数を省略したときはホームURLが返る
 
 //□以下の2点の設定が必要
-//$設定['URL.ホーム'] → ホームページのURL。
+//$設定['URL.ホーム'] → ホームページのURL
 //$設定['URL.短縮']   → 短縮URLを有効にするかどうかの真偽値
 function geturl($query = ""){
     global $設定;
@@ -39,4 +41,12 @@ function geturl($query = ""){
     }
     if(count($query)){ $output_query = "?" . http_build_query($query, "", "&"); }
     return ($短縮対象id値) ? $base.$短縮対象id値.$output_query : $設定['URL.ホーム'].$output_query;
+}
+
+
+function 開発用の設定(){
+    if($_SERVER['REMOTE_ADDR'] !== '127.0.0.1' or $_SERVER['HTTP_HOST'] !== '127.0.0.1'){ return; }
+
+    ini_set('error_reporting', E_ALL ^ E_NOTICE);
+    ini_set('display_errors', 1);
 }
