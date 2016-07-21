@@ -1,5 +1,5 @@
 <?php
-// http://musou.s38.xrea.com/php/pdo.html
+// http://musou.s38.xrea.com/php/PDOライブラリ.html
 
 /*
 function データベース($table, $driver = null, $user = null, $pass = null){

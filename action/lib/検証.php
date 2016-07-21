@@ -1,5 +1,5 @@
 <?php
-// http://musou.s38.xrea.com/php/validate.html
+// http://musou.s38.xrea.com/php/検証.html
 
 /*
 function 確認($value, $method = ""){

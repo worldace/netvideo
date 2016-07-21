@@ -1,5 +1,5 @@
 <?php
-// http://musou.s38.xrea.com/php/parts.html
+// http://musou.s38.xrea.com/php/部品関数.html
 
 /*
 function 部品(){
