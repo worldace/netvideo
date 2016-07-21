@@ -10,7 +10,7 @@ function クラスローダ($dir = __DIR__){
     spl_autoload_register(function($class) use($dir){
         if(preg_match("/^win/i", PHP_OS)){ $class = addslashes(mb_convert_encoding($class, 'SJIS', 'UTF-8')); }
         $class = str_replace("_", "/", $class);
-        include "{$dir}/{$class}.php";
+        require_once "{$dir}/{$class}.php";
     });
 }
 
@@ -307,7 +307,7 @@ function uuid($hyphen = false) { //uuid v4
 
 
 function ランダム文字列($length = 8, $userfriendly = true){
-    $str = "ABDEFGHJLMNQRTYabdefghmnqrty23456789";
+    $str = "ABDEFGHJLMNQRTYabdefghmnrty23456789";
     if(!$userfriendly){ $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"; }
     $str = str_repeat($str, floor($length/2));
     return substr(str_shuffle($str), 0, $length);
