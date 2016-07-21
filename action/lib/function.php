@@ -132,6 +132,15 @@ function POST送信($url, array $querymap = null, array $request = null, &$respo
 }
 
 
+function キャッシュ無効(){
+    if(headers_sent()){ return false; }
+    header('Expires: Wed, 11 Jan 1984 05:00:00 GMT');
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+    header('Cache-Control: no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+}
+
+
 function 現在のURL($no_query = false){
     if(filter_input(INPUT_SERVER, 'HTTPS', FILTER_VALIDATE_BOOLEAN)){
         $scheme = "https://";
