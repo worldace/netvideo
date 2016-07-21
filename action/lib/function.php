@@ -47,7 +47,7 @@ function 検証($value, $method = ""){
 }
 
 
-function エラー($str = ""){
+function エラー($str = "エラーが発生しました"){
     header('HTTP', true, 400);
     print $str;
     exit;
@@ -61,8 +61,10 @@ function テキスト表示($str = ""){
 }
 
 
-function JSON表示($json = [], $callback = null, $allow = "*"){
-    if($allow_origin){ header("Access-Control-Allow-Origin: $allow"); } //$_SERVER['HTTP_ORIGIN']
+function JSON表示($json = [], $callback = null, $allow = null){
+    if(!$allow){ $allow = ($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : "*"; }
+    header("Access-Control-Allow-Origin: $allow");
+    header("Access-Control-Allow-Credentials: true");
     if($callback){ //JSONP
         header("Content-Type: text/javascript; charset=utf-8");
         print $callback . "(" . json_encode($json) . ");";
@@ -76,13 +78,12 @@ function JSON表示($json = [], $callback = null, $allow = "*"){
 
 
 function リダイレクト($url){
-    $url = preg_replace("/[\r\n]/", "", $url);
     header("Location: $url");
     exit;
 }
 
 
-function ダウンロード($filepath, $filename = "", $data = "", $timeout = 60*60*24){
+function ダウンロード($filepath = "", $filename = "", $data = "", $timeout = 60*60*24){
     @set_time_limit($timeout);
     if($data){
         $filesize = strlen($data);
@@ -148,8 +149,8 @@ function POSTなら(){
 }
 
 
-function 連想配列なら(array $array){
-    return (array_values($array) !== $array) ? true : false;
+function 連想配列なら($array = null){
+    return (is_array($array) and array_values($array) !== $array) ? true : false;
 }
 
 
@@ -190,17 +191,17 @@ function 自動リンク($str = "", array $attrmap = []){
 }
 
 
-function ファイル一覧($path = ".", $pattern = "/./", $fullpath = true){
+function ファイル一覧($path = ".", $pattern = ".", $fullpath = true){
     foreach(glob("$path/*") as $file){
-        if(is_file("$path/$file") and preg_match($pattern, $file)){ $list[] = ($fullpath) ? realpath("$path/$file") : $file; }
+        if(is_file("$path/$file") and preg_match("#$pattern#i", $file)){ $list[] = ($fullpath) ? realpath("$path/$file") : $file; }
     }
     return (array)$list;
 }
 
 
-function ディレクトリ一覧($path = ".", $pattern = "/./", $fullpath = true){
+function ディレクトリ一覧($path = ".", $pattern = ".", $fullpath = true){
     foreach(glob("$path/*", GLOB_ONLYDIR) as $dir){
-        if(preg_match($pattern, $dir)){ $list[] = ($fullpath) ? realpath("$path/$dir") : $dir; }
+        if(preg_match("#$pattern#i", $dir)){ $list[] = ($fullpath) ? realpath("$path/$dir") : $dir; }
     }
     return (array)$list;
 }
@@ -277,19 +278,14 @@ function 連想配列ソート(array &$array){
 }
 
 
-function テンプレート変換($テンプレート, $変換関係){
+function テンプレート変換($テンプレート, array $変換関係 = []){
     return preg_replace_callback("|《([^》]*)》|u", function($match) use($変換関係){
         $最初の文字 = substr($match[1], 0, 1);
         $以降の文字 = substr($match[1], 1);
         switch($最初の文字){
             case "&": return htmlspecialchars($変換関係[$以降の文字], ENT_QUOTES, "UTF-8");
             case "%": return rawurlencode($変換関係[$以降の文字]);
-            case "?":
-                ob_start();
-                eval($以降の文字 . ";");
-                $出力 = ob_get_contents();
-                ob_end_clean();
-                return $出力;
+            case "?": ob_start(); eval($以降の文字.";"); return ob_get_clean();
             default: return $変換関係[$match[1]];
         }
     }, $テンプレート);

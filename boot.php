@@ -25,10 +25,9 @@
 function URL作成($query = ""){
     global $設定;
 
-    if(preg_match("#^(https?:|ftp:|mailto:|data:|//)#i", $query)){ return $query; }
-
     $base = (preg_match("|/$|", $設定['URL.ホーム'])) ? $設定['URL.ホーム'] : dirname($設定['URL.ホーム'])."/";
 
+    if(preg_match("#^(https?:|ftp:|mailto:|data:|//)#i", $query)){ return $query; }
     if(preg_match("/^\?/", $query)){ parse_str(substr($query,1), $query); }
     else{ return ($query) ? $base.preg_replace("|^/|","",$query) : $設定['URL.ホーム']; }
 

@@ -1,6 +1,28 @@
 <?php
 // http://musou.s38.xrea.com/php/validate.html
 
+/*
+function 確認($value, $method = ""){
+    return new 検証("確認", $value, $method);
+}
+
+
+function GET検証($key){
+    return new 検証("検証", $key, "GET");
+}
+
+
+function POST検証($key){
+    return new 検証("検証", $key, "POST");
+}
+
+
+function 検証($value, $method = ""){
+    return new 検証("検証", $value, $method);
+}
+*/
+
+
 class 検証{
     public $エラー関数;
     public $key;
