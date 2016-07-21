@@ -102,6 +102,18 @@ function ダウンロード($filepath = "", $filename = "", $data = "", $timeout
 }
 
 
+function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 = "", $本文 = ""){
+	if($送信元 and $送信者) {
+		$送信者 = mb_encode_mimeheader(mb_convert_encoding($送信者, "ISO-2022-JP", "UTF-8"));
+		$from = "From: $送信者 <$送信元>\r\n";
+	}
+	else if($送信元) {
+		$from = "From: $送信元\r\n";
+	}
+	return mb_send_mail($送信先, $題名, $本文, $from);
+}
+
+
 function GET送信($url, array $querymap = null, array $request = null, &$response){
     if($querymap and preg_match("/\?/", $url)){ $url .= "&" . http_build_query($querymap, "", "&"); }
     else if($querymap){ $url .= "?" . http_build_query($querymap, "", "&"); }
