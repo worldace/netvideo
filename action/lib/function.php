@@ -192,7 +192,7 @@ function 自動リンク($str = "", array $attrmap = []){
 }
 
 
-function ファイル一覧($path = ".", $nameonly = false, $pattern = "."){
+function ファイル一覧($path = ".", $pattern = ".", $nameonly = false){
     foreach(glob("$path/*") as $file){
         if(is_file("$path/$file") and preg_match("#$pattern#i", $file)){ $list[] = ($nameonly) ? $file : realpath("$path/$file"); }
     }
@@ -200,7 +200,7 @@ function ファイル一覧($path = ".", $nameonly = false, $pattern = "."){
 }
 
 
-function ディレクトリ一覧($path = ".", $nameonly = false, $pattern = "."){
+function ディレクトリ一覧($path = ".", $pattern = ".", $nameonly = false){
     foreach(glob("$path/*", GLOB_ONLYDIR) as $dir){
         if(preg_match("#$pattern#i", $dir)){ $list[] = ($nameonly) ? $dir : realpath("$path/$dir"); }
     }
