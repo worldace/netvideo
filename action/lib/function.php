@@ -151,6 +151,11 @@ function ベースURL($url){
 }
 
 
+function Windowsなら(){
+    return preg_match("/^WIN/i", PHP_OS);
+}
+
+
 function GETなら(){
     return (strtoupper($_SERVER['REQUEST_METHOD']) === 'GET') ? true : false;
 }
@@ -166,7 +171,7 @@ function 連想配列なら($array){
 }
 
 
-function 日付($time = 0, $str = '[年]/[0月]/[0日] [0時]:[0分]:[0秒]'){
+function 日付($time = 0, $str = '[年]/[0月]/[0日] [0時]:[0分]'){
 	if(!$time){ $time = time(); }
 	$week = ['日','月','火','水','木','金','土'][date('w', $time)];
     $from = ['[年]','[月]','[0月]','[日]','[0日]','[時]','[0時]','[0分]','[0秒]','[曜日]'];
