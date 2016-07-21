@@ -149,7 +149,7 @@ function POSTなら(){
 }
 
 
-function 連想配列なら($array = null){
+function 連想配列なら($array){
     return (is_array($array) and array_values($array) !== $array) ? true : false;
 }
 
@@ -166,7 +166,8 @@ function 日付($time = 0, $str = '[年]/[0月]/[0日] [0時]:[0分]:[0秒]'){
 }
 
 
-function 経過時間($time){
+function 経過($time){
+    if(!$time){ return ""; }
     $時間差 = time() - $time;
     switch($時間差){
         case $時間差 < 1        : return "今";
@@ -191,17 +192,17 @@ function 自動リンク($str = "", array $attrmap = []){
 }
 
 
-function ファイル一覧($path = ".", $pattern = ".", $fullpath = true){
+function ファイル一覧($path = ".", $nameonly = false, $pattern = "."){
     foreach(glob("$path/*") as $file){
-        if(is_file("$path/$file") and preg_match("#$pattern#i", $file)){ $list[] = ($fullpath) ? realpath("$path/$file") : $file; }
+        if(is_file("$path/$file") and preg_match("#$pattern#i", $file)){ $list[] = ($nameonly) ? $file : realpath("$path/$file"); }
     }
     return (array)$list;
 }
 
 
-function ディレクトリ一覧($path = ".", $pattern = ".", $fullpath = true){
+function ディレクトリ一覧($path = ".", $nameonly = false, $pattern = "."){
     foreach(glob("$path/*", GLOB_ONLYDIR) as $dir){
-        if(preg_match("#$pattern#i", $dir)){ $list[] = ($fullpath) ? realpath("$path/$dir") : $dir; }
+        if(preg_match("#$pattern#i", $dir)){ $list[] = ($nameonly) ? $dir : realpath("$path/$dir"); }
     }
     return (array)$list;
 }
@@ -238,7 +239,8 @@ function zip圧縮($zipfile, array $filemap){
 
 function キャッシュ保存($name, $data){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "-" . $name;
-    file_put_contents($tempfile, serialize($data), LOCK_EX);
+    $result = file_put_contents($tempfile, serialize($data), LOCK_EX);
+    return ($result === false) ? false : $tempfile;
 }
 
 
@@ -249,7 +251,8 @@ function キャッシュ取得($name){
 
 
 function JSON保存($file, $data){
-    file_put_contents($file, "<?php\n".json_encode($data, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES), LOCK_EX);
+    $result = file_put_contents($file, "<?php\n".json_encode($data, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES), LOCK_EX);
+    return ($result === false) ? false : $file;
 }
 
 
@@ -266,7 +269,7 @@ function uuid($hyphen = false) { //uuid v4
 
 
 function ランダム文字列($length = 8, $userfriendly = true){
-    $str = "ABCDEFGHJKLMNPQRSTWXYZabcdefghkmnpqrstwxyz23456789";
+    $str = "ABDEFGHJLMNQRTYabdefghmnqrty23456789";
     if(!$userfriendly){ $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"; }
     $str = str_repeat($str, floor($length/2));
     return substr(str_shuffle($str), 0, $length);
@@ -285,7 +288,7 @@ function テンプレート変換($テンプレート, array $変換関係 = [])
         switch($最初の文字){
             case "&": return htmlspecialchars($変換関係[$以降の文字], ENT_QUOTES, "UTF-8");
             case "%": return rawurlencode($変換関係[$以降の文字]);
-            case "?": ob_start(); eval($以降の文字.";"); return ob_get_clean();
+            case "?": ob_start(); eval($変換関係[$以降の文字].";"); return ob_get_clean();
             default: return $変換関係[$match[1]];
         }
     }, $テンプレート);
