@@ -209,6 +209,18 @@ function 自動リンク($str = "", array $attrmap = []){
 }
 
 
+function テーブルタグ作成(array $array){
+    $firstkey = key($array);
+    if(is_array($array[$firstkey])){ $tag = "<tr>\n<th></th>\n<th>" . implode("</th>\n<th>",array_keys($array[$firstkey])) . "</th>\n</tr>\n"; }
+    foreach($array as $key1 => $value1){
+        $tag .= "<tr>\n<th>$key1</th>\n";
+        foreach((array)$value1 as $key2 => $value2){ $tag .= "<td>$value2</td>\n"; }
+        $tag .= "</tr>\n";
+    }
+    return $tag;
+}
+
+
 function ファイル一覧($path = ".", $pattern = ".", $nameonly = false){
     foreach(glob("$path/*") as $file){
         if(is_file("$path/$file") and preg_match("#$pattern#i", $file)){ $list[] = ($nameonly) ? $file : realpath("$path/$file"); }
