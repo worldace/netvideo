@@ -14,7 +14,6 @@ class データベース{
     private $テーブル;
     private $id列名 = "id";
     public static $件数 = 31;
-    public static $行タイプ = PDO::FETCH_ASSOC;
 
     public function __construct($table, $driver = null, $user = null, $pass = null){
         $this->テーブル($table);
@@ -28,14 +27,15 @@ class データベース{
     }
 
     private function 接続($driver, $user = null, $pass = null){
-        try{
-            self::$pdo = new PDO($driver, $user, $pass, [
-                PDO::ATTR_DEFAULT_FETCH_MODE => self::$行タイプ,
-                PDO::ATTR_EMULATE_PREPARES => true,
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-            ]);
-        } catch(Exception $e){ print "接続エラー。データベース::設定(ドライバ,ユーザID,パスワード)を再確認してください"; }
+        $setting = $_ENV['データベース付加設定'] ?: [
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => true,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+        ];
+
+        try{ self::$pdo = new PDO($driver, $user, $pass, $setting); }
+        catch(Exception $e){ print "接続エラー。データベース::設定(ドライバ,ユーザID,パスワード)を再確認してください"; }
         self::$現在のドライバー = $driver;
         return $this;
     }
@@ -58,13 +58,13 @@ class データベース{
     public function 取得(array $条件 = null){
         list($追加文, $割当, $行タイプ) = $this->追加SQL文($条件, "where");
         $SQL文 = "select * from {$this->テーブル} $追加文";
-        return $this -> 実行($SQL文, $割当) -> fetchAll($行タイプ);
+        return $this -> 実行($SQL文, $割当) -> fetchAll(...$行タイプ);
     }
 
     public function 行取得($id, array $条件 = null){
         list($追加文, $割当, $行タイプ) = $this->追加SQL文($条件, "where");
         $SQL文 = "select * from {$this->テーブル} where {$this->id列名} = ?";
-        return $this -> 実行($SQL文, [(int)$id]) -> fetchAll($行タイプ)[0];
+        return $this -> 実行($SQL文, [(int)$id]) -> fetchAll(...$行タイプ)[0];
     }
 
     public function 列取得($列, array $条件 = null){
@@ -108,7 +108,7 @@ class データベース{
 
         $SQL文 = "select * from {$this->テーブル} where {$検索SQL} {$追加文} ";
         
-        return $this -> 実行($SQL文, $割当) -> fetchAll($行タイプ);
+        return $this -> 実行($SQL文, $割当) -> fetchAll(...$行タイプ);
     }
 
     public function 追加(array $data){
@@ -243,11 +243,17 @@ class データベース{
             $割当[] = (int)$条件["位置"];
         }
 
+        $行タイプ = [];
         if($条件['行タイプ']){
-            if($条件['行タイプ'] === "クラス"){ $行タイプ = PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE; }
-            else if($条件['行タイプ'] === "連想配列"){ $行タイプ = PDO::FETCH_ASSOC; }
-            else if($条件['行タイプ'] === "配列"){ $行タイプ = PDO::FETCH_NUM; }
-            else { $行タイプ = PDO::FETCH_ASSOC; }
+            if($条件['行タイプ'] === "オブジェクト"){ $行タイプ[0] = PDO::FETCH_OBJ; }
+            else if($条件['行タイプ'] === "連想配列"){ $行タイプ[0] = PDO::FETCH_ASSOC; }
+            else if($条件['行タイプ'] === "配列"){ $行タイプ[0] = PDO::FETCH_NUM; }
+            else { $行タイプ = [PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $条件['行タイプ']]; }
+        }
+        else{
+            if($_ENV['データベース付加設定'][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){
+                $行タイプ = [$_ENV['データベース付加設定'][PDO::ATTR_DEFAULT_FETCH_MODE], "{$this->テーブル}テーブル"];
+            }
         }
 
         return [$SQL文, $割当, $行タイプ];
