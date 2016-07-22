@@ -214,7 +214,7 @@ function h($str = ""){
 
 function 自動リンク($str = "", array $attrmap = []){
     foreach($attrmap as $name => $value){ $attr .= " $name=\"$value\""; }
-    return preg_replace("|(https?://[^[:space:]\r\n]+)|i", "<a href=\"$1\"$attr>$1</a>", $str);
+    return preg_replace("|(https?://[^[:space:]　\r\n]+)|ui", "<a href=\"$1\"$attr>$1</a>", $str);
 }
 
 
@@ -278,7 +278,7 @@ function zip圧縮($zipfile, array $filemap){
 function キャッシュ保存($name, $data){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "-" . $name;
     $result = file_put_contents($tempfile, serialize($data), LOCK_EX);
-    return ($result === false) ? false : $tempfile;
+    return ($result === false) ? false : $name;
 }
 
 
