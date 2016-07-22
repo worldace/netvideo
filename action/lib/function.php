@@ -239,17 +239,23 @@ function テーブルタグ作成(array $array){
 }
 
 
-function ファイル一覧($path = ".", $pattern = ".", $nameonly = false){
-    foreach(glob("$path/*") as $file){
-        if(is_file("$path/$file") and preg_match("#$pattern#i", $file)){ $list[] = ($nameonly) ? $file : realpath("$path/$file"); }
+function ファイル一覧($path = "./", $pattern = "."){
+    if(!is_dir($path)){ return false; }
+    foreach(array_diff(scandir($path), ['.','..']) as $file){
+        if(is_file("$path/$file") and preg_match("#$pattern#i", $file)){ $list[] = realpath("$path/$file"); }
+        if(is_dir("$path/$file")) { $list = array_merge($list, ファイル一覧("$path/$file", $pattern)); }
     }
     return (array)$list;
 }
 
 
-function ディレクトリ一覧($path = ".", $pattern = ".", $nameonly = false){
-    foreach(glob("$path/*", GLOB_ONLYDIR) as $dir){
-        if(preg_match("#$pattern#i", $dir)){ $list[] = ($nameonly) ? $dir : realpath("$path/$dir"); }
+function ディレクトリ一覧($path = "./", $pattern = "."){
+    if(!is_dir($path)){ return false; }
+    foreach(array_diff(scandir($path), ['.','..']) as $file){
+        if(is_dir("$path/$file")) {
+            if(preg_match("#$pattern#i", $file)){ $list[] = realpath("$path/$file"); }
+            $list = array_merge($list, ディレクトリ一覧("$path/$file", $pattern));
+        }
     }
     return (array)$list;
 }
