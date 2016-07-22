@@ -207,6 +207,15 @@ function 経過($time){
 }
 
 
+function 日本語設定(){
+    (preg_match("/^WIN/i", PHP_OS)) ? setlocale(LC_ALL, '') : setlocale(LC_ALL, 'ja_JP.UTF-8');
+    ini_set("default_charset", "UTF-8");
+    ini_set("mbstring.language", "Japanese");
+    ini_set("mbstring.detect_order", "UTF-8,CP932,EUC-JP,ASCII");
+    ini_set("date.timezone", "Asia/Tokyo");
+}
+
+
 function h($str = ""){
     return htmlspecialchars($str, ENT_QUOTES, "UTF-8");
 }
@@ -273,6 +282,15 @@ function zip圧縮($zipfile, array $filemap){
     $zip->close();
     return $zipfile;
 }
+
+
+function zip解凍($zipfile, $where){
+    $zip = new ZipArchive();
+    if(!$zip->open($zipfile)){ return false; }
+    $zip->extractTo($where);
+    $zip->close();
+}
+
 
 
 function キャッシュ保存($name, $data){

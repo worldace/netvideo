@@ -27,13 +27,13 @@
 
 
 /*
-function 暗号化($str, $secret) {
-    $blowfish = new Blowfish($secret);
+function 暗号化($str, $password) {
+    $blowfish = new Blowfish($password);
     return bin2hex($blowfish->encrypt($str));
 }
 
-function 暗号解読($str, $secret) {
-    $blowfish = new Blowfish($secret);
+function 暗号解読($str, $password) {
+    $blowfish = new Blowfish($password);
     return rtrim($blowfish->decrypt(pack("H*", $str)), "\0");
 }
 */
