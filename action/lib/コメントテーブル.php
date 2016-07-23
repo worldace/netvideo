@@ -7,4 +7,9 @@ class コメントテーブル{
         "動画時間"     => "integer unsigned not null",
         "投稿時間"     => "integer unsigned not null",
     ];
+
+    public $id;
+    public $コメント;
+    public $動画時間;
+    public $投稿時間;
 }

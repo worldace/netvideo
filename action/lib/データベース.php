@@ -150,6 +150,7 @@ class データベース{
     }
 
     public function 作成(array $テーブル定義){
+        if(!$テーブル定義){ throw new Exception("テーブル定義が存在しません"); }
         foreach($テーブル定義 as $name => $value){
             $this->文字列検証($name);
             $列情報 .= "$name $value,";
