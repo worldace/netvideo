@@ -198,9 +198,10 @@ function 改行変換($arg = "", $replace = ""){
 }
 
 
-function 自動リンク($str = "", array $attrmap = []){
+function 自動リンク($arg = "", array $attrmap = []){
+    if(is_array($arg)){ return array_map(function($str) use($attrmap){ return 自動リンク($str, $attrmap); }, $arg); }
     foreach($attrmap as $name => $value){ $attr .= " $name=\"$value\""; }
-    return preg_replace("|(https?://[^[:space:]　\r\n]+)|ui", "<a href=\"$1\"$attr>$1</a>", $str);
+    return preg_replace("|(https?://[^[:space:]　\r\n]+)|ui", "<a href=\"$1\"$attr>$1</a>", $arg);
 }
 
 
