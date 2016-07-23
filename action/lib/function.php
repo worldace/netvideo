@@ -184,8 +184,17 @@ function 日本語設定(){
 }
 
 
-function h($str = ""){
-    return htmlspecialchars($str, ENT_QUOTES, "UTF-8");
+function h($arg = ""){
+    if(is_array($arg)){ return array_map("h", $arg); }
+    return htmlspecialchars($arg, ENT_QUOTES, "UTF-8");
+}
+
+
+function 改行変換($arg = "", $replace = ""){
+    if(is_array($arg)){ return array_map(function($str) use($replace){ return 改行変換($str, $replace); }, $arg); }
+    $arg = str_replace("\r", "", $arg);
+    $arg = str_replace("\n", $replace, $arg);
+    return $arg;
 }
 
 
