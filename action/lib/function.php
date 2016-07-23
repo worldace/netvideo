@@ -1,6 +1,6 @@
 <?php
 //======================================================
-// ■汎用関数 http://musou.s38.xrea.com/php/汎用関数.html
+// ■汎用関数 http://musou.s38.xrea.com/php/
 // 
 // 呼び出し元: "../../index.php"
 //======================================================
@@ -12,38 +12,6 @@ function クラスローダ($dir = __DIR__){
         $class = str_replace("_", "/", $class);
         require_once "{$dir}/{$class}.php";
     });
-}
-
-
-function データベース($table, $driver = null, $user = null, $pass = null){
-    return new データベース($table, $driver, $user, $pass);
-}
-
-
-function 部品(){
-    $引数   = func_get_args();
-    $部品名 = array_shift($引数);
-    return 部品::作成($部品名, $引数);
-}
-
-
-function 確認($value, $method = ""){
-    return new 検証("確認", $value, $method);
-}
-
-
-function GET検証($key){
-    return new 検証("検証", $key, "GET");
-}
-
-
-function POST検証($key){
-    return new 検証("検証", $key, "POST");
-}
-
-
-function 検証($value, $method = ""){
-    return new 検証("検証", $value, $method);
 }
 
 
@@ -357,3 +325,494 @@ function テンプレート変換($テンプレート, array $変換関係 = [])
     }, $テンプレート);
 }
 
+
+function データベース($table, $driver = null, $user = null, $pass = null){
+    return new データベース($table, $driver, $user, $pass);
+}
+
+
+class データベース{
+    private static $現在のドライバー;
+    private static $pdo;
+    private $テーブル;
+    private $id列名 = "id";
+    public static $件数 = 31;
+
+    public function __construct($table, $driver = null, $user = null, $pass = null){
+        $this->テーブル($table);
+        if($driver){ $this->接続($driver, $user, $pass); }
+        else{
+            if(!self::$pdo or (self::$現在のドライバー != $_ENV['データベースドライバー'])){
+                $this->接続($_ENV['データベースドライバー'], $_ENV['データベースユーザー名'], $_ENV['データベースパスワード']);
+            }
+        }
+        return $this;
+    }
+
+    private function 接続($driver, $user = null, $pass = null){
+        $setting = $_ENV['データベース付加設定'] ?: [
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => true,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+        ];
+
+        try{ self::$pdo = new PDO($driver, $user, $pass, $setting); }
+        catch(Exception $e){ print "接続エラー。データベース::設定(ドライバ,ユーザID,パスワード)を再確認してください"; }
+        self::$現在のドライバー = $driver;
+        return $this;
+    }
+
+    public function 実行($SQL文, array $割当 = null){
+        $stmt = self::$pdo -> prepare($SQL文);
+        for($i = 1; $i <= count($割当); $i++){
+            $type = gettype($割当[$i-1]);
+            if($type === "integer" or $type === "boolean"){
+                $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_INT);
+            }
+            else {
+                $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_STR);
+            }
+        }
+        $stmt -> execute();
+        return $stmt;
+    }
+
+    public function 取得(array $条件 = null){
+        list($追加文, $割当, $行タイプ) = $this->追加SQL文($条件, "where");
+        $SQL文 = "select * from {$this->テーブル} $追加文";
+        return $this -> 実行($SQL文, $割当) -> fetchAll(...$行タイプ);
+    }
+
+    public function 行取得($id, array $条件 = null){
+        list($追加文, $割当, $行タイプ) = $this->追加SQL文($条件, "where");
+        $SQL文 = "select * from {$this->テーブル} where {$this->id列名} = ?";
+        return $this -> 実行($SQL文, [(int)$id]) -> fetchAll(...$行タイプ)[0];
+    }
+
+    public function 列取得($列, array $条件 = null){
+        $this->文字列検証($列);
+        list($追加文, $割当) = $this->追加SQL文($条件, "where");
+        $SQL文 = "select {$列} from {$this->テーブル} $追加文 ";
+        return $this -> 実行($SQL文, $割当) -> fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    public function セル取得($id, $列){
+        $this->文字列検証($列);
+        $SQL文 = "select {$列} from {$this->テーブル} where {$this->id列名} = ?";
+        return $this -> 実行($SQL文, [(int)$id]) -> fetchColumn();
+    }
+
+    public function 件数(array $条件 = null){
+        if($条件['式']){ $追加文 = "where {$条件['式']}"; }
+        $SQL文 = "select count(*) from {$this->テーブル} $追加文";
+        return $this -> 実行($SQL文, $条件['割当']) -> fetchColumn();
+    }
+
+    public function 検索($検索ワード, $列, array $条件 = null){
+
+        foreach((array)$検索ワード as $単語){
+            $単語 = addcslashes($単語, '_%');
+            $割当1[] = "%$単語%";
+        }
+
+        $列 = (array)$列;
+        foreach($列 as $単列){ $this->文字列検証($単列); }
+        if(preg_match("/sqlite/i", self::$現在のドライバー)){
+            $concat文字列 = "(" . implode('||',$列) . ")";
+        }
+        else{
+            $concat文字列 = "concat(" . implode(',',$列) . ")";
+        }
+        $検索SQL = implode(' and ', array_fill(0,count($割当1),"$concat文字列 like ?"));
+
+        list($追加文, $割当2, $行タイプ) = $this->追加SQL文($条件, "and");
+        $割当 = array_merge($割当1, $割当2);
+
+        $SQL文 = "select * from {$this->テーブル} where {$検索SQL} {$追加文} ";
+        
+        return $this -> 実行($SQL文, $割当) -> fetchAll(...$行タイプ);
+    }
+
+    public function 追加(array $data){
+        foreach($data as $name => $value){
+            $this->文字列検証($name);
+            $into文1 .= "{$name},";
+            $into文2 .= "?,";
+            $割当[] = $value;
+        }
+        $into文1 = rtrim($into文1, ',');
+        $into文2 = rtrim($into文2, ',');
+
+        $SQL文 = "insert into {$this->テーブル} ($into文1) values ($into文2)";
+        $this -> 実行($SQL文, $割当);
+        return self::$pdo -> lastInsertId();
+    }
+
+    public function 更新($id, array $data){
+        foreach($data as $name => $value){
+            if(preg_match("/=/", $name)){
+                $set文 .= "{$name},";
+            }
+            else{
+                $this->文字列検証($name);
+                $set文 .= "{$name}=?,";
+                $割当[] = $value;
+            }
+        }
+        $set文 = rtrim($set文, ',');
+        $割当[] = (int)$id;
+
+        $SQL文 = "update {$this->テーブル} set {$set文} where {$this->id列名} = ?";
+        return $this -> 実行($SQL文, $割当) -> rowCount();
+    }
+
+    public function 削除($id){
+        $SQL文 = "delete from {$this->テーブル} where {$this->id列名} = ?";
+        return $this -> 実行($SQL文, [(int)$id]) -> rowCount();
+    }
+
+    public function 作成(array $テーブル定義){
+        if(!$テーブル定義){ throw new Exception("テーブル定義が存在しません"); }
+        foreach($テーブル定義 as $name => $value){
+            $this->文字列検証($name);
+            $列情報 .= "$name $value,";
+        }
+        $列情報 = rtrim($列情報, ',');
+        $SQL文 = "create table IF NOT EXISTS {$this->テーブル} ($列情報)";
+
+        if(preg_match('/^sqlite/i', self::$現在のドライバー)){ //SQLite用
+            $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
+        }
+        else { //MySQL用
+            $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
+            $SQL文 .= " ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci";
+        }
+        $this -> 実行($SQL文);
+        return $this;
+    }
+
+    public function インデックス作成($列){
+        $this->文字列検証($列);
+        $SQL文  = "create index {$列}インデックス on {$this->テーブル} ($列)";
+        $this -> 実行($SQL文);
+        return $this;
+    }
+
+    public function トランザクション開始(){
+        self::$pdo -> beginTransaction();
+        return $this;
+    }
+
+    public function トランザクション終了(){
+        self::$pdo -> commit();
+        return $this;
+    }
+
+    public function トランザクション失敗(){
+        self::$pdo -> rollBack();
+        return $this;
+    }
+
+    public function テーブル($arg = null){
+        if($arg){
+            $this->文字列検証($arg);
+            $this->テーブル = $arg;
+            return $this;
+        }
+        else{
+            return $this->テーブル;
+        }
+    }
+
+    public function id($arg = null){
+        if($arg){
+            $this->文字列検証($arg);
+            $this->id列名 = $arg;
+            return $this;
+        }
+        else{
+            return $this->id;
+        }
+    }
+
+    private function 文字列検証($str){
+        if(preg_match("/[[:cntrl:][:punct:][:space:]]/", $str)){ throw new Exception("引数に不正な文字列"); }
+    }
+
+    private function 追加SQL文(array $条件 = null, $WHEREorAND = "where"){
+        $割当  = (array)$条件['割当'];
+        if($条件["式"]){ $SQL文 = " $WHEREorAND {$条件['式']} "; }
+
+        if(count($条件["順番"]) === 2){
+            $this->文字列検証($条件["順番"][0]);
+            $順番列 = ($条件["順番"][0]) ? $条件["順番"][0] : $this->id列名;
+            $順番順 = ($条件["順番"][1] == "小さい順") ? "asc" : "desc";
+        }
+        else{
+            $順番列 = $this->id列名;
+            $順番順 = "desc";
+        }
+        $SQL文 .= " order by $順番列 $順番順 ";
+
+        if(!$条件["件数"]){ $条件["件数"] = self::$件数; }
+        if(!$条件["位置"]){ $条件["位置"] = 0; }
+        if($条件["件数"] === "∞"){
+            $SQL文 .= " offset ? ";
+            $割当[] = (int)$条件["位置"];
+        }
+        else{
+            $SQL文 .= " limit ? offset ?";
+            $割当[] = (int)$条件["件数"];
+            $割当[] = (int)$条件["位置"];
+        }
+
+        $行タイプ = [];
+        if($条件['行タイプ']){
+            if($条件['行タイプ'] === "オブジェクト"){ $行タイプ[0] = PDO::FETCH_OBJ; }
+            else if($条件['行タイプ'] === "連想配列"){ $行タイプ[0] = PDO::FETCH_ASSOC; }
+            else if($条件['行タイプ'] === "配列"){ $行タイプ[0] = PDO::FETCH_NUM; }
+            else { $行タイプ = [PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $条件['行タイプ']]; }
+        }
+        else{
+            if($_ENV['データベース付加設定'][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){
+                $行タイプ = [$_ENV['データベース付加設定'][PDO::ATTR_DEFAULT_FETCH_MODE], "{$this->テーブル}テーブル"];
+            }
+        }
+
+        return [$SQL文, $割当, $行タイプ];
+    }
+}
+
+
+function 部品(){
+    $引数   = func_get_args();
+    $部品名 = array_shift($引数);
+    return 部品::作成($部品名, $引数);
+}
+
+
+class 部品{
+    private static $ディレクトリ = ".";
+    private static $初期化済み = false;
+    private static $キャッシュ;
+    private static $windows;
+    public  static $イベント;
+    public  static $js;
+    public  static $css;
+
+    public static function 作成($部品名, $引数){
+        if($部品名 === null){ throw new Exception('部品名がありません'); }
+        if(!self::$初期化済み){ self::初期化実行(); }
+
+        if(self::$キャッシュ[$部品名]["読み込み済み"] === true){
+            $html = self::$キャッシュ[$部品名]["html"];
+            $css  = self::$キャッシュ[$部品名]["css"];
+            $js   = self::$キャッシュ[$部品名]["js"];
+        }
+        else{
+            $path = self::$ディレクトリ . "/{$部品名}.php";
+            if(self::$windows){ $path = self::$ディレクトリ . addslashes(mb_convert_encoding("/{$部品名}.php", 'SJIS', 'UTF-8')); }
+            require $path;
+            self::$キャッシュ[$部品名]["読み込み済み"] = true;
+            self::$キャッシュ[$部品名]["html"] = $html;
+            self::$キャッシュ[$部品名]["css"]  = $css;
+            self::$キャッシュ[$部品名]["js"]   = $js;
+        }
+
+        if($css) { self::$css[$部品名] = is_callable($css) ? call_user_func_array($css, $引数) : $css; }
+        if($js)  { self::$js[$部品名]  = is_callable($js)  ? call_user_func_array($js,  $引数) : $js; }
+
+        return is_callable($html) ? call_user_func_array($html, $引数) : $html;
+    }
+
+    public static function 終了処理(){
+        $buf = ob_get_contents();
+        ob_end_clean();
+        if(self::$js){
+            $js     = "\n<script>\n" . implode(self::$js,"\n") . "\n</script>\n";
+            $js_pos = strripos($buf, "</body>");
+            if($js_pos !== false){
+                $buf = substr_replace($buf, $js, $js_pos, 0); //最後に出現する</body>の前にJSを挿入する
+            }
+            else{
+                $buf .= $js;
+            }
+        }
+        if(self::$css){
+            $css     = "\n<style>\n " . implode(self::$css,"\n") . "\n</style>\n";
+            $css_pos = stripos($buf, "</head>");
+            if($css_pos !== false){
+                $buf = substr_replace($buf, $css, $css_pos, 0); //最初に出現する</head>の前にCSSを挿入する
+            }
+            else{
+                $buf = $css . $buf;
+            }
+        }
+        if(is_callable(self::$イベント['出力前'])){ call_user_func(self::$イベント['出力前'], $buf); }
+        print $buf;
+    }
+
+    private static function 初期化実行(){
+        self::$初期化済み = true;
+        self::$windows = preg_match("/win/i", PHP_OS);
+        ob_start();
+        register_shutdown_function("部品::終了処理");
+    }
+
+    public static function 初期化($dir = null){
+        if($dir){ self::$ディレクトリ = $dir; }
+        if(!self::$初期化済み){ self::初期化実行(); }
+    }
+}
+
+
+function 確認($value, $method = ""){
+    return new 検証("確認", $value, $method);
+}
+
+
+function GET検証($key){
+    return new 検証("検証", $key, "GET");
+}
+
+
+function POST検証($key){
+    return new 検証("検証", $key, "POST");
+}
+
+
+function 検証($value, $method = ""){
+    return new 検証("検証", $value, $method);
+}
+
+
+class 検証{
+    public $エラー関数;
+    public $key;
+    public $value;
+    public $mode;
+    public $method;
+
+    public function __construct($mode, $value, $method = ""){
+        $this->エラー関数 = (検証エラー関数) ? 検証エラー関数 : "エラー";
+        $this->mode = $mode;
+        if($method){
+            $this->key   = $value;
+            $this->value = ($method == "POST") ? @$_POST[$value] : @$_GET[$value];
+        }
+        else{
+            $this->value = $value;
+        }
+    }
+    
+    public function 必須($comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}を入力してください"; }
+        return ($this->value !== null or $this->value !== "") ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 数($comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}には数値を入力してください"; }
+        return (is_numeric($this->value) and !preg_match("/^-?0+\d/", $this->value)) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 自然数($comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}は1以上にしてください"; }
+        return (preg_match("/^[1-9][0-9]*$/", $this->value)) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 自然数と0($comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}は0以上にしてください"; }
+        return (preg_match("/^(0|[1-9]\d*)$/", $this->value)) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 数字($comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}に数字以外の文字が含まれています"; }
+        return (preg_match("/^[0-9]+$/", $this->value)) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 英語($comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}に英語以外の文字が含まれています"; }
+        return (preg_match("/^[A-Za-z]+$/", $this->value)) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 英数字($comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}に英数字以外の文字が含まれています"; }
+        return (preg_match("/^[A-Za-z0-9]+$/", $this->value)) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function URL($comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}にはURLを入力してください"; }
+        return (preg_match("|^https?://.{4,}|i", $this->value)) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 画像データ($comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}を取得できませんでした"; }
+        return (getimagesizefromstring($this->value)[0] > 0) ? $this->成功() : $this->失敗($comment); //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
+    }
+
+    public function と同じ($value, $comment = ""){ //非文書化
+        if(!$comment and $this->key){ $comment = "{$this->key}が{$value}でありません"; }
+        return ($this->value == $value) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 以上($num, $unit = "", $comment = ""){ //非文書化
+        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}以上にしてください"; }
+        return (is_numeric($this->value) and ($this->value >= $num)) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 以下($num, $unit = "", $comment = ""){ //非文書化
+        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}以下にしてください"; }
+        return (is_numeric($this->value) and ($this->value <= $num)) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function より大きい($num, $unit = "", $comment = ""){ //非文書化
+        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}より大きくしてください"; }
+        return (is_numeric($this->value) and ($this->value > $num)) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function より小さい($num, $unit = "", $comment = ""){ //非文書化
+        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}より小さくしてください"; }
+        return (is_numeric($this->value) and ($this->value < $num)) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 文字以上($num, $comment = ""){ //非文書化
+        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以上にしてください"; }
+        return (mb_strlen($this->value,"UTF-8") < $num) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 文字以下($num, $comment = ""){ //非文書化
+        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以内にしてください"; }
+        return (mb_strlen($this->value,"UTF-8") > $num) ? $this->成功() : $this->失敗($comment);
+    }
+
+    private function 全角数字変換($num){
+        $num = preg_replace("/^ー/u", "-", $num);
+        $num = preg_replace("/．/u", ".", $num);
+        $num = mb_convert_kana($num, "n", "utf-8");
+        return $num;
+    }
+
+    private function 成功(){
+        return ($this->mode === "確認") ? true : $this;
+    }
+
+    private function 失敗($comment = "エラーが発生しました"){
+        if($this->mode === "確認"){ return false; }
+        if(is_callable($this->エラー関数)){ call_user_func($this->エラー関数, $comment, $this); }
+        return $this;
+    }
+
+    function __call($name, $args){
+        if     (preg_match("/^([０-９]+)文?字以上$/u", $name, $m)) { return $this->文字以上($this->全角数字変換($m[1]), $args[0]); }
+        else if(preg_match("/^([０-９]+)文?字以/u", $name, $m))    { return $this->文字以下($this->全角数字変換($m[1]), $args[0]); }
+        else if(preg_match("/^(ー?[０-９．]+)(\w*)以上$/u", $name, $m)) { return $this->以上($this->全角数字変換($m[1]), $m[2], $args[0]); }
+        else if(preg_match("/^(ー?[０-９．]+)(\w*)以/u", $name, $m))    { return $this->以下($this->全角数字変換($m[1]), $m[2], $args[0]); }
+        else if(preg_match("/^(ー?[０-９．]+)(\w*)より大/u", $name, $m)){ return $this->より大きい($this->全角数字変換($m[1]), $m[2], $args[0]); }
+        else if(preg_match("/^(ー?[０-９．]+)(\w*)より小/u", $name, $m)){ return $this->より小きい($this->全角数字変換($m[1]), $m[2], $args[0]); }
+        else {
+            if(preg_match("/^(ー?[０-９．]+)$/u", $name)){ $name = $this->全角数字変換($name); }
+            return $this->と同じ($name, $args[0]);
+        }
+    }
+}
