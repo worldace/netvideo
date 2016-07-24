@@ -323,16 +323,7 @@ function 連想配列ソート(array &$array){
 
 
 function テンプレート変換($テンプレート, array $変換関係 = []){
-    return preg_replace_callback("|《([^》]*)》|u", function($match) use($変換関係){
-        $最初の文字 = substr($match[1], 0, 1);
-        $以降の文字 = substr($match[1], 1);
-        switch($最初の文字){
-            case "&": return htmlspecialchars($変換関係[$以降の文字], ENT_QUOTES, "UTF-8");
-            case "%": return rawurlencode($変換関係[$以降の文字]);
-            case "?": ob_start(); eval($変換関係[$以降の文字].";"); return ob_get_clean();
-            default: return $変換関係[$match[1]];
-        }
-    }, $テンプレート);
+    return preg_replace_callback("|《([^》]*)》|u", function($match) use($変換関係){ return $変換関係[$match[1]]; }, $テンプレート);
 }
 
 
