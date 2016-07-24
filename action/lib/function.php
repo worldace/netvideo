@@ -286,9 +286,10 @@ function zip圧縮($zipfile, array $filemap){
 }
 
 
-function zip解凍($zipfile, $where){
+function zip解凍($zipfile, $where = ""){
     $zip = new ZipArchive();
     if(!$zip->open($zipfile)){ return false; }
+    if(!$where){ $where = dirname(realpath($zipfile)); }
     $result = $zip->extractTo($where);
     $zip->close();
     return $result;
