@@ -28,8 +28,9 @@ function URL作成($query = ""){
     $base = (preg_match("|/$|", $設定['URL.ホーム'])) ? $設定['URL.ホーム'] : dirname($設定['URL.ホーム'])."/";
 
     if(preg_match("#^(https?:|ftp:|mailto:|data:|//)#i", $query)){ return $query; }
+    $query = preg_replace("|^\.?/|", "", $query);
     if(preg_match("/^\?/", $query)){ parse_str(substr($query,1), $query); }
-    else{ return ($query) ? $base.preg_replace("|^/|","",$query) : $設定['URL.ホーム']; }
+    else{ return ($query) ? $base.$query : $設定['URL.ホーム']; }
 
     if($設定['URL.短縮'] and $query["action"] === $設定['URL.短縮名'] and $query[$設定['URL.短縮値']]){
         $短縮値 = rawurlencode($query[$設定['URL.短縮値']]);
