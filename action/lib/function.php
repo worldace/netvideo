@@ -91,7 +91,7 @@ function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 =
             $body .= "--__PHPMAIL__\r\n";
             $body .= "Content-Type: " . MIMEタイプ($name) . "\r\n";
             $body .= "Content-Transfer-Encoding: base64\r\n";
-            $body .= "Content-Disposition: attachment; filename=\"$name\"\r\n\r\n";
+            $body .= "Content-Disposition: attachment; filename=\"" . mb_encode_mimeheader($name, "ISO-2022-JP") . "\"\r\n\r\n";
             $body .= chunk_split(base64_encode($value)) . "\r\n";
         }
         $body .= "--__PHPMAIL__--\r\n";
