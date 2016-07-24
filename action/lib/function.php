@@ -70,15 +70,72 @@ function ダウンロード($filepath = "", $filename = "", $data = "", $timeout
 }
 
 
-function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 = "", $本文 = ""){
-	if($送信元 and $送信者) {
-		$送信者 = mb_encode_mimeheader($送信者, "ISO-2022-JP");
-		$from = "From: $送信者 <$送信元>\r\n";
-	}
-	else if($送信元) {
-		$from = "From: $送信元\r\n";
-	}
-	return mb_send_mail($送信先, $題名, $本文, $from);
+function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 = "", $本文 = "", array $添付 = null, $cc = "", $bcc = ""){
+    $題名 = mb_encode_mimeheader($題名, "ISO-2022-JP");
+    $body = mb_convert_encoding($本文, "ISO-2022-JP", "UTF-8");
+
+	if($送信元 and $送信者) { $header .= "From: " . mb_encode_mimeheader($送信者,"ISO-2022-JP") . " <$送信元>\r\n"; }
+	else if($送信元) { $header .= "From: $送信元\r\n";	}
+    if($cc) { $header .= "Cc: $cc\r\n"; }
+    if($bcc){ $header .= "Bcc: $bcc\r\n"; }
+
+    if(is_array($添付)){
+        $header .= "MIME-Version: 1.0\r\n";
+        $header .= "Content-Type: multipart/mixed; boundary=\"__PHPMAIL__\"\r\n";
+
+        $body  = "--__PHPMAIL__\r\n";
+        $body .= "Content-Type: text/plain; charset=\"ISO-2022-JP\"\r\n\r\n";
+        $body .= mb_convert_encoding($本文, "ISO-2022-JP", "UTF-8") . "\r\n";
+
+        foreach($添付 as $name => $value){
+            $body .= "--__PHPMAIL__\r\n";
+            $body .= "Content-Type: " . MIMEタイプ($name) . "\r\n";
+            $body .= "Content-Transfer-Encoding: base64\r\n";
+            $body .= "Content-Disposition: attachment; filename=\"$name\"\r\n\r\n";
+            $body .= chunk_split(base64_encode($value)) . "\r\n";
+        }
+        $body .= "--__PHPMAIL__--\r\n";
+    }
+    mail($送信先, $題名, $body, $header);
+}
+
+
+function MIMEタイプ($path){ // http://www.iana.org/assignments/media-types/media-types.xhtml
+    $list = [
+        'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png'  => 'image/png',
+        'gif'  => 'image/gif',
+        'bmp'  => 'image/bmp',
+        'svg'  => 'image/image/svg+xml',
+        'ico'  => 'image/x-icon',
+        'txt'  => 'text/plain',
+        'htm'  => 'text/html',
+        'html' => 'text/html',
+        'css'  => 'text/css',
+        'xml'  => 'text/xml',
+        'csv'  => 'text/csv',
+        'tsv'  => 'text/tab-separated-values',
+        'js'   => 'application/javascript',
+        'json' => 'application/json',
+        'doc'  => 'application/msword',
+        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'xls'  => 'application/vnd.ms-excel',
+        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'ppt'  => 'application/vnd.ms-powerpoint',
+        'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'pdf'  => 'application/pdf',
+        'swf'  => 'application/x-shockwave-flash',
+        'zip'  => 'application/zip',
+        'lzh'  => 'application/x-lzh',
+        'mp3'  => 'audio/mpeg',
+        'wav'  => 'audio/x-wav',
+        'wmv'  => 'video/x-ms-wmv',
+        '3g2'  => 'video/3gpp2',
+        'mp4'  => 'video/mp4',
+    ];
+    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    return $list[$ext] ?: "application/octet-stream";
 }
 
 
