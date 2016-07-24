@@ -297,14 +297,14 @@ function zip解凍($zipfile, $where = ""){
 
 
 
-function キャッシュ保存($name, $data){
+function 一時保存($name, $data){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "-" . $name;
     $result = file_put_contents($tempfile, serialize($data), LOCK_EX);
     return ($result === false) ? false : $name;
 }
 
 
-function キャッシュ取得($name){
+function 一時取得($name){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "-" . $name;
     return (file_exists($tempfile)) ? unserialize(file_get_contents($tempfile)) : false;
 }
@@ -344,8 +344,6 @@ function 連想配列ソート(array &$array){
 function テンプレート変換($テンプレート, array $変換関係 = []){
     return preg_replace_callback("|《([^》]*)》|u", function($match) use($変換関係){ return $変換関係[$match[1]]; }, $テンプレート);
 }
-
-
 
 
 function MIMEタイプ($path){ // http://www.iana.org/assignments/media-types/media-types.xhtml
