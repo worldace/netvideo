@@ -671,8 +671,9 @@ class 部品{
             $js   = self::$キャッシュ[$部品名]["js"];
         }
         else{
-            $path = self::$ディレクトリ . "/{$部品名}.php";
-            if(self::$windows){ $path = self::$ディレクトリ . addslashes(mb_convert_encoding("/{$部品名}.php", 'SJIS', 'UTF-8')); }
+            $拡張子 = (preg_match("/\.php/i", $部品名)) ? "" : ".php";
+            if(self::$windows){ $path = self::$ディレクトリ . addslashes(mb_convert_encoding("/$部品名", 'SJIS', 'UTF-8')) . $拡張子; }
+            else{ $path = self::$ディレクトリ . "/$部品名" . $拡張子; }
             require $path;
             self::$キャッシュ[$部品名]["読み込み済み"] = true;
             self::$キャッシュ[$部品名]["html"] = $html;
@@ -720,8 +721,8 @@ class 部品{
         register_shutdown_function("部品::終了処理");
     }
 
-    public static function 初期化($dir = null){
-        if($dir){ self::$ディレクトリ = $dir; }
+    public static function 設定($dir = null){
+        if($dir){ self::$ディレクトリ = preg_replace("|/$|", "", $dir); }
         if(!self::$初期化済み){ self::初期化実行(); }
     }
 }
