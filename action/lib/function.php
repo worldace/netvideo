@@ -96,46 +96,7 @@ function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 =
         }
         $body .= "--__PHPMAIL__--\r\n";
     }
-    mail($送信先, $題名, $body, $header);
-}
-
-
-function MIMEタイプ($path){ // http://www.iana.org/assignments/media-types/media-types.xhtml
-    $list = [
-        'jpg'  => 'image/jpeg',
-        'jpeg' => 'image/jpeg',
-        'png'  => 'image/png',
-        'gif'  => 'image/gif',
-        'bmp'  => 'image/bmp',
-        'svg'  => 'image/image/svg+xml',
-        'ico'  => 'image/x-icon',
-        'txt'  => 'text/plain',
-        'htm'  => 'text/html',
-        'html' => 'text/html',
-        'css'  => 'text/css',
-        'xml'  => 'text/xml',
-        'csv'  => 'text/csv',
-        'tsv'  => 'text/tab-separated-values',
-        'js'   => 'application/javascript',
-        'json' => 'application/json',
-        'doc'  => 'application/msword',
-        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'xls'  => 'application/vnd.ms-excel',
-        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'ppt'  => 'application/vnd.ms-powerpoint',
-        'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'pdf'  => 'application/pdf',
-        'swf'  => 'application/x-shockwave-flash',
-        'zip'  => 'application/zip',
-        'lzh'  => 'application/x-lzh',
-        'mp3'  => 'audio/mpeg',
-        'wav'  => 'audio/x-wav',
-        'wmv'  => 'video/x-ms-wmv',
-        '3g2'  => 'video/3gpp2',
-        'mp4'  => 'video/mp4',
-    ];
-    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-    return $list[$ext] ?: "application/octet-stream";
+    return mail($送信先, $題名, $body, $header);
 }
 
 
@@ -382,6 +343,48 @@ function 連想配列ソート(array &$array){
 function テンプレート変換($テンプレート, array $変換関係 = []){
     return preg_replace_callback("|《([^》]*)》|u", function($match) use($変換関係){ return $変換関係[$match[1]]; }, $テンプレート);
 }
+
+
+
+
+function MIMEタイプ($path){ // http://www.iana.org/assignments/media-types/media-types.xhtml
+    $list = [
+        'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png'  => 'image/png',
+        'gif'  => 'image/gif',
+        'bmp'  => 'image/bmp',
+        'svg'  => 'image/image/svg+xml',
+        'ico'  => 'image/x-icon',
+        'txt'  => 'text/plain',
+        'htm'  => 'text/html',
+        'html' => 'text/html',
+        'css'  => 'text/css',
+        'xml'  => 'text/xml',
+        'csv'  => 'text/csv',
+        'tsv'  => 'text/tab-separated-values',
+        'js'   => 'application/javascript',
+        'json' => 'application/json',
+        'doc'  => 'application/msword',
+        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'xls'  => 'application/vnd.ms-excel',
+        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'ppt'  => 'application/vnd.ms-powerpoint',
+        'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'pdf'  => 'application/pdf',
+        'swf'  => 'application/x-shockwave-flash',
+        'zip'  => 'application/zip',
+        'lzh'  => 'application/x-lzh',
+        'mp3'  => 'audio/mpeg',
+        'wav'  => 'audio/x-wav',
+        'wmv'  => 'video/x-ms-wmv',
+        '3g2'  => 'video/3gpp2',
+        'mp4'  => 'video/mp4',
+    ];
+    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    return $list[$ext] ?: "application/octet-stream";
+}
+
 
 
 function データベース($table, $driver = null, $user = null, $pass = null){
