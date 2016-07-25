@@ -74,8 +74,8 @@ function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 =
     $題名 = mb_encode_mimeheader($題名, "jis");
     $body = mb_convert_encoding($本文, "jis", "UTF-8");
 
-	if($送信元 and $送信者) { $header .= "From: " . mb_encode_mimeheader($送信者,"jis") . " <$送信元>\r\n"; }
-	else if($送信元) { $header .= "From: $送信元\r\n";	}
+    if($送信元 and $送信者) { $header .= "From: " . mb_encode_mimeheader($送信者,"jis") . " <$送信元>\r\n"; }
+    else if($送信元) { $header .= "From: $送信元\r\n";	}
     if($cc) { $header .= "Cc: $cc\r\n"; }
     if($bcc){ $header .= "Bcc: $bcc\r\n"; }
 
