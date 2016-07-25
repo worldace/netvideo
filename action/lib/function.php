@@ -70,7 +70,7 @@ function ダウンロード($filepath = "", $filename = "", $data = "", $timeout
 }
 
 
-function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 = "", $本文 = "", array $添付 = null, $cc = "", $bcc = ""){
+function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 = "", $本文 = "", array $添付 = null, $cc = "", $bcc = "", $add = ""){
     $題名 = mb_encode_mimeheader($題名, "ISO-2022-JP");
     $body = mb_convert_encoding($本文, "ISO-2022-JP", "UTF-8");
 
@@ -78,6 +78,7 @@ function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 =
 	else if($送信元) { $header .= "From: $送信元\r\n";	}
     if($cc) { $header .= "Cc: $cc\r\n"; }
     if($bcc){ $header .= "Bcc: $bcc\r\n"; }
+    if($add){ $header .= $add; }
 
     if(is_array($添付)){
         $区切り = "__" . uuid() . "__";
