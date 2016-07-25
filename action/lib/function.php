@@ -180,7 +180,7 @@ function 日付($time = 0, $str = '[年]/[0月]/[0日] [0時]:[0分]'){
 
 
 function 経過($time){
-    if(!$time){ return ""; }
+    if(!preg_match("/^\d+$/", $time)){ return ""; }
     $時間差 = time() - $time;
     switch($時間差){
         case $時間差 < 1        : return "今";
