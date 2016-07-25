@@ -78,7 +78,6 @@ function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 =
 	else if($送信元) { $header .= "From: $送信元\r\n";	}
     if($cc) { $header .= "Cc: $cc\r\n"; }
     if($bcc){ $header .= "Bcc: $bcc\r\n"; }
-    if($add){ $header .= $add; }
 
     if(is_array($添付)){
         $区切り = "__" . uuid() . "__";
@@ -98,7 +97,7 @@ function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 =
         }
         $body .= "--{$区切り}--\r\n";
     }
-    return mail($送信先, $題名, $body, $header);
+    return mail($送信先, $題名, $body, $header.$add);
 }
 
 
