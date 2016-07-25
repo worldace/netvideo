@@ -153,12 +153,12 @@ function Windowsなら(){
 
 
 function GETなら(){
-    return (strtoupper($_SERVER['REQUEST_METHOD']) === 'GET') ? true : false;
+    return (strtoupper(filter_input(INPUT_SERVER, "REQUEST_METHOD")) === 'GET') ? true : false;
 }
 
 
 function POSTなら(){
-    return (strtoupper($_SERVER['REQUEST_METHOD']) === 'POST') ? true : false;
+    return (strtoupper(filter_input(INPUT_SERVER, "REQUEST_METHOD")) === 'POST') ? true : false;
 }
 
 
