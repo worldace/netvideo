@@ -75,7 +75,7 @@ function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 =
     $body = mb_convert_encoding($本文, "jis", "UTF-8");
 
     if($送信元 and $送信者) { $header .= "From: " . mb_encode_mimeheader($送信者,"jis") . " <$送信元>\r\n"; }
-    else if($送信元) { $header .= "From: $送信元\r\n";	}
+    else if($送信元) { $header .= "From: $送信元\r\n"; }
     if($cc) { $header .= "Cc: $cc\r\n"; }
     if($bcc){ $header .= "Bcc: $bcc\r\n"; }
 
@@ -168,14 +168,14 @@ function 連想配列なら($array){
 
 
 function 日付($time = 0, $str = '[年]/[0月]/[0日] [0時]:[0分]'){
-	if(!$time){ $time = time(); }
-	$week = ['日','月','火','水','木','金','土'][date('w', $time)];
+    if(!$time){ $time = time(); }
+    $week = ['日','月','火','水','木','金','土'][date('w', $time)];
     $from = ['[年]','[月]','[0月]','[日]','[0日]','[時]','[0時]','[0分]','[0秒]','[曜日]'];
     $to   = ['Y'   ,'n'   ,'m'    ,'j'   ,'d'    ,'G'   ,'H'    ,'i'    ,'s'    ,$week];
-	$str  = str_replace($from, $to, $str);
-	$str  = str_replace('[分]', ltrim(date('i',$time),"0"), $str);
-	$str  = str_replace('[秒]', ltrim(date('s',$time),"0"), $str);
-	return date($str, $time);
+    $str  = str_replace($from, $to, $str);
+    $str  = str_replace('[分]', ltrim(date('i',$time),"0"), $str);
+    $str  = str_replace('[秒]', ltrim(date('s',$time),"0"), $str);
+    return date($str, $time);
 }
 
 
