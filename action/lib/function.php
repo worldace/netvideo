@@ -34,7 +34,7 @@ function JSON表示($json = [], $callback = null, $allow = null){
     header("Access-Control-Allow-Origin: $allow");
     header("Access-Control-Allow-Credentials: true");
     if($callback){ //JSONP
-        header("Content-Type: text/javascript; charset=utf-8");
+        header("Content-Type: application/javascript; charset=utf-8");
         print $callback . "(" . json_encode($json) . ");";
     }
     else{ //JSON
@@ -80,21 +80,22 @@ function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 =
     if($bcc){ $header .= "Bcc: $bcc\r\n"; }
 
     if(is_array($添付)){
+        $区切り = "__" . uuid() . "__";
         $header .= "MIME-Version: 1.0\r\n";
-        $header .= "Content-Type: multipart/mixed; boundary=\"__PHPMAIL__\"\r\n";
+        $header .= "Content-Type: multipart/mixed; boundary=\"{$区切り}\"\r\n";
 
-        $body  = "--__PHPMAIL__\r\n";
+        $body  = "--{$区切り}\r\n";
         $body .= "Content-Type: text/plain; charset=\"ISO-2022-JP\"\r\n\r\n";
         $body .= mb_convert_encoding($本文, "ISO-2022-JP", "UTF-8") . "\r\n";
 
         foreach($添付 as $name => $value){
-            $body .= "--__PHPMAIL__\r\n";
+            $body .= "--{$区切り}\r\n";
             $body .= "Content-Type: " . MIMEタイプ($name) . "\r\n";
             $body .= "Content-Transfer-Encoding: base64\r\n";
             $body .= "Content-Disposition: attachment; filename=\"" . mb_encode_mimeheader($name, "ISO-2022-JP") . "\"\r\n\r\n";
             $body .= chunk_split(base64_encode($value)) . "\r\n";
         }
-        $body .= "--__PHPMAIL__--\r\n";
+        $body .= "--{$区切り}--\r\n";
     }
     return mail($送信先, $題名, $body, $header);
 }
@@ -235,6 +236,16 @@ function テーブルタグ作成(array $array){
 }
 
 
+function dd(){
+    foreach(func_get_args() as $var){
+        $out = var_export($var, true);
+        if(php_sapi_name() === 'cli'){ print (preg_match("/^WIN/i",PHP_OS)) ? mb_convert_encoding($out,'SJIS','UTF-8') : $out; }
+        else{ print "<pre>$out</pre>"; }
+        print "\n\n";
+    }
+}
+
+
 function ファイル一覧($path = "./", $pattern = "."){
     if(!is_dir($path)){ return false; }
     foreach(array_diff(scandir($path), ['.','..']) as $file){
@@ -298,14 +309,14 @@ function zip解凍($zipfile, $where = ""){
 
 
 function 一時保存($name, $data){
-    $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "-" . md5($name);
+    $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
     $result = file_put_contents($tempfile, serialize($data), LOCK_EX);
     return ($result === false) ? false : $name;
 }
 
 
 function 一時取得($name){
-    $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "-" . md5($name);
+    $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
     return (file_exists($tempfile)) ? unserialize(file_get_contents($tempfile)) : false;
 }
 
