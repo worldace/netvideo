@@ -86,7 +86,7 @@ function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 =
         $header .= "Content-Type: multipart/mixed; boundary=\"{$区切り}\"\r\n";
 
         $body  = "--{$区切り}\r\n";
-        $body .= "Content-Type: text/plain; charset=\"jis\"\r\n\r\n";
+        $body .= "Content-Type: text/plain; charset=\"ISO-2022-JP\"\r\n\r\n";
         $body .= mb_convert_encoding($本文, "jis", "UTF-8") . "\r\n";
 
         foreach($添付 as $name => $value){
