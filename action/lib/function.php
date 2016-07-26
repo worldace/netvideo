@@ -101,20 +101,46 @@ function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 =
 }
 
 
-function GET送信($url, array $querymap = null, array $request = null, &$response){
+function GET送信($url, array $querymap = null, array $request_header = null){
     if($querymap and preg_match("/\?/", $url)){ $url .= "&" . http_build_query($querymap, "", "&"); }
     else if($querymap){ $url .= "?" . http_build_query($querymap, "", "&"); }
-    $request = stream_context_create(['http'=>['method'=>'GET', 'header'=>implode("\r\n", (array)$request)]]);
+    $request = stream_context_create(['http'=>['method'=>'GET', 'header'=>implode("\r\n", (array)$request_header)]]);
     $contents = @file_get_contents($url, false, $request);
-    $response = $http_response_header;
+    $_ENV['RESPONSE_HEADER'] = $http_response_header;
     return $contents;
 }
 
 
-function POST送信($url, array $querymap = null, array $request = null, &$response){
-    $request = stream_context_create(['http'=>['method'=>'POST', 'header'=>implode("\r\n",(array)$request), 'content'=>http_build_query((array)$querymap,"","&")]]);
+function POST送信($url, array $querymap = null, array $request_header = null){
+    $request = stream_context_create(['http'=>['method'=>'POST','header'=>implode("\r\n",(array)$request_header),'content'=>http_build_query((array)$querymap,"","&")]]);
     $contents = @file_get_contents($url, false, $request);
-    $response = $http_response_header;
+    $_ENV['RESPONSE_HEADER'] = $http_response_header;
+    return $contents;
+}
+
+
+function ファイル送信($url, array $querymap = null, array $request_header = null){
+    $区切り = "__" . uuid() . "__";
+    $request_header[] = "Content-Type: multipart/form-data; boundary=$区切り";
+    foreach($querymap as $name => $value){
+        if(is_array($value)){
+            foreach($value as $name2 => $value2){
+                $content .= "--$区切り\r\n";
+                $content .= "Content-Disposition: form-data; name=\"$name\"; filename=\"$name2\"\r\n";
+                $content .= "Content-Type: application/octet-stream\r\n\r\n";
+                $content .= "$value2\r\n";
+            }
+        }
+        else{
+            $content .= "--$区切り\r\n";
+            $content .= "Content-Disposition: form-data; name=\"$name\"\r\n\r\n";
+            $content .= "$value\r\n";
+        }
+    }
+    $content .= "--$区切り--\r\n";
+    $request = stream_context_create(['http'=>['method'=>'POST', 'header'=>implode("\r\n",(array)$request_header), 'content'=>$content]]);
+    $contents = @file_get_contents($url, false, $request);
+    $_ENV['RESPONSE_HEADER'] = $http_response_header;
     return $contents;
 }
 
