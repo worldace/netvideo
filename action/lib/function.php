@@ -16,7 +16,7 @@ function クラスローダ($dir = __DIR__){
 
 
 function エラー($str = "エラーが発生しました"){
-    header('HTTP', true, 400);
+    header('HTTP', true, 500);
     print $str;
     exit;
 }
