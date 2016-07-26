@@ -550,11 +550,11 @@ class データベース{
     public function 更新($id, $data){
         if(gettype($data) === "object" and get_class($data) === "{$this->テーブル}テーブル"){ $data = $this->型変換($data, "{$this->テーブル}テーブル"); }
         foreach($data as $name => $value){
-            if(preg_match("/=/", $name)){
-                $set文 .= "{$name},";
+            $this->文字列検証($name);
+            if(is_array($value) and array_key_exists('式', $value)){
+                $set文 .= "{$name}={$value['式']},";
             }
             else{
-                $this->文字列検証($name);
                 $set文 .= "{$name}=?,";
                 $割当[] = $value;
             }
@@ -687,6 +687,10 @@ class データベース{
         $newdata = [];
         foreach($data as $key => $value){
             if(!isset($定義[$key]) or !isset($value)){ continue; }
+            if(is_array($value) and array_key_exists('式', $value)){
+                $newdata[$key] = $value;
+                continue;
+            }
             $型 = explode(" ", $定義[$key])[0];
             if(preg_match("/int/i", $型)){ $newdata[$key] = (int)$value; }
             //他にもやるべきだが省略
