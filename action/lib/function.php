@@ -434,7 +434,7 @@ class データベース{
     private $ドライバー;
     private $接続名;
     private $テーブル;
-    private $主キー名 = "id";
+    private $主キー = "id";
 
     public function __construct($table, $driver = null, $user = null, $password = null){
         $this->テーブル($table);
@@ -485,7 +485,7 @@ class データベース{
 
     public function 行取得($id, array $条件 = null){
         list($追加文, $割当, $行タイプ) = $this->追加SQL文($条件, "where");
-        $SQL文 = "select * from {$this->テーブル} where {$this->主キー名} = ?";
+        $SQL文 = "select * from {$this->テーブル} where {$this->主キー} = ?";
         return $this -> 実行($SQL文, [(int)$id]) -> fetchAll(...$行タイプ)[0];
     }
 
@@ -498,7 +498,7 @@ class データベース{
 
     public function セル取得($id, $列){
         $this->文字列検証($列);
-        $SQL文 = "select {$列} from {$this->テーブル} where {$this->主キー名} = ?";
+        $SQL文 = "select {$列} from {$this->テーブル} where {$this->主キー} = ?";
         return $this -> 実行($SQL文, [(int)$id]) -> fetchColumn();
     }
 
@@ -564,12 +564,12 @@ class データベース{
         $set文 = rtrim($set文, ',');
         $割当[] = (int)$id;
 
-        $SQL文 = "update {$this->テーブル} set {$set文} where {$this->主キー名} = ?";
+        $SQL文 = "update {$this->テーブル} set {$set文} where {$this->主キー} = ?";
         return $this -> 実行($SQL文, $割当) -> rowCount();
     }
 
     public function 削除($id){
-        $SQL文 = "delete from {$this->テーブル} where {$this->主キー名} = ?";
+        $SQL文 = "delete from {$this->テーブル} where {$this->主キー} = ?";
         return $this -> 実行($SQL文, [(int)$id]) -> rowCount();
     }
 
@@ -633,7 +633,7 @@ class データベース{
     public function 主キー($arg = null){
         if($arg){
             $this->文字列検証($arg);
-            $this->主キー名 = $arg;
+            $this->主キー = $arg;
             return $this;
         }
         else{
@@ -651,11 +651,11 @@ class データベース{
 
         if(count($条件["順番"]) === 2){
             $this->文字列検証($条件["順番"][0]);
-            $順番列 = ($条件["順番"][0]) ? $条件["順番"][0] : $this->主キー名;
+            $順番列 = ($条件["順番"][0]) ? $条件["順番"][0] : $this->主キー;
             $順番順 = ($条件["順番"][1] == "小さい順") ? "asc" : "desc";
         }
         else{
-            $順番列 = $this->主キー名;
+            $順番列 = $this->主キー;
             $順番順 = "desc";
         }
         $SQL文 .= " order by $順番列 $順番順 ";
