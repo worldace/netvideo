@@ -265,7 +265,7 @@ function テーブルタグ作成(array $array){
 function dd(){
     foreach(func_get_args() as $var){
         $out = var_export($var, true);
-        if(php_sapi_name() === 'cli'){ print (preg_match("/^WIN/i",PHP_OS)) ? mb_convert_encoding($out,'SJIS','UTF-8') : $out; }
+        if(php_sapi_name() === 'cli'){ print (preg_match("/^WIN/i",PHP_OS) and version_compare(PHP_VERSION,'7.1.0','<')) ? mb_convert_encoding($out,'SJIS','UTF-8') : $out; }
         else{ print "<pre>$out</pre>"; }
         print "\n\n";
     }
@@ -531,7 +531,8 @@ class データベース{
         return $this -> 実行($SQL文, $割当) -> fetchAll(...$行タイプ);
     }
 
-    public function 追加(array $data){
+    public function 追加($data){
+        if(gettype($data) === "object" and get_class($data) === "{$this->テーブル}テーブル"){ $data = $this->型変換($data, "{$this->テーブル}テーブル"); }
         foreach($data as $name => $value){
             $this->文字列検証($name);
             $into文1 .= "{$name},";
@@ -546,7 +547,8 @@ class データベース{
         return self::$pdo -> lastInsertId();
     }
 
-    public function 更新($id, array $data){
+    public function 更新($id, $data){
+        if(gettype($data) === "object" and get_class($data) === "{$this->テーブル}テーブル"){ $data = $this->型変換($data, "{$this->テーブル}テーブル"); }
         foreach($data as $name => $value){
             if(preg_match("/=/", $name)){
                 $set文 .= "{$name},";
@@ -678,6 +680,19 @@ class データベース{
         }
 
         return [$SQL文, $割当, $行タイプ];
+    }
+
+    private function 型変換($data, $table){
+        $定義 = constant("$table::定義");
+        $newdata = [];
+        foreach($data as $key => $value){
+            if(!isset($定義[$key]) or !isset($value)){ continue; }
+            $型 = explode(" ", $定義[$key])[0];
+            if(preg_match("/int/i", $型)){ $newdata[$key] = (int)$value; }
+            //他にもやるべきだが省略
+            else{ $newdata[$key] = $value; }
+        }
+        return $newdata;
     }
 }
 
