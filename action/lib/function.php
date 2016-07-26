@@ -436,7 +436,7 @@ class データベース{
     private $テーブル;
     private $主キー名 = "id";
 
-    public function __construct($table, $driver = null, $user = null, $pass = null){
+    public function __construct($table, $driver = null, $user = null, $password = null){
         $this->テーブル($table);
         if(!$driver){
             $driver   = $_ENV['データベースドライバー'];
