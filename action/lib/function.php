@@ -682,21 +682,21 @@ class データベース{
         return [$SQL文, $割当, $行タイプ];
     }
 
-    private function 型変換($data, $table){
+    private function 型変換($object, $table){
         $定義 = constant("$table::定義");
-        $newdata = [];
-        foreach($data as $key => $value){
+        $data = [];
+        foreach($object as $key => $value){
             if(!isset($定義[$key]) or !isset($value)){ continue; }
             if(is_array($value) and array_key_exists('式', $value)){
-                $newdata[$key] = $value;
+                $data[$key] = $value;
                 continue;
             }
             $型 = explode(" ", $定義[$key])[0];
-            if(preg_match("/int/i", $型)){ $newdata[$key] = (int)$value; }
+            if(preg_match("/int/i", $型)){ $data[$key] = (int)$value; }
             //他にもやるべきだが省略
-            else{ $newdata[$key] = $value; }
+            else{ $data[$key] = $value; }
         }
-        return $newdata;
+        return $data;
     }
 }
 
