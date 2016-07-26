@@ -630,7 +630,7 @@ class データベース{
         }
     }
 
-    public function id($arg = null){
+    public function 主キー($arg = null){
         if($arg){
             $this->文字列検証($arg);
             $this->主キー名 = $arg;
