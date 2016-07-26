@@ -573,23 +573,23 @@ class データベース{
         return $this -> 実行($SQL文, [(int)$id]) -> rowCount();
     }
 
-    public function 作成(array $テーブル定義){
+    public function 作成(array $テーブル定義, $追加文 = ""){
         if(!$テーブル定義){ throw new Exception("テーブル定義が存在しません"); }
         foreach($テーブル定義 as $name => $value){
             $this->文字列検証($name);
             $列情報 .= "$name $value,";
         }
         $列情報 = rtrim($列情報, ',');
-        $SQL文 = "create table IF NOT EXISTS {$this->テーブル} ($列情報)";
+        $SQL文 = "create table IF NOT EXISTS {$this->テーブル} ($列情報) ";
 
         if(preg_match('/^sqlite/i', $this->ドライバー)){ //SQLite用
             $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
         }
         else { //MySQL用
             $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
-            $SQL文 .= " ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci";
+            $追加文 = ($追加文) ?: "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci";
         }
-        $this -> 実行($SQL文);
+        $this -> 実行($SQL文.$追加文);
         return $this;
     }
 
