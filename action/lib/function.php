@@ -127,7 +127,7 @@ function ファイル送信($url, array $querymap = null, array $request_header 
             foreach($value as $name2 => $value2){
                 $content .= "--$区切り\r\n";
                 $content .= "Content-Disposition: form-data; name=\"$name\"; filename=\"$name2\"\r\n";
-                $content .= "Content-Type: application/octet-stream\r\n\r\n";
+                $content .= "Content-Type: " . MIMEタイプ($name2) . "\r\n\r\n";
                 $content .= "$value2\r\n";
             }
         }
