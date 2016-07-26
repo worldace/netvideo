@@ -429,20 +429,22 @@ function データベース($table, $driver = null, $user = null, $pass = null){
 
 
 class データベース{
-    private static $現在のドライバー;
-    private static $pdo;
+    private static $pdo = [];
+    public  static $件数 = 31;
+    private $ドライバー;
     private $テーブル;
-    private $id列名 = "id";
-    public static $件数 = 31;
+    private $主キー名 = "id";
 
     public function __construct($table, $driver = null, $user = null, $pass = null){
         $this->テーブル($table);
-        if($driver){ $this->接続($driver, $user, $pass); }
-        else{
-            if(!self::$pdo or (self::$現在のドライバー != $_ENV['データベースドライバー'])){
-                $this->接続($_ENV['データベースドライバー'], $_ENV['データベースユーザー名'], $_ENV['データベースパスワード']);
-            }
+        if(!$driver){
+            $driver   = $_ENV['データベースドライバー'];
+            $user     = $_ENV['データベースユーザー名'];
+            $password = $_ENV['データベースパスワード'];
         }
+        $this->ドライバー = $driver;
+        $this->接続名     = md5($driver.$user.$password);
+        if(!array_key_exists($this->接続名, self::$pdo)){ self::$pdo[$this->接続名] = $this->接続($driver, $user, $password); }
         return $this;
     }
 
@@ -454,14 +456,13 @@ class データベース{
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ];
 
-        try{ self::$pdo = new PDO($driver, $user, $pass, $setting); }
-        catch(Exception $e){ print "接続エラー。データベース::設定(ドライバ,ユーザID,パスワード)を再確認してください"; }
-        self::$現在のドライバー = $driver;
-        return $this;
+        try{ $pdo = new PDO($driver, $user, $pass, $setting); }
+        catch(Exception $e){ print "接続エラー。データベースの設定(ドライバ,ユーザID,パスワード)を再確認してください"; }
+        return $pdo;
     }
 
     public function 実行($SQL文, array $割当 = null){
-        $stmt = self::$pdo -> prepare($SQL文);
+        $stmt = self::$pdo[$this->接続名] -> prepare($SQL文);
         for($i = 1; $i <= count($割当); $i++){
             $type = gettype($割当[$i-1]);
             if($type === "integer" or $type === "boolean"){
@@ -483,7 +484,7 @@ class データベース{
 
     public function 行取得($id, array $条件 = null){
         list($追加文, $割当, $行タイプ) = $this->追加SQL文($条件, "where");
-        $SQL文 = "select * from {$this->テーブル} where {$this->id列名} = ?";
+        $SQL文 = "select * from {$this->テーブル} where {$this->主キー名} = ?";
         return $this -> 実行($SQL文, [(int)$id]) -> fetchAll(...$行タイプ)[0];
     }
 
@@ -496,7 +497,7 @@ class データベース{
 
     public function セル取得($id, $列){
         $this->文字列検証($列);
-        $SQL文 = "select {$列} from {$this->テーブル} where {$this->id列名} = ?";
+        $SQL文 = "select {$列} from {$this->テーブル} where {$this->主キー名} = ?";
         return $this -> 実行($SQL文, [(int)$id]) -> fetchColumn();
     }
 
@@ -515,7 +516,7 @@ class データベース{
 
         $列 = (array)$列;
         foreach($列 as $単列){ $this->文字列検証($単列); }
-        if(preg_match("/sqlite/i", self::$現在のドライバー)){
+        if(preg_match("/sqlite/i", $this->ドライバー)){
             $concat文字列 = "(" . implode('||',$列) . ")";
         }
         else{
@@ -544,7 +545,7 @@ class データベース{
 
         $SQL文 = "insert into {$this->テーブル} ($into文1) values ($into文2)";
         $this -> 実行($SQL文, $割当);
-        return self::$pdo -> lastInsertId();
+        return self::$pdo[$this->接続名] -> lastInsertId();
     }
 
     public function 更新($id, $data){
@@ -562,12 +563,12 @@ class データベース{
         $set文 = rtrim($set文, ',');
         $割当[] = (int)$id;
 
-        $SQL文 = "update {$this->テーブル} set {$set文} where {$this->id列名} = ?";
+        $SQL文 = "update {$this->テーブル} set {$set文} where {$this->主キー名} = ?";
         return $this -> 実行($SQL文, $割当) -> rowCount();
     }
 
     public function 削除($id){
-        $SQL文 = "delete from {$this->テーブル} where {$this->id列名} = ?";
+        $SQL文 = "delete from {$this->テーブル} where {$this->主キー名} = ?";
         return $this -> 実行($SQL文, [(int)$id]) -> rowCount();
     }
 
@@ -580,7 +581,7 @@ class データベース{
         $列情報 = rtrim($列情報, ',');
         $SQL文 = "create table IF NOT EXISTS {$this->テーブル} ($列情報)";
 
-        if(preg_match('/^sqlite/i', self::$現在のドライバー)){ //SQLite用
+        if(preg_match('/^sqlite/i', $this->ドライバー)){ //SQLite用
             $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
         }
         else { //MySQL用
@@ -599,17 +600,17 @@ class データベース{
     }
 
     public function トランザクション開始(){
-        self::$pdo -> beginTransaction();
+        self::$pdo[$this->接続名] -> beginTransaction();
         return $this;
     }
 
     public function トランザクション終了(){
-        self::$pdo -> commit();
+        self::$pdo[$this->接続名] -> commit();
         return $this;
     }
 
     public function トランザクション失敗(){
-        self::$pdo -> rollBack();
+        self::$pdo[$this->接続名] -> rollBack();
         return $this;
     }
 
@@ -627,7 +628,7 @@ class データベース{
     public function id($arg = null){
         if($arg){
             $this->文字列検証($arg);
-            $this->id列名 = $arg;
+            $this->主キー名 = $arg;
             return $this;
         }
         else{
@@ -645,11 +646,11 @@ class データベース{
 
         if(count($条件["順番"]) === 2){
             $this->文字列検証($条件["順番"][0]);
-            $順番列 = ($条件["順番"][0]) ? $条件["順番"][0] : $this->id列名;
+            $順番列 = ($条件["順番"][0]) ? $条件["順番"][0] : $this->主キー名;
             $順番順 = ($条件["順番"][1] == "小さい順") ? "asc" : "desc";
         }
         else{
-            $順番列 = $this->id列名;
+            $順番列 = $this->主キー名;
             $順番順 = "desc";
         }
         $SQL文 .= " order by $順番列 $順番順 ";
