@@ -445,7 +445,7 @@ class データベース{
         }
         $this->ドライバー = $driver;
         $this->接続名     = md5($driver.$user.$password);
-        if(!array_key_exists($this->接続名, self::$pdo)){ self::$pdo[$this->接続名] = $this->接続($driver, $user, $password); }
+        if(!isset(self::$pdo[$this->接続名])){ self::$pdo[$this->接続名] = $this->接続($driver, $user, $password); }
         return $this;
     }
 
