@@ -432,6 +432,7 @@ class データベース{
     private static $pdo = [];
     public  static $件数 = 31;
     private $ドライバー;
+    private $接続名;
     private $テーブル;
     private $主キー名 = "id";
 
