@@ -693,7 +693,7 @@ class データベース{
         $data = [];
         foreach($object as $key => $value){
             if(!isset($定義[$key]) or !isset($value)){ continue; }
-            if(is_array($value) and array_key_exists('式', $value)){
+            if(isset($value['式'])){
                 $data[$key] = $value;
                 continue;
             }
