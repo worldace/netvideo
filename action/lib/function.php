@@ -615,6 +615,11 @@ class データベース{
         return $this;
     }
 
+    public function 切断($all = false){
+        if($all === true){ self::$pdo = []; }
+        else { self::$pdo[$this->接続名] = null; }
+    }
+
     public function テーブル($arg = null){
         if($arg){
             $this->文字列検証($arg);
