@@ -450,7 +450,7 @@ class データベース{
     }
 
     private function 接続($driver, $user = null, $password = null){
-        $setting = $_ENV['データベース付加設定'] ?: [
+        $setting = $_ENV['データベース詳細設定'] ?: [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -678,8 +678,8 @@ class データベース{
             else { $行タイプ = [PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $条件['行タイプ']]; }
         }
         else{
-            if($_ENV['データベース付加設定'][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){
-                $行タイプ = [$_ENV['データベース付加設定'][PDO::ATTR_DEFAULT_FETCH_MODE], "{$this->テーブル}テーブル"];
+            if($_ENV['データベース詳細設定'][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){
+                $行タイプ = [$_ENV['データベース詳細設定'][PDO::ATTR_DEFAULT_FETCH_MODE], "{$this->テーブル}テーブル"];
             }
         }
 
