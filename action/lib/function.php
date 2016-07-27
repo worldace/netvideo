@@ -450,12 +450,12 @@ class データベース{
     }
 
     private function 接続($driver, $user = null, $password = null){
-        $setting = $_ENV['データベース詳細設定'] ?: [
+        $setting = array_merge([
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-        ];
+        ], (array)$_ENV['データベース詳細設定']);
 
         try{ $pdo = new PDO($driver, $user, $password, $setting); }
         catch(Exception $e){ print "接続エラー。データベースの設定(ドライバ,ユーザID,パスワード)を再確認してください"; }
