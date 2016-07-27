@@ -471,8 +471,8 @@ class データベース{
             else if($type === "NULL"){ $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_NULL); }
             else { $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_STR); }
         }
-        $stmt -> execute();
-        return $stmt;
+        $result = $stmt -> execute();
+        return ($result) ? $stmt : false;
     }
 
     public function 取得(array $条件 = null){
@@ -587,15 +587,15 @@ class データベース{
             $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
             $追加文 = ($追加文) ?: "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci";
         }
-        $this -> 実行($SQL文.$追加文);
-        return $this;
+        $result = $this -> 実行($SQL文.$追加文);
+        return ($result) ? true : false;
     }
 
     public function インデックス作成($列){
         $this->文字列検証($列);
         $SQL文  = "create index {$列}インデックス on {$this->テーブル} ($列)";
-        $this -> 実行($SQL文);
-        return $this;
+        $result = $this -> 実行($SQL文);
+        return ($result) ? true : false;
     }
 
     public function トランザクション開始(){
