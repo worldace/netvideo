@@ -449,7 +449,7 @@ class データベース{
         return $this;
     }
 
-    private function 接続($driver, $user = null, $pass = null){
+    private function 接続($driver, $user = null, $password = null){
         $setting = $_ENV['データベース付加設定'] ?: [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
@@ -457,7 +457,7 @@ class データベース{
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ];
 
-        try{ $pdo = new PDO($driver, $user, $pass, $setting); }
+        try{ $pdo = new PDO($driver, $user, $password, $setting); }
         catch(Exception $e){ print "接続エラー。データベースの設定(ドライバ,ユーザID,パスワード)を再確認してください"; }
         return $pdo;
     }
@@ -466,12 +466,10 @@ class データベース{
         $stmt = self::$pdo[$this->接続名] -> prepare($SQL文);
         for($i = 1; $i <= count($割当); $i++){
             $type = gettype($割当[$i-1]);
-            if($type === "integer" or $type === "boolean"){
-                $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_INT);
-            }
-            else {
-                $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_STR);
-            }
+            if($type === "integer" or $type === "boolean"){ $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_INT); }
+            else if($type === "resource"){ $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_LOB); }
+            else if($type === "NULL"){ $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_NULL); }
+            else { $stmt -> bindValue($i, $割当[$i-1], PDO::PARAM_STR); }
         }
         $stmt -> execute();
         return $stmt;
