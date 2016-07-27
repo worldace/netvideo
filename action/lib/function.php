@@ -690,16 +690,16 @@ class データベース{
         $定義 = constant("$table::定義");
         $data = [];
         foreach($定義 as $列名 => $型情報){
-            if(!isset($object[$列名])){ continue; } //nullどうしようか
-            if(isset($object[$列名]['式'])){
-                $data[$列名] = $object[$列名];
+            if(!isset($object->$列名)){ continue; } //nullどうしようか
+            if(isset($object->$列名['式'])){
+                $data[$列名] = $object->$列名;
                 continue;
             }
             $型 = explode(" ", $型情報)[0];
-            if(preg_match("/INT/i", $型)){ $data[$列名] = (int)$object[$列名]; }
-            else if(preg_match("/CHAR|TEXT|CLOB/i", $型)){ $data[$列名] = (string)$object[$列名]; }
-            else if(preg_match("/REAL|FLOA|DOUB/i", $型)){ $data[$列名] = (float)$object[$列名]; }
-            else{ $data[$列名] = $object[$列名]; }
+            if(preg_match("/INT/i", $型)){ $data[$列名] = (int)$object->$列名; }
+            else if(preg_match("/CHAR|TEXT|CLOB/i", $型)){ $data[$列名] = (string)$object->$列名; }
+            else if(preg_match("/REAL|FLOA|DOUB/i", $型)){ $data[$列名] = (float)$object->$列名; }
+            else{ $data[$列名] = $object->$列名; }
         }
         return $data;
     }
