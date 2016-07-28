@@ -450,12 +450,13 @@ class データベース{
     }
 
     private function 接続($driver, $user = null, $password = null){
-        $setting = array_merge([
+        $setting = [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-        ], (array)$_ENV['データベース詳細設定']);
+        ];
+        foreach((array)$_ENV['データベース詳細設定'] as $name => $value){ $setting[$name] = $value; }
 
         try{ $pdo = new PDO($driver, $user, $password, $setting); }
         catch(Exception $e){ print "接続エラー。データベースの設定(ドライバ,ユーザID,パスワード)を再確認してください"; }
@@ -732,10 +733,10 @@ class 部品{
             $js   = self::$キャッシュ[$部品名]["js"];
         }
         else{
-            $拡張子 = (preg_match("/\.php/i", $部品名)) ? "" : ".php";
-            if(self::$windows){ $path = self::$ディレクトリ . addslashes(mb_convert_encoding("/$部品名", 'SJIS', 'UTF-8')) . $拡張子; }
-            else{ $path = self::$ディレクトリ . "/$部品名" . $拡張子; }
-            require $path;
+            $パス用部品名 = (self::$windows) ? addslashes(mb_convert_encoding($部品名, 'SJIS', 'UTF-8')) : $部品名;
+            if(preg_match("/\.php/i", $パス用部品名)){ require $パス用部品名; }
+            else{ require self::$ディレクトリ . "/$パス用部品名.php"; }
+
             self::$キャッシュ[$部品名]["読み込み済み"] = true;
             self::$キャッシュ[$部品名]["html"] = $html;
             self::$キャッシュ[$部品名]["css"]  = $css;
