@@ -734,8 +734,7 @@ class 部品{
         }
         else{
             $パス用部品名 = (self::$windows) ? addslashes(mb_convert_encoding($部品名, 'SJIS', 'UTF-8')) : $部品名;
-            if(preg_match("/\.php/i", $パス用部品名)){ require $パス用部品名; }
-            else{ require self::$ディレクトリ . "/$パス用部品名.php"; }
+            require self::$ディレクトリ . "/$パス用部品名.php";
 
             self::$キャッシュ[$部品名]["読み込み済み"] = true;
             self::$キャッシュ[$部品名]["html"] = $html;
