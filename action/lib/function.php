@@ -52,7 +52,7 @@ function リダイレクト($url){
 
 
 function ダウンロード($filepath = "", $filename = "", $data = "", $timeout = 60*60*24){
-    @set_time_limit($timeout);
+    ini_set("max_execution_time", $timeout);
     if($data){
         $filesize = strlen($data);
     }
