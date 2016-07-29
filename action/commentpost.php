@@ -18,10 +18,8 @@ POST検証("コメント")     -> 必須() -> ６４文字以内();
 
 
 function SQLiteドライバ(){
-    global $設定;
-    
     $ymd  = date('Y/md', $_POST['動画投稿時間']);
-    $path = "{$設定['ディレクトリ.upload']}/{$ymd}/{$_POST['id']}.db";
+    $path = "{$_ENV['ディレクトリ.upload']}/{$ymd}/{$_POST['id']}.db";
     if(!is_file($path)){ exit(); }
     return "sqlite:$path";
 }

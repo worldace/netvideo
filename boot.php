@@ -8,7 +8,7 @@
 
 クラスローダ();
 
-部品::設定("{$設定['ディレクトリ.action']}/parts");
+部品::設定("{$_ENV['ディレクトリ.action']}/parts");
 
 
 
@@ -18,27 +18,25 @@
 //ホームページを基準としたパス文字列。引数省略時はホームURLが返る
 
 //□以下の4点の設定が必要
-//$設定['URL.ホーム'] → ホームページのURL
-//$設定['URL.短縮']   → 短縮URLを有効にするかどうかの真偽値
-//$設定['URL.短縮名'] → 短縮URLの対象となるアクション名
-//$設定['URL.短縮値'] → 短縮URLの対象となる値のキー名
+//$_ENV['URL.ホーム'] → ホームページのURL
+//$_ENV['URL.短縮']   → 短縮URLを有効にするかどうかの真偽値
+//$_ENV['URL.短縮名'] → 短縮URLの対象となるアクション名
+//$_ENV['URL.短縮値'] → 短縮URLの対象となる値のキー名
 function URL作成($query = ""){
-    global $設定;
-
-    $base = (preg_match("|/$|", $設定['URL.ホーム'])) ? $設定['URL.ホーム'] : dirname($設定['URL.ホーム'])."/";
+    $base = (preg_match("|/$|", $_ENV['URL.ホーム'])) ? $_ENV['URL.ホーム'] : dirname($_ENV['URL.ホーム'])."/";
 
     if(preg_match("#^(https?:|ftp:|mailto:|data:|//)#i", $query)){ return $query; }
     $query = preg_replace("|^\.?/|", "", $query);
     if(preg_match("/^\?/", $query)){ parse_str(substr($query,1), $query); }
-    else{ return ($query) ? $base.$query : $設定['URL.ホーム']; }
+    else{ return ($query) ? $base.$query : $_ENV['URL.ホーム']; }
 
-    if($設定['URL.短縮'] and $query["action"] === $設定['URL.短縮名'] and $query[$設定['URL.短縮値']]){
-        $短縮値 = rawurlencode($query[$設定['URL.短縮値']]);
+    if($_ENV['URL.短縮'] and $query["action"] === $_ENV['URL.短縮名'] and $query[$_ENV['URL.短縮値']]){
+        $短縮値 = rawurlencode($query[$_ENV['URL.短縮値']]);
         unset($query["action"]);
-        unset($query[$設定['URL.短縮値']]);
+        unset($query[$_ENV['URL.短縮値']]);
     }
     if(count($query)){ $output_query = "?" . http_build_query($query, "", "&"); }
-    return ($短縮値) ? $base.$短縮値.$output_query : $設定['URL.ホーム'].$output_query;
+    return ($短縮値) ? $base.$短縮値.$output_query : $_ENV['URL.ホーム'].$output_query;
 }
 
 
