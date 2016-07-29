@@ -14,6 +14,12 @@ function クラスローダ($dir = __DIR__){
     });
 }
 
+function route(){
+    foreach(func_get_args() as $file){
+        require_once $file;
+    }
+    exit;
+}
 
 function エラー($str = "エラーが発生しました"){
     header('HTTP', true, 500);
