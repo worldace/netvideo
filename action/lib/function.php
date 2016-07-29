@@ -821,7 +821,7 @@ class 検証{
         $this->mode = $mode;
         if($method){
             $this->key   = $value;
-            $this->value = ($method == "POST") ? @$_POST[$value] : @$_GET[$value];
+            $this->value = ($method == "POST") ? @$_POST[$this->key] : @$_GET[$this->key];
         }
         else{
             $this->value = $value;
@@ -906,6 +906,16 @@ class 検証{
     public function 文字以下($num, $comment = ""){ //非文書化
         if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以内にしてください"; }
         return (mb_strlen($this->value,"UTF-8") > $num) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 条件($bool, $comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}の入力が間違っています"; }
+        return ($bool) ? $this->成功() : $this->失敗($comment);
+    }
+
+    public function 正規表現($regex, $comment = ""){
+        if(!$comment and $this->key){ $comment = "{$this->key}の入力が正しくありません"; }
+        return (preg_match($regex, $this->value)) ? $this->成功() : $this->失敗($comment);
     }
 
     private function 全角数字変換($num){
