@@ -23,19 +23,26 @@
 //$_ENV['URL.短縮名'] → 短縮URLの対象となるアクション名
 //$_ENV['URL.短縮値'] → 短縮URLの対象となる値のキー名
 function URL作成($query = ""){
+    if(preg_match("#^(https?:|ftp:|mailto:|data:|//)#i", $query)){
+        return $query;
+    }
     $base = (preg_match("|/$|", $_ENV['URL.ホーム'])) ? $_ENV['URL.ホーム'] : dirname($_ENV['URL.ホーム'])."/";
-
-    if(preg_match("#^(https?:|ftp:|mailto:|data:|//)#i", $query)){ return $query; }
     $query = preg_replace("|^\.?/|", "", $query);
-    if(preg_match("/^\?/", $query)){ parse_str(substr($query,1), $query); }
-    else{ return ($query) ? $base.$query : $_ENV['URL.ホーム']; }
+    if(preg_match("/^\?/", $query)){
+        parse_str(substr($query,1), $query);
+    }
+    else{
+        return ($query) ? $base.$query : $_ENV['URL.ホーム'];
+    }
 
     if($_ENV['URL.短縮'] and $query["action"] === $_ENV['URL.短縮名'] and $query[$_ENV['URL.短縮値']]){
         $短縮値 = rawurlencode($query[$_ENV['URL.短縮値']]);
         unset($query["action"]);
         unset($query[$_ENV['URL.短縮値']]);
     }
-    if(count($query)){ $output_query = "?" . http_build_query($query, "", "&"); }
+    if(count($query)){
+        $output_query = "?" . http_build_query($query, "", "&");
+    }
     return ($短縮値) ? $base.$短縮値.$output_query : $_ENV['URL.ホーム'].$output_query;
 }
 

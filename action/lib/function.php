@@ -445,9 +445,9 @@ class データベース{
     public function __construct($table, $driver = null, $user = null, $password = null){
         $this->テーブル($table);
         if(!$driver){
-            $driver   = $_ENV['データベースドライバー'];
-            $user     = $_ENV['データベースユーザー名'];
-            $password = $_ENV['データベースパスワード'];
+            $driver   = $_ENV['データベース.ドライバー'];
+            $user     = $_ENV['データベース.ユーザー名'];
+            $password = $_ENV['データベース.パスワード'];
         }
         $this->ドライバー = $driver;
         $this->接続名     = md5($driver.$user.$password);
@@ -462,7 +462,7 @@ class データベース{
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ];
-        foreach((array)$_ENV['データベース詳細設定'] as $name => $value){ $setting[$name] = $value; }
+        foreach((array)$_ENV['データベース.詳細設定'] as $name => $value){ $setting[$name] = $value; }
 
         try{ $pdo = new PDO($driver, $user, $password, $setting); }
         catch(Exception $e){ print "接続エラー。データベースの設定(ドライバ,ユーザID,パスワード)を再確認してください"; }
@@ -685,8 +685,8 @@ class データベース{
             else { $行タイプ = [PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $条件['行タイプ']]; }
         }
         else{
-            if($_ENV['データベース詳細設定'][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){
-                $行タイプ = [$_ENV['データベース詳細設定'][PDO::ATTR_DEFAULT_FETCH_MODE], "{$this->テーブル}テーブル"];
+            if($_ENV['データベース.詳細設定'][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){
+                $行タイプ = [$_ENV['データベース.詳細設定'][PDO::ATTR_DEFAULT_FETCH_MODE], "{$this->テーブル}テーブル"];
             }
         }
 
