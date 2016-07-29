@@ -15,8 +15,8 @@ function クラスローダ($dir = __DIR__){
 }
 
 function route(){
-    foreach(func_get_args() as $file){
-        require_once $file;
+    foreach(func_get_args() as $_ENV['CURRENT_ROUTE']){
+        require_once $_ENV['CURRENT_ROUTE'];
     }
     exit;
 }
