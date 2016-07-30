@@ -25,7 +25,7 @@
 function URL作成($query = ""){
     $query = htmlspecialchars($query, ENT_QUOTES, "UTF-8");
 
-    if(preg_match("#^(https?:|ftp:|mailto:|data:|//)#i", $query)){
+    if(preg_match("#^https?://#i", $query)){
         return $query;
     }
     $base  = (preg_match("|/$|", $_ENV['URL.ホーム'])) ? $_ENV['URL.ホーム'] : dirname($_ENV['URL.ホーム'])."/";
