@@ -370,7 +370,7 @@ $v.comment.laneCalc = function(height){
 
 $v.comment.laneCheck = function(){
     var lane = Array($v.comment.laneCount);
-    for(var i = 0; i < $v.comment.laneCount.length; i++){ lane[i] = true; }
+    for(var i = 0; i < lane.length; i++){ lane[i] = true; }
  
     var comments = $v.screen.querySelectorAll(".comment");
     for(var i = comments.length-1; i >= 0; i--){
