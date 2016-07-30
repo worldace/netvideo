@@ -7,7 +7,6 @@
 
 
 $html = function($video){
-    $video = h($video);
 
     部品::$js["player"] .= "\$v.player.init('{$video['動画URL']}', 640, 360);";
 

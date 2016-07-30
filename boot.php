@@ -8,7 +8,7 @@
 
 クラスローダ();
 
-部品::設定("{$_ENV['ディレクトリ.action']}/parts");
+部品::設定("{$_ENV['ディレクトリ.action']}/parts", true);
 
 
 
@@ -23,16 +23,22 @@
 //$_ENV['URL.短縮名'] → 短縮URLの対象となるアクション名
 //$_ENV['URL.短縮値'] → 短縮URLの対象となる値のキー名
 function URL作成($query = ""){
+    $query = htmlspecialchars($query, ENT_QUOTES, "UTF-8");
+
     if(preg_match("#^(https?:|ftp:|mailto:|data:|//)#i", $query)){
         return $query;
     }
-    $base = (preg_match("|/$|", $_ENV['URL.ホーム'])) ? $_ENV['URL.ホーム'] : dirname($_ENV['URL.ホーム'])."/";
+    $base  = (preg_match("|/$|", $_ENV['URL.ホーム'])) ? $_ENV['URL.ホーム'] : dirname($_ENV['URL.ホーム'])."/";
     $query = preg_replace("|^\.?/|", "", $query);
     if(preg_match("/^\?/", $query)){
+        $query = str_replace("&amp;", "&", $query);
         parse_str(substr($query,1), $query);
     }
+    elseif(!$query){
+        return $_ENV['URL.ホーム'];
+    }
     else{
-        return ($query) ? $base.$query : $_ENV['URL.ホーム'];
+        return $base.$query;
     }
 
     if($_ENV['URL.短縮'] and $query["action"] === $_ENV['URL.短縮名'] and $query[$_ENV['URL.短縮値']]){

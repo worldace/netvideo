@@ -384,7 +384,8 @@ function 連想配列ソート(array &$array){
 }
 
 
-function テンプレート変換($テンプレート, array $変換関係 = []){
+function テンプレート変換($テンプレート, array $変換関係 = [], $自動エスケープ = true){
+    if($自動エスケープ === true){ $変換関係 = h($変換関係); }
     return preg_replace_callback("|《([^》]*)》|u", function($match) use($変換関係){ return $変換関係[$match[1]]; }, $テンプレート);
 }
 
@@ -723,6 +724,7 @@ function 部品(){
 class 部品{
     private static $ディレクトリ = ".";
     private static $初期化済み = false;
+    private static $自動エスケープ = true;
     private static $キャッシュ;
     private static $windows;
     public  static $イベント;
@@ -747,6 +749,8 @@ class 部品{
             self::$キャッシュ[$部品名]["css"]  = $css;
             self::$キャッシュ[$部品名]["js"]   = $js;
         }
+
+        if($自動エスケープ){ $引数 = self::h($引数); }
 
         if($css) { self::$css[$部品名] = is_callable($css) ? call_user_func_array($css, $引数) : $css; }
         if($js)  { self::$js[$部品名]  = is_callable($js)  ? call_user_func_array($js,  $引数) : $js; }
@@ -781,6 +785,11 @@ class 部品{
         print $buf;
     }
 
+    public static function h($arg = ""){
+        if(is_array($arg)){ return array_map("部品::h", $arg); }
+        return htmlspecialchars($arg, ENT_QUOTES, "UTF-8");
+    }
+
     private static function 初期化実行(){
         self::$初期化済み = true;
         self::$windows = (preg_match("/^WIN/i", PHP_OS) and version_compare(PHP_VERSION, '7.1.0', '<'));
@@ -788,8 +797,9 @@ class 部品{
         register_shutdown_function("部品::終了処理");
     }
 
-    public static function 設定($dir = null){
+    public static function 設定($dir = null, $自動エスケープ = true){
         if($dir){ self::$ディレクトリ = preg_replace("|/$|", "", $dir); }
+        self::$自動エスケープ = $自動エスケープ;
         if(!self::$初期化済み){ self::初期化実行(); }
     }
 }
