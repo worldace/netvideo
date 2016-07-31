@@ -58,7 +58,7 @@ $v.player.init = function(url, width, height){
     $v.comment.laneKeyframe(width);
     $v.comment.laneCalc(height);
 
-    $v.setting = $v.loadObject("araiplayer") || {};
+    $v.setting = $v.loadObject("jsplayer") || {};
     $v.setting.volume = Number($v.setting.volume) || 1;
     $v.controller.setSeeker($v.setting.volume, $v.controller.volumeSeeker);
 
@@ -135,7 +135,7 @@ $v.player.addEventListener('keydown', function(event){
 
 
 window.addEventListener('unload', function(event){
-    $v.saveObject("araiplayer", $v.setting);
+    $v.saveObject("jsplayer", $v.setting);
 });
 
 
@@ -147,10 +147,10 @@ $v.video = document.getElementById("video");
 $v.video.fit = function(screenW, screenH, objectW, objectH){
     var pos = $v.objectFit(screenW, screenH, objectW, objectH);
 
-    $v.video.setAttribute("width",  pos.w);
-    $v.video.setAttribute("height", pos.h);
-    $v.video.style.left = pos.x + "px";
-    $v.video.style.top  = pos.y + "px";
+    $v.video.style.width  = pos.w + "px";
+    $v.video.style.height = pos.h + "px";
+    $v.video.style.left   = pos.x + "px";
+    $v.video.style.top    = pos.y + "px";
 };
 
 
@@ -322,7 +322,7 @@ $v.comment.release = function(comments, lane){
 $v.comment.create = function(data, laneNo){
     var comment = document.createElement("span");
     comment.textContent = data[0];
-    comment.setAttribute("class", "comment");
+    comment.className = "comment";
     comment.setAttribute("data-lane", laneNo);
 
     comment.style.top = laneNo * $v.comment.laneHeight + $v.comment.marginTop + "px";
@@ -649,7 +649,7 @@ $v.screen = document.getElementById("video-screen");
 $v.screen.showOsd = function(str){
     var osd = document.createElement("span");
     osd.textContent = str;
-    osd.setAttribute("class", "osd");
+    osd.className   = "osd";
     osd.style.fontSize = $v.comment.fontSize + "px";
 
     $v.screen.clearOsd();
