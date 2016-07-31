@@ -1,11 +1,11 @@
 <?php
 
-require './action/lib/function.php';
-require './setting.php';
-require './boot.php';
+include './action/lib/function.php';
+include './setting.php';
+include './boot.php';
 
 switch($_GET['action']){
-    case 'index'         : route('./action/index.php');
+    case ''              : route('./action/index.php');
     case 'video'         : route('./action/video.php');
     case 'commentget'    : route('./action/commentget.php');
     case 'commentpost'   : route('./action/commentpost.php');

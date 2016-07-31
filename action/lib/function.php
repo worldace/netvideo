@@ -10,13 +10,13 @@ function クラスローダ($dir = __DIR__){
     spl_autoload_register(function($class) use($dir){
         if(preg_match("/^WIN/i", PHP_OS) and version_compare(PHP_VERSION, '7.1.0', '<')){ $class = addslashes(mb_convert_encoding($class, 'SJIS', 'UTF-8')); }
         $class = str_replace("_", "/", $class);
-        require_once "{$dir}/{$class}.php";
+        include_once "{$dir}/{$class}.php";
     });
 }
 
 function route(){
     foreach(func_get_args() as $_ENV['CURRENT_ROUTE']){
-        require_once $_ENV['CURRENT_ROUTE'];
+        include_once $_ENV['CURRENT_ROUTE'];
     }
     exit;
 }
