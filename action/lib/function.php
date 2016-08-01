@@ -372,8 +372,8 @@ function uuid($hyphen = false) { //uuid v4
 
 
 function ランダム英数字($length = 8, $userfriendly = false){
-    $str = "ABDEFGHJLMNQRTYabdefghmnrty23456789";
-    if(!$userfriendly){ $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"; }
+    $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+    if($userfriendly){ $str = "ABDEFGHJLMNQRTYabdefghmnrty23456789"; }
     $str = str_repeat($str, floor($length/2));
     return substr(str_shuffle($str), 0, $length);
 }
