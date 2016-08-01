@@ -38,5 +38,5 @@ file_put_contents("$dir/$id.png", $_POST['サムネイル'], LOCK_EX);
 <meta charset="utf-8">
 <title>投稿成功</title>
 </head>
-<body><?= 部品("jump", URL作成("?action=video&id=$id")) ?></body>
+<body><?= 部品("jump", URL作成(["action"=>"video","id"=>$id])) ?></body>
 </html>

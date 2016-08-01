@@ -9,10 +9,8 @@ ini_set('session.cookie_httponly', 1);
 
 
 クラスローダ();
-
-部品::設定("{$_ENV['ディレクトリ.action']}/parts", true);
-
-
+部品::設定("{$_ENV['ディレクトリ.action']}/parts");
+開発用の設定();
 
 //■以下アプリ固有関数
 
@@ -32,23 +30,27 @@ function 開発用の設定(){
 //$_ENV['URL.短縮']   → 短縮URLを有効にするかどうかの真偽値
 //$_ENV['URL.短縮名'] → 短縮URLの対象となるアクション名
 //$_ENV['URL.短縮値'] → 短縮URLの対象となる値のキー名
-function URL作成($query = ""){
-    $query = htmlspecialchars($query, ENT_QUOTES, "UTF-8");
-    $query = preg_replace("|^\.?/|", "", $query);
-    $base  = (preg_match("|/$|", $_ENV['URL.ホーム'])) ? $_ENV['URL.ホーム'] : dirname($_ENV['URL.ホーム'])."/";
+function URL作成($query = "", $home = ""){
+    $home = ($home) ?: $_ENV['URL.ホーム'];
+    $base = (preg_match("|/$|", $home)) ? $home : dirname($home)."/";
 
-    if(preg_match("#^https?://#i", $query)){
-        return $query;
-    }
-    if(preg_match("/^\?/", $query)){
-        $query = str_replace("&amp;", "&", $query);
-        parse_str(substr($query,1), $query);
-    }
-    elseif(!$query){
-        return $_ENV['URL.ホーム'];
-    }
-    else{
-        return $base.$query;
+    if(is_string($query)){
+        $query = htmlspecialchars($query, ENT_QUOTES, "UTF-8");
+        $query = preg_replace("|^\.?/|", "", $query);
+
+        if(!$query){
+            return $home;
+        }
+        else if(preg_match("#^(https?://|//)#i", $query)){
+            return $query;
+        }
+        else if(preg_match("/^\?/", $query)){
+            $query = str_replace("&amp;", "&", $query);
+            parse_str(substr($query,1), $query);
+        }
+        else{
+            return $base.$query;
+        }
     }
 
     if($_ENV['URL.短縮'] and $query["action"] === $_ENV['URL.短縮名'] and $query[$_ENV['URL.短縮値']]){
@@ -59,5 +61,5 @@ function URL作成($query = ""){
     if(count($query)){
         $output_query = "?" . http_build_query($query, "", "&");
     }
-    return ($短縮値) ? $base.$短縮値.$output_query : $_ENV['URL.ホーム'].$output_query;
+    return ($短縮値) ? $base.$短縮値.$output_query : $home.$output_query;
 }
