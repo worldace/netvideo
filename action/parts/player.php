@@ -144,8 +144,9 @@ window.addEventListener('unload', function(event){
 $v.video = document.getElementById("video");
 
 
-$v.video.fit = function(screenW, screenH, objectW, objectH){
-    var pos = $v.objectFit(screenW, screenH, objectW, objectH);
+$v.video.fit = function(){
+    if(!$v.screen.pos.width || !$v.video.videoWidth){ return; }
+    var pos = $v.objectFit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 
     $v.video.style.width  = pos.w + "px";
     $v.video.style.height = pos.h + "px";
@@ -199,7 +200,7 @@ $v.video.addEventListener('loadedmetadata', function(){
     $v.controller.setTime($v.video.duration, $v.controller.totalTime);
 
     $v.video.volume = $v.setting.volume;
-    $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+    $v.video.fit();
 });
 
 
@@ -692,7 +693,7 @@ $v.screen.toggleFullscreen = function(){
 $v.screen.fullscreenEvent = function(){
     if($v.screen.isFullscreen()){
         $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
-        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+        $v.video.fit();
 
         $v.screen.addEventListener('click', $v.controller.toggle);
 
@@ -703,7 +704,7 @@ $v.screen.fullscreenEvent = function(){
     }
     else{
         $v.screen.pos = $v.screen.getBoundingClientRect();
-        $v.video.fit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+        $v.video.fit();
 
         $v.screen.removeEventListener('click', $v.controller.toggle);
 
