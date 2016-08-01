@@ -813,22 +813,13 @@ $v.extendObject = function(){
 
 
 $v.objectFit = function(screenW, screenH, objectW, objectH){
-    var result  = {};
-    var screenR = screenW / screenH;
-    var objectR = objectW / objectH;
-
-    if(screenR > 1){
-        var scale = (objectR < screenR) ? screenH/objectH : screenW/objectW;
-    }
-    else{
-        var scale = (objectR > screenR) ? screenW/objectW : screenH/objectH;
-    }
-    result.w = Math.floor(objectW * scale);
-    result.h = Math.floor(objectH * scale);
-    result.x = Math.floor((screenW / 2) - (objectW * scale / 2));
-    result.y = Math.floor((screenH / 2) - (objectH * scale / 2));
-
-    return result;
+    var scale = (objectW/objectH > screenW/screenH) ? screenW/objectW : screenH/objectH;
+    return {
+        w: Math.floor(objectW * scale),
+        h: Math.floor(objectH * scale),
+        x: Math.floor((screenW / 2) - (objectW * scale / 2)),
+        y: Math.floor((screenH / 2) - (objectH * scale / 2)),
+    };
 };
 
 
