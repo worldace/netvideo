@@ -549,6 +549,22 @@ $v.controller.toggle = function(event){
 };
 
 
+$v.controller.intoScreen = function(){
+    $v.screen.appendChild($v.controller);
+    var controller = $v.controller.getBoundingClientRect();
+    $v.controller.style.top  = screen.height - controller.height + "px";
+    $v.controller.style.left = (screen.width/2) - (controller.width/2) + "px";
+};
+
+
+$v.controller.intoPlayer = function(){
+    $v.player.appendChild($v.controller);
+    $v.controller.style.top  = 0;
+    $v.controller.style.left = 0;
+    $v.controller.style.visibility = "visible";
+};
+
+
 $v.controller.playButton.addEventListener('click', function(){
     $v.video.paused ? $v.video.play() : $v.video.pause();
 });
@@ -693,26 +709,15 @@ $v.screen.toggleFullscreen = function(){
 $v.screen.fullscreenEvent = function(){
     if($v.screen.isFullscreen()){
         $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
-        $v.video.fit();
-
         $v.screen.addEventListener('click', $v.controller.toggle);
-
-        $v.screen.appendChild($v.controller);
-        var controller = $v.controller.getBoundingClientRect();
-        $v.controller.style.top  = screen.height - controller.height + "px";
-        $v.controller.style.left = (screen.width/2) - (controller.width/2) + "px";
+        $v.controller.intoScreen();
     }
     else{
         $v.screen.pos = $v.screen.getBoundingClientRect();
-        $v.video.fit();
-
         $v.screen.removeEventListener('click', $v.controller.toggle);
-
-        $v.player.appendChild($v.controller);
-        $v.controller.style.top  = 0;
-        $v.controller.style.left = 0;
-        $v.controller.style.visibility = "visible";
+        $v.controller.intoPlayer();
     }
+    $v.video.fit();
     $v.comment.laneCalc($v.screen.pos.height);
     $v.comment.clear();
 };
