@@ -7,37 +7,37 @@
 
 
 $html = function($video){
-    部品::$js["player"] .= '$v.player.init("' . str_replace("&amp;", "&", $video['動画URL']) . '", 640, 360);';
+    部品::$js["jsplayer"] .= '$v.player.init("' . str_replace("&amp;", "&", $video['動画URL']) . '", 640, 360);';
 
     return <<<"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-<div id="video-player" class="video-player"
-  ><div id="video-screen" class="video-screen" tabindex="1"
-    ><video id="video" class="video" loop></video
+<div id="jsplayer" class="jsplayer"
+  ><div class="jsplayer-screen" tabindex="1"
+    ><video class="jsplayer-video" loop></video
   ></div
-  ><div id="video-controller" class="video-controller"
-    ><div class="controller-wrap"
-      ><img id="controller-play-button" class="controller-img" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNTc2IDkyN2wtMTMyOCA3MzhxLTIzIDEzLTM5LjUgM3QtMTYuNS0zNnYtMTQ3MnEwLTI2IDE2LjUtMzZ0MzkuNSAzbDEzMjggNzM4cTIzIDEzIDIzIDMxdC0yMyAzMXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4="
-      ><span id="controller-current-time" class="controller-time controller-current-time">00:00</span
-      ><div id="controller-time-seek" class="controller-seek controller-time-seek"
-        ><div id="controller-time-seekbar" class="controller-seekbar controller-time-seekbar"
-          ><span id="controller-time-seeker" class="controller-seeker"></span
+  ><div class="jsplayer-controller"
+    ><div class="jsplayer-controller-wrap"
+      ><img class="jsplayer-controller-play-button" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNTc2IDkyN2wtMTMyOCA3MzhxLTIzIDEzLTM5LjUgM3QtMTYuNS0zNnYtMTQ3MnEwLTI2IDE2LjUtMzZ0MzkuNSAzbDEzMjggNzM4cTIzIDEzIDIzIDMxdC0yMyAzMXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4="
+      ><span class="jsplayer-controller-current-time">00:00</span
+      ><div class="jsplayer-controller-time-seek"
+        ><div class="jsplayer-controller-time-seekbar"
+          ><span class="jsplayer-controller-time-seeker"></span
         ></div
       ></div
-      ><span id="controller-total-time" class="controller-time controller-total-time">00:00</span
-      ><img id="controller-volume-button" class="controller-img" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04MzIgMzUydjEwODhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTMzMy0zMzNoLTI2MnEtMjYgMC00NS0xOXQtMTktNDV2LTM4NHEwLTI2IDE5LTQ1dDQ1LTE5aDI2MmwzMzMtMzMzcTE5LTE5IDQ1LTE5dDQ1IDE5IDE5IDQ1em0zODQgNTQ0cTAgNzYtNDIuNSAxNDEuNXQtMTEyLjUgOTMuNXEtMTAgNS0yNSA1LTI2IDAtNDUtMTguNXQtMTktNDUuNXEwLTIxIDEyLTM1LjV0MjktMjUgMzQtMjMgMjktMzUuNSAxMi01Ny0xMi01Ny0yOS0zNS41LTM0LTIzLTI5LTI1LTEyLTM1LjVxMC0yNyAxOS00NS41dDQ1LTE4LjVxMTUgMCAyNSA1IDcwIDI3IDExMi41IDkzdDQyLjUgMTQyem0yNTYgMHEwIDE1My04NSAyODIuNXQtMjI1IDE4OC41cS0xMyA1LTI1IDUtMjcgMC00Ni0xOXQtMTktNDVxMC0zOSAzOS01OSA1Ni0yOSA3Ni00NCA3NC01NCAxMTUuNS0xMzUuNXQ0MS41LTE3My41LTQxLjUtMTczLjUtMTE1LjUtMTM1LjVxLTIwLTE1LTc2LTQ0LTM5LTIwLTM5LTU5IDAtMjYgMTktNDV0NDUtMTlxMTMgMCAyNiA1IDE0MCA1OSAyMjUgMTg4LjV0ODUgMjgyLjV6bTI1NiAwcTAgMjMwLTEyNyA0MjIuNXQtMzM4IDI4My41cS0xMyA1LTI2IDUtMjYgMC00NS0xOXQtMTktNDVxMC0zNiAzOS01OSA3LTQgMjIuNS0xMC41dDIyLjUtMTAuNXE0Ni0yNSA4Mi01MSAxMjMtOTEgMTkyLTIyN3Q2OS0yODktNjktMjg5LTE5Mi0yMjdxLTM2LTI2LTgyLTUxLTctNC0yMi41LTEwLjV0LTIyLjUtMTAuNXEtMzktMjMtMzktNTkgMC0yNiAxOS00NXQ0NS0xOXExMyAwIDI2IDUgMjExIDkxIDMzOCAyODMuNXQxMjcgNDIyLjV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+"
-      ><div id="controller-volume-seek" class="controller-seek controller-volume-seek"
-        ><div id="controller-volume-seekbar" class="controller-seekbar controller-volume-seekbar"
-          ><span id="controller-volume-seeker" class="controller-seeker"></span
+      ><span class="jsplayer-controller-total-time">00:00</span
+      ><img class="jsplayer-controller-volume-button" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04MzIgMzUydjEwODhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTMzMy0zMzNoLTI2MnEtMjYgMC00NS0xOXQtMTktNDV2LTM4NHEwLTI2IDE5LTQ1dDQ1LTE5aDI2MmwzMzMtMzMzcTE5LTE5IDQ1LTE5dDQ1IDE5IDE5IDQ1em0zODQgNTQ0cTAgNzYtNDIuNSAxNDEuNXQtMTEyLjUgOTMuNXEtMTAgNS0yNSA1LTI2IDAtNDUtMTguNXQtMTktNDUuNXEwLTIxIDEyLTM1LjV0MjktMjUgMzQtMjMgMjktMzUuNSAxMi01Ny0xMi01Ny0yOS0zNS41LTM0LTIzLTI5LTI1LTEyLTM1LjVxMC0yNyAxOS00NS41dDQ1LTE4LjVxMTUgMCAyNSA1IDcwIDI3IDExMi41IDkzdDQyLjUgMTQyem0yNTYgMHEwIDE1My04NSAyODIuNXQtMjI1IDE4OC41cS0xMyA1LTI1IDUtMjcgMC00Ni0xOXQtMTktNDVxMC0zOSAzOS01OSA1Ni0yOSA3Ni00NCA3NC01NCAxMTUuNS0xMzUuNXQ0MS41LTE3My41LTQxLjUtMTczLjUtMTE1LjUtMTM1LjVxLTIwLTE1LTc2LTQ0LTM5LTIwLTM5LTU5IDAtMjYgMTktNDV0NDUtMTlxMTMgMCAyNiA1IDE0MCA1OSAyMjUgMTg4LjV0ODUgMjgyLjV6bTI1NiAwcTAgMjMwLTEyNyA0MjIuNXQtMzM4IDI4My41cS0xMyA1LTI2IDUtMjYgMC00NS0xOXQtMTktNDVxMC0zNiAzOS01OSA3LTQgMjIuNS0xMC41dDIyLjUtMTAuNXE0Ni0yNSA4Mi01MSAxMjMtOTEgMTkyLTIyN3Q2OS0yODktNjktMjg5LTE5Mi0yMjdxLTM2LTI2LTgyLTUxLTctNC0yMi41LTEwLjV0LTIyLjUtMTAuNXEtMzktMjMtMzktNTkgMC0yNiAxOS00NXQ0NS0xOXExMyAwIDI2IDUgMjExIDkxIDMzOCAyODMuNXQxMjcgNDIyLjV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+"
+      ><div class="jsplayer-controller-volume-seek"
+        ><div class="jsplayer-controller-volume-seekbar"
+          ><span class="jsplayer-controller-volume-seeker"></span
         ></div
       ></div
-      ><img id="controller-comment-button" class="controller-img" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im02NDAsNzkycTAsLTUzIC0zNy41LC05MC41dC05MC41LC0zNy41dC05MC41LDM3LjV0LTM3LjUsOTAuNXQzNy41LDkwLjV0OTAuNSwzNy41dDkwLjUsLTM3LjV0MzcuNSwtOTAuNXptMzg0LDBxMCwtNTMgLTM3LjUsLTkwLjV0LTkwLjUsLTM3LjV0LTkwLjUsMzcuNXQtMzcuNSw5MC41dDM3LjUsOTAuNXQ5MC41LDM3LjV0OTAuNSwtMzcuNXQzNy41LC05MC41em0zODQsMHEwLC01MyAtMzcuNSwtOTAuNXQtOTAuNSwtMzcuNXQtOTAuNSwzNy41dC0zNy41LDkwLjV0MzcuNSw5MC41dDkwLjUsMzcuNXQ5MC41LC0zNy41dDM3LjUsLTkwLjV6bTM4NCwwcTAsMTc0IC0xMjAsMzIxLjV0LTMyNiwyMzN0LTQ1MCw4NS41cS0xMTAsMCAtMjExLC0xOHEtMTczLDE3MyAtNDM1LDIyOXEtNTIsMTAgLTg2LDEzcS0xMiwxIC0yMiwtNnQtMTMsLTE4cS00LC0xNSAyMCwtMzdxNSwtNSAyMy41LC0yMS41dDI1LjUsLTIzLjV0MjMuNSwtMjUuNXQyNCwtMzEuNXQyMC41LC0zN3QyMCwtNDh0MTQuNSwtNTcuNXQxMi41LC03Mi41cS0xNDYsLTkwIC0yMjkuNSwtMjE2LjV0LTgzLjUsLTI2OS41cTAsLTE3NCAxMjAsLTMyMS41dDMyNiwtMjMzLjAwMDA3NnQ0NTAsLTg1LjUwMDMydDQ1MCw4NS41MDAzMnQzMjYsMjMzLjAwMDA3NnQxMjAsMzIxLjV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+"
-      ><img id="controller-screen-button" class="controller-img" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04ODMgMTA1NnEwIDEzLTEwIDIzbC0zMzIgMzMyIDE0NCAxNDRxMTkgMTkgMTkgNDV0LTE5IDQ1LTQ1IDE5aC00NDhxLTI2IDAtNDUtMTl0LTE5LTQ1di00NDhxMC0yNiAxOS00NXQ0NS0xOSA0NSAxOWwxNDQgMTQ0IDMzMi0zMzJxMTAtMTAgMjMtMTB0MjMgMTBsMTE0IDExNHExMCAxMCAxMCAyM3ptNzgxLTg2NHY0NDhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTE0NC0xNDQtMzMyIDMzMnEtMTAgMTAtMjMgMTB0LTIzLTEwbC0xMTQtMTE0cS0xMC0xMC0xMC0yM3QxMC0yM2wzMzItMzMyLTE0NC0xNDRxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDQ0OHEyNiAwIDQ1IDE5dDE5IDQ1eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg=="
+      ><img class="jsplayer-controller-comment-button" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im02NDAsNzkycTAsLTUzIC0zNy41LC05MC41dC05MC41LC0zNy41dC05MC41LDM3LjV0LTM3LjUsOTAuNXQzNy41LDkwLjV0OTAuNSwzNy41dDkwLjUsLTM3LjV0MzcuNSwtOTAuNXptMzg0LDBxMCwtNTMgLTM3LjUsLTkwLjV0LTkwLjUsLTM3LjV0LTkwLjUsMzcuNXQtMzcuNSw5MC41dDM3LjUsOTAuNXQ5MC41LDM3LjV0OTAuNSwtMzcuNXQzNy41LC05MC41em0zODQsMHEwLC01MyAtMzcuNSwtOTAuNXQtOTAuNSwtMzcuNXQtOTAuNSwzNy41dC0zNy41LDkwLjV0MzcuNSw5MC41dDkwLjUsMzcuNXQ5MC41LC0zNy41dDM3LjUsLTkwLjV6bTM4NCwwcTAsMTc0IC0xMjAsMzIxLjV0LTMyNiwyMzN0LTQ1MCw4NS41cS0xMTAsMCAtMjExLC0xOHEtMTczLDE3MyAtNDM1LDIyOXEtNTIsMTAgLTg2LDEzcS0xMiwxIC0yMiwtNnQtMTMsLTE4cS00LC0xNSAyMCwtMzdxNSwtNSAyMy41LC0yMS41dDI1LjUsLTIzLjV0MjMuNSwtMjUuNXQyNCwtMzEuNXQyMC41LC0zN3QyMCwtNDh0MTQuNSwtNTcuNXQxMi41LC03Mi41cS0xNDYsLTkwIC0yMjkuNSwtMjE2LjV0LTgzLjUsLTI2OS41cTAsLTE3NCAxMjAsLTMyMS41dDMyNiwtMjMzLjAwMDA3NnQ0NTAsLTg1LjUwMDMydDQ1MCw4NS41MDAzMnQzMjYsMjMzLjAwMDA3NnQxMjAsMzIxLjV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+"
+      ><img class="jsplayer-controller-screen-button" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04ODMgMTA1NnEwIDEzLTEwIDIzbC0zMzIgMzMyIDE0NCAxNDRxMTkgMTkgMTkgNDV0LTE5IDQ1LTQ1IDE5aC00NDhxLTI2IDAtNDUtMTl0LTE5LTQ1di00NDhxMC0yNiAxOS00NXQ0NS0xOSA0NSAxOWwxNDQgMTQ0IDMzMi0zMzJxMTAtMTAgMjMtMTB0MjMgMTBsMTE0IDExNHExMCAxMCAxMCAyM3ptNzgxLTg2NHY0NDhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTE0NC0xNDQtMzMyIDMzMnEtMTAgMTAtMjMgMTB0LTIzLTEwbC0xMTQtMTE0cS0xMC0xMC0xMC0yM3QxMC0yM2wzMzItMzMyLTE0NC0xNDRxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDQ0OHEyNiAwIDQ1IDE5dDE5IDQ1eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg=="
     ></div
-    ><form id="comment-form" class="comment-form" action="javascript:void 0"
-      ><input id="comment-form-input" class="comment-form-input" type="text" name="コメント" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
-      ><input id="comment-form-submit" class="comment-form-submit" type="submit" value="コメントする" tabindex="3" disabled
-      ><input id="comment-form-id" type="hidden" name="id" value="{$video['id']}"
-      ><input id="comment-form-time" type="hidden" name="動画投稿時間" value="{$video['投稿時間']}"
+    ><form class="jsplayer-form" action="javascript:void 0"
+      ><input class="jsplayer-form-input" type="text" name="コメント" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
+      ><input class="jsplayer-form-submit" type="submit" value="コメントする" tabindex="3" disabled
+      ><input class="jsplayer-form-id" type="hidden" name="id" value="{$video['id']}"
+      ><input class="jsplayer-form-time" type="hidden" name="動画投稿時間" value="{$video['投稿時間']}"
     ></form
   ></div
 ></div>
@@ -51,7 +51,7 @@ $js = <<<'━━━━━━━━━━━━━━━━━━━━━━━�
 var $v = {};
 
 //■ player
-$v.player = document.getElementById("video-player");
+$v.player = document.getElementById("jsplayer");
 
 
 $v.player.init = function(url, width, height){
@@ -148,7 +148,7 @@ window.addEventListener('unload', function(event){
 
 
 //■ video
-$v.video = document.getElementById("video");
+$v.video = $v.player.querySelector(".jsplayer-video");
 
 
 $v.video.fit = function(){
@@ -330,7 +330,7 @@ $v.comment.release = function(comments, lane){
 $v.comment.create = function(data, laneNo){
     var comment = document.createElement("span");
     comment.textContent = data[0];
-    comment.className = "comment";
+    comment.className = "jsplayer-comment";
     comment.setAttribute("data-lane", laneNo);
 
     comment.style.top = laneNo * $v.comment.laneHeight + $v.comment.marginTop + "px";
@@ -380,7 +380,7 @@ $v.comment.laneCheck = function(){
     var lane = Array($v.comment.laneCount);
     for(var i = 0; i < lane.length; i++){ lane[i] = true; }
  
-    var comments = $v.screen.querySelectorAll(".comment");
+    var comments = $v.screen.querySelectorAll(".jsplayer-comment");
     for(var i = comments.length-1; i >= 0; i--){
         comments[i].pos = comments[i].getBoundingClientRect();
         if(comments[i].pos.right > $v.screen.pos.right-30){ lane[comments[i].getAttribute("data-lane")] = false; }
@@ -391,7 +391,7 @@ $v.comment.laneCheck = function(){
 
 
 $v.comment.clear = function(){
-    var comments = $v.screen.querySelectorAll(".comment");
+    var comments = $v.screen.querySelectorAll(".jsplayer-comment");
     for(var i = comments.length-1; i >= 0; i--){
         comments[i].style.opacity = 0; //firefox：フルスクリーン時に画面最上部のコメントが消えないことがある対策
         $v.screen.removeChild(comments[i]);
@@ -400,7 +400,7 @@ $v.comment.clear = function(){
 
 
 $v.comment.pause = function(){
-    var comments = $v.screen.querySelectorAll(".comment");
+    var comments = $v.screen.querySelectorAll(".jsplayer-comment");
     for(var i = 0; i < comments.length; i++){
         comments[i].style.animationPlayState = "paused";
     }
@@ -408,7 +408,7 @@ $v.comment.pause = function(){
 
 
 $v.comment.run = function(){
-    var comments = $v.screen.querySelectorAll(".comment");
+    var comments = $v.screen.querySelectorAll(".jsplayer-comment");
     for(var i = 0; i < comments.length; i++){
         comments[i].style.animationPlayState = "running";
     }
@@ -423,8 +423,8 @@ $v.comment.get = function(){
 
     var url = "?" + $v.param({
         "action"       : "commentget",
-        "id"           : document.getElementById("comment-form-id").value,
-        "動画投稿時間" : document.getElementById("comment-form-time").value,
+        "id"           : $v.player.querySelector(".jsplayer-form-id").value,
+        "動画投稿時間" : $v.player.querySelector(".jsplayer-form-time").value,
         "件数"         : sec * 4,
         "nocache"      : Date.now()
     });
@@ -457,22 +457,22 @@ $v.comment.post = function(){
 
 
 //■ controller
-$v.controller               = document.getElementById("video-controller");
-$v.controller.timeSeek      = document.getElementById("controller-time-seek");
-$v.controller.timeSeekbar   = document.getElementById("controller-time-seekbar");
-$v.controller.timeSeeker    = document.getElementById("controller-time-seeker");
-$v.controller.volumeSeek    = document.getElementById("controller-volume-seek");
-$v.controller.volumeSeekbar = document.getElementById("controller-volume-seekbar");
-$v.controller.volumeSeeker  = document.getElementById("controller-volume-seeker");
-$v.controller.currentTime   = document.getElementById("controller-current-time");
-$v.controller.totalTime     = document.getElementById("controller-total-time");
-$v.controller.playButton    = document.getElementById("controller-play-button");
-$v.controller.volumeButton  = document.getElementById("controller-volume-button");
-$v.controller.commentButton = document.getElementById("controller-comment-button");
-$v.controller.screenButton  = document.getElementById("controller-screen-button");
-$v.controller.form          = document.getElementById("comment-form");
-$v.controller.input         = document.getElementById("comment-form-input");
-$v.controller.submit        = document.getElementById("comment-form-submit");
+$v.controller               = $v.player.querySelector(".jsplayer-controller");
+$v.controller.timeSeek      = $v.player.querySelector(".jsplayer-controller-time-seek");
+$v.controller.timeSeekbar   = $v.player.querySelector(".jsplayer-controller-time-seekbar");
+$v.controller.timeSeeker    = $v.player.querySelector(".jsplayer-controller-time-seeker")
+$v.controller.volumeSeek    = $v.player.querySelector(".jsplayer-controller-volume-seek")
+$v.controller.volumeSeekbar = $v.player.querySelector(".jsplayer-controller-volume-seekbar");
+$v.controller.volumeSeeker  = $v.player.querySelector(".jsplayer-controller-volume-seeker");
+$v.controller.currentTime   = $v.player.querySelector(".jsplayer-controller-current-time");
+$v.controller.totalTime     = $v.player.querySelector(".jsplayer-controller-total-time");
+$v.controller.playButton    = $v.player.querySelector(".jsplayer-controller-play-button");
+$v.controller.volumeButton  = $v.player.querySelector(".jsplayer-controller-volume-button");
+$v.controller.commentButton = $v.player.querySelector(".jsplayer-controller-comment-button");
+$v.controller.screenButton  = $v.player.querySelector(".jsplayer-controller-screen-button");
+$v.controller.form          = $v.player.querySelector(".jsplayer-form");
+$v.controller.input         = $v.player.querySelector(".jsplayer-form-input");
+$v.controller.submit        = $v.player.querySelector(".jsplayer-form-submit");
 
 $v.controller.parts = {
     play:       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNTc2IDkyN2wtMTMyOCA3MzhxLTIzIDEzLTM5LjUgM3QtMTYuNS0zNnYtMTQ3MnEwLTI2IDE2LjUtMzZ0MzkuNSAzbDEzMjggNzM4cTIzIDEzIDIzIDMxdC0yMyAzMXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=",
@@ -667,13 +667,13 @@ $v.controller.input.addEventListener('focus', function(event){
 
 
 //■ screen
-$v.screen = document.getElementById("video-screen");
+$v.screen = $v.player.querySelector(".jsplayer-screen");
 
 
 $v.screen.showOsd = function(str){
     var osd = document.createElement("span");
     osd.textContent = str;
-    osd.className   = "osd";
+    osd.className   = "jsplayer-screen-osd";
     osd.style.fontSize = $v.comment.fontSize + "px";
 
     $v.screen.clearOsd();
@@ -683,7 +683,7 @@ $v.screen.showOsd = function(str){
 
 
 $v.screen.clearOsd = function(){
-    var osd = $v.screen.querySelectorAll(".osd");
+    var osd = $v.screen.querySelectorAll(".jsplayer-screen-osd");
     for(var i = osd.length-1; i >= 0; i--){
         $v.screen.removeChild(osd[i]);
     }
@@ -693,7 +693,7 @@ $v.screen.clearOsd = function(){
 
 $v.screen.isFullscreen = function(){
     var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-    return (element && element.id == $v.screen.id) ? true : false;
+    return (element && element.className == $v.screen.className) ? true : false;
 };
 
 
@@ -849,15 +849,17 @@ $v.type = function(target){
 
 
 $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
-/* box-sizing:border-box 基準 */
 
-.video{
+.jsplayer{
+    visibility: hidden;
+    box-sizing: border-box;
+}
+
+.jsplayer-video{
     position: absolute;
 }
-.video-player{
-    visibility: hidden;
-}
-.video-screen{
+
+.jsplayer-screen{
     background-color: #000;
     width: 640px;
     height: 360px;
@@ -870,10 +872,51 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
     user-select: none;
     position: relative;
 }
-.video-screen:focus{
+
+.jsplayer-screen:focus{
     outline: none;
 }
-.video-controller{
+
+.jsplayer-screen-osd{
+    font-family: Arial, sans-serif;
+    position: absolute;
+    right: 2%;
+    top: 5%;
+    background-color: #000;
+    color:#0f0;
+    z-index: 3;
+}
+
+.jsplayer-screen:-ms-fullscreen{
+    position: absolute;
+    width: 100% !important;
+    height: 100% !important;
+	left: 0;
+ 	top: 0;
+}
+.jsplayer-screen:-webkit-full-screen{
+    position: absolute;
+    width: 100% !important;
+    height: 100% !important;
+	left: 0;
+ 	top: 0;
+}
+.jsplayer-screen:-moz-full-screen{
+    position: absolute;
+    width: 100% !important;
+    height: 100% !important;
+	left: 0;
+ 	top: 0;
+}
+.jsplayer-screen:fullscreen{
+    position: absolute;
+    width: 100% !important;
+    height: 100% !important;
+	left: 0;
+ 	top: 0;
+}
+
+.jsplayer-controller{
     display: block;
     width: 640px;
     height: 55px;
@@ -891,12 +934,15 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
     position:relative;
     visibility:visible;
 }
-.controller-wrap{
+
+.jsplayer-controller-wrap{
     padding: 0 6px;
     position:absolute;
     top: 5px;
 }
-.controller-time{
+
+.jsplayer-controller-current-time,
+.jsplayer-controller-total-time{
     font-family: Arial, sans-serif;
     font-size: 12px;
     vertical-align: 6px;
@@ -904,26 +950,43 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
     display: inline-block;
     width: 35px;
 }
-.controller-current-time{
+
+.jsplayer-controller-current-time{
     text-align: right;
-    
 }
-.controller-total-time{
+
+.jsplayer-controller-total-time{
     text-align: left;
 }
-.controller-img{
+
+.jsplayer-controller-play-button,
+.jsplayer-controller-volume-button,
+.jsplayer-controller-comment-button,
+.jsplayer-controller-screen-button{
     margin: 0 3px;
     padding: 0;
     border: none;
 	cursor: pointer;
 }
-.controller-seek{
+
+.jsplayer-controller-time-seek,
+.jsplayer-controller-volume-seek{
     display: inline-block;
     margin: 0 5px;
     padding: 0;
     height: 20px;
 }
-.controller-seekbar{
+
+.jsplayer-controller-time-seek{
+    width: 333px;
+}
+
+.jsplayer-controller-volume-seek{
+    width: 100px;
+}
+
+.jsplayer-controller-time-seekbar,
+.jsplayer-controller-volume-seekbar{
     position: relative;
     height: 5px;
     margin: 0 0 8px 0;
@@ -933,13 +996,16 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
     width: 100%;
     top: 7px;
 }
-.controller-time-seekbar{
+
+.jsplayer-controller-time-seekbar{
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAICAIAAABcT7kVAAAAFUlEQVQI12N0WX+DgYGBiYGBgSQKAGI2AdswIf1pAAAAAElFTkSuQmCC");
     background-repeat: no-repeat;
     background-position: 0;
     background-size : 0;
 }
-.controller-seeker{
+
+.jsplayer-controller-time-seeker,
+.jsplayer-controller-volume-seeker{
     position: absolute;
 	cursor: pointer;
 	width: 10px;
@@ -952,19 +1018,13 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
     border-radius: 3px;
     display: inline;
 }
-.controller-time-seek{
-    width: 333px;
-}
-.controller-volume-seek{
-    width: 100px;
-}
 
-.comment-form{
+.jsplayer-form{
     width: 100%;
     position: absolute;
     top:29px;
 }
-.comment-form-input{
+.jsplayer-form-input{
     width: 80%;
     height: 26px;
     box-shadow: 3px 3px 3px rgba(200,200,200,0.2) inset;
@@ -974,7 +1034,7 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
     vertical-align:middle;
     ime-mode: active;
 }
-.comment-form-submit{
+.jsplayer-form-submit{
     width: 20%;
     height: 26px;
     text-decoration: none;
@@ -992,7 +1052,7 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
 	cursor: pointer;
 }
 
-.comment{
+.jsplayer-comment{
     font-family: 'MS PGothic', Meiryo, sans-serif;
     position: absolute;
     left: 100%;
@@ -1004,43 +1064,6 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
     animation-timing-function: linear;
     animation-duration: 17s;
     opacity: 0.9;
-}
-.osd{
-    font-family: Arial, sans-serif;
-    position: absolute;
-    right: 2%;
-    top: 5%;
-    background-color: #000;
-    color:#0f0;
-    z-index: 3;
-}
-.video-screen:-ms-fullscreen{
-    position: absolute;
-    width: 100% !important;
-    height: 100% !important;
-	left: 0;
- 	top: 0;
-}
-.video-screen:-webkit-full-screen{
-    position: absolute;
-    width: 100% !important;
-    height: 100% !important;
-	left: 0;
- 	top: 0;
-}
-.video-screen:-moz-full-screen{
-    position: absolute;
-    width: 100% !important;
-    height: 100% !important;
-	left: 0;
- 	top: 0;
-}
-.video-screen:fullscreen{
-    position: absolute;
-    width: 100% !important;
-    height: 100% !important;
-	left: 0;
- 	top: 0;
 }
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━;
