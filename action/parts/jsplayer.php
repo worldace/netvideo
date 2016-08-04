@@ -35,9 +35,9 @@ $html = function($video){
     ></div
     ><form class="jsplayer-form" action="javascript:void(0)"
       ><input class="jsplayer-form-input" type="text" name="コメント" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
-      ><input class="jsplayer-form-submit" type="submit" value="コメントする" tabindex="3" disabled
-      ><input class="jsplayer-form-id" type="hidden" name="id" value="{$video['id']}"
-      ><input class="jsplayer-form-time" type="hidden" name="動画投稿時間" value="{$video['投稿時間']}"
+      ><input class="jsplayer-form-button" type="submit" value="コメントする" tabindex="3" disabled
+      ><input class="jsplayer-form-hidden-id" type="hidden" name="id" value="{$video['id']}"
+      ><input class="jsplayer-form-hidden-time" type="hidden" name="動画投稿時間" value="{$video['投稿時間']}"
     ></form
   ></div
 ></div>
@@ -83,7 +83,7 @@ $v.player.addEventListener('keydown', function(event){
     if(event.target.tagName.match(/input/i)){ return true; }
 
     if(event.which == 32){ //Space
-        $v.controller.input.focus();
+        $v.form.input.focus();
     }
     else if(event.which == 13 && event.ctrlKey){ //Ctrl+Enter ※IE11で効かない
         $v.screen.toggleFullscreen();
@@ -197,14 +197,12 @@ $v.video.isSeekable = function(sec){
 
 
 $v.video.addEventListener('loadedmetadata', function(){
-    if(!$v.isUnregistered){
-        $v.comment.get();
-        $v.controller.input.disabled  = false;
-        $v.controller.submit.disabled = false;
-    }
+    $v.comment.get();
 
     $v.controller.setBuffer();
     $v.controller.setTime($v.video.duration, $v.controller.totalTime);
+    $v.form.input.disabled  = false;
+    $v.form.button.disabled = false;
 
     $v.video.volume = $v.setting.volume;
     $v.video.fit();
@@ -423,8 +421,8 @@ $v.comment.get = function(){
 
     var url = "?" + $v.param({
         "action"       : "commentget",
-        "id"           : $v.player.querySelector(".jsplayer-form-id").value,
-        "動画投稿時間" : $v.player.querySelector(".jsplayer-form-time").value,
+        "id"           : $v.form.hiddenId.value,
+        "動画投稿時間" : $v.form.hiddenTime.value,
         "件数"         : sec * 4,
         "nocache"      : Date.now()
     });
@@ -442,14 +440,14 @@ $v.comment.get = function(){
 
 
 $v.comment.post = function(){
-    var text = $v.controller.input.value.trim();
+    var text = $v.form.input.value.trim();
     if(text == "" || text.length > 64){ return; }
-    $v.controller.input.value = "";
+    $v.form.input.value = "";
 
     var sec  = $v.video.currentTime;
     $v.comment.list[Math.floor(sec+1)].unshift([text, sec+1, Math.floor(Date.now()/1000)]);
 
-    var formdata = new FormData($v.controller.form);
+    var formdata = new FormData($v.form);
     formdata.append("動画時間", sec.toFixed(2)*100);
     $v.post('?action=commentpost', formdata);
 };
@@ -470,9 +468,6 @@ $v.controller.playButton    = $v.player.querySelector(".jsplayer-controller-play
 $v.controller.volumeButton  = $v.player.querySelector(".jsplayer-controller-volume-button");
 $v.controller.commentButton = $v.player.querySelector(".jsplayer-controller-comment-button");
 $v.controller.screenButton  = $v.player.querySelector(".jsplayer-controller-screen-button");
-$v.controller.form          = $v.player.querySelector(".jsplayer-form");
-$v.controller.input         = $v.player.querySelector(".jsplayer-form-input");
-$v.controller.submit        = $v.player.querySelector(".jsplayer-form-submit");
 
 $v.controller.parts = {
     play:       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNTc2IDkyN2wtMTMyOCA3MzhxLTIzIDEzLTM5LjUgM3QtMTYuNS0zNnYtMTQ3MnEwLTI2IDE2LjUtMzZ0MzkuNSAzbDEzMjggNzM4cTIzIDEzIDIzIDMxdC0yMyAzMXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=",
@@ -652,7 +647,16 @@ $v.controller.screenButton.addEventListener('click', function(){
 });
 
 
-$v.controller.form.addEventListener('submit', function(event){
+
+//■ form
+$v.form            = $v.player.querySelector(".jsplayer-form");
+$v.form.input      = $v.player.querySelector(".jsplayer-form-input");
+$v.form.button     = $v.player.querySelector(".jsplayer-form-button");
+$v.form.hiddenId   = $v.player.querySelector(".jsplayer-form-hidden-id");
+$v.form.hiddenTime = $v.player.querySelector(".jsplayer-form-hidden-time");
+
+
+$v.form.addEventListener('submit', function(event){
     event.preventDefault();
     $v.comment.post();
     $v.video.play();
@@ -660,7 +664,7 @@ $v.controller.form.addEventListener('submit', function(event){
 });
 
 
-$v.controller.input.addEventListener('focus', function(event){
+$v.form.input.addEventListener('focus', function(event){
     $v.video.pause();
 });
 
@@ -1039,7 +1043,7 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
     box-sizing: border-box;
 }
 
-.jsplayer-form-submit{
+.jsplayer-form-button{
     width: 20%;
     height: 26px;
     text-decoration: none;
