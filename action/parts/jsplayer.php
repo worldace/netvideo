@@ -10,7 +10,7 @@ $html = function($video){
     部品::$js["jsplayer"] .= '$v.player.init("' . str_replace("&amp;", "&", $video['動画URL']) . '", 640, 360);';
 
     return <<<"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-<div id="jsplayer" class="jsplayer"
+<div class="jsplayer" id="jsplayer"
   ><div class="jsplayer-screen" tabindex="1"
     ><video class="jsplayer-video" loop></video
   ></div
@@ -33,7 +33,7 @@ $html = function($video){
       ><img class="jsplayer-controller-comment-button" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im02NDAsNzkycTAsLTUzIC0zNy41LC05MC41dC05MC41LC0zNy41dC05MC41LDM3LjV0LTM3LjUsOTAuNXQzNy41LDkwLjV0OTAuNSwzNy41dDkwLjUsLTM3LjV0MzcuNSwtOTAuNXptMzg0LDBxMCwtNTMgLTM3LjUsLTkwLjV0LTkwLjUsLTM3LjV0LTkwLjUsMzcuNXQtMzcuNSw5MC41dDM3LjUsOTAuNXQ5MC41LDM3LjV0OTAuNSwtMzcuNXQzNy41LC05MC41em0zODQsMHEwLC01MyAtMzcuNSwtOTAuNXQtOTAuNSwtMzcuNXQtOTAuNSwzNy41dC0zNy41LDkwLjV0MzcuNSw5MC41dDkwLjUsMzcuNXQ5MC41LC0zNy41dDM3LjUsLTkwLjV6bTM4NCwwcTAsMTc0IC0xMjAsMzIxLjV0LTMyNiwyMzN0LTQ1MCw4NS41cS0xMTAsMCAtMjExLC0xOHEtMTczLDE3MyAtNDM1LDIyOXEtNTIsMTAgLTg2LDEzcS0xMiwxIC0yMiwtNnQtMTMsLTE4cS00LC0xNSAyMCwtMzdxNSwtNSAyMy41LC0yMS41dDI1LjUsLTIzLjV0MjMuNSwtMjUuNXQyNCwtMzEuNXQyMC41LC0zN3QyMCwtNDh0MTQuNSwtNTcuNXQxMi41LC03Mi41cS0xNDYsLTkwIC0yMjkuNSwtMjE2LjV0LTgzLjUsLTI2OS41cTAsLTE3NCAxMjAsLTMyMS41dDMyNiwtMjMzLjAwMDA3NnQ0NTAsLTg1LjUwMDMydDQ1MCw4NS41MDAzMnQzMjYsMjMzLjAwMDA3NnQxMjAsMzIxLjV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+"
       ><img class="jsplayer-controller-screen-button" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04ODMgMTA1NnEwIDEzLTEwIDIzbC0zMzIgMzMyIDE0NCAxNDRxMTkgMTkgMTkgNDV0LTE5IDQ1LTQ1IDE5aC00NDhxLTI2IDAtNDUtMTl0LTE5LTQ1di00NDhxMC0yNiAxOS00NXQ0NS0xOSA0NSAxOWwxNDQgMTQ0IDMzMi0zMzJxMTAtMTAgMjMtMTB0MjMgMTBsMTE0IDExNHExMCAxMCAxMCAyM3ptNzgxLTg2NHY0NDhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTE0NC0xNDQtMzMyIDMzMnEtMTAgMTAtMjMgMTB0LTIzLTEwbC0xMTQtMTE0cS0xMC0xMC0xMC0yM3QxMC0yM2wzMzItMzMyLTE0NC0xNDRxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDQ0OHEyNiAwIDQ1IDE5dDE5IDQ1eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg=="
     ></div
-    ><form class="jsplayer-form" action="javascript:void 0"
+    ><form class="jsplayer-form" action="javascript:void(0)"
       ><input class="jsplayer-form-input" type="text" name="コメント" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
       ><input class="jsplayer-form-submit" type="submit" value="コメントする" tabindex="3" disabled
       ><input class="jsplayer-form-id" type="hidden" name="id" value="{$video['id']}"
@@ -852,7 +852,6 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
 
 .jsplayer{
     visibility: hidden;
-    box-sizing: border-box;
 }
 
 .jsplayer-video{
@@ -894,6 +893,7 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
 	left: 0;
  	top: 0;
 }
+
 .jsplayer-screen:-webkit-full-screen{
     position: absolute;
     width: 100% !important;
@@ -901,6 +901,7 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
 	left: 0;
  	top: 0;
 }
+
 .jsplayer-screen:-moz-full-screen{
     position: absolute;
     width: 100% !important;
@@ -908,6 +909,7 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
 	left: 0;
  	top: 0;
 }
+
 .jsplayer-screen:fullscreen{
     position: absolute;
     width: 100% !important;
@@ -1024,6 +1026,7 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
     position: absolute;
     top:29px;
 }
+
 .jsplayer-form-input{
     width: 80%;
     height: 26px;
@@ -1033,7 +1036,9 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
     padding:4px 6px 3px 12px;
     vertical-align:middle;
     ime-mode: active;
+    box-sizing: border-box;
 }
+
 .jsplayer-form-submit{
     width: 20%;
     height: 26px;
@@ -1050,6 +1055,7 @@ $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━
     vertical-align: middle;
     font-family: 'MS PGothic', Meiryo, sans-serif;
 	cursor: pointer;
+    box-sizing: border-box;
 }
 
 .jsplayer-comment{
