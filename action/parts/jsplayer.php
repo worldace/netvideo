@@ -62,8 +62,8 @@ $v.player.init = function(url, width, height){
     $v.controller.style.width = width + "px";
     $v.controller.timeSeek.style.width = width - 307 + "px";
 
-    $v.comment.laneKeyframe(width);
-    $v.comment.laneSetting(height);
+    $v.comment.keyframe(width);
+    $v.comment.setting(height);
 
     $v.user = $v.loadObject("jsplayer") || {};
     $v.user.volume = Number($v.user.volume) || 1;
@@ -314,14 +314,15 @@ $v.comment = {};
 
 
 $v.comment.release = function(comments, lane){
+    var vdom  = document.createDocumentFragment();
     var index = 0;
     for(var i = 0; i < lane.length; i++){
         if(!(index in comments)){ break; }
         if(lane[i] === false){ continue; }
-
-        $v.screen.insertBefore($v.comment.create(comments[index], i), $v.screen.firstChild);
+        vdom.appendChild($v.comment.create(comments[index], i));
         index++;
     }
+    if(index){ $v.screen.insertBefore(vdom, $v.screen.firstChild); }
 };
 
 
@@ -343,7 +344,7 @@ $v.comment.create = function(data, laneNo){
 };
 
 
-$v.comment.laneKeyframe = function(width){
+$v.comment.keyframe = function(width){
     var css = "";
     css += "@keyframes " + $v.player.id + "normallane{";
     css += "from{transform:translateX(0);}";
@@ -358,7 +359,7 @@ $v.comment.laneKeyframe = function(width){
 };
 
 
-$v.comment.laneSetting = function(height){
+$v.comment.setting = function(height){
     if(height >= 360){
         $v.comment.laneCount  = Math.floor((height-360)/180) + 10;
         $v.comment.laneHeight = height / $v.comment.laneCount * 0.8;
@@ -730,7 +731,7 @@ $v.screen.fullscreenEvent = function(){
         $v.controller.intoPlayer();
     }
     $v.video.fit();
-    $v.comment.laneSetting($v.screen.pos.height);
+    $v.comment.setting($v.screen.pos.height);
     $v.comment.clear();
 };
 
