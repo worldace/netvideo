@@ -440,12 +440,13 @@ $v.comment.get = function(){
 
 
 $v.comment.post = function(){
-    var text = $v.form.input.value.trim();
-    if(text == "" || text.length > 64){ return; }
-    $v.form.input.value = "";
-
     var sec  = $v.video.currentTime;
+    var text = $v.form.input.value.trim();
+
+    if(text == "" || text.length > 64){ return; }
+
     $v.comment.list[Math.floor(sec+1)].unshift([text, sec+1, Math.floor(Date.now()/1000)]);
+    $v.form.input.value = "";
 
     var formdata = new FormData($v.form);
     formdata.append("動画時間", sec.toFixed(2)*100);
