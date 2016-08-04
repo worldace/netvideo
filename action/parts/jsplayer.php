@@ -65,9 +65,9 @@ $v.player.init = function(url, width, height){
     $v.comment.laneKeyframe(width);
     $v.comment.laneSetting(height);
 
-    $v.setting = $v.loadObject("jsplayer") || {};
-    $v.setting.volume = Number($v.setting.volume) || 1;
-    $v.controller.setSeeker($v.setting.volume, $v.controller.volumeSeeker);
+    $v.user = $v.loadObject("jsplayer") || {};
+    $v.user.volume = Number($v.user.volume) || 1;
+    $v.controller.setSeeker($v.user.volume, $v.controller.volumeSeeker);
 
     $v.player.style.visibility = "visible";
 
@@ -142,7 +142,7 @@ $v.player.addEventListener('keydown', function(event){
 
 
 window.addEventListener('unload', function(event){
-    $v.saveObject("jsplayer", $v.setting);
+    $v.saveObject("jsplayer", $v.user);
 });
 
 
@@ -204,7 +204,7 @@ $v.video.addEventListener('loadedmetadata', function(){
     $v.form.input.disabled  = false;
     $v.form.button.disabled = false;
 
-    $v.video.volume = $v.setting.volume;
+    $v.video.volume = $v.user.volume;
     $v.video.fit();
 });
 
@@ -264,7 +264,7 @@ $v.video.addEventListener('volumechange', function(){
     else{
         $v.controller.volumeButton.setAttribute("src", $v.controller.parts.volume);
         $v.controller.setSeeker($v.video.volume, $v.controller.volumeSeeker);
-        $v.setting.volume = $v.video.volume;
+        $v.user.volume = $v.video.volume;
     }
 });
 
