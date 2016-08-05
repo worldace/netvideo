@@ -10,6 +10,7 @@ $html = function($url){
 
 
 $js = function($url){
+    $url = str_replace("&amp;", "&", $url);
     return <<<"━━━"
 window.onload = function(){ setTimeout(function(){ location.href = "$url"; }, 0); };
 ━━━;
