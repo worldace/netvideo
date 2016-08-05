@@ -364,8 +364,9 @@ function JSON取得($file){
 }
 
 
-function tojs($data){
-    return json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+function tojs($data, $escape = true){
+    $json = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    return ($escape) ? h($json) : $json;
 }
 
 
