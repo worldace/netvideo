@@ -733,8 +733,8 @@ class 部品{
     private static $キャッシュ;
     private static $windows;
     public  static $イベント;
-    public  static $js;
-    public  static $css;
+    public  static $js  = [];
+    public  static $css = [];
 
     public static function 作成($部品名, $引数){
         if($部品名 === null){ throw new Exception('部品名がありません'); }
@@ -767,7 +767,11 @@ class 部品{
         $buf = ob_get_contents();
         ob_end_clean();
         if(self::$js){
-            $js     = "\n<script>\n" . implode(self::$js,"\n") . "\n</script>\n";
+            $js = "\n";
+            foreach(self::$js as $code){
+                $js .= (preg_match("/<script/i", $code)) ? $code : "<script>\n$code\n</script>";
+                $js .= "\n";
+            }
             $js_pos = strripos($buf, "</body>");
             if($js_pos !== false){
                 $buf = substr_replace($buf, $js, $js_pos, 0); //最後に出現する</body>の前にJSを挿入する
@@ -777,7 +781,11 @@ class 部品{
             }
         }
         if(self::$css){
-            $css     = "\n<style>\n " . implode(self::$css,"\n") . "\n</style>\n";
+            $css = "\n";
+            foreach(self::$css as $code){
+                $css .= (preg_match("/<style/i", $code)) ? $code : "<style>\n$code\n</style>";
+                $css .= "\n";
+            }
             $css_pos = stripos($buf, "</head>");
             if($css_pos !== false){
                 $buf = substr_replace($buf, $css, $css_pos, 0); //最初に出現する</head>の前にCSSを挿入する
