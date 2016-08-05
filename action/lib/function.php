@@ -769,6 +769,7 @@ class 部品{
         if(self::$js){
             $js = "\n";
             foreach(self::$js as $code){
+                $code = ltrim($code);
                 $js .= (preg_match("/<script/i", $code)) ? $code : "<script>\n$code\n</script>";
                 $js .= "\n";
             }
@@ -783,6 +784,7 @@ class 部品{
         if(self::$css){
             $css = "\n";
             foreach(self::$css as $code){
+                $code = ltrim($code);
                 $css .= (preg_match("/<style/i", $code)) ? $code : "<style>\n$code\n</style>";
                 $css .= "\n";
             }
