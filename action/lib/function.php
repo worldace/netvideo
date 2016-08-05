@@ -770,7 +770,7 @@ class 部品{
             $js = "\n";
             foreach(self::$js as $code){
                 $code = ltrim($code);
-                $js .= (preg_match("/<script/i", $code)) ? $code : "<script>\n$code\n</script>";
+                $js .= (preg_match("/^</", $code)) ? $code : "<script>\n$code\n</script>";
                 $js .= "\n";
             }
             $js_pos = strripos($buf, "</body>");
@@ -785,7 +785,7 @@ class 部品{
             $css = "\n";
             foreach(self::$css as $code){
                 $code = ltrim($code);
-                $css .= (preg_match("/<style/i", $code)) ? $code : "<style>\n$code\n</style>";
+                $css .= (preg_match("/^</", $code)) ? $code : "<style>\n$code\n</style>";
                 $css .= "\n";
             }
             $css_pos = stripos($buf, "</head>");
