@@ -377,6 +377,7 @@ function JSON保存($file, $data){
 
 function JSON取得($file){
     $json = file_get_contents($file);
+    if(!$json){ return false; }
     $json = preg_replace("/^<\?php\r?\n/i", "", $json);
     return json_decode($json, true);
 }
@@ -387,6 +388,7 @@ function XML取得($xml, $options = array()) {
         $xml = ltrim($xml);
         if(preg_match("/^</", $input)){ $xml = @simplexml_load_string($xml); }
         else{ $xml = @simplexml_load_file($xml); }
+        if(!$xml){ return false; }
     }
     //xmlToArray Tamlyn Rhodes <http://tamlyn.org> Public Domain
     $defaults = array(
