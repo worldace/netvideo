@@ -298,7 +298,7 @@ function ファイル一覧($path = "./", $pattern = "."){
     if(!is_dir($path)){ return false; }
     foreach(array_diff(scandir($path), ['.','..']) as $file){
         if(is_file("$path/$file") and preg_match("#$pattern#i", $file)){ $list[] = realpath("$path/$file"); }
-        if(is_dir("$path/$file")) { $list = array_merge($list, ファイル一覧("$path/$file", $pattern)); }
+        if(is_dir("$path/$file")) { $list = array_merge((array)$list, ファイル一覧("$path/$file", $pattern)); }
     }
     return (array)$list;
 }
@@ -309,7 +309,7 @@ function ディレクトリ一覧($path = "./", $pattern = "."){
     foreach(array_diff(scandir($path), ['.','..']) as $file){
         if(is_dir("$path/$file")) {
             if(preg_match("#$pattern#i", $file)){ $list[] = realpath("$path/$file"); }
-            $list = array_merge($list, ディレクトリ一覧("$path/$file", $pattern));
+            $list = array_merge((array)$list, ディレクトリ一覧("$path/$file", $pattern));
         }
     }
     return (array)$list;
