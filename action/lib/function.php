@@ -376,7 +376,9 @@ function JSON保存($file, $data){
 
 
 function JSON取得($file){
-    return json_decode(file_get_contents($file,null,null,5), true);
+    $json = file_get_contents($file);
+    $json = preg_replace("/^<\?php\r?\n/i", "", $json);
+    return json_decode($json, true);
 }
 
 
