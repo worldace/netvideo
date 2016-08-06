@@ -76,7 +76,15 @@ function ダウンロード($filepath = "", $filename = "", $data = "", $timeout
 }
 
 
-function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 = "", $本文 = "", array $添付 = null, $cc = "", $bcc = "", $add = ""){
+function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 = "", $本文 = "", array $添付 = null, $cc = "", $bcc = "", array $add = null){
+    $送信先 = 改行変換($送信先);
+    $送信元 = 改行変換($送信元);
+    $送信者 = 改行変換($送信者);
+    $題名   = 改行変換($題名);
+    $cc     = 改行変換($cc);
+    $bcc    = 改行変換($bcc);
+    $add    = 改行変換($add);
+
     $題名 = mb_encode_mimeheader($題名, "jis");
     $body = mb_convert_encoding($本文, "jis", "UTF-8");
 
@@ -84,6 +92,7 @@ function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 =
     else if($送信元) { $header .= "From: $送信元\r\n"; }
     if($cc) { $header .= "Cc: $cc\r\n"; }
     if($bcc){ $header .= "Bcc: $bcc\r\n"; }
+    if(is_array($add)){ $header .= implode("\r\n", $add) . "\r\n"; }
 
     if(is_array($添付)){
         $区切り = "__" . uuid() . "__";
@@ -103,7 +112,7 @@ function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 =
         }
         $body .= "--{$区切り}--\r\n";
     }
-    return mail($送信先, $題名, $body, $header.$add);
+    return mail($送信先, $題名, $body, $header);
 }
 
 
