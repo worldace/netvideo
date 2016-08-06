@@ -124,7 +124,7 @@ function GET送信($url, array $querymap = null, array $request_header = null){
     if($querymap and preg_match("/\?/", $url)){ $url .= "&" . http_build_query($querymap, "", "&"); }
     else if($querymap){ $url .= "?" . http_build_query($querymap, "", "&"); }
     $request = stream_context_create(['http'=>['method'=>'GET', 'header'=>implode("\r\n", (array)$request_header)]]);
-    $contents = @file_get_contents($url, false, $request);
+    $contents = file_get_contents($url, false, $request);
     $_ENV['RESPONSE_HEADER'] = $http_response_header;
     return $contents;
 }
@@ -133,7 +133,7 @@ function GET送信($url, array $querymap = null, array $request_header = null){
 function POST送信($url, array $querymap = null, array $request_header = null){
     if(is_array($request_header)){ $request_header = str_replace(["\r","\n"], "", $request_header); }
     $request = stream_context_create(['http'=>['method'=>'POST','header'=>implode("\r\n",(array)$request_header),'content'=>http_build_query((array)$querymap,"","&")]]);
-    $contents = @file_get_contents($url, false, $request);
+    $contents = file_get_contents($url, false, $request);
     $_ENV['RESPONSE_HEADER'] = $http_response_header;
     return $contents;
 }
@@ -160,7 +160,7 @@ function ファイル送信($url, array $querymap = null, array $request_header 
     }
     $content .= "--$区切り--\r\n";
     $request = stream_context_create(['http'=>['method'=>'POST', 'header'=>implode("\r\n",(array)$request_header), 'content'=>$content]]);
-    $contents = @file_get_contents($url, false, $request);
+    $contents = file_get_contents($url, false, $request);
     $_ENV['RESPONSE_HEADER'] = $http_response_header;
     return $contents;
 }
@@ -377,6 +377,7 @@ function JSON保存($file, $data){
 
 function JSON取得($file){
     $json = file_get_contents($file);
+    if($json === false){ return false; }
     $json = preg_replace("/^<\?php\r?\n/i", "", $json);
     return json_decode($json, true);
 }
@@ -385,8 +386,8 @@ function JSON取得($file){
 function XML取得($xml, $options = array()) {
     if(!is_object($xml)){
         $xml = ltrim($xml);
-        if(preg_match("/^</", $input)){ $xml = @simplexml_load_string($xml); }
-        else{ $xml = @simplexml_load_file($xml); }
+        if(preg_match("/^</", $input)){ $xml = simplexml_load_string($xml); }
+        else{ $xml = simplexml_load_file($xml); }
         if(!$xml){ return false; }
     }
     //xmlToArray Tamlyn Rhodes <http://tamlyn.org> Public Domain
