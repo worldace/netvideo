@@ -907,7 +907,7 @@ class 検証{
 
     public function と同じ($value, $comment = ""){
         if(!$comment and $this->key){ $comment = "{$this->key}が{$value}でありません"; }
-        return ($this->value === $value) ? $this->成功() : $this->失敗($comment);
+        return ($this->value == $value) ? $this->成功() : $this->失敗($comment);
     }
 
     public function 以上($num, $unit = "", $comment = ""){ //非文書化
