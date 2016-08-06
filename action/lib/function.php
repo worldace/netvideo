@@ -380,32 +380,7 @@ function JSON取得($file){
 }
 
 
-function tojs($data){
-    return json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
-}
-
-
-function uuid($hyphen = false) { //uuid v4
-    $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-    mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0x0fff)|0x4000,mt_rand(0,0x3fff)|0x8000,mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff));
-    return ($hyphen) ? $uuid : str_replace("-", "", $uuid);
-}
-
-
-function ランダム英数字($length = 8, $userfriendly = false){
-    $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
-    if($userfriendly){ $str = "ABDEFGHJLMNQRTYabdefghmnrty23456789"; }
-    $str = str_repeat($str, floor($length/2));
-    return substr(str_shuffle($str), 0, $length);
-}
-
-
-function 連想配列ソート(array &$array){
-    array_multisort(array_values($array), SORT_DESC, array_keys($array), SORT_ASC, $array);
-}
-
-
-function XML変換($xml, $options = array()) {
+function XML取得($xml, $options = array()) {
     if(!is_object($xml)){
         $xml = ltrim($xml);
         if(preg_match("/^</", $input)){ $xml = @simplexml_load_string($xml); }
@@ -438,7 +413,7 @@ function XML変換($xml, $options = array()) {
     $tagsArray = array();
     foreach ($namespaces as $prefix => $namespace) {
         foreach ($xml->children($namespace) as $childXml) {
-            $childArray = XML変換($childXml, $options);
+            $childArray = XML取得($childXml, $options);
             list($childTagName, $childProperties) = each($childArray);
  
             if ($options['keySearch']){ $childTagName = str_replace($options['keySearch'], $options['keyReplace'], $childTagName); }
@@ -461,6 +436,31 @@ function XML変換($xml, $options = array()) {
     $propertiesArray = !$options['autoText'] || $attributesArray || $tagsArray || ($plainText === '') ? array_merge($attributesArray, $tagsArray, $textContentArray) : $plainText;
  
     return array($xml->getName() => $propertiesArray);
+}
+
+
+function tojs($data){
+    return json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+}
+
+
+function uuid($hyphen = false) { //uuid v4
+    $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+    mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0x0fff)|0x4000,mt_rand(0,0x3fff)|0x8000,mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff));
+    return ($hyphen) ? $uuid : str_replace("-", "", $uuid);
+}
+
+
+function ランダム英数字($length = 8, $userfriendly = false){
+    $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+    if($userfriendly){ $str = "ABDEFGHJLMNQRTYabdefghmnrty23456789"; }
+    $str = str_repeat($str, floor($length/2));
+    return substr(str_shuffle($str), 0, $length);
+}
+
+
+function 連想配列ソート(array &$array){
+    array_multisort(array_values($array), SORT_DESC, array_keys($array), SORT_ASC, $array);
 }
 
 
