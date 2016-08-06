@@ -57,14 +57,17 @@ function リダイレクト($url){
 }
 
 
-function ダウンロード($filepath = "", $filename = "", $data = "", $timeout = 60*60*24){
+function ダウンロード($data, $filename, $timeout = 60*60*12){
     ini_set("max_execution_time", $timeout);
-    if($data){
+    if(preg_match("/^:/", $filename)){
+        $filename = preg_replace("/^:/", "", $filename);
         $filesize = strlen($data);
+        $is_data = true;
     }
     else{
-        $filesize = filesize($filepath);
-        if(!$filename){ $filename = basename($filepath); }
+        if(!file_exists($data)){ throw new Exception("ファイルが存在しません。もしくは、データダウンロード時はファイル名の先頭に:を付けてください"); }
+        $filesize = filesize($data);
+        if(!$filename){ $filename = basename($data); }
     }
     $filenameE = rawurlencode($filename);
     header("Content-Type: application/force-download");
@@ -72,7 +75,7 @@ function ダウンロード($filepath = "", $filename = "", $data = "", $timeout
     header("Content-Disposition: attachment; filename=\"$filename\"; filename*=UTF-8''$filenameE");
 
     while(ob_get_level()){ ob_end_clean(); }
-    ($data) ? print($data) : readfile($filepath);
+    ($is_data) ? print($data) : readfile($data);
 }
 
 
