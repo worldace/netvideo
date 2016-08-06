@@ -286,10 +286,11 @@ function テーブルタグ作成(array $array){
 function dd(){
     foreach(func_get_args() as $var){
         $out = var_export($var, true);
-        if(php_sapi_name() === 'cli'){ print (preg_match("/^WIN/i",PHP_OS) and version_compare(PHP_VERSION,'7.1.0','<')) ? mb_convert_encoding($out,'SJIS','UTF-8') : $out; }
-        else{ print "<pre>$out</pre>"; }
-        print "\n\n";
+        if(php_sapi_name() === 'cli'){ $str .= (preg_match("/^WIN/i",PHP_OS) and version_compare(PHP_VERSION,'7.1.0','<')) ? mb_convert_encoding($out,'SJIS','UTF-8') : $out; }
+        else{ $str .= "<pre>$out</pre>"; }
+        $str .= "\n\n";
     }
+    return $str;
 }
 
 
@@ -401,6 +402,65 @@ function ランダム英数字($length = 8, $userfriendly = false){
 
 function 連想配列ソート(array &$array){
     array_multisort(array_values($array), SORT_DESC, array_keys($array), SORT_ASC, $array);
+}
+
+
+function XML変換($xml, $options = array()) {
+    if(!is_object($xml)){
+        $xml = ltrim($xml);
+        if(preg_match("/^</", $input)){ $xml = @simplexml_load_string($xml); }
+        else{ $xml = @simplexml_load_file($xml); }
+    }
+    //xmlToArray Tamlyn Rhodes <http://tamlyn.org> Public Domain
+    $defaults = array(
+        'namespaceSeparator' => ':',//you may want this to be something other than a colon
+        'attributePrefix' => '',   //to distinguish between attributes and nodes with the same name
+        'alwaysArray' => array(),   //array of xml tag names which should always become arrays
+        'autoArray' => true,        //only create arrays for tags which appear more than once
+        'textContent' => 'content',       //key used for the text content of elements
+        'autoText' => true,         //skip textContent key if node has no attributes or child nodes
+        'keySearch' => false,       //optional search and replace on tag and attribute names
+        'keyReplace' => false       //replace values for above search values (as passed to str_replace())
+    );
+    $options = array_merge($defaults, $options);
+    $namespaces = $xml->getDocNamespaces();
+    $namespaces[''] = null;
+ 
+    $attributesArray = array();
+    foreach ($namespaces as $prefix => $namespace) {
+        foreach ($xml->attributes($namespace) as $attributeName => $attribute) {
+            if ($options['keySearch']) { $attributeName = str_replace($options['keySearch'], $options['keyReplace'], $attributeName); }
+            $attributeKey = $options['attributePrefix'] . ($prefix ? $prefix . $options['namespaceSeparator'] : '') . $attributeName;
+            $attributesArray[$attributeKey] = (string)$attribute;
+        }
+    }
+
+    $tagsArray = array();
+    foreach ($namespaces as $prefix => $namespace) {
+        foreach ($xml->children($namespace) as $childXml) {
+            $childArray = XML変換($childXml, $options);
+            list($childTagName, $childProperties) = each($childArray);
+ 
+            if ($options['keySearch']){ $childTagName = str_replace($options['keySearch'], $options['keyReplace'], $childTagName); }
+            if ($prefix){ $childTagName = $prefix . $options['namespaceSeparator'] . $childTagName; }
+ 
+            if (!isset($tagsArray[$childTagName])) {
+                $tagsArray[$childTagName] = in_array($childTagName, $options['alwaysArray']) || !$options['autoArray'] ? array($childProperties) : $childProperties;
+            } elseif (is_array($tagsArray[$childTagName]) && array_keys($tagsArray[$childTagName]) === range(0, count($tagsArray[$childTagName]) - 1)) {
+                $tagsArray[$childTagName][] = $childProperties;
+            } else {
+                $tagsArray[$childTagName] = array($tagsArray[$childTagName], $childProperties);
+            }
+        }
+    }
+ 
+    $textContentArray = array();
+    $plainText = trim((string)$xml);
+    if ($plainText !== '') $textContentArray[$options['textContent']] = $plainText;
+ 
+    $propertiesArray = !$options['autoText'] || $attributesArray || $tagsArray || ($plainText === '') ? array_merge($attributesArray, $tagsArray, $textContentArray) : $plainText;
+ 
+    return array($xml->getName() => $propertiesArray);
 }
 
 
