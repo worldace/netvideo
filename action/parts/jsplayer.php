@@ -6,8 +6,8 @@
 //======================================================
 
 
-$html = function($video){
-    部品::$js["jsplayer"] .= '$v.player.init("' . str_replace("&amp;", "&", $video['動画URL']) . '", 640, 360);';
+$html = function ($動画){
+    部品::$js["jsplayer"] .= '$v.player.init("' . str_replace("&amp;", "&", $動画['url']) . '", 640, 360);';
 
     return <<<"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 <div class="jsplayer" id="jsplayer"
@@ -34,10 +34,10 @@ $html = function($video){
       ><img class="jsplayer-controller-screen-button" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04ODMgMTA1NnEwIDEzLTEwIDIzbC0zMzIgMzMyIDE0NCAxNDRxMTkgMTkgMTkgNDV0LTE5IDQ1LTQ1IDE5aC00NDhxLTI2IDAtNDUtMTl0LTE5LTQ1di00NDhxMC0yNiAxOS00NXQ0NS0xOSA0NSAxOWwxNDQgMTQ0IDMzMi0zMzJxMTAtMTAgMjMtMTB0MjMgMTBsMTE0IDExNHExMCAxMCAxMCAyM3ptNzgxLTg2NHY0NDhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTE0NC0xNDQtMzMyIDMzMnEtMTAgMTAtMjMgMTB0LTIzLTEwbC0xMTQtMTE0cS0xMC0xMC0xMC0yM3QxMC0yM2wzMzItMzMyLTE0NC0xNDRxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDQ0OHEyNiAwIDQ1IDE5dDE5IDQ1eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg=="
     ></div
     ><form class="jsplayer-form" action="javascript:void(0)"
-      ><input class="jsplayer-form-input" type="text" name="コメント" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
+      ><input class="jsplayer-form-input" type="text" name="本文" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
       ><input class="jsplayer-form-button" type="submit" value="コメントする" tabindex="3" disabled
-      ><input class="jsplayer-form-hidden-id" type="hidden" name="id" value="{$video['id']}"
-      ><input class="jsplayer-form-hidden-time" type="hidden" name="動画投稿時間" value="{$video['投稿時間']}"
+      ><input class="jsplayer-form-hidden-id" type="hidden" name="id" value="{$動画['id']}"
+      ><input class="jsplayer-form-hidden-time" type="hidden" name="登録時間" value="{$動画['登録時間']}"
     ></form
   ></div
 ></div>
@@ -421,11 +421,11 @@ $v.comment.get = function(){
     for(var i = 0; i < $v.comment.list.length; i++){ $v.comment.list[i] = []; }
 
     var url = "?" + $v.param({
-        "action"       : "commentget",
-        "id"           : $v.form.hiddenId.value,
-        "動画投稿時間" : $v.form.hiddenTime.value,
-        "件数"         : sec * 4,
-        "nocache"      : Date.now()
+        "action"   : "commentget",
+        "id"       : $v.form.hiddenId.value,
+        "登録時間" : $v.form.hiddenTime.value,
+        "件数"     : sec * 4,
+        "nocache"  : Date.now()
     });
 
     $v.get(url, function(xhr){
@@ -450,7 +450,7 @@ $v.comment.post = function(){
     $v.form.input.value = "";
 
     var formdata = new FormData($v.form);
-    formdata.append("動画時間", sec.toFixed(2)*100);
+    formdata.append("位置", sec.toFixed(2)*100);
     $v.post('?action=commentpost', formdata);
 };
 

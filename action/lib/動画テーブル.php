@@ -3,11 +3,11 @@
 class 動画テーブル{
     const 定義 = [
         "id"           => "integer primary key auto_increment",
-        "動画URL"      => "varchar(500) not null",
-        "横サイズ"     => "smallint unsigned not null",
-        "縦サイズ"     => "smallint unsigned not null",
-        "動画時間"     => "float unsigned not null",
-        "投稿時間"     => "integer unsigned not null",
+        "url"          => "varchar(500) not null",
+        "横幅"         => "smallint unsigned not null",
+        "縦幅"         => "smallint unsigned not null",
+        "長さ"         => "float unsigned not null",
+        "登録時間"     => "integer unsigned not null",
         "アクセス数"   => "integer unsigned default 0",
         "コメント数"   => "integer unsigned default 0",
         "ユーザid"     => "varchar(250) not null",
@@ -18,11 +18,11 @@ class 動画テーブル{
     ];
     
     public $id;
-    public $動画URL;
-    public $横サイズ;
-    public $縦サイズ;
-    public $動画時間;
-    public $投稿時間;
+    public $url;
+    public $横幅;
+    public $縦幅;
+    public $長さ;
+    public $登録時間;
     public $アクセス数;
     public $コメント数;
     public $ユーザid;

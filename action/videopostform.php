@@ -13,7 +13,7 @@
 
 <form action="?action=videopost" method="POST" id="form">
 <table>
-<tr><td>動画ファイルのURL</td><td><input type="text" name="動画URL" id="動画URL" autocomplete="off" spellcheck="false"></td></tr>
+<tr><td>動画ファイルのURL</td><td><input type="text" name="url" id="url" autocomplete="off" spellcheck="false"></td></tr>
 
 <tr><td>サムネイル</td><td><canvas id="canvas" width="256" height="144"></canvas></td></tr>
 <tr><td>動画情報</td><td id="動画情報"></td></tr>
@@ -22,9 +22,9 @@
 <tr><td colspan="2"><input type="submit" value="     この動画を登録する     " id="submit"></td></tr>
 </table>
 <input type="hidden" name="ユーザid" id="ユーザid" value="https://me.yahoo.co.jp/a/">
-<input type="hidden" name="横サイズ" id="横サイズ" value="">
-<input type="hidden" name="縦サイズ" id="縦サイズ" value="">
-<input type="hidden" name="動画時間" id="動画時間" value="">
+<input type="hidden" name="横幅" id="横幅" value="">
+<input type="hidden" name="縦幅" id="縦幅" value="">
+<input type="hidden" name="長さ" id="長さ" value="">
 <input type="hidden" name="サムネイル" id="サムネイル" value="">
 </form>
 
@@ -35,13 +35,13 @@ document.addEventListener('DOMContentLoaded', function(){
 $v.video  = document.getElementById("video");
 $v.canvas = document.getElementById("canvas");
 $v.form   = document.getElementById("form");
-$v.url    = document.getElementById("動画URL");
+$v.url    = document.getElementById("url");
 $v.thumbnail  = document.getElementById("サムネイル");
 
 $v.url.addEventListener('input', function(e){
-    document.getElementById("横サイズ").value    = "";
-    document.getElementById("縦サイズ").value    = "";
-    document.getElementById("動画時間").value    = "";
+    document.getElementById("横幅").value    = "";
+    document.getElementById("縦幅").value    = "";
+    document.getElementById("長さ").value    = "";
     document.getElementById("サムネイル").value  = "";
     document.getElementById("動画情報").textContent = "";
     document.getElementById("撮影ボタン").disabled = true;
@@ -56,9 +56,9 @@ $v.url.addEventListener('input', function(e){
 });
 
 $v.video.addEventListener('canplaythrough', function(){
-    document.getElementById("横サイズ").value = $v.video.videoWidth;
-    document.getElementById("縦サイズ").value = $v.video.videoHeight;
-    document.getElementById("動画時間").value = $v.video.duration;
+    document.getElementById("横幅").value = $v.video.videoWidth;
+    document.getElementById("縦幅").value = $v.video.videoHeight;
+    document.getElementById("長さ").value = $v.video.duration;
     document.getElementById("動画情報").textContent = $v.infostr($v.video.videoWidth, $v.video.videoHeight, $v.video.duration);
     document.getElementById("撮影ボタン").disabled = false;
 
