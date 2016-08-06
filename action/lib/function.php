@@ -905,9 +905,9 @@ class 検証{
         return (getimagesizefromstring($this->value)[0] > 0) ? $this->成功() : $this->失敗($comment); //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
     }
 
-    public function と同じ($value, $comment = ""){ //非文書化
+    public function と同じ($value, $comment = ""){
         if(!$comment and $this->key){ $comment = "{$this->key}が{$value}でありません"; }
-        return ($this->value == $value) ? $this->成功() : $this->失敗($comment);
+        return ($this->value === $value) ? $this->成功() : $this->失敗($comment);
     }
 
     public function 以上($num, $unit = "", $comment = ""){ //非文書化
@@ -954,7 +954,7 @@ class 検証{
         $num = preg_replace("/^ー/u", "-", $num);
         $num = preg_replace("/．/u", ".", $num);
         $num = mb_convert_kana($num, "n", "utf-8");
-        return $num;
+        return (int)$num;
     }
 
     private function 成功(){
@@ -974,9 +974,7 @@ class 検証{
         else if(preg_match("/^(ー?[０-９．]+)(\w*)以/u", $name, $m))    { return $this->以下($this->全角数字変換($m[1]), $m[2], $args[0]); }
         else if(preg_match("/^(ー?[０-９．]+)(\w*)より大/u", $name, $m)){ return $this->より大きい($this->全角数字変換($m[1]), $m[2], $args[0]); }
         else if(preg_match("/^(ー?[０-９．]+)(\w*)より小/u", $name, $m)){ return $this->より小きい($this->全角数字変換($m[1]), $m[2], $args[0]); }
-        else {
-            if(preg_match("/^(ー?[０-９．]+)$/u", $name)){ $name = $this->全角数字変換($name); }
-            return $this->と同じ($name, $args[0]);
-        }
+        else if(preg_match("/^(ー?[０-９．]+)と同じ$/u", $name, $m)){ return $this->と同じ($this->全角数字変換($m[1]), $args[0]); }
+        else if(preg_match("/^(\w+)と同じ$/u", $name, $m)){ return $this->と同じ($m[1], $args[0]); }
     }
 }
