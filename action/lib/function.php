@@ -294,6 +294,14 @@ function dd(){
 }
 
 
+function パーミッション($path, $permission = null){
+    if(!preg_match("/^0/", $permission) and $permission >= 100 and $permission <= 777){
+        chmod($path, octdec($permission));
+    }
+    return decoct(fileperms($path) & 0777);
+}
+
+
 function ファイル一覧($path = "./", $pattern = "."){
     if(!is_dir($path)){ return false; }
     foreach(array_diff(scandir($path), ['.','..']) as $file){
