@@ -432,9 +432,9 @@ $v.comment.get = function(){
         try{ var comments = JSON.parse(xhr.responseText); } catch(e){ return; }
 
         for(var i = 0; i < comments.length; i++){
-            comments[i][0] = comments[i][0].substring(0, 64);
-            var index = Math.floor(comments[i][1]/100);
-            if(index in $v.comment.list){ $v.comment.list[index].push(comments[i]); }
+            if(comments[i][1] == null){ continue; }
+            var index = Math.floor(comments[i][2]/100);
+            if(index in $v.comment.list){ $v.comment.list[index].push([comments[i][1].substring(0,64), comments[i][2]/100]); }
         }
     });
 };
@@ -450,6 +450,7 @@ $v.comment.post = function(){
     $v.form.input.value = "";
 
     var formdata = new FormData($v.form);
+    formdata.append("本文", text);
     formdata.append("位置", sec.toFixed(2)*100);
     $v.post('?action=commentpost', formdata);
 };
@@ -744,42 +745,26 @@ document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent);
 
 
 //■ function
-$v.get = function(url, callback){
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", url);
-    xhr.timeout = 60*1000;
-    if(callback){ xhr.addEventListener("load", function(){ callback(xhr); }); }
-    xhr.send();
+$v.get = function(url, success){
+    $v.ajax(url, {method:"GET", success:success});
 };
 
 
-$v.post = function(url, param, callback){
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', url);
-    xhr.timeout = 60*1000;
-    if(callback){ xhr.addEventListener("load", function(){ callback(xhr); }); }
-
-    if(param instanceof FormData){
-        var body = param;
-    }
-    else{
-        var body = "";
-        for(var key in param){
-            if(!param.hasOwnProperty(key)){ continue; }
-            body += encodeURIComponent(key) + "=" + encodeURIComponent(param[key]) + "&";
-        }
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-    }
-    xhr.send(body);
+$v.post = function(url, data, success){
+    $v.ajax(url, {method:"POST", data:data, success:success});
 };
 
 
 $v.ajax = function(url, option){ //method, data, timeout, credential, header, success, error, complete
-    option.method   = option.method  || "GET";
-    option.timeout  = option.timeout || 60;
-    var xhr  = new XMLHttpRequest();
+    url    = url    || "./";
+    option = option || {};
+    option.method  = option.method  || "GET";
+    option.timeout = option.timeout || 60;
+
     var body = null;
-    
+    var xhr  = new XMLHttpRequest();
+    xhr.open(option.method, url);
+
     if(option.timeout >= 0){ xhr.timeout = option.timeout * 1000; }
     if(option.credential){ xhr.withCredentials = true; }
     if(option.header){
@@ -811,7 +796,6 @@ $v.ajax = function(url, option){ //method, data, timeout, credential, header, su
         if(option.complete){ option.complete(xhr); }
     });
 
-    xhr.open(option.method, url);
     xhr.send(body);
 };
 
