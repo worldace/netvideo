@@ -756,7 +756,6 @@ $v.post = function(url, data, success){
 
 
 $v.ajax = function(url, option){ //method, data, timeout, credential, header, success, error, complete
-    url    = url    || "./";
     option = option || {};
     option.method  = option.method  || "GET";
     option.timeout = option.timeout || 60;
