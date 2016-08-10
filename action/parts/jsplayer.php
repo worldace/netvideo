@@ -776,15 +776,15 @@ $v.post = function(url, param, callback){
 
 $v.ajax = function(url, option){ //method, data, timeout, credential, header, success, error, complete
     option.method   = option.method  || "GET";
-    option.timeout  = option.timeout || 30;
+    option.timeout  = option.timeout || 60;
     var xhr  = new XMLHttpRequest();
-    var body = "";
+    var body = null;
     
-    if(option.timeout >= 0){ xhr.timeout = option.timeout; }
+    if(option.timeout >= 0){ xhr.timeout = option.timeout * 1000; }
     if(option.credential){ xhr.withCredentials = true; }
     if(option.header){
         for(var name in option.header){
-            if(!option.data.hasOwnProperty(name)){ continue; }
+            if(!option.header.hasOwnProperty(name)){ continue; }
             xhr.setRequestHeader(name, option.header[name]);
         }
     }
@@ -793,6 +793,7 @@ $v.ajax = function(url, option){ //method, data, timeout, credential, header, su
             body = option.data;
         }
         else{
+            body = "";
             for(var key in option.data){
                 if(!option.data.hasOwnProperty(key)){ continue; }
                 body += encodeURIComponent(key) + "=" + encodeURIComponent(option.data[key]) + "&";
