@@ -7,7 +7,7 @@
 
 
 $html = function ($動画){
-    部品::$js["jsplayer"] .= '$v.player.init(' . tojs(htmlspecialchars_decode($動画['url'],ENT_QUOTES)) . ', 640, 360);';
+    部品::$js["jsplayer"] .= '$v.player.entrypoint(' . tojs(htmlspecialchars_decode($動画['url'],ENT_QUOTES)) . ', 640, 360);';
 
     return <<<"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 <div class="jsplayer" id="jsplayer"
@@ -54,7 +54,7 @@ var $v = {};
 $v.player = document.getElementById("jsplayer");
 
 
-$v.player.init = function(url, width, height){
+$v.player.entrypoint = function(url, width, height){
     width  = width  || 640;
     height = height || 360;
     $v.screen.style.width  = width + "px";
