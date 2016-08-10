@@ -948,7 +948,7 @@ class 検証{
     
     public function 必須($comment = ""){
         if(!$comment and $this->key){ $comment = "{$this->key}を入力してください"; }
-        return ($this->value !== null or $this->value !== "") ? $this->成功() : $this->失敗($comment);
+        return (strlen($this->value) > 0) ? $this->成功() : $this->失敗($comment);
     }
 
     public function 数($comment = ""){
