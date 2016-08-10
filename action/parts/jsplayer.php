@@ -767,20 +767,20 @@ $v.ajax = function(url, option){ //method, data, timeout, credential, header, su
     if(option.timeout >= 0){ xhr.timeout = option.timeout * 1000; }
     if(option.credential){ xhr.withCredentials = true; }
     if(option.header){
-        Object.keys(option.header).forEach(function(key){
+        for(var key in option.header){
             xhr.setRequestHeader(key, option.header[key]);
-        });
+        }
     }
     if(option.method.match(/^POST$/i)){
         if(option.data instanceof FormData){
             body = option.data;
         }
         else{
-            body = "";
-            Object.keys(option.data).forEach(function(key){
-                body += encodeURIComponent(key) + "=" + encodeURIComponent(option.data[key]) + "&";
-            });
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            body = "";
+            for(var key in option.data){
+                body += encodeURIComponent(key) + "=" + encodeURIComponent(option.data[key]) + "&";
+            }
         }
     }
     xhr.addEventListener('loadend', function(){
