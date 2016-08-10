@@ -760,32 +760,31 @@ $v.ajax = function(url, option){ //method, data, timeout, credential, header, su
     option.method  = option.method  || "GET";
     option.timeout = option.timeout || 60;
 
-    var body = null;
+    var body = "";
     var xhr  = new XMLHttpRequest();
     xhr.open(option.method, url);
 
     if(option.timeout >= 0){ xhr.timeout = option.timeout * 1000; }
     if(option.credential){ xhr.withCredentials = true; }
-    if(option.header){
-        for(var key in option.header){
-            xhr.setRequestHeader(key, option.header[key]);
-        }
-    }
     if(option.method.match(/^POST$/i)){
         if(option.data instanceof FormData){
             body = option.data;
         }
         else{
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-            body = "";
             for(var key in option.data){
                 body += encodeURIComponent(key) + "=" + encodeURIComponent(option.data[key]) + "&";
             }
         }
     }
+    if(option.header){
+        for(var key in option.header){
+            xhr.setRequestHeader(key, option.header[key]);
+        }
+    }
     xhr.addEventListener('loadend', function(){
         if(xhr.status >= 200 && xhr.status < 300 || xhr.status == 304){
-             if(option.success){ option.success(xhr); }
+            if(option.success){ option.success(xhr); }
         }
         else{
             if(option.error){ option.error(xhr); }
