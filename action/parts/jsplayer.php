@@ -326,13 +326,13 @@ $v.comment.release = function(comments, lane){
 };
 
 
-$v.comment.create = function(data, laneNo){
+$v.comment.create = function(data, laneNumber){
     var comment = document.createElement("span");
     comment.textContent = data[0];
     comment.className = "jsplayer-comment";
-    comment.setAttribute("data-lane", laneNo);
+    comment.setAttribute("data-lane", laneNumber);
 
-    comment.style.top = laneNo * $v.comment.laneHeight + $v.comment.marginTop + "px";
+    comment.style.top = laneNumber * $v.comment.laneHeight + $v.comment.marginTop + "px";
     comment.style.fontSize = $v.comment.fontSize + "px";
     comment.style.animationName = $v.screen.isFullscreen() ? $v.player.id+"fulllane" : $v.player.id+"normallane";
 
@@ -770,6 +770,47 @@ $v.post = function(url, param, callback){
         }
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
     }
+    xhr.send(body);
+};
+
+
+$v.ajax = function(url, option){ //method, data, timeout, credential, header, success, error, complete
+    option.method   = option.method  || "GET";
+    option.timeout  = option.timeout || 30;
+    var xhr  = new XMLHttpRequest();
+    var body = "";
+    
+    if(option.timeout >= 0){ xhr.timeout = option.timeout; }
+    if(option.credential){ xhr.withCredentials = true; }
+    if(option.header){
+        for(var name in option.header){
+            if(!option.data.hasOwnProperty(name)){ continue; }
+            xhr.setRequestHeader(name, option.header[name]);
+        }
+    }
+    if(option.method.match(/^POST$/i)){
+        if(option.data instanceof FormData){
+            body = option.data;
+        }
+        else{
+            for(var key in option.data){
+                if(!option.data.hasOwnProperty(key)){ continue; }
+                body += encodeURIComponent(key) + "=" + encodeURIComponent(option.data[key]) + "&";
+            }
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        }
+    }
+    xhr.addEventListener('loadend', function(){
+        if(xhr.status >= 200 && xhr.status < 300 || xhr.status == 304){
+             if(option.success){ option.success(xhr); }
+        }
+        else{
+            if(option.error){ option.error(xhr); }
+        }
+        if(option.complete){ option.complete(xhr); }
+    });
+
+    xhr.open(option.method, url);
     xhr.send(body);
 };
 
