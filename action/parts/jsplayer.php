@@ -35,7 +35,7 @@ $html = function ($動画){
     ></div
     ><form class="jsplayer-form" action="javascript:void(0)"
       ><input class="jsplayer-form-input" type="text" name="本文" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
-      ><input class="jsplayer-form-button" type="submit" value="コメントする" tabindex="3" disabled
+      ><input class="jsplayer-form-button" type="submit" value="コメントする" disabled
       ><input class="jsplayer-form-hidden-id" type="hidden" name="id" value="{$動画['id']}"
       ><input class="jsplayer-form-hidden-time" type="hidden" name="登録時間" value="{$動画['登録時間']}"
     ></form
@@ -784,12 +784,12 @@ $v.ajax = function(url, option){ //method, data, timeout, credential, header, su
     }
     xhr.addEventListener('loadend', function(){
         if(xhr.status >= 200 && xhr.status < 300 || xhr.status == 304){
-            if(option.success){ option.success(xhr); }
+            if($v.type(option.success) == "function"){ option.success(xhr); }
         }
         else{
-            if(option.error){ option.error(xhr); }
+            if($v.type(option.error) == "function"){ option.error(xhr); }
         }
-        if(option.complete){ option.complete(xhr); }
+        if($v.type(option.complete) == "function"){ option.complete(xhr); }
     });
 
     xhr.send(body);
