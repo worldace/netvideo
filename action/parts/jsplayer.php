@@ -432,9 +432,9 @@ $v.comment.get = function(){
         try{ var comments = JSON.parse(xhr.responseText); } catch(e){ return; }
 
         for(var i = 0; i < comments.length; i++){
-            if(comments[i][1] == null){ continue; }
-            var index = Math.floor(comments[i][2]/100);
-            if(index in $v.comment.list){ $v.comment.list[index].push([comments[i][1].substring(0,64), comments[i][2]/100]); }
+            if(comments[i].本文 == null){ continue; }
+            var index = Math.floor(comments[i].位置/100);
+            if(index in $v.comment.list){ $v.comment.list[index].push([comments[i].本文.substring(0,64), comments[i].位置/100]); }
         }
     });
 };
