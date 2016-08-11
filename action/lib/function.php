@@ -632,7 +632,7 @@ class データベース{
     }
 
     public function 追加($data){
-        if(gettype($data) === "object" and get_class($data) === "{$this->テーブル}テーブル"){ $data = $this->型変換($data, "{$this->テーブル}テーブル"); }
+        if(gettype($data) === "object" and get_class($data) === "{$this->テーブル}ライン"){ $data = $this->型変換($data, "{$this->テーブル}ライン"); }
         foreach($data as $name => $value){
             $this->文字列検証($name);
             $into文1 .= "{$name},";
@@ -648,7 +648,7 @@ class データベース{
     }
 
     public function 更新($id, $data){
-        if(gettype($data) === "object" and get_class($data) === "{$this->テーブル}テーブル"){ $data = $this->型変換($data, "{$this->テーブル}テーブル"); }
+        if(gettype($data) === "object" and get_class($data) === "{$this->テーブル}ライン"){ $data = $this->型変換($data, "{$this->テーブル}ライン"); }
         foreach($data as $name => $value){
             $this->文字列検証($name);
             if(is_array($value) and array_key_exists('式', $value)){
@@ -779,7 +779,7 @@ class データベース{
         }
         else{
             if($_ENV['データベース.詳細設定'][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){
-                $行タイプ = [$_ENV['データベース.詳細設定'][PDO::ATTR_DEFAULT_FETCH_MODE], "{$this->テーブル}テーブル"];
+                $行タイプ = [$_ENV['データベース.詳細設定'][PDO::ATTR_DEFAULT_FETCH_MODE], "{$this->テーブル}ライン"];
             }
         }
 
