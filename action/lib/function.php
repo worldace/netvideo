@@ -521,7 +521,6 @@ function MIMEタイプ($path){ // http://www.iana.org/assignments/media-types/me
 }
 
 
-
 function データベース($table, $driver = null, $user = null, $pass = null){
     return new データベース($table, $driver, $user, $pass);
 }
@@ -842,7 +841,7 @@ class 部品{
             self::$キャッシュ[$部品名]["js"]   = $js;
         }
 
-        if($自動エスケープ){ $引数 = self::h($引数); }
+        if(self::$自動エスケープ){ $引数 = self::h($引数); }
 
         if($css) { self::$css[$部品名] = is_callable($css) ? call_user_func_array($css, $引数) : $css; }
         if($js)  { self::$js[$部品名]  = is_callable($js)  ? call_user_func_array($js,  $引数) : $js; }
