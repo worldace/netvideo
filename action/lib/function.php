@@ -294,6 +294,23 @@ function dd(){
 }
 
 
+function newTrait($trait = null, $class = null, $args = null){
+    if($trait !== null){
+        foreach((array)$trait as $value){
+            if(!preg_match("/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/", $value)){ throw new Exception("第1引数に不正な文字列"); };
+        }
+        $trait_code = "use " . implode(",", (array)$trait) . ";";
+    }
+    if($class !== null){
+        if(!preg_match("/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/", $class)){ throw new Exception("第2引数に不正な文字列"); };
+        $class_code = "extends $class";
+    }
+    $code  = "\$object = new class(...(array)\$args) $class_code{ $trait_code };";
+    eval($code);
+    return $object;
+}
+
+
 function パーミッション($path, $permission = null){
     if(!preg_match("/^0/", $permission) and $permission >= 100 and $permission <= 777){
         chmod($path, octdec($permission));
@@ -518,16 +535,6 @@ function MIMEタイプ($path){ // http://www.iana.org/assignments/media-types/me
     ];
     $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
     return $list[$ext] ?: "application/octet-stream";
-}
-
-
-function newTrait($class = null, $args = null, $trait = null){
-    $ext_code = ($class) ? "extends $class" : "";
-    $arg_code = implode(",", (array)$args);
-    if($trait){ $trait_code = "use " . implode(",", (array)$trait) . ";"; }
-    $code  = "\$object = new class($arg_code) $ext_code{ $trait_code };";
-    eval($code);
-    return $object;
 }
 
 
