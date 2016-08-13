@@ -305,8 +305,7 @@ function newTrait($trait = null, $class = null, $args = null){
         if(!preg_match("/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/", $class)){ throw new Exception("第2引数に不正な文字列"); };
         $class_code = "extends $class";
     }
-    $code  = "\$object = new class(...(array)\$args) $class_code{ $trait_code };";
-    eval($code);
+    eval("\$object = new class(...(array)\$args) $class_code{ $trait_code };");
     return $object;
 }
 
