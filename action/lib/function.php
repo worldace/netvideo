@@ -297,12 +297,12 @@ function dd(){
 function newTrait($trait = null, $class = null, $args = null){
     if($trait !== null){
         foreach((array)$trait as $value){
-            if(!preg_match("/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/", $value)){ throw new Exception("第1引数に不正な文字列"); };
+            if(!preg_match("/^[a-zA-Z_\x7f-\xff\\][a-zA-Z0-9_\x7f-\xff\\]*$/", $value)){ throw new Exception("第1引数に不正な文字列"); };
         }
         $trait_code = "use " . implode(",", (array)$trait) . ";";
     }
     if($class !== null){
-        if(!preg_match("/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/", $class)){ throw new Exception("第2引数に不正な文字列"); };
+        if(!preg_match("/^[a-zA-Z_\x7f-\xff\\][a-zA-Z0-9_\x7f-\xff\\]*$/", $class)){ throw new Exception("第2引数に不正な文字列"); };
         $class_code = "extends $class";
     }
     eval("\$object = new class(...(array)\$args) $class_code{ $trait_code };");
