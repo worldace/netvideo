@@ -521,6 +521,16 @@ function MIMEタイプ($path){ // http://www.iana.org/assignments/media-types/me
 }
 
 
+function newTrait($class = null, $args = null, $trait = null){
+    $ext_code = ($class) ? "extends $class" : "";
+    $arg_code = implode(",", (array)$args);
+    if($trait){ $trait_code = "use " . implode(",", (array)$trait) . ";"; }
+    $code  = "\$object = new class($arg_code) $ext_code{ $trait_code };";
+    eval($code);
+    return $object;
+}
+
+
 function データベース($table, $driver = null, $user = null, $pass = null){
     return new データベース($table, $driver, $user, $pass);
 }
