@@ -501,7 +501,7 @@ function jwt発行($data, $key){
 }
 
 
-function jwt検証($jwt, $key){
+function jwt認証($jwt, $key){
     if(substr_count($jwt, ".") !== 2) { return false; }
 
     list($headb64, $datab64, $cryptob64) = explode('.', $jwt);
