@@ -487,6 +487,26 @@ function base64_decode_urlsafe($input){
 }
 
 
+function 暗号化($str, $key, $type = 'aes-256-ecb'){
+    return openssl_encrypt($str, $type, $key);
+}
+
+
+function 復号化($str, $key, $type = 'aes-256-ecb'){
+    return openssl_decrypt($str, $type, $key);
+}
+
+
+function パスワードハッシュ化($password){
+    return password_hash($password, PASSWORD_DEFAULT);
+}
+
+
+function パスワード認証($password, $hash){
+    return password_verify($password, $hash);
+}
+
+
 function jwt発行($data, $key){
     if(!$data){ throw new Exception("第1引数に有効なデータを入力してください"); }
     $header     = ['typ'=>'jwt', 'alg'=>'HS256'];
