@@ -784,12 +784,12 @@ $v.ajax = function(url, option){ //method, data, timeout, credential, header, su
     }
     xhr.addEventListener('loadend', function(){
         if(xhr.status >= 200 && xhr.status < 300 || xhr.status == 304){
-            if($v.type(option.success) == "function"){ option.success(xhr); }
+            if(typeof option.success === "function"){ option.success(xhr); }
         }
         else{
-            if($v.type(option.error) == "function"){ option.error(xhr); }
+            if(typeof option.error === "function"){ option.error(xhr); }
         }
-        if($v.type(option.complete) == "function"){ option.complete(xhr); }
+        if(typeof option.complete === "function"){ option.complete(xhr); }
     });
 
     xhr.send(body);

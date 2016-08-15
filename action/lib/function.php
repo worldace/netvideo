@@ -472,6 +472,51 @@ function tojs($data){
 }
 
 
+function base64_encode_urlsafe($input){
+    return str_replace('=', '', strtr(base64_encode($input), '+/', '-_'));
+}
+
+
+function base64_decode_urlsafe($input){
+    $remainder = strlen($input) % 4;
+    if($remainder){
+        $padlen = 4 - $remainder;
+        $input .= str_repeat('=', $padlen);
+    }
+    return base64_decode(strtr($input, '-_', '+/'));
+}
+
+
+function jwt発行($data, $key){
+    if(!$data){ throw new Exception("第1引数に有効なデータを入力してください"); }
+    $header     = ['typ'=>'jwt', 'alg'=>'HS256'];
+    $segments   = [];
+    $segments[] = base64_encode_urlsafe(json_encode($header));
+    $segments[] = base64_encode_urlsafe(json_encode($data));
+
+    $sign       = hash_hmac('sha256', implode('.', $segments), $key, true);
+    $segments[] = base64_encode_urlsafe($sign);
+
+    return implode('.', $segments);
+}
+
+
+function jwt検証($jwt, $key){
+    if(substr_count($jwt, ".") !== 2) { return false; }
+
+    list($headb64, $datab64, $cryptob64) = explode('.', $jwt);
+    $header = json_decode(base64_decode_urlsafe($headb64));
+    $data   = json_decode(base64_decode_urlsafe($datab64), true);
+    $sign   = base64_decode_urlsafe($cryptob64);
+
+    if(!$header or !$data) { return false; }
+    if($header->alg !== "HS256") { return false; }
+    if($sign !== hash_hmac('sha256', "$headb64.$datab64", $key, true)) { return false; }
+
+    return $data;
+}
+
+
 function uuid($hyphen = false) { //uuid v4
     $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
     mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0x0fff)|0x4000,mt_rand(0,0x3fff)|0x8000,mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff));
