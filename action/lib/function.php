@@ -497,7 +497,7 @@ function 復号化($str, $key, $type = 'aes-256-ecb'){
 }
 
 
-function パスワードハッシュ化($password){
+function パスワードハッシュ($password){
     return password_hash($password, PASSWORD_DEFAULT);
 }
 
