@@ -472,28 +472,18 @@ function tojs($data){
 }
 
 
-function base64_encode_urlsafe($input){
-    return str_replace('=', '', strtr(base64_encode($input), '+/', '-_'));
+function uuid($hyphen = false) { //uuid v4
+    $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+    mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0x0fff)|0x4000,mt_rand(0,0x3fff)|0x8000,mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff));
+    return ($hyphen) ? $uuid : str_replace("-", "", $uuid);
 }
 
 
-function base64_decode_urlsafe($input){
-    $remainder = strlen($input) % 4;
-    if($remainder){
-        $padlen = 4 - $remainder;
-        $input .= str_repeat('=', $padlen);
-    }
-    return base64_decode(strtr($input, '-_', '+/'));
-}
-
-
-function 暗号化($str, $key, $type = 'aes-256-ecb'){
-    return openssl_encrypt($str, $type, $key);
-}
-
-
-function 復号化($str, $key, $type = 'aes-256-ecb'){
-    return openssl_decrypt($str, $type, $key);
+function パスワード発行($length = 8, $userfriendly = false){
+    $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+    if($userfriendly){ $str = "ABDEFGHJLMNQRTYabdefghmnrty23456789"; }
+    $str = str_repeat($str, floor($length/2));
+    return substr(str_shuffle($str), 0, $length);
 }
 
 
@@ -504,6 +494,16 @@ function パスワードハッシュ($password){
 
 function パスワード認証($password, $hash){
     return password_verify($password, $hash);
+}
+
+
+function 暗号化($str, $key, $type = 'aes-256-ecb'){
+    return openssl_encrypt($str, $type, $key);
+}
+
+
+function 復号化($str, $key, $type = 'aes-256-ecb'){
+    return openssl_decrypt($str, $type, $key);
 }
 
 
@@ -537,18 +537,18 @@ function jwt認証($jwt, $key){
 }
 
 
-function uuid($hyphen = false) { //uuid v4
-    $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-    mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0x0fff)|0x4000,mt_rand(0,0x3fff)|0x8000,mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff));
-    return ($hyphen) ? $uuid : str_replace("-", "", $uuid);
+function base64_encode_urlsafe($input){
+    return str_replace('=', '', strtr(base64_encode($input), '+/', '-_'));
 }
 
 
-function ランダム英数字($length = 8, $userfriendly = false){
-    $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
-    if($userfriendly){ $str = "ABDEFGHJLMNQRTYabdefghmnrty23456789"; }
-    $str = str_repeat($str, floor($length/2));
-    return substr(str_shuffle($str), 0, $length);
+function base64_decode_urlsafe($input){
+    $remainder = strlen($input) % 4;
+    if($remainder){
+        $padlen = 4 - $remainder;
+        $input .= str_repeat('=', $padlen);
+    }
+    return base64_decode(strtr($input, '-_', '+/'));
 }
 
 
