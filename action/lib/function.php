@@ -552,6 +552,18 @@ function base64_decode_urlsafe($input){
 }
 
 
+function ベーシック認証($認証関数, $realm="member only"){
+    if(isset($_SERVER['PHP_AUTH_USER']) and isset($_SERVER['PHP_AUTH_PW'])){
+        if(call_user_func($認証関数, $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) === true){
+            return $_SERVER['PHP_AUTH_USER'];
+        }
+    }
+    header("WWW-Authenticate: Basic realm=\"$realm\"");
+    header("HTTP/1.0 401 Unauthorized");
+    return false;
+}
+
+
 function 連想配列ソート(array &$array){
     array_multisort(array_values($array), SORT_DESC, array_keys($array), SORT_ASC, $array);
 }
