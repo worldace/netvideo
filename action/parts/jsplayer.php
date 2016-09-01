@@ -104,10 +104,10 @@ $v.player.addEventListener('keydown', function(event){
         $v.video.setTime($v.video.currentTime - 30);
     }
     else if(event.which == 39){ //→
-        $v.video.setTime($v.video.currentTime + 10);
+        $v.video.setTime($v.video.currentTime + 15);
     }
     else if(event.which == 37){ //←
-        $v.video.setTime($v.video.currentTime - 10);
+        $v.video.setTime($v.video.currentTime - 15);
     }
     else if(event.which == 36){ //Home
         $v.video.setTime(0);
@@ -584,7 +584,7 @@ $v.controller.timeSeek.addEventListener('click', function(event){
 
 
 $v.controller.timeSeek.addEventListener('wheel', function(event){
-    (event.deltaY < 0) ? $v.video.setTime($v.video.currentTime+10) : $v.video.setTime($v.video.currentTime-10);
+    (event.deltaY < 0) ? $v.video.setTime($v.video.currentTime+15) : $v.video.setTime($v.video.currentTime-15);
 });
 
 
