@@ -8,7 +8,6 @@
 
 function クラスローダ($dir = __DIR__){
     spl_autoload_register(function($class) use($dir){
-        if(preg_match("/^WIN/i", PHP_OS) and version_compare(PHP_VERSION, '7.1.0', '<')){ $class = addslashes(mb_convert_encoding($class, 'SJIS', 'UTF-8')); }
         $class = str_replace("_", "/", $class);
         include_once "{$dir}/{$class}.php";
     });
@@ -286,7 +285,7 @@ function テーブルタグ作成(array $array){
 function dd(){
     foreach(func_get_args() as $var){
         $out = var_export($var, true);
-        if(php_sapi_name() === 'cli'){ $str .= (preg_match("/^WIN/i",PHP_OS) and version_compare(PHP_VERSION,'7.1.0','<')) ? mb_convert_encoding($out,'SJIS','UTF-8') : $out; }
+        if(php_sapi_name() === 'cli'){ $str .= $out; }
         else{ $str .= "<pre>$out</pre>"; }
         $str .= "\n\n";
     }
@@ -318,25 +317,33 @@ function パーミッション($path, $permission = null){
 }
 
 
-function ファイル一覧($path = "./", $pattern = "."){
-    if(!is_dir($path)){ return false; }
-    foreach(array_diff(scandir($path), ['.','..']) as $file){
-        if(is_file("$path/$file") and preg_match("#$pattern#i", $file)){ $list[] = realpath("$path/$file"); }
-        if(is_dir("$path/$file")) { $list = array_merge((array)$list, ファイル一覧("$path/$file", $pattern)); }
+function ファイル一覧($dir = ".", $pattern = "."){
+    if(!is_dir($dir)){ return false; }
+    foreach(array_diff(scandir($dir), ['.','..']) as $file){
+        if(is_dir("$dir/$file")) {
+            foreach(ファイル一覧("$dir/$file", $pattern) as $sub){
+                yield $sub;
+            }
+        }
+        if(is_file("$dir/$file") and preg_match("#$pattern#i", $file)){
+            yield realpath("$dir/$file");
+        }
     }
-    return (array)$list;
 }
 
 
-function ディレクトリ一覧($path = "./", $pattern = "."){
-    if(!is_dir($path)){ return false; }
-    foreach(array_diff(scandir($path), ['.','..']) as $file){
-        if(is_dir("$path/$file")) {
-            if(preg_match("#$pattern#i", $file)){ $list[] = realpath("$path/$file"); }
-            $list = array_merge((array)$list, ディレクトリ一覧("$path/$file", $pattern));
+function ディレクトリ一覧($dir = ".", $pattern = "."){
+    if(!is_dir($dir)){ return false; }
+    foreach(array_diff(scandir($dir), ['.','..']) as $file){
+        if(is_dir("$dir/$file")) {
+            if(preg_match("#$pattern#i", $file)){
+                yield realpath("$dir/$file");
+            }
+            foreach(ディレクトリ一覧("$dir/$file", $pattern) as $sub){
+                yield $sub;
+            }
         }
     }
-    return (array)$list;
 }
 
 
@@ -910,7 +917,6 @@ class 部品{
     private static $初期化済み = false;
     private static $自動エスケープ = true;
     private static $キャッシュ;
-    private static $windows;
     public  static $イベント;
     public  static $js  = [];
     public  static $css = [];
@@ -925,8 +931,7 @@ class 部品{
             $js   = self::$キャッシュ[$部品名]["js"];
         }
         else{
-            $パス用部品名 = (self::$windows) ? addslashes(mb_convert_encoding($部品名, 'SJIS', 'UTF-8')) : $部品名;
-            require self::$ディレクトリ . "/$パス用部品名.php";
+            require self::$ディレクトリ . "/$部品名.php";
 
             self::$キャッシュ[$部品名]["読み込み済み"] = true;
             self::$キャッシュ[$部品名]["html"] = $html;
@@ -986,7 +991,6 @@ class 部品{
 
     private static function 初期化実行(){
         self::$初期化済み = true;
-        self::$windows = (preg_match("/^WIN/i", PHP_OS) and version_compare(PHP_VERSION, '7.1.0', '<'));
         ob_start();
         register_shutdown_function("部品::終了処理");
     }
