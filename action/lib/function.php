@@ -188,7 +188,16 @@ function 現在のURL($no_query = false){
 }
 
 
-function ベースURL($url){
+function ホームURL($url){
+    $parsed_url = parse_url($url);
+    $scheme = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
+    $host   = isset($parsed_url['host']) ? $parsed_url['host'] : '';
+    $port   = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
+    return $scheme . $host . $port . "/";
+}
+
+
+function 親URL($url){
     return (substr_count($url, "/") === 2) ? $url."/" : dirname($url."a")."/";
 }
 
