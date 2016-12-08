@@ -272,6 +272,23 @@ function 改行変換($arg = "", $replace = ""){
 }
 
 
+function 開始タグ($tag, array $attr = []){
+    $tag = htmlspecialchars($tag, ENT_QUOTES, "UTF-8");
+    foreach((array)$attr as $key => $value){
+        $key   = htmlspecialchars($key, ENT_QUOTES, "UTF-8");
+        $value = htmlspecialchars($value, ENT_QUOTES, "UTF-8");
+        $attr_str .= " $key=\"$value\"";
+    }
+    return "<$tag$attr_str>";
+}
+
+
+function 終了タグ($tag){
+    $tag = htmlspecialchars($tag, ENT_QUOTES, "UTF-8");
+    return "</$tag>";
+}
+
+
 function 自動リンク($arg = "", array $attrmap = []){
     if(is_array($arg)){ return array_map(function($str) use($attrmap){ return 自動リンク($str, $attrmap); }, $arg); }
     foreach($attrmap as $name => $value){ $attr .= " $name=\"$value\""; }
