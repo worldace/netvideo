@@ -213,7 +213,7 @@ function 連想配列なら($array){
 }
 
 
-function 日付($time = 0, $str = '[年]/[0月]/[0日] [0時]:[0分]'){
+function 日付($str = '[年]/[0月]/[0日] [0時]:[0分]', $time = 0){
     if(!$time){ $time = time(); }
     $week = ['日','月','火','水','木','金','土'][date('w', $time)];
     $from = ['[年]','[月]','[0月]','[日]','[0日]','[時]','[0時]','[0分]','[0秒]','[曜日]'];
@@ -320,13 +320,13 @@ function パーミッション($path, $permission = null){
 function ファイル一覧($dir = ".", $pattern = "."){
     if(!is_dir($dir)){ return false; }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
+        if(is_file("$dir/$file") and preg_match("#$pattern#i", $file)){
+            yield realpath("$dir/$file");
+        }
         if(is_dir("$dir/$file")) {
             foreach(ファイル一覧("$dir/$file", $pattern) as $sub){
                 yield $sub;
             }
-        }
-        if(is_file("$dir/$file") and preg_match("#$pattern#i", $file)){
-            yield realpath("$dir/$file");
         }
     }
 }
