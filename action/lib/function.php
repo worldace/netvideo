@@ -273,30 +273,24 @@ function 改行変換($arg = "", $replace = ""){
 
 
 function 開始タグ($tag, array $attr = []){
-    $tag = htmlspecialchars($tag, ENT_QUOTES, "UTF-8");
-    foreach((array)$attr as $key => $value){
-        $key   = htmlspecialchars($key, ENT_QUOTES, "UTF-8");
-        $value = htmlspecialchars($value, ENT_QUOTES, "UTF-8");
-        $attr_str .= " $key=\"$value\"";
-    }
+    foreach($attr as $name => $value){ $attr_str .= " $name=\"$value\""; }
     return "<$tag$attr_str>";
 }
 
 
 function 終了タグ($tag){
-    $tag = htmlspecialchars($tag, ENT_QUOTES, "UTF-8");
     return "</$tag>";
 }
 
 
-function 自動リンク($arg = "", array $attrmap = []){
-    if(is_array($arg)){ return array_map(function($str) use($attrmap){ return 自動リンク($str, $attrmap); }, $arg); }
-    foreach($attrmap as $name => $value){ $attr .= " $name=\"$value\""; }
-    return preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr>$1</a>", $arg);
+function 自動リンク($arg = "", array $attr = []){
+    if(is_array($arg)){ return array_map(function($str) use($attr){ return 自動リンク($str, $attr); }, $arg); }
+    foreach($attr as $name => $value){ $attr_str .= " $name=\"$value\""; }
+    return preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $arg);
 }
 
 
-function テーブルタグ作成(array $array){
+function テーブルタグ作成(array $array, array $attr = []){
     $firstkey = key($array);
     if(is_array($array[$firstkey])){ $tag = "<tr>\n<th></th>\n<th>" . implode("</th>\n<th>",array_keys($array[$firstkey])) . "</th>\n</tr>\n"; }
     foreach($array as $key1 => $value1){
@@ -304,7 +298,8 @@ function テーブルタグ作成(array $array){
         foreach((array)$value1 as $key2 => $value2){ $tag .= "<td>$value2</td>\n"; }
         $tag .= "</tr>\n";
     }
-    return $tag;
+    foreach($attr as $name => $value){ $attr_str .= " $name=\"$value\""; }
+    return "<table$attr_str>\n$tag\n</table>";
 }
 
 
