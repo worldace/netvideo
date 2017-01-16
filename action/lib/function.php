@@ -124,7 +124,7 @@ function GET送信($url, array $querymap = null, array $request_header = null){
     else if($querymap){ $url .= "?" . http_build_query($querymap, "", "&"); }
     $request = stream_context_create(['http'=>['method'=>'GET', 'header'=>implode("\r\n", (array)$request_header)]]);
     $contents = file_get_contents($url, false, $request);
-    $_ENV['RESPONSE_HEADER'] = ($contents !== false) ? $http_response_header : null;
+    $_ENV['RESPONSE_HEADER'] = ($contents !== false) ? $http_response_header : [];
     return $contents;
 }
 
@@ -133,7 +133,7 @@ function POST送信($url, array $querymap = null, array $request_header = null){
     if(is_array($request_header)){ $request_header = str_replace(["\r","\n"], "", $request_header); }
     $request = stream_context_create(['http'=>['method'=>'POST','header'=>implode("\r\n",(array)$request_header),'content'=>http_build_query((array)$querymap,"","&")]]);
     $contents = file_get_contents($url, false, $request);
-    $_ENV['RESPONSE_HEADER'] = ($contents !== false) ? $http_response_header : null;
+    $_ENV['RESPONSE_HEADER'] = ($contents !== false) ? $http_response_header : [];
     return $contents;
 }
 
@@ -160,7 +160,7 @@ function ファイル送信($url, array $querymap = null, array $request_header 
     $content .= "--$区切り--\r\n";
     $request = stream_context_create(['http'=>['method'=>'POST', 'header'=>implode("\r\n",(array)$request_header), 'content'=>$content]]);
     $contents = file_get_contents($url, false, $request);
-    $_ENV['RESPONSE_HEADER'] = ($contents !== false) ? $http_response_header : null;
+    $_ENV['RESPONSE_HEADER'] = ($contents !== false) ? $http_response_header : [];
     return $contents;
 }
 

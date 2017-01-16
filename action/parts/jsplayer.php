@@ -584,7 +584,7 @@ $v.controller.timeSeek.addEventListener('click', function(event){
 
 
 $v.controller.timeSeek.addEventListener('wheel', function(event){
-    (event.deltaY < 0) ? $v.video.setTime($v.video.currentTime+15) : $v.video.setTime($v.video.currentTime-15);
+    (event.deltaY > 0) ? $v.video.setTime($v.video.currentTime+15) : $v.video.setTime($v.video.currentTime-15);
 });
 
 
