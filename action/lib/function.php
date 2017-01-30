@@ -438,8 +438,14 @@ function JSON取得($file){
 function XML取得($xml, $options = array()) {
     if(!is_object($xml)){
         $xml = ltrim($xml);
-        if(preg_match("/^</", $input)){ $xml = simplexml_load_string($xml); }
-        else{ $xml = simplexml_load_file($xml); }
+        if(!preg_match("/^</", $input)){
+            $xmlstr = file_get_contents($xml);
+        }
+        else{
+            $xmlstr = $xml;
+        }
+        $xmlstr = preg_replace("/&(?!amp;)/", "&amp;" ,$xmlstr);
+        $xml = simplexml_load_string($xmlstr);
         if(!$xml){ return false; }
     }
     //xmlToArray Tamlyn Rhodes <http://tamlyn.org> Public Domain
