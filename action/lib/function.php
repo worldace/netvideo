@@ -222,6 +222,16 @@ function 連想配列なら($array){
 }
 
 
+function 本番環境なら(){
+    return ini_get("display_errors") ? false : true;
+}
+
+
+function 開発環境なら(){
+    return ini_get("display_errors") ? true : false;
+}
+
+
 function 日付($str = '[年]/[0月]/[0日] [0時]:[0分]', $time = 0){
     if(!$time){ $time = time(); }
     $week = ['日','月','火','水','木','金','土'][date('w', $time)];
