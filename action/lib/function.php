@@ -22,31 +22,98 @@ function route(){
 }
 
 
-function 検証($method, $name, callable $func){
-    if(preg_match("/^get$/i", $method)){
-        $result = $_ENV['検証結果']["GET:{$name}"] = $func(@$_GET[$name]);
+function 検証($type, $name, $func){
+    if(preg_match("/^get$/i", $type)){
+        $value = @$_GET[$name];
     }
-    elseif(preg_match("/^post$/i", $method)){
-        $result = $_ENV['検証結果']["POST:{$name}"] = $func(@$_POST[$name]);
+    elseif(preg_match("/^post$/i", $type)){
+        $value = @$_POST[$name];
     }
-    elseif(preg_match("/^cookie$/i", $method)){
-        $result = $_ENV['検証結果']["COOKIE:{$name}"] = $func(@$_COOKIE[$name]);
+    elseif(preg_match("/^cookie$/i", $type)){
+        $value = @$_COOKIE[$name];
     }
 
+    if(is_callable($func)){
+        $result = $func($value);
+    }
+    else{
+        if     (is_callable("検証::$func"))                          { $result = 検証::$func($value); }
+        else if(preg_match("/^([0-9]+)文字以上$/u", $func, $m))      { $result = 検証::文字以上($value, $m[1]); }
+        else if(preg_match("/^([0-9]+)文字以下$/u", $func, $m))      { $result = 検証::文字以下($value, $m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)以上$/u", $func, $m))      { $result = 検証::以上($value, $m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)以下$/u", $func, $m))      { $result = 検証::以下($value, $m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)より大きい$/u", $func, $m)){ $result = 検証::より大きい($value, $m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)より小さい$/u", $func, $m)){ $result = 検証::より小さい($value, $m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)と同じ$/u", $func, $m))    { $result = 検証::と同じ($value, $m[1]); }
+        else                                                         { throw new Exception("検証関数名が正しくありません"); }
+    }
+    
     if($result === true){ return true; }
     elseif($result === false){ return false; }
-    else{ throw new Exception("検証関数はtrueまたはfalseを返してください");}
+    else{ throw new Exception("検証関数はtrueまたはfalseを返してください"); }
 }
 
 
-function 整形($method, $name, callable $func){
-    if(preg_match("/^get$/i", $method)){
+class 検証{
+    public static function 必須($v){
+        return strlen($v) > 0;
+    }
+    public static function 数($v){
+        return (is_numeric($v) and !preg_match("/^-?0+\d/", $v));
+    }
+    public static function 自然数($v){
+        return preg_match("/^[1-9][0-9]*$/", $v) > 0;
+    }
+    public static function 自然数と0($v){
+        return preg_match("/^(0|[1-9]\d*)$/", $v) > 0;
+    }
+    public static function 数字($v){
+        return preg_match("/^[0-9]+$/", $v) > 0;
+    }
+    public static function 英語($v){
+        return preg_match("/^[A-Za-z]+$/", $v) > 0;
+    }
+    public static function 英数字($v){
+        return preg_match("/^[A-Za-z0-9]+$/", $v) > 0;
+    }
+    public static function URL($v){
+        return preg_match("|^https?://.{4,}|i", $v) > 0;
+    }
+    public static function 画像データ($v){
+        return getimagesizefromstring($v)[0] > 0; //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
+    }
+    public static function と同じ($v, $num){
+        return $v == $num;
+    }
+    public static function 以上($v, $num){
+        return (is_numeric($v) and ($v >= $num));
+    }
+    public static function 以下($v, $num){
+        return (is_numeric($v) and ($v <= $num));
+    }
+    public static function より大きい($v, $num){
+        return (is_numeric($v) and ($v > $num));
+    }
+    public static function より小さい($v, $num){
+        return (is_numeric($v) and ($v < $num));
+    }
+    public static function 文字以上($v, $num){
+        return mb_strlen($v,"UTF-8") >= $num;
+    }
+    public static function 文字以下($v, $num){
+        return mb_strlen($v,"UTF-8") <= $num;
+    }
+}
+
+
+function 整形($type, $name, $func){
+    if(preg_match("/^get$/i", $type)){
         $result = $_GET[$name] = $func(@$_GET[$name]);
     }
-    elseif(preg_match("/^post$/i", $method)){
+    elseif(preg_match("/^post$/i", $type)){
         $result = $_POST[$name] = $func(@$_POST[$name]);
     }
-    elseif(preg_match("/^cookie$/i", $method)){
+    elseif(preg_match("/^cookie$/i", $type)){
         $result = $_COOKIE[$name] = $func(@$_COOKIE[$name]);
     }
     return $result;
