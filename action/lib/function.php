@@ -48,6 +48,10 @@ function 検証($type, $name, $func){
         else                                                         { throw new Exception("検証関数名が正しくありません"); }
     }
     
+    if(検証::$例外 === true and $result === false){
+        throw new Exception(h($name)."の値が不正です");
+    }
+    
     if($result === true){ return true; }
     elseif($result === false){ return false; }
     else{ throw new Exception("検証関数はtrueまたはfalseを返してください"); }
@@ -55,6 +59,8 @@ function 検証($type, $name, $func){
 
 
 class 検証{
+    public static $例外 = false;
+
     public static function 必須($v){
         return strlen($v) > 0;
     }
