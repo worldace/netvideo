@@ -13,12 +13,45 @@ function クラスローダ($dir = __DIR__){
     });
 }
 
+
 function route(){
     foreach(func_get_args() as $_ENV['CURRENT_ROUTE']){
         include_once $_ENV['CURRENT_ROUTE'];
     }
     exit;
 }
+
+
+function 検証($method, $name, callable $func){
+    if(preg_match("/^get$/i", $method)){
+        $result = $_ENV['検証結果']["GET:{$name}"] = $func(@$_GET[$name]);
+    }
+    elseif(preg_match("/^post$/i", $method)){
+        $result = $_ENV['検証結果']["POST:{$name}"] = $func(@$_POST[$name]);
+    }
+    elseif(preg_match("/^cookie$/i", $method)){
+        $result = $_ENV['検証結果']["COOKIE:{$name}"] = $func(@$_COOKIE[$name]);
+    }
+
+    if($result === true){ return true; }
+    elseif($result === false){ return false; }
+    else{ throw new Exception("検証関数はtrueまたはfalseを返してください");}
+}
+
+
+function 整形($method, $name, callable $func){
+    if(preg_match("/^get$/i", $method)){
+        $result = $_GET[$name] = $func(@$_GET[$name]);
+    }
+    elseif(preg_match("/^post$/i", $method)){
+        $result = $_POST[$name] = $func(@$_POST[$name]);
+    }
+    elseif(preg_match("/^cookie$/i", $method)){
+        $result = $_COOKIE[$name] = $func(@$_COOKIE[$name]);
+    }
+    return $result;
+}
+
 
 function エラー($str = "エラーが発生しました"){
     header('HTTP', true, 500);
@@ -1036,164 +1069,5 @@ class 部品{
         if($dir){ self::$ディレクトリ = preg_replace("|/$|", "", $dir); }
         self::$自動エスケープ = $自動エスケープ;
         if(!self::$初期化済み){ self::初期化実行(); }
-    }
-}
-
-
-function 確認($value, $method = ""){
-    return new 検証("確認", $value, $method);
-}
-
-
-function GET検証($key){
-    return new 検証("検証", $key, "GET");
-}
-
-
-function POST検証($key){
-    return new 検証("検証", $key, "POST");
-}
-
-
-function 検証($value, $method = ""){
-    return new 検証("検証", $value, $method);
-}
-
-
-class 検証{
-    public $エラー関数;
-    public $key;
-    public $value;
-    public $mode;
-    public $method;
-
-    public function __construct($mode, $value, $method = ""){
-        $this->エラー関数 = (検証エラー関数) ? 検証エラー関数 : "エラー";
-        $this->mode = $mode;
-        if($method){
-            $this->key   = $value;
-            $this->value = ($method == "POST") ? @$_POST[$this->key] : @$_GET[$this->key];
-        }
-        else{
-            $this->value = $value;
-        }
-    }
-    
-    public function 必須($comment = ""){
-        if(!$comment and $this->key){ $comment = "{$this->key}を入力してください"; }
-        return (strlen($this->value) > 0) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function 数($comment = ""){
-        if(!$comment and $this->key){ $comment = "{$this->key}には数値を入力してください"; }
-        return (is_numeric($this->value) and !preg_match("/^-?0+\d/", $this->value)) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function 自然数($comment = ""){
-        if(!$comment and $this->key){ $comment = "{$this->key}は1以上にしてください"; }
-        return (preg_match("/^[1-9][0-9]*$/", $this->value)) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function 自然数と0($comment = ""){
-        if(!$comment and $this->key){ $comment = "{$this->key}は0以上にしてください"; }
-        return (preg_match("/^(0|[1-9]\d*)$/", $this->value)) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function 数字($comment = ""){
-        if(!$comment and $this->key){ $comment = "{$this->key}に数字以外の文字が含まれています"; }
-        return (preg_match("/^[0-9]+$/", $this->value)) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function 英語($comment = ""){
-        if(!$comment and $this->key){ $comment = "{$this->key}に英語以外の文字が含まれています"; }
-        return (preg_match("/^[A-Za-z]+$/", $this->value)) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function 英数字($comment = ""){
-        if(!$comment and $this->key){ $comment = "{$this->key}に英数字以外の文字が含まれています"; }
-        return (preg_match("/^[A-Za-z0-9]+$/", $this->value)) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function URL($comment = ""){
-        if(!$comment and $this->key){ $comment = "{$this->key}にはURLを入力してください"; }
-        return (preg_match("|^https?://.{4,}|i", $this->value)) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function 画像データ($comment = ""){
-        if(!$comment and $this->key){ $comment = "{$this->key}を取得できませんでした"; }
-        return (getimagesizefromstring($this->value)[0] > 0) ? $this->成功() : $this->失敗($comment); //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
-    }
-
-    public function と同じ($value, $comment = ""){
-        if(!$comment and $this->key){ $comment = "{$this->key}が{$value}でありません"; }
-        return ($this->value == $value) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function 以上($num, $unit = "", $comment = ""){ //非文書化
-        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}以上にしてください"; }
-        return (is_numeric($this->value) and ($this->value >= $num)) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function 以下($num, $unit = "", $comment = ""){ //非文書化
-        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}以下にしてください"; }
-        return (is_numeric($this->value) and ($this->value <= $num)) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function より大きい($num, $unit = "", $comment = ""){ //非文書化
-        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}より大きくしてください"; }
-        return (is_numeric($this->value) and ($this->value > $num)) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function より小さい($num, $unit = "", $comment = ""){ //非文書化
-        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}{$unit}より小さくしてください"; }
-        return (is_numeric($this->value) and ($this->value < $num)) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function 文字以上($num, $comment = ""){ //非文書化
-        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以上にしてください"; }
-        return (mb_strlen($this->value,"UTF-8") < $num) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function 文字以下($num, $comment = ""){ //非文書化
-        if(!$comment and $this->key){ $comment = "{$this->key}は{$num}文字以内にしてください"; }
-        return (mb_strlen($this->value,"UTF-8") > $num) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function 条件($bool, $comment = ""){
-        if(!$comment and $this->key){ $comment = "{$this->key}の入力が間違っています"; }
-        return ($bool) ? $this->成功() : $this->失敗($comment);
-    }
-
-    public function 正規表現($regex, $comment = ""){
-        if(!$comment and $this->key){ $comment = "{$this->key}の入力が正しくありません"; }
-        return (preg_match($regex, $this->value)) ? $this->成功() : $this->失敗($comment);
-    }
-
-    private function 全角数字変換($num){
-        $num = preg_replace("/^ー/u", "-", $num);
-        $num = preg_replace("/．/u", ".", $num);
-        $num = mb_convert_kana($num, "n", "utf-8");
-        return (int)$num;
-    }
-
-    private function 成功(){
-        return ($this->mode === "確認") ? true : $this;
-    }
-
-    private function 失敗($comment = "エラーが発生しました"){
-        if($this->mode === "確認"){ return false; }
-        if(is_callable($this->エラー関数)){ call_user_func($this->エラー関数, $comment, $this); }
-        return $this;
-    }
-
-    function __call($name, $args){
-        if     (preg_match("/^([０-９]+)文?字以上$/u", $name, $m)) { return $this->文字以上($this->全角数字変換($m[1]), $args[0]); }
-        else if(preg_match("/^([０-９]+)文?字以/u", $name, $m))    { return $this->文字以下($this->全角数字変換($m[1]), $args[0]); }
-        else if(preg_match("/^(ー?[０-９．]+)(\w*)以上$/u", $name, $m)) { return $this->以上($this->全角数字変換($m[1]), $m[2], $args[0]); }
-        else if(preg_match("/^(ー?[０-９．]+)(\w*)以/u", $name, $m))    { return $this->以下($this->全角数字変換($m[1]), $m[2], $args[0]); }
-        else if(preg_match("/^(ー?[０-９．]+)(\w*)より大/u", $name, $m)){ return $this->より大きい($this->全角数字変換($m[1]), $m[2], $args[0]); }
-        else if(preg_match("/^(ー?[０-９．]+)(\w*)より小/u", $name, $m)){ return $this->より小きい($this->全角数字変換($m[1]), $m[2], $args[0]); }
-        else if(preg_match("/^(ー?[０-９．]+)と同じ$/u", $name, $m)){ return $this->と同じ($this->全角数字変換($m[1]), $args[0]); }
-        else if(preg_match("/^(\w+)と同じ$/u", $name, $m)){ return $this->と同じ($m[1], $args[0]); }
     }
 }
