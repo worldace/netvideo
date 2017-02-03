@@ -27,17 +27,17 @@ function 開発用の設定(){
 //クエリの連想配列・ホームページを基準としたパス文字列のどちらか。省略時はホームURLが返る
 
 //□以下の4点の設定が必要
-//$_ENV['URL.ホーム'] → ホームページのURL
+//$_ENV['URL']        → ホームページのURL
 //$_ENV['URL.短縮']   → 短縮URLを有効にするかどうかの真偽値
 //$_ENV['URL.短縮名'] → 短縮URLの対象となるアクション名
 //$_ENV['URL.短縮値'] → 短縮URLの対象となる値のキー名
 function URL作成($query = ""){
-    $base = (preg_match("|/$|", $_ENV['URL.ホーム'])) ? $_ENV['URL.ホーム'] : dirname($_ENV['URL.ホーム'])."/";
+    $base = (preg_match("|/$|", $_ENV['URL'])) ? $_ENV['URL'] : dirname($_ENV['URL'])."/";
 
     if(is_string($query)){
         $query = str_replace(["<",">","'",'"',"\r","\n"], "", $query);
         $query = preg_replace("|^\.?/|", "", $query);
-        return ($query) ? $base.$query : $_ENV['URL.ホーム'];
+        return ($query) ? $base.$query : $_ENV['URL'];
     }
 
     if($_ENV['URL.短縮'] and $query["action"] === $_ENV['URL.短縮名'] and $query[$_ENV['URL.短縮値']]){
@@ -48,5 +48,5 @@ function URL作成($query = ""){
     if(count($query)){
         $output_query = "?" . http_build_query($query, "", "&", PHP_QUERY_RFC3986);
     }
-    return ($短縮値) ? $base.$短縮値.$output_query : $_ENV['URL.ホーム'].$output_query;
+    return ($短縮値) ? $base.$短縮値.$output_query : $_ENV['URL'].$output_query;
 }

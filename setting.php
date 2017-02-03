@@ -2,7 +2,7 @@
 
 
 //ホームページのURL
-$_ENV['URL.ホーム'] = "http://127.0.0.1/netvideo/";
+$_ENV['URL'] = "http://127.0.0.1/netvideo/";
 
 //短縮URLを有効にするなら1、無効にするには0
 $_ENV['URL.短縮'] = 0;
