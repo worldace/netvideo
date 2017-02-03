@@ -18,5 +18,5 @@ if(!is_file($db)){ exit; }
 データベース("コメント", "sqlite:$db") -> 追加([
     "本文"     => $_POST['本文'],
     "位置"     => (int)$_POST['位置'],
-    "登録時間" => $_SERVER['REQUEST_TIME'],
+    "登録時間" => (int)$_SERVER['REQUEST_TIME'],
 ]);

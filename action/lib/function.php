@@ -62,7 +62,7 @@ class 検証{
     public static $例外 = false;
 
     public static function 必須($v){
-        return strlen($v) > 0;
+        return (is_string($v) and strlen($v) > 0);
     }
     public static function 数($v){
         return (is_numeric($v) and !preg_match("/^-?0+\d/", $v));
