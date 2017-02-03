@@ -11,16 +11,11 @@
     "コメント数" => ["式"=>"コメント数+1"],
 ]);
 
-データベース("コメント", SQLiteドライバ()) -> 追加([
+$db = "{$_ENV['ディレクトリ.upload']}/". date('Y/md', $_GET['登録時間']) . "/{$_GET['id']}.db";
+if(!is_file($db)){ exit; }
+
+データベース("コメント", "sqlite:$db") -> 追加([
     "本文"     => $_POST['本文'],
     "位置"     => (int)$_POST['位置'],
     "登録時間" => (int)$_SERVER['REQUEST_TIME'],
 ]);
-
-
-function SQLiteドライバ(){
-    $ymd  = date('Y/md', $_POST['登録時間']);
-    $path = "{$_ENV['ディレクトリ.upload']}/{$ymd}/{$_POST['id']}.db";
-    if(!is_file($path)){ exit(); }
-    return "sqlite:$path";
-}
