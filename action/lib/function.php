@@ -140,13 +140,13 @@ function テキスト表示($str = ""){
 }
 
 
-function JSON表示($json = [], $callback = null, $allow = null){
+function JSON表示($json = [], $allow = null){
     if(!$allow){ $allow = ($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : "*"; }
     header("Access-Control-Allow-Origin: $allow");
     header("Access-Control-Allow-Credentials: true");
-    if($callback){ //JSONP
+    if($_GET['callback']){ //JSONP
         header("Content-Type: application/javascript; charset=utf-8");
-        print $callback . "(" . json_encode($json) . ");";
+        print $_GET['callback'] . "(" . json_encode($json) . ");";
     }
     else{ //JSON
         header("Content-Type: application/json; charset=utf-8");
