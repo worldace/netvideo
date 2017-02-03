@@ -49,7 +49,7 @@ function 検証($type, $name, $func){
     }
     
     if(検証::$例外 === true and $result === false){
-        throw new Exception(h($name)."の値が不正です");
+        throw new Exception("{$name}の値が不正です");
     }
     
     if($result === true){ return true; }
