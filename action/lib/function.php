@@ -144,7 +144,7 @@ function JSON表示($json = [], $allow = null){
     if(!$allow){ $allow = ($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : "*"; }
     header("Access-Control-Allow-Origin: $allow");
     header("Access-Control-Allow-Credentials: true");
-    if($_GET['callback']){ //JSONP
+    if(is_string($_GET['callback'])){ //JSONP
         header("Content-Type: application/javascript; charset=utf-8");
         print $_GET['callback'] . "(" . json_encode($json) . ");";
     }
@@ -1057,90 +1057,104 @@ function 部品(){
 
 class 部品{
     private static $ディレクトリ = ".";
-    private static $初期化済み = false;
     private static $自動エスケープ = true;
-    private static $キャッシュ;
-    public  static $イベント;
-    public  static $js  = [];
-    public  static $css = [];
+    private static $初期化済み = false;
+    private static $記憶 = [];
+    private static $結果 = [];
+
+
+    public static function 設定($dir = ".", $escape = true){
+        self::$ディレクトリ   = preg_replace("|/$|", "", $dir);
+        self::$自動エスケープ = $escape;
+        if(!self::$初期化済み){ self::初期化(); }
+    }
 
     public static function 作成($部品名, $引数){
         if($部品名 === null){ throw new Exception('部品名がありません'); }
-        if(!self::$初期化済み){ self::初期化実行(); }
-
-        if(self::$キャッシュ[$部品名]["読み込み済み"] === true){
-            $html = self::$キャッシュ[$部品名]["html"];
-            $css  = self::$キャッシュ[$部品名]["css"];
-            $js   = self::$キャッシュ[$部品名]["js"];
-        }
-        else{
-            require self::$ディレクトリ . "/$部品名.php";
-
-            self::$キャッシュ[$部品名]["読み込み済み"] = true;
-            self::$キャッシュ[$部品名]["html"] = $html;
-            self::$キャッシュ[$部品名]["css"]  = $css;
-            self::$キャッシュ[$部品名]["js"]   = $js;
-        }
-
         if(self::$自動エスケープ){ $引数 = self::h($引数); }
 
-        if($css) { self::$css[$部品名] = is_callable($css) ? call_user_func_array($css, $引数) : $css; }
-        if($js)  { self::$js[$部品名]  = is_callable($js)  ? call_user_func_array($js,  $引数) : $js; }
+        if(!self::$記憶[$部品名]['読み込み済み']){
+            require self::$ディレクトリ . "/$部品名.php";
+            self::$記憶[$部品名]['読み込み済み'] = true;
+            self::$記憶[$部品名]['html'] = $html;
 
+            if($cssfile){
+                foreach((array)$cssfile as $_file){
+                    if(in_array($_file, $記憶['読み込み済みファイル'])){ continue; }
+                    $_cssfile .= "<link rel=\"stylesheet\" href=\"{$_file}\">\n";
+                    $記憶['読み込み済みファイル'][] = $_file;
+                }
+            }
+            if($css){
+                $_css = is_callable($css) ? call_user_func_array($css, $引数) : $css;
+                $_css = ltrim($_css);
+                $_css = preg_match("/^</", $_css) ? "$_css\n" : "<style>\n$_css\n</style>\n";
+            }
+            self::$結果['css'] .= $_cssfile . $_css;
+
+            if($jsfile){
+                foreach((array)$jsfile as $_file){
+                    if(in_array($_file, $記憶['読み込み済みファイル'])){ continue; }
+                    $_jsfile .= "<script src=\"{$_file}\"></script>\n";
+                    $記憶['読み込み済みファイル'][] = $_file;
+                }
+            }
+            if($js){
+                $_js = is_callable($js) ? call_user_func_array($js, $引数) : $js;
+                $_js = ltrim($_js);
+                $_js = preg_match("/^</", $_js) ? "$_js\n" : "<script>\n$_js\n</script>\n";
+            }
+
+            if($jsinhead){
+                self::$結果['jsinhead'] .= $_jsfile . $_js;
+            }
+            else{
+                self::$結果['jsinbody'] .= $_jsfile . $_js;
+            }
+        }
+        else{
+            $html = self::$記憶[$部品名]['html'];
+        }
+        
         return is_callable($html) ? call_user_func_array($html, $引数) : $html;
     }
 
     public static function 終了処理(){
         $buf = ob_get_contents();
         ob_end_clean();
-        if(self::$js){
-            $js = "\n";
-            foreach(self::$js as $code){
-                $code = ltrim($code);
-                $js .= (preg_match("/^</", $code)) ? $code : "<script>\n$code\n</script>";
-                $js .= "\n";
-            }
-            $js_pos = strripos($buf, "</body>");
-            if($js_pos !== false){
-                $buf = substr_replace($buf, $js, $js_pos, 0); //最後に出現する</body>の前にJSを挿入する
+        
+        $code_in_head = self::$結果['css'] . self::$結果['jsinhead']; //面倒なので合成してしまう
+        
+        if(self::$結果['jsinbody']){
+            $pos = strripos($buf, "</body>");
+            if($pos !== false){
+                $buf = substr_replace($buf, self::$結果['jsinbody'], $pos, 0); //最後に出現する</body>の前にJSを挿入する
             }
             else{
-                $buf .= $js;
+                $buf .= self::$結果['jsinbody'];
             }
         }
-        if(self::$css){
-            $css = "\n";
-            foreach(self::$css as $code){
-                $code = ltrim($code);
-                $css .= (preg_match("/^</", $code)) ? $code : "<style>\n$code\n</style>";
-                $css .= "\n";
-            }
-            $css_pos = stripos($buf, "</head>");
-            if($css_pos !== false){
-                $buf = substr_replace($buf, $css, $css_pos, 0); //最初に出現する</head>の前にCSSを挿入する
+        if($code_in_head){
+            $pos = stripos($buf, "</head>");
+            if($pos !== false){
+                $buf = substr_replace($buf, $code_in_head, $pos, 0); //最初に出現する</head>の前に挿入する
             }
             else{
-                $buf = $css . $buf;
+                $buf = $code_in_head . $buf;
             }
         }
-        if(is_callable(self::$イベント['出力前'])){ call_user_func(self::$イベント['出力前'], $buf); }
+        /*if(is_callable(self::$イベント['出力前'])){ call_user_func(self::$イベント['出力前'], $buf); }*/
         print $buf;
     }
 
-    public static function h($arg = ""){
-        if(is_array($arg)){ return array_map("部品::h", $arg); }
-        return htmlspecialchars($arg, ENT_QUOTES, "UTF-8");
-    }
-
-    private static function 初期化実行(){
+    private static function 初期化(){
         self::$初期化済み = true;
         ob_start();
         register_shutdown_function("部品::終了処理");
     }
 
-    public static function 設定($dir = null, $自動エスケープ = true){
-        if($dir){ self::$ディレクトリ = preg_replace("|/$|", "", $dir); }
-        self::$自動エスケープ = $自動エスケープ;
-        if(!self::$初期化済み){ self::初期化実行(); }
+    private static function h($arg = ""){
+        if(is_array($arg)){ return array_map("部品::h", $arg); }
+        return htmlspecialchars($arg, ENT_QUOTES, "UTF-8");
     }
 }
