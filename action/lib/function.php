@@ -76,7 +76,7 @@ class 検証{
     public static function 数字($v){
         return preg_match("/^[0-9]+$/", $v) > 0;
     }
-    public static function 英語($v){
+    public static function 英字($v){
         return preg_match("/^[A-Za-z]+$/", $v) > 0;
     }
     public static function 英数字($v){
