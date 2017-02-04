@@ -1122,7 +1122,8 @@ class 部品{
     public static function 終了処理(){
         $buf = ob_get_contents();
         ob_end_clean();
-        
+        if($buf == ""){ exit; }
+
         $code_in_head = self::$結果['css'] . self::$結果['jsinhead']; //面倒なので合成してしまう
         
         if(self::$結果['jsinbody']){
