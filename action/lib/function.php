@@ -1056,14 +1056,14 @@ function 部品(){
 
 
 class 部品{
-    private static $ディレクトリ = ".";
+    private static $ディレクトリ = "./parts";
     private static $自動エスケープ = true;
     private static $初期化済み = false;
     private static $記憶 = [];
     private static $結果 = [];
 
 
-    public static function 設定($dir = ".", $escape = true){
+    public static function 設定($dir = "./parts", $escape = true){
         self::$ディレクトリ   = preg_replace("|/$|", "", $dir);
         self::$自動エスケープ = $escape;
         if(!self::$初期化済み){ self::初期化(); }
@@ -1071,6 +1071,7 @@ class 部品{
 
     public static function 作成($部品名, $引数){
         if($部品名 === null){ throw new Exception('部品名がありません'); }
+        if(!self::$初期化済み){ self::初期化(); }
         if(self::$自動エスケープ){ $引数 = self::h($引数); }
 
         if(!self::$記憶[$部品名]['読み込み済み']){
