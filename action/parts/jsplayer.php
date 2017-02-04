@@ -6,9 +6,7 @@
 //======================================================
 
 
-$html = function ($動画){
-    //部品::$js["jsplayer"] .= '$v.player.entrypoint(' . tojs(htmlspecialchars_decode($動画['url'],ENT_QUOTES)) . ', 640, 360);';
-
+$html = function($動画){
     return <<<"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 <div class="jsplayer" id="jsplayer"
   ><div class="jsplayer-screen" tabindex="1"
@@ -46,8 +44,8 @@ $html = function ($動画){
 
 
 
-$js = <<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
-
+$js = function ($動画){
+    $code = <<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
 var $v = {};
 
 //■ player
@@ -870,6 +868,9 @@ $v.type = function(target){
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━;
+
+    return $code . '$v.player.entrypoint("' . $動画['url'] . '", 640, 360);';
+};
 
 
 
