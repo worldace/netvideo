@@ -33,7 +33,7 @@ $id = データベース("動画") -> 追加([
 
 file_put_contents("$dir/$id.png", $_POST['サムネイル'], LOCK_EX);
 
-データベース("コメント", "sqlite:$dir/$id.db") -> 作成(コメントライン::定義);
+データベース("コメント", "sqlite:$dir/$id.db") -> 作成(コメント定義::定義);
 
 ?>
 <!DOCTYPE html>

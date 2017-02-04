@@ -1,6 +1,6 @@
 <?php
 
-class 動画ライン{
+class 動画定義{
     const 定義 = [
         "id"           => "integer primary key auto_increment",
         "url"          => "varchar(500) not null",

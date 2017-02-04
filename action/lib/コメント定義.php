@@ -1,6 +1,6 @@
 <?php
 
-class コメントライン{
+class コメント定義{
     const 定義 = [
         "id"       => "integer primary key auto_increment",
         "本文"     => "varchar(64) not null",
