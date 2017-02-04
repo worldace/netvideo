@@ -1105,7 +1105,7 @@ class 部品{
                 $_js = preg_match("/^</", $_js) ? "$_js\n" : "<script>\n$_js\n</script>\n";
             }
 
-            if($jsinhead === true){
+            if($jsinhead){
                 self::$結果['jsinhead'] .= $_jsfile . $_js;
             }
             else{
