@@ -1079,10 +1079,10 @@ class 部品{
             self::$記憶[$部品名]['html'] = $html;
 
             if($cssfile){
-                foreach((array)$cssfile as $_file){
-                    if(in_array($_file, $記憶['読み込み済みファイル'])){ continue; }
-                    $_cssfile .= "<link rel=\"stylesheet\" href=\"{$_file}\">\n";
-                    $記憶['読み込み済みファイル'][] = $_file;
+                foreach((array)$cssfile as $_url){
+                    if(in_array($_url, $記憶['読み込み済みURL'])){ continue; }
+                    $_cssfile .= "<link rel=\"stylesheet\" href=\"{$_url}\">\n";
+                    $記憶['読み込み済みURL'][] = $_url;
                 }
             }
             if($css){
@@ -1093,10 +1093,10 @@ class 部品{
             self::$結果['css'] .= $_cssfile . $_css;
 
             if($jsfile){
-                foreach((array)$jsfile as $_file){
-                    if(in_array($_file, $記憶['読み込み済みファイル'])){ continue; }
-                    $_jsfile .= "<script src=\"{$_file}\"></script>\n";
-                    $記憶['読み込み済みファイル'][] = $_file;
+                foreach((array)$jsfile as $_url){
+                    if(in_array($_url, $記憶['読み込み済みURL'])){ continue; }
+                    $_jsfile .= "<script src=\"{$_url}\"></script>\n";
+                    $記憶['読み込み済みURL'][] = $_url;
                 }
             }
             if($js){
@@ -1105,7 +1105,7 @@ class 部品{
                 $_js = preg_match("/^</", $_js) ? "$_js\n" : "<script>\n$_js\n</script>\n";
             }
 
-            if($jsinhead){
+            if($jsinhead === true){
                 self::$結果['jsinhead'] .= $_jsfile . $_js;
             }
             else{
