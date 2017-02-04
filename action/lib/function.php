@@ -1080,7 +1080,7 @@ class 部品{
 
             if($cssfile){
                 foreach((array)$cssfile as $_url){
-                    if(in_array($_url, self::$記憶['読み込み済みURL'])){ continue; }
+                    if(in_array($_url, (array)self::$記憶['読み込み済みURL'])){ continue; }
                     $_cssfile .= "<link rel=\"stylesheet\" href=\"{$_url}\">\n";
                     self::$記憶['読み込み済みURL'][] = $_url;
                 }
@@ -1094,7 +1094,7 @@ class 部品{
 
             if($jsfile){
                 foreach((array)$jsfile as $_url){
-                    if(in_array($_url, self::$記憶['読み込み済みURL'])){ continue; }
+                    if(in_array($_url, (array)self::$記憶['読み込み済みURL'])){ continue; }
                     $_jsfile .= "<script src=\"{$_url}\"></script>\n";
                     self::$記憶['読み込み済みURL'][] = $_url;
                 }

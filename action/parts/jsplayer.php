@@ -7,7 +7,7 @@
 
 
 $html = function ($動画){
-    部品::$js["jsplayer"] .= '$v.player.entrypoint(' . tojs(htmlspecialchars_decode($動画['url'],ENT_QUOTES)) . ', 640, 360);';
+    //部品::$js["jsplayer"] .= '$v.player.entrypoint(' . tojs(htmlspecialchars_decode($動画['url'],ENT_QUOTES)) . ', 640, 360);';
 
     return <<<"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 <div class="jsplayer" id="jsplayer"
