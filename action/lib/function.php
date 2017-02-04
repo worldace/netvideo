@@ -1059,7 +1059,9 @@ class 部品{
     private static $ディレクトリ = ".";
     private static $自動エスケープ = true;
     private static $初期化済み = false;
-    private static $記憶 = [];
+    private static $読み込み済み部品 = [];
+    private static $読み込み済みURL = [];
+    private static $HTMLキャッシュ = [];
     private static $結果 = [];
 
 
@@ -1073,16 +1075,16 @@ class 部品{
         if($部品名 === null){ throw new Exception('部品名がありません'); }
         if(self::$自動エスケープ){ $引数 = self::h($引数); }
 
-        if(!self::$記憶[$部品名]['読み込み済み']){
+        if(!self::$読み込み済み部品[$部品名]){
             require self::$ディレクトリ . "/$部品名.php";
-            self::$記憶[$部品名]['読み込み済み'] = true;
-            self::$記憶[$部品名]['html'] = $html;
+            self::$読み込み済み部品[$部品名] = true;
+            self::$HTMLキャッシュ[$部品名]   = $html;
 
             if($cssfile){
                 foreach((array)$cssfile as $_url){
-                    if(in_array($_url, $記憶['読み込み済みURL'])){ continue; }
+                    if(in_array($_url, self::$読み込み済みURL)){ continue; }
                     $_cssfile .= "<link rel=\"stylesheet\" href=\"{$_url}\">\n";
-                    $記憶['読み込み済みURL'][] = $_url;
+                    self::$読み込み済みURL[] = $_url;
                 }
             }
             if($css){
@@ -1094,9 +1096,9 @@ class 部品{
 
             if($jsfile){
                 foreach((array)$jsfile as $_url){
-                    if(in_array($_url, $記憶['読み込み済みURL'])){ continue; }
+                    if(in_array($_url, self::$読み込み済みURL)){ continue; }
                     $_jsfile .= "<script src=\"{$_url}\"></script>\n";
-                    $記憶['読み込み済みURL'][] = $_url;
+                    self::$読み込み済みURL[] = $_url;
                 }
             }
             if($js){
@@ -1113,7 +1115,7 @@ class 部品{
             }
         }
         else{
-            $html = self::$記憶[$部品名]['html'];
+            $html = self::$HTMLキャッシュ[$部品名];
         }
         
         return is_callable($html) ? call_user_func_array($html, $引数) : $html;
