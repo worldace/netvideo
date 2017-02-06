@@ -1180,6 +1180,14 @@ class エラー400 extends RuntimeException{
     
 }
 
+class エラー404 extends RuntimeException{
+    use 例外トレイト;
+
+    public function __construct($message = "") {
+        parent::__construct($message, 404);
+    }
+}
+
 class エラー500 extends RuntimeException{
     use 例外トレイト;
 
