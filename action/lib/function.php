@@ -126,13 +126,6 @@ function 整形($type, $name, $func){
 }
 
 
-function エラー($str = "エラーが発生しました"){
-    header('HTTP', true, 500);
-    print $str;
-    exit;
-}
-
-
 function テキスト表示($str = ""){
     header("Content-Type: text/plain; charset=utf-8");
     print $str;
