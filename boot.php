@@ -7,11 +7,16 @@
 
 ini_set('session.cookie_httponly', 1);
 
+set_exception_handler(function($e){
+    print "$e";
+});
+
 
 クラスローダ();
 検証::$例外 = true;
 部品::設定("{$_ENV['ディレクトリ.action']}/parts");
 開発用の設定();
+
 
 //■以下アプリ固有関数
 

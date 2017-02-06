@@ -782,6 +782,7 @@ class データベース{
             $driver   = $_ENV['データベース.ドライバー'];
             $user     = $_ENV['データベース.ユーザー名'];
             $password = $_ENV['データベース.パスワード'];
+            if(!$driver){ throw new 設定バグ('$_ENV[\'データベース.ドライバー\']を設定してください');}
         }
         $this->ドライバー = $driver;
         $this->接続名     = md5($driver.$user.$password);
@@ -799,7 +800,7 @@ class データベース{
         foreach((array)$_ENV['データベース.詳細設定'] as $name => $value){ $setting[$name] = $value; }
 
         try{ $pdo = new PDO($driver, $user, $password, $setting); }
-        catch(Exception $e){ print "接続エラー。データベースの設定(ドライバ,ユーザID,パスワード)を再確認してください"; }
+        catch(PDOException $e){ throw new 設定バグ("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください", 0, $e); }
         return $pdo;
     }
 
@@ -1206,7 +1207,9 @@ trait 例外トレイト{
 
         $str  = "【" . get_class($this) . "】{$this->message}\n";
         $str .= "{$file} {$line}行目\n\n";
+        $str .= "---------------------------------------------------\n";
         $str .= $this->getTraceAsString();
+        $str .= "\n---------------------------------------------------\n";
         return $str;
     }
 }
