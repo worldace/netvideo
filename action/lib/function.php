@@ -1171,7 +1171,7 @@ class 入力エラー extends RuntimeException{
     
     public function __construct($message = "", $name = "") {
         $this->name = $name;
-        parent::__construct($message);
+        parent::__construct($message, 400);
     }
     
     public function getName(){
@@ -1182,6 +1182,10 @@ class 入力エラー extends RuntimeException{
 
 class 運用エラー extends RuntimeException{
     use 例外トレイト;
+
+    public function __construct($message = "") {
+        parent::__construct($message, 500);
+    }
 }
 
 class プログラミングバグ extends LogicException{
