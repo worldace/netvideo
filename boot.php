@@ -8,7 +8,7 @@
 ini_set('session.cookie_httponly', 1);
 
 set_exception_handler(function($e){
-    print "$e";
+    print $e;
 });
 
 

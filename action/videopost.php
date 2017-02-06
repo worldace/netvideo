@@ -17,7 +17,7 @@
 
 //ToDo: 二重投稿防止(URLユニーク)
 
-$dir = ディレクトリ作成($_ENV['ディレクトリ.upload'].date('/Y/md')) or throw new エラー500("ディレクトリが作成できません");
+$dir = ディレクトリ作成($_ENV['ディレクトリ.upload'].date('/Y/md')) or エラー500("ディレクトリが作成できません");
 
 $id = データベース("動画") -> 追加([
     "url"      => $_POST['url'],
@@ -28,7 +28,7 @@ $id = データベース("動画") -> 追加([
     "縦幅"     => (int)$_POST['縦幅'],
     "長さ"     => (int)$_POST['長さ'],
     "登録時間" => (int)$_SERVER['REQUEST_TIME'],
-]) or throw new エラー500("データベースに登録できません");
+]) or エラー500("データベースに登録できません");
 
 
 file_put_contents("$dir/$id.png", $_POST['サムネイル'], LOCK_EX);

@@ -49,7 +49,7 @@ function 検証($type, $name, $func){
     }
     
     if(検証::$例外 === true and $result === false){
-        throw new エラー400("{$name}の値が間違っています", $name);
+        エラー400("{$name}の値が間違っています");
     }
     
     if($result === true){ return true; }
@@ -163,7 +163,7 @@ function ダウンロード($data, $filename, $timeout = 60*60*12){
         $is_data = true;
     }
     else{
-        if(!file_exists($data)){ throw new エラー500("ダウンロードファイルが存在しません。もしくは、データダウンロード時はファイル名の先頭に:を付けてください"); }
+        if(!file_exists($data)){ エラー500("ダウンロードファイルが存在しません。もしくは、データダウンロード時はファイル名の先頭に:を付けてください"); }
         $filesize = filesize($data);
         if(!$filename){ $filename = basename($data); }
     }
@@ -978,7 +978,7 @@ class データベース{
     }
 
     private function 文字列検証($str){
-        if(preg_match("/[[:cntrl:][:punct:][:space:]]/", $str)){ throw new エラー500("引数に不正な文字列が含まれています"); }
+        if(preg_match("/[[:cntrl:][:punct:][:space:]]/", $str)){ エラー500("引数に不正な文字列が含まれています"); }
     }
 
     private function 追加SQL文(array $条件 = null, $WHEREorAND = "where"){
@@ -1158,35 +1158,20 @@ class 部品{
 }
 
 
-class エラー400 extends RuntimeException{
-    use 例外トレイト;
-    private $name;
-    
-    public function __construct($message = "", $name = "") {
-        $this->name = $name;
-        parent::__construct($message, 400);
-    }
-    
-    public function getName(){
-        return $this->name;
-    }
-    
+function エラー400($str){
+    throw new エラー($str, 400);
 }
 
-class エラー404 extends RuntimeException{
-    use 例外トレイト;
-
-    public function __construct($message = "") {
-        parent::__construct($message, 404);
-    }
+function エラー404($str){
+    throw new エラー($str, 404);
 }
 
-class エラー500 extends RuntimeException{
-    use 例外トレイト;
+function エラー500($str){
+    throw new エラー($str, 500);
+}
 
-    public function __construct($message = "") {
-        parent::__construct($message, 500);
-    }
+class エラー extends RuntimeException{
+    use 例外トレイト;
 }
 
 class プログラミングバグ extends LogicException{
