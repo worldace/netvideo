@@ -45,7 +45,7 @@ function 検証($type, $name, $func){
         else if(preg_match("/^(-?[0-9\.]+)より大きい$/u", $func, $m)){ $result = 検証::より大きい($value, $m[1]); }
         else if(preg_match("/^(-?[0-9\.]+)より小さい$/u", $func, $m)){ $result = 検証::より小さい($value, $m[1]); }
         else if(preg_match("/^(-?[0-9\.]+)と同じ$/u", $func, $m))    { $result = 検証::と同じ($value, $m[1]); }
-        else                                                         { throw new Exception("検証関数名が正しくありません"); }
+        else                                                         { throw new プログラミングバグ(__function__."()第3引数の関数名が間違っています"); }
     }
     
     if(検証::$例外 === true and $result === false){
@@ -54,7 +54,7 @@ function 検証($type, $name, $func){
     
     if($result === true){ return true; }
     elseif($result === false){ return false; }
-    else{ throw new Exception("検証関数はtrueまたはfalseを返してください"); }
+    else{ throw new プログラミングバグ(__function__."()第3引数の関数はtrueまたはfalseを返してください"); }
 }
 
 
@@ -433,12 +433,12 @@ function dd(){
 function newTrait($trait = null, $class = null, $args = null){
     if($trait !== null){
         foreach((array)$trait as $value){
-            if(!preg_match("/^[a-zA-Z_\x7f-\xff\\][a-zA-Z0-9_\x7f-\xff\\]*$/", $value)){ throw new Exception("第1引数に不正な文字列"); };
+            if(!preg_match('/^[a-zA-Z_\x7f-\xff\\\\][a-zA-Z0-9_\x7f-\xff\\\\]*$/', $value)){ throw new プログラミングバグ(__function__."()第1引数に使用不可能な文字が含まれています"); };
         }
         $trait_code = "use " . implode(",", (array)$trait) . ";";
     }
     if($class !== null){
-        if(!preg_match("/^[a-zA-Z_\x7f-\xff\\][a-zA-Z0-9_\x7f-\xff\\]*$/", $class)){ throw new Exception("第2引数に不正な文字列"); };
+        if(!preg_match('/^[a-zA-Z_\x7f-\xff\\\\][a-zA-Z0-9_\x7f-\xff\\\\]*$/', $class)){ throw new プログラミングバグ(__function__."()第2引数に使用不可能な文字が含まれています"); };
         $class_code = "extends $class";
     }
     eval("\$object = new class(...(array)\$args) $class_code{ $trait_code };");
@@ -658,7 +658,6 @@ function 復号化($str, $key, $type = 'aes-256-ecb'){
 
 
 function jwt発行($data, $key){
-    if(!$data){ throw new Exception("第1引数に有効なデータを入力してください"); }
     $header     = ['typ'=>'jwt', 'alg'=>'HS256'];
     $segments   = [];
     $segments[] = base64_encode_urlsafe(json_encode($header));
@@ -1070,7 +1069,7 @@ class 部品{
     }
 
     public static function 作成($部品名, $引数){
-        if($部品名 === null){ throw new Exception('部品名がありません'); }
+        if($部品名 === null){ throw new プログラミングバグ('部品名がありません'); }
         if(!self::$初期化済み){ self::初期化(); }
         if(self::$自動エスケープ){ $引数 = self::h($引数); }
 
@@ -1158,5 +1157,40 @@ class 部品{
     private static function h($arg = ""){
         if(is_array($arg)){ return array_map("部品::h", $arg); }
         return htmlspecialchars($arg, ENT_QUOTES, "UTF-8");
+    }
+}
+
+
+class 入力エラー extends RuntimeException{
+    use 例外トレイト;
+}
+class プログラミングバグ extends LogicException{
+    use 例外トレイト;
+}
+class 設定バグ extends LogicException{
+    use 例外トレイト;
+}
+
+trait 例外トレイト{
+    public function __toString() {
+        $trace = $this->getTrace();
+        if(is_array($trace)){
+            for($i=0; $i<count($trace); $i++){
+                if($trace[$i]["file"] !== __FILE__){
+                    $file = $trace[$i]["file"];
+                    $line = $trace[$i]["line"];
+                    break;
+                }
+            }
+        }
+        if(!$file){
+            $file = $this->file;
+            $line = $this->line;
+        }
+
+        $str  = "【" . get_class($this) . "】{$this->message}\n";
+        $str .= "{$file} {$line}行目\n\n";
+        $str .= $this->getTraceAsString();
+        return $str;
     }
 }
