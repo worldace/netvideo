@@ -1159,18 +1159,18 @@ class 部品{
 
 
 function エラー400($str){
-    throw new エラー($str, 400);
+    throw new 実行エラー($str, 400);
 }
 
 function エラー404($str){
-    throw new エラー($str, 404);
+    throw new 実行エラー($str, 404);
 }
 
 function エラー500($str){
-    throw new エラー($str, 500);
+    throw new 実行エラー($str, 500);
 }
 
-class エラー extends RuntimeException{
+class 実行エラー extends RuntimeException{
     use 例外トレイト;
 }
 
