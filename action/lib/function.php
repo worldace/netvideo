@@ -1220,4 +1220,9 @@ trait 例外トレイト{
         $str .= "\n---------------------------------------------------\n";
         return $str;
     }
+
+    public function getTitle() {
+        return get_class($this);
+    }
+
 }
