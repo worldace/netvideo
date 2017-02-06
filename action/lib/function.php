@@ -45,16 +45,16 @@ function 検証($type, $name, $func){
         else if(preg_match("/^(-?[0-9\.]+)より大きい$/u", $func, $m)){ $result = 検証::より大きい($value, $m[1]); }
         else if(preg_match("/^(-?[0-9\.]+)より小さい$/u", $func, $m)){ $result = 検証::より小さい($value, $m[1]); }
         else if(preg_match("/^(-?[0-9\.]+)と同じ$/u", $func, $m))    { $result = 検証::と同じ($value, $m[1]); }
-        else                                                         { throw new プログラミングバグ(__function__."()第3引数の関数名が間違っています"); }
+        else                                                         { throw new プログラミングバグ(__function__."() 第3引数の関数名が間違っています"); }
     }
     
     if(検証::$例外 === true and $result === false){
-        throw new Exception("{$name}の値が不正です");
+        throw new 入力エラー("{$name}の値が間違っています", $name);
     }
     
     if($result === true){ return true; }
     elseif($result === false){ return false; }
-    else{ throw new プログラミングバグ(__function__."()第3引数の関数はtrueまたはfalseを返してください"); }
+    else{ throw new プログラミングバグ(__function__."() 第3引数の関数はtrueまたはfalseを返してください"); }
 }
 
 
@@ -170,7 +170,7 @@ function ダウンロード($data, $filename, $timeout = 60*60*12){
         $is_data = true;
     }
     else{
-        if(!file_exists($data)){ throw new Exception("ファイルが存在しません。もしくは、データダウンロード時はファイル名の先頭に:を付けてください"); }
+        if(!file_exists($data)){ throw new 運用エラー("ダウンロードファイルが存在しません。もしくは、データダウンロード時はファイル名の先頭に:を付けてください"); }
         $filesize = filesize($data);
         if(!$filename){ $filename = basename($data); }
     }
@@ -433,12 +433,12 @@ function dd(){
 function newTrait($trait = null, $class = null, $args = null){
     if($trait !== null){
         foreach((array)$trait as $value){
-            if(!preg_match('/^[a-zA-Z_\x7f-\xff\\\\][a-zA-Z0-9_\x7f-\xff\\\\]*$/', $value)){ throw new プログラミングバグ(__function__."()第1引数に使用不可能な文字が含まれています"); };
+            if(!preg_match('/^[a-zA-Z_\x7f-\xff\\\\][a-zA-Z0-9_\x7f-\xff\\\\]*$/', $value)){ throw new プログラミングバグ(__function__."() 第1引数に使用不可能な文字が含まれています"); };
         }
         $trait_code = "use " . implode(",", (array)$trait) . ";";
     }
     if($class !== null){
-        if(!preg_match('/^[a-zA-Z_\x7f-\xff\\\\][a-zA-Z0-9_\x7f-\xff\\\\]*$/', $class)){ throw new プログラミングバグ(__function__."()第2引数に使用不可能な文字が含まれています"); };
+        if(!preg_match('/^[a-zA-Z_\x7f-\xff\\\\][a-zA-Z0-9_\x7f-\xff\\\\]*$/', $class)){ throw new プログラミングバグ(__function__."() 第2引数に使用不可能な文字が含まれています"); };
         $class_code = "extends $class";
     }
     eval("\$object = new class(...(array)\$args) $class_code{ $trait_code };");
@@ -913,7 +913,6 @@ class データベース{
     }
 
     public function 作成(array $テーブル定義, $追加文 = ""){
-        if(!$テーブル定義){ throw new Exception("テーブル定義が存在しません"); }
         foreach($テーブル定義 as $name => $value){
             $this->文字列検証($name);
             $列情報 .= "$name $value,";
@@ -981,7 +980,7 @@ class データベース{
     }
 
     private function 文字列検証($str){
-        if(preg_match("/[[:cntrl:][:punct:][:space:]]/", $str)){ throw new Exception("引数に不正な文字列"); }
+        if(preg_match("/[[:cntrl:][:punct:][:space:]]/", $str)){ throw new 運用エラー("引数に不正な文字列が含まれています"); }
     }
 
     private function 追加SQL文(array $条件 = null, $WHEREorAND = "where"){
@@ -1163,10 +1162,27 @@ class 部品{
 
 class 入力エラー extends RuntimeException{
     use 例外トレイト;
+    private $name;
+    
+    public function __construct($message = "", $name = "") {
+        $this->name = $name;
+        parent::__construct($message);
+    }
+    
+    public function getName(){
+        return $this->name;
+    }
+    
 }
+
+class 運用エラー extends RuntimeException{
+    use 例外トレイト;
+}
+
 class プログラミングバグ extends LogicException{
     use 例外トレイト;
 }
+
 class 設定バグ extends LogicException{
     use 例外トレイト;
 }
