@@ -134,7 +134,12 @@ function テキスト表示($str = ""){
 
 
 function JSON表示($json = [], $allow = null){
-    if(!$allow){ $allow = ($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : "*"; }
+    if(!$allow){
+        $allow = ($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : "*";
+    }
+    else{
+        $allow = implode(" ", (array)$allow);
+    }
     header("Access-Control-Allow-Origin: $allow");
     header("Access-Control-Allow-Credentials: true");
     if(is_string($_GET['callback'])){ //JSONP
@@ -186,13 +191,20 @@ function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 =
     $bcc    = 改行変換($bcc);
     $add    = 改行変換($add);
 
-    $題名 = mb_encode_mimeheader($題名, "jis");
-    $body = mb_convert_encoding($本文, "jis", "UTF-8");
+    $送信先 = implode(",", (array)$送信先);
+    $題名   = mb_encode_mimeheader($題名, "jis");
+    $body   = mb_convert_encoding($本文, "jis", "UTF-8");
 
     if($送信元 and $送信者) { $header .= "From: " . mb_encode_mimeheader($送信者,"jis") . " <$送信元>\r\n"; }
     else if($送信元) { $header .= "From: $送信元\r\n"; }
-    if($cc) { $header .= "Cc: $cc\r\n"; }
-    if($bcc){ $header .= "Bcc: $bcc\r\n"; }
+    if($cc) {
+        $cc = implode(",", (array)$cc);
+        $header .= "Cc: $cc\r\n";
+    }
+    if($bcc){
+        $bcc = implode(",", (array)$bcc);
+        $header .= "Bcc: $bcc\r\n";
+    }
     if(is_array($add)){ $header .= implode("\r\n", $add) . "\r\n"; }
 
     if(is_array($添付)){
@@ -447,10 +459,10 @@ function パーミッション($path, $permission = null){
 }
 
 
-function ファイル一覧($dir = ".", $pattern = "."){
+function ファイル一覧($dir = ".", $pattern = "/./"){
     if(!is_dir($dir)){ return false; }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
-        if(is_file("$dir/$file") and preg_match("#$pattern#i", $file)){
+        if(is_file("$dir/$file") and preg_match($pattern, $file)){
             yield realpath("$dir/$file");
         }
         if(is_dir("$dir/$file")) {
@@ -462,11 +474,11 @@ function ファイル一覧($dir = ".", $pattern = "."){
 }
 
 
-function ディレクトリ一覧($dir = ".", $pattern = "."){
+function ディレクトリ一覧($dir = ".", $pattern = "/./"){
     if(!is_dir($dir)){ return false; }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         if(is_dir("$dir/$file")) {
-            if(preg_match("#$pattern#i", $file)){
+            if(preg_match($pattern, $file)){
                 yield realpath("$dir/$file");
             }
             foreach(ディレクトリ一覧("$dir/$file", $pattern) as $sub){
