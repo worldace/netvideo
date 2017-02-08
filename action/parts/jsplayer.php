@@ -151,7 +151,7 @@ $v.video = $v.player.querySelector(".jsplayer-video");
 
 $v.video.fit = function(){
     if(!$v.screen.pos.width || !$v.video.videoWidth){ return; }
-    var pos = $v.objectFit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+    var pos = $v.contentFit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 
     $v.video.style.width  = pos.w + "px";
     $v.video.style.height = pos.h + "px";
@@ -851,7 +851,7 @@ $v.extendObject = function(){
 };
 
 
-$v.objectFit = function(screenW, screenH, objectW, objectH){
+$v.contentFit = function(screenW, screenH, objectW, objectH){
     var scale = (objectW/objectH > screenW/screenH) ? screenW/objectW : screenH/objectH;
     return {
         w: Math.floor(objectW * scale),
