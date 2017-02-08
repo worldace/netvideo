@@ -24,13 +24,13 @@ function route(){
 
 function 検証($type, $name, $func){
     if(preg_match("/^get$/i", $type)){
-        $value = @$_GET[$name];
+        $value = $_GET[$name];
     }
     elseif(preg_match("/^post$/i", $type)){
-        $value = @$_POST[$name];
+        $value = $_POST[$name];
     }
     elseif(preg_match("/^cookie$/i", $type)){
-        $value = @$_COOKIE[$name];
+        $value = $_COOKIE[$name];
     }
 
     if(is_callable($func)){
@@ -114,13 +114,13 @@ class 検証{
 
 function 整形($type, $name, $func){
     if(preg_match("/^get$/i", $type)){
-        $result = $_GET[$name] = $func(@$_GET[$name]);
+        $result = $_GET[$name] = $func($_GET[$name]);
     }
     elseif(preg_match("/^post$/i", $type)){
-        $result = $_POST[$name] = $func(@$_POST[$name]);
+        $result = $_POST[$name] = $func($_POST[$name]);
     }
     elseif(preg_match("/^cookie$/i", $type)){
-        $result = $_COOKIE[$name] = $func(@$_COOKIE[$name]);
+        $result = $_COOKIE[$name] = $func($_COOKIE[$name]);
     }
     return $result;
 }
