@@ -160,25 +160,31 @@ function リダイレクト($url){
 }
 
 
-function ダウンロード($data, $filename, $timeout = 60*60*12){
+function ファイルダウンロード($data, $filename = null, $timeout = 60*60*12){
     ini_set("max_execution_time", $timeout);
-    if(preg_match("/^:/", $filename)){
-        $filename = preg_replace("/^:/", "", $filename);
-        $filesize = strlen($data);
-        $is_data = true;
-    }
-    else{
-        if(!file_exists($data)){ エラー500("ダウンロードファイルが存在しません。もしくは、データダウンロード時はファイル名の先頭に:を付けてください"); }
-        $filesize = filesize($data);
-        if(!$filename){ $filename = basename($data); }
-    }
+    if(!file_exists($data)){ エラー500("ダウンロードファイルが存在しません"); }
+    $filesize = filesize($data);
+    if(!$filename){ $filename = basename($data); }
     $filenameE = rawurlencode($filename);
     header("Content-Type: application/force-download");
     header("Content-Length: $filesize");
     header("Content-Disposition: attachment; filename=\"$filename\"; filename*=UTF-8''$filenameE");
 
     while(ob_get_level()){ ob_end_clean(); }
-    ($is_data) ? print($data) : readfile($data);
+    readfile($data);
+}
+
+
+function データダウンロード($data, $filename = "data", $timeout = 60*60*12){
+    ini_set("max_execution_time", $timeout);
+    $filesize = strlen($data);
+    $filenameE = rawurlencode($filename);
+    header("Content-Type: application/force-download");
+    header("Content-Length: $filesize");
+    header("Content-Disposition: attachment; filename=\"$filename\"; filename*=UTF-8''$filenameE");
+
+    while(ob_get_level()){ ob_end_clean(); }
+    print($data);
 }
 
 
