@@ -425,7 +425,7 @@ function 改行変換($arg = "", $replace = ""){
 function 制御文字削除($arg = "", $LF = false){
     if(is_array($arg)){ return array_map(function($str) use($LF){ return 制御文字削除($str, $LF); }, $arg); }
     $arg = preg_replace("/\t/", "    ", $arg);
-    return ($LF) ? preg_replace("/(?!\n)[[:cntrl:]]/", "", $arg) : preg_replace("/[[:cntrl:]]/", "", $arg);
+    return ($LF) ? preg_replace("/(?!\n)[[:cntrl:]]/u", "", $arg) : preg_replace("/[[:cntrl:]]/u", "", $arg);
 }
 
 
