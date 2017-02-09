@@ -422,9 +422,10 @@ function 改行変換($arg = "", $replace = ""){
 }
 
 
-function 制御文字削除($arg = "", $LF = false){
+function 制御文字削除($arg = "", $LF = false){ // http://blog.sarabande.jp/post/52701231276
     if(is_array($arg)){ return array_map(function($str) use($LF){ return 制御文字削除($str, $LF); }, $arg); }
     $arg = preg_replace("/\t/", "    ", $arg);
+    $arg = preg_replace("/\xC2[\x80-\x9F]/", "", $arg); //Unicode制御文字
     return ($LF) ? preg_replace("/(?!\n)[[:cntrl:]]/u", "", $arg) : preg_replace("/[[:cntrl:]]/u", "", $arg);
 }
 
