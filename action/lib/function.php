@@ -156,18 +156,18 @@ function JSON表示($json = [], $allow = null){
 
 function RSS表示(array $channel, array $items){ // http://www.futomi.com/lecture/japanese/rss20.html
     $tag = function ($name, $value){
-        return "<$name>" . $value . "</$name>\n";
+        return "<$name>$value</$name>\n";
     };
     
-    if($channel["title"]){ $rss .= $tag("title", h($channel['title'])); }
-    if($channel["link"]){ $rss .= $tag("link", h($channel['link'])); }
-    if($channel["description"]){ $rss .= $tag("description", h($channel['description'])); }
+    if(isset($channel["title"])){ $rss .= $tag("title", h($channel['title'])); }
+    if(isset($channel["link"])){ $rss .= $tag("link", h($channel['link'])); }
+    if(isset($channel["description"])){ $rss .= $tag("description", h($channel['description'])); }
     
     foreach($items as $item){
         $rss .= "<item>\n";
-        if($item["title"]){ $rss .= $tag("title", h($item['title'])); }
-        if($item["link"]){ $rss .= $tag("link", h($item['link'])); }
-        if($item["pubDate"]){ $rss .= $tag("pubDate", date("r", $item["pubDate"])); }
+        if(isset($item["title"])){ $rss .= $tag("title", h($item['title'])); }
+        if(isset($item["link"])){ $rss .= $tag("link", h($item['link'])); }
+        if(isset($item["pubDate"])){ $rss .= $tag("pubDate", date("r", $item["pubDate"])); }
         $rss .= "</item>\n";
     }
     
