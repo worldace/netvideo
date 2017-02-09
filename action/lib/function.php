@@ -154,24 +154,25 @@ function JSON表示($json = [], $allow = null){
 }
 
 
-function RSS表示(array $channel, array $items){
-    $rss = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\">\n<channel>\n";
-
-    if($channel["タイトル"]){ $rss .= "<title>" . h($channel['タイトル']) . "</title>\n"; }
-    if($channel["リンク"]){ $rss .= "<link>" . h($channel["リンク"]) . "</link>\n"; }
-    if($channel["要約"]){ $rss .= "<description>" . h($channel["要約"]) . "</description>\n"; }
+function RSS表示(array $channel, array $items){ // http://www.futomi.com/lecture/japanese/rss20.html
+    $tag = function ($name, $value){
+        return "<$name>" . $value . "</$name>\n";
+    };
+    
+    if($channel["title"]){ $rss .= $tag("title", h($channel['title'])); }
+    if($channel["link"]){ $rss .= $tag("link", h($channel['link'])); }
+    if($channel["description"]){ $rss .= $tag("description", h($channel['description'])); }
     
     foreach($items as $item){
         $rss .= "<item>\n";
-        if($item["タイトル"]){ $rss .= "  <title>" . h($item['タイトル']) . "</title>\n"; }
-        if($item["リンク"]){ $rss .= "  <link>" . h($item["リンク"]) . "</link>\n"; }
-        if($item["時間"]){ $rss .= "  <pubDate>" . date("r", $item["時間"]) . "</pubDate>\n"; }
+        if($item["title"]){ $rss .= $tag("title", h($item['title'])); }
+        if($item["link"]){ $rss .= $tag("link", h($item['link'])); }
+        if($item["pubDate"]){ $rss .= $tag("pubDate", date("r", $item["pubDate"])); }
         $rss .= "</item>\n";
     }
     
-    $rss .= "</channel>\n</rss>";
     header("Content-Type: application/xml; charset=UTF-8");
-    print $rss;
+    print "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\">\n<channel>\n{$rss}</channel>\n</rss>";
     exit;
 }
 
