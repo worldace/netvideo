@@ -422,6 +422,13 @@ function 改行変換($arg = "", $replace = ""){
 }
 
 
+function 制御文字削除($arg = "", $LF = false){
+    if(is_array($arg)){ return array_map(function($str) use($LF){ return 制御文字削除($str, $LF); }, $arg); }
+    $arg = preg_replace("/\t/", "    ", $arg);
+    return ($LF) ? preg_replace("/(?!\n)[[:cntrl:]]/", "", $arg) : preg_replace("/[[:cntrl:]]/", "", $arg);
+}
+
+
 function 開始タグ($tag, array $attr = []){
     foreach($attr as $name => $value){ $attr_str .= " $name=\"$value\""; }
     return "<$tag$attr_str>";
@@ -748,7 +755,7 @@ function ベーシック認証($認証関数, $realm="member only"){
 
 
 function 連想配列ソート(array &$array){
-    array_multisort(array_values($array), SORT_DESC, array_keys($array), SORT_ASC, $array);
+    array_multisort(array_values($array), SORT_DESC, SORT_NATURAL, array_keys($array), SORT_ASC, SORT_NATURAL, $array);
 }
 
 
