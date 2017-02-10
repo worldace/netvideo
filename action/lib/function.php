@@ -185,7 +185,7 @@ function リダイレクト($url){
 
 function ファイルダウンロード($data, $filename = null, $timeout = 60*60*12){
     ini_set("max_execution_time", $timeout);
-    if(!file_exists($data)){ エラー500("ダウンロードファイルが存在しません"); }
+    if(!file_exists($data)){ エラー404("ダウンロードファイルが存在しません"); }
     $filesize = filesize($data);
     if(!$filename){ $filename = basename($data); }
     $filenameE = rawurlencode($filename);
