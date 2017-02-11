@@ -145,6 +145,81 @@ window.addEventListener('unload', function(event){
 
 
 
+
+
+
+//■ screen
+$v.screen = $v.player.querySelector(".jsplayer-screen");
+
+
+$v.screen.showOsd = function(str){
+    var osd = document.createElement("span");
+    osd.textContent = str;
+    osd.className   = "jsplayer-screen-osd";
+    osd.style.fontSize = $v.comment.fontSize + "px";
+
+    $v.screen.clearOsd();
+    $v.screen.appendChild(osd);
+    $v.screen.osdTimer = window.setTimeout($v.screen.clearOsd, 1500);
+};
+
+
+$v.screen.clearOsd = function(){
+    var osd = $v.screen.querySelectorAll(".jsplayer-screen-osd");
+    for(var i = osd.length-1; i >= 0; i--){
+        $v.screen.removeChild(osd[i]);
+    }
+    if($v.screen.osdTimer){ window.clearTimeout($v.screen.osdTimer); }
+};
+
+
+$v.screen.isFullscreen = function(){
+    var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+    return (element && element.className == $v.screen.className) ? true : false;
+};
+
+
+$v.screen.toggleFullscreen = function(){
+    if(!$v.screen.isFullscreen()){
+        if     ($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
+        else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
+        else if($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
+        else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
+    }
+    else{
+        if     (document.exitFullscreen)      { document.exitFullscreen(); }
+        else if(document.msExitFullscreen)    { document.msExitFullscreen(); }
+        else if(document.webkitExitFullscreen){ document.webkitExitFullscreen(); }
+        else if(document.mozCancelFullScreen) { document.mozCancelFullScreen(); }
+    }
+};
+
+
+$v.screen.fullscreenEvent = function(){
+    if($v.screen.isFullscreen()){
+        $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
+        $v.screen.addEventListener('click', $v.controller.toggle);
+        $v.controller.intoScreen();
+    }
+    else{
+        $v.screen.pos = $v.screen.getBoundingClientRect();
+        $v.screen.removeEventListener('click', $v.controller.toggle);
+        $v.controller.intoPlayer();
+    }
+    $v.video.fit();
+    $v.comment.setting($v.screen.pos.height);
+    $v.comment.clear();
+};
+
+
+document.addEventListener("fullscreenchange",       $v.screen.fullscreenEvent);
+document.addEventListener("MSFullscreenChange",     $v.screen.fullscreenEvent);
+document.addEventListener("webkitfullscreenchange", $v.screen.fullscreenEvent);
+document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent);
+
+
+
+
 //■ video
 $v.video = $v.player.querySelector(".jsplayer-video");
 
@@ -671,75 +746,6 @@ $v.form.input.addEventListener('focus', function(event){
 
 
 
-//■ screen
-$v.screen = $v.player.querySelector(".jsplayer-screen");
-
-
-$v.screen.showOsd = function(str){
-    var osd = document.createElement("span");
-    osd.textContent = str;
-    osd.className   = "jsplayer-screen-osd";
-    osd.style.fontSize = $v.comment.fontSize + "px";
-
-    $v.screen.clearOsd();
-    $v.screen.appendChild(osd);
-    $v.screen.osdTimer = window.setTimeout($v.screen.clearOsd, 1500);
-};
-
-
-$v.screen.clearOsd = function(){
-    var osd = $v.screen.querySelectorAll(".jsplayer-screen-osd");
-    for(var i = osd.length-1; i >= 0; i--){
-        $v.screen.removeChild(osd[i]);
-    }
-    if($v.screen.osdTimer){ window.clearTimeout($v.screen.osdTimer); }
-};
-
-
-$v.screen.isFullscreen = function(){
-    var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-    return (element && element.className == $v.screen.className) ? true : false;
-};
-
-
-$v.screen.toggleFullscreen = function(){
-    if(!$v.screen.isFullscreen()){
-        if     ($v.screen.requestFullscreen)      { $v.screen.requestFullscreen(); }
-        else if($v.screen.msRequestFullscreen)    { $v.screen.msRequestFullscreen(); }
-        else if($v.screen.webkitRequestFullscreen){ $v.screen.webkitRequestFullscreen(); }
-        else if($v.screen.mozRequestFullScreen)   { $v.screen.mozRequestFullScreen(); }
-    }
-    else{
-        if     (document.exitFullscreen)      { document.exitFullscreen(); }
-        else if(document.msExitFullscreen)    { document.msExitFullscreen(); }
-        else if(document.webkitExitFullscreen){ document.webkitExitFullscreen(); }
-        else if(document.mozCancelFullScreen) { document.mozCancelFullScreen(); }
-    }
-};
-
-
-$v.screen.fullscreenEvent = function(){
-    if($v.screen.isFullscreen()){
-        $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
-        $v.screen.addEventListener('click', $v.controller.toggle);
-        $v.controller.intoScreen();
-    }
-    else{
-        $v.screen.pos = $v.screen.getBoundingClientRect();
-        $v.screen.removeEventListener('click', $v.controller.toggle);
-        $v.controller.intoPlayer();
-    }
-    $v.video.fit();
-    $v.comment.setting($v.screen.pos.height);
-    $v.comment.clear();
-};
-
-
-document.addEventListener("fullscreenchange",       $v.screen.fullscreenEvent);
-document.addEventListener("MSFullscreenChange",     $v.screen.fullscreenEvent);
-document.addEventListener("webkitfullscreenchange", $v.screen.fullscreenEvent);
-document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent);
-
 
 
 //■ function
@@ -831,7 +837,7 @@ $v.loadObject = function(name){
 };
 
 
-$v.extendObject = function(){
+$v.objectExtend = function(){
     if(!arguments.length){ return; }
     if(arguments.lenth == 1){ return arguments[0]; }
     var destination = Array.prototype.shift.call(arguments);
@@ -840,7 +846,7 @@ $v.extendObject = function(){
         for(var property in source){
             if(source[property] && source[property].constructor && source[property].constructor === Object){
                 destination[property] = destination[property] || {};
-                $v.extendObject(destination[property], source[property]);
+                $v.objectExtend(destination[property], source[property]);
             }
             else{
                 destination[property] = source[property];
