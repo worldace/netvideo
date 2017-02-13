@@ -1175,11 +1175,7 @@ class 部品{
         return is_callable($html) ? call_user_func_array($html, $引数) : $html;
     }
 
-    public static function 終了処理(){
-        $buf = ob_get_contents();
-        ob_end_clean();
-        if($buf == ""){ exit; }
-
+    public static function 出力($buf){
         $code_in_head = self::$結果['css'] . self::$結果['jsinhead']; //面倒なので合成してしまう
         
         if(self::$結果['jsinbody']){
@@ -1201,13 +1197,12 @@ class 部品{
             }
         }
         /*if(is_callable(self::$イベント['出力前'])){ call_user_func(self::$イベント['出力前'], $buf); }*/
-        print $buf;
+        return $buf;
     }
 
     private static function 初期化(){
         self::$初期化済み = true;
-        ob_start();
-        register_shutdown_function("部品::終了処理");
+        ob_start(["部品", "出力"]);
     }
 
     private static function h($arg = ""){
