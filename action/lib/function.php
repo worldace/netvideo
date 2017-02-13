@@ -38,13 +38,14 @@ function 検証($type, $name, $func){
     }
     else{
         if     (is_callable("検証::$func"))                          { $result = 検証::$func($value); }
-        else if(preg_match("/^([0-9]+)文字以上$/u", $func, $m))      { $result = 検証::文字以上($value, $m[1]); }
-        else if(preg_match("/^([0-9]+)文字以下$/u", $func, $m))      { $result = 検証::文字以下($value, $m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)以上$/u", $func, $m))      { $result = 検証::以上($value, $m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)以下$/u", $func, $m))      { $result = 検証::以下($value, $m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)より大きい$/u", $func, $m)){ $result = 検証::より大きい($value, $m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)より小さい$/u", $func, $m)){ $result = 検証::より小さい($value, $m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)と同じ$/u", $func, $m))    { $result = 検証::と同じ($value, $m[1]); }
+        else if(preg_match("/^([0-9]+)文字$/u", $func, $m))          { $result = 検証::文字($value, (int)$m[1]); }
+        else if(preg_match("/^([0-9]+)文字以上$/u", $func, $m))      { $result = 検証::文字以上($value, (int)$m[1]); }
+        else if(preg_match("/^([0-9]+)文字以下$/u", $func, $m))      { $result = 検証::文字以下($value, (int)$m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)以上$/u", $func, $m))      { $result = 検証::以上($value, (int)$m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)以下$/u", $func, $m))      { $result = 検証::以下($value, (int)$m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)より大きい$/u", $func, $m)){ $result = 検証::より大きい($value, (int)$m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)より小さい$/u", $func, $m)){ $result = 検証::より小さい($value, (int)$m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)と同じ$/u", $func, $m))    { $result = 検証::と同じ($value, (int)$m[1]); }
         else                                                         { throw new プログラミングバグ(__function__."() 第3引数の関数名が間違っています"); }
     }
     
@@ -88,6 +89,9 @@ class 検証{
     public static function 画像データ($v){
         return getimagesizefromstring($v)[0] > 0; //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
     }
+    public static function UTF8($v){
+        return preg_match('//u', $v); //mb_check_encoding($v, 'UTF-8')
+    }
     public static function と同じ($v, $num){
         return $v == $num;
     }
@@ -102,6 +106,9 @@ class 検証{
     }
     public static function より小さい($v, $num){
         return (is_numeric($v) and ($v < $num));
+    }
+    public static function 文字($v, $num){
+        return mb_strlen($v,"UTF-8") == $num;
     }
     public static function 文字以上($v, $num){
         return mb_strlen($v,"UTF-8") >= $num;
