@@ -1106,28 +1106,33 @@ class データベース{
 function 部品(){
     $引数   = func_get_args();
     $部品名 = array_shift($引数);
-    return 部品::作成($部品名, $引数);
+    return 部品::作成($部品名, true, $引数);
+}
+
+
+function 生部品(){
+    $引数   = func_get_args();
+    $部品名 = array_shift($引数);
+    return 部品::作成($部品名, false, $引数);
 }
 
 
 class 部品{
     private static $ディレクトリ = "./parts";
-    private static $自動エスケープ = true;
     private static $初期化済み = false;
     private static $記憶 = [];
     private static $結果 = [];
 
 
-    public static function 設定($dir = "./parts", $escape = true){
+    public static function 設定($dir = "./parts"){
         self::$ディレクトリ   = preg_replace("|/$|", "", $dir);
-        self::$自動エスケープ = $escape;
         if(!self::$初期化済み){ self::初期化(); }
     }
 
-    public static function 作成($部品名, $引数){
+    public static function 作成($部品名, $自動エスケープ, $引数){
         if($部品名 === null){ throw new プログラミングバグ('部品名がありません'); }
         if(!self::$初期化済み){ self::初期化(); }
-        if(self::$自動エスケープ){ $引数 = self::h($引数); }
+        if($自動エスケープ){ $引数 = self::h($引数); }
 
         if(!self::$記憶[$部品名]['読み込み済み']){
             require self::$ディレクトリ . "/$部品名.php";
@@ -1175,7 +1180,7 @@ class 部品{
         return is_callable($html) ? call_user_func_array($html, $引数) : $html;
     }
 
-    public static function 出力($buf){
+    public static function 差し込み($buf){
         $code_in_head = self::$結果['css'] . self::$結果['jsinhead']; //面倒なので合成してしまう
         
         if(self::$結果['jsinbody']){
@@ -1202,7 +1207,7 @@ class 部品{
 
     private static function 初期化(){
         self::$初期化済み = true;
-        ob_start(["部品", "出力"]);
+        ob_start(["部品", "差し込み"]);
     }
 
     private static function h($arg = ""){
