@@ -25,7 +25,7 @@ function route(){
 }
 
 
-function 検証($type, $name, $func){
+function 検査($type, $name, $func){
     if(preg_match("/^get$/i", $type)){
         $value = $_GET[$name];
     }
@@ -40,19 +40,19 @@ function 検証($type, $name, $func){
         $result = $func($value);
     }
     else{
-        if     (is_callable("検証::$func"))                          { $result = 検証::$func($value); }
-        else if(preg_match("/^([0-9]+)文字$/u", $func, $m))          { $result = 検証::文字($value, (int)$m[1]); }
-        else if(preg_match("/^([0-9]+)文字以上$/u", $func, $m))      { $result = 検証::文字以上($value, (int)$m[1]); }
-        else if(preg_match("/^([0-9]+)文字以下$/u", $func, $m))      { $result = 検証::文字以下($value, (int)$m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)以上$/u", $func, $m))      { $result = 検証::以上($value, (int)$m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)以下$/u", $func, $m))      { $result = 検証::以下($value, (int)$m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)より大きい$/u", $func, $m)){ $result = 検証::より大きい($value, (int)$m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)より小さい$/u", $func, $m)){ $result = 検証::より小さい($value, (int)$m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)と同じ$/u", $func, $m))    { $result = 検証::と同じ($value, (int)$m[1]); }
+        if     (is_callable("検査::$func"))                          { $result = 検査::$func($value); }
+        else if(preg_match("/^([0-9]+)文字$/u", $func, $m))          { $result = 検査::文字($value, (int)$m[1]); }
+        else if(preg_match("/^([0-9]+)文字以上$/u", $func, $m))      { $result = 検査::文字以上($value, (int)$m[1]); }
+        else if(preg_match("/^([0-9]+)文字以下$/u", $func, $m))      { $result = 検査::文字以下($value, (int)$m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)以上$/u", $func, $m))      { $result = 検査::以上($value, (int)$m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)以下$/u", $func, $m))      { $result = 検査::以下($value, (int)$m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)より大きい$/u", $func, $m)){ $result = 検査::より大きい($value, (int)$m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)より小さい$/u", $func, $m)){ $result = 検査::より小さい($value, (int)$m[1]); }
+        else if(preg_match("/^(-?[0-9\.]+)と同じ$/u", $func, $m))    { $result = 検査::と同じ($value, (int)$m[1]); }
         else                                                         { throw new プログラミングバグ(__function__."() 第3引数の関数名が間違っています"); }
     }
     
-    if(検証::$例外 === true and $result === false){
+    if(検査::$例外 === true and $result === false){
         エラー400("{$name}の値が間違っています");
     }
     
@@ -62,7 +62,7 @@ function 検証($type, $name, $func){
 }
 
 
-class 検証{
+class 検査{
     public static $例外 = false;
 
     public static function 必須($v){
