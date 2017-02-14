@@ -382,6 +382,11 @@ function 開発環境なら(){
 }
 
 
+function PHPが($str){
+    return version_compare(PHP_VERSION, $str) >= 0;
+}
+
+
 function 日付($str = '[年]/[0月]/[0日] [0時]:[0分]', $time = 0){
     if(!$time){ $time = time(); }
     $week = ['日','月','火','水','木','金','土'][date('w', $time)];
@@ -1188,20 +1193,13 @@ class 部品{
             if($pos !== false){
                 $buf = substr_replace($buf, self::$結果['jsinbody'], $pos, 0); //最後に出現する</body>の前にJSを挿入する
             }
-            else{
-                $buf .= self::$結果['jsinbody'];
-            }
         }
         if($code_in_head){
             $pos = stripos($buf, "</head>");
             if($pos !== false){
                 $buf = substr_replace($buf, $code_in_head, $pos, 0); //最初に出現する</head>の前に挿入する
             }
-            else{
-                $buf = $code_in_head . $buf;
-            }
         }
-        /*if(is_callable(self::$イベント['出力前'])){ call_user_func(self::$イベント['出力前'], $buf); }*/
         return $buf;
     }
 
