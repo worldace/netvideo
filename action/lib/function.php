@@ -463,7 +463,7 @@ function 自動リンク($arg = "", array $attr = []){
 }
 
 
-function テーブルタグ作成(array $array, array $attr = []){
+function 配列→テーブルタグ(array $array, array $attr = []){
     $firstkey = key($array);
     if(is_array($array[$firstkey])){ $tag = "<tr>\n<th></th>\n<th>" . implode("</th>\n<th>",array_keys($array[$firstkey])) . "</th>\n</tr>\n"; }
     foreach($array as $key1 => $value1){
