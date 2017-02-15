@@ -487,16 +487,17 @@ function dd(){
 }
 
 
-function newTrait($trait = null, $class = null, $args = null){
+function newa($class = null, $args = null, $trait = null){
+    if($class !== null){
+        if(class_exists($class)){ $class_code = "extends $class"; }
+        else if(interface_exists($class)){ $class_code = "implements $class"; }
+        else{ throw new プログラミングバグ(__function__."() 第2引数の[$class]クラス/インターフェースが見つかりません"); }
+    }
     if($trait !== null){
         foreach((array)$trait as $value){
-            if(!preg_match('/^[a-zA-Z_\x7f-\xff\\\\][a-zA-Z0-9_\x7f-\xff\\\\]*$/', $value)){ throw new プログラミングバグ(__function__."() 第1引数に使用不可能な文字が含まれています"); };
+            if(!trait_exists($value)){ throw new プログラミングバグ(__function__."() 第1引数の[$value]トレイトが見つかりません"); };
         }
         $trait_code = "use " . implode(",", (array)$trait) . ";";
-    }
-    if($class !== null){
-        if(!preg_match('/^[a-zA-Z_\x7f-\xff\\\\][a-zA-Z0-9_\x7f-\xff\\\\]*$/', $class)){ throw new プログラミングバグ(__function__."() 第2引数に使用不可能な文字が含まれています"); };
-        $class_code = "extends $class";
     }
     eval("\$object = new class(...(array)\$args) $class_code{ $trait_code };");
     return $object;
