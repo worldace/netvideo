@@ -15,9 +15,9 @@ function クラスローダ($dir = __DIR__){
 
 
 function route(){
-    foreach(func_get_args() as $_ENV['ルートの現ファイル']){
+    foreach(func_get_args() as $_ENV['route.現在のファイル']){
         $func = function (){
-            require_once $_ENV['ルートの現ファイル'];
+            require_once $_ENV['route.現在のファイル'];
         };
         $_ENV['前ファイルの戻り値'] = $func();
     }
@@ -463,7 +463,7 @@ function 自動リンク($arg = "", array $attr = []){
 }
 
 
-function 配列→テーブルタグ(array $array, array $attr = []){
+function 配列→table(array $array, array $attr = []){
     $firstkey = key($array);
     if(is_array($array[$firstkey])){ $tag = "<tr>\n<th></th>\n<th>" . implode("</th>\n<th>",array_keys($array[$firstkey])) . "</th>\n</tr>\n"; }
     foreach($array as $key1 => $value1){
