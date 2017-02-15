@@ -1229,18 +1229,18 @@ function エラー500($str){
 }
 
 class 実行エラー extends RuntimeException{
-    use 例外トレイト;
+    use 例外の実装;
 }
 
 class プログラミングバグ extends LogicException{
-    use 例外トレイト;
+    use 例外の実装;
 }
 
 class 設定バグ extends LogicException{
-    use 例外トレイト;
+    use 例外の実装;
 }
 
-trait 例外トレイト{
+trait 例外の実装{
     public function __toString() {
         $trace = $this->getTrace();
         if(is_array($trace)){
