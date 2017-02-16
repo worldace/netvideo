@@ -14,7 +14,7 @@ function クラスローダ($dir = __DIR__){
 }
 
 
-function route(array $route, $arg = null){
+function route(array $route, $arg = 1){
     $_ENV['route.return'] = $arg;
     $_ENV['route.dir'] = dirname(debug_backtrace()[0]['file']);
     if(!function_exists("routed")){
