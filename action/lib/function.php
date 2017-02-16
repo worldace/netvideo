@@ -15,17 +15,18 @@ function クラスローダ($dir = __DIR__){
 
 
 function route(array $route, $arg = null){
-    $_ENV['route.戻り値'] = $arg;
-    function routed(){ return $_ENV['route.戻り値']; }
-
+    $_ENV['route.return'] = $arg;
     $_ENV['route.dir'] = dirname(debug_backtrace()[0]['file']);
+    if(!function_exists("routed")){
+        function routed(){ return $_ENV['route.return']; }
+    }
 
-    foreach((array)$route as $_ENV['route.現在のファイル']){
-        if(preg_match("#^(?!(/|\w:|http)).+#", $_ENV['route.現在のファイル'])){ //相対パスなら
-            $_ENV['route.現在のファイル'] = $_ENV['route.dir'] . "/" . $_ENV['route.現在のファイル'];
+    foreach((array)$route as $_ENV['route.file']){
+        if(preg_match("#^(?!(/|\w:|http)).+#", $_ENV['route.file'])){ //相対パスなら
+            $_ENV['route.file'] = $_ENV['route.dir'] . "/" . $_ENV['route.file'];
         }
-        $func = function (){ require_once $_ENV['route.現在のファイル']; };
-        $_ENV['route.戻り値'] = $func();
+        $func = function (){ require_once $_ENV['route.file']; };
+        $_ENV['route.return'] = $func();
     }
     exit;
 }
