@@ -15,7 +15,7 @@ function クラスローダ($dir = __DIR__){
 
 
 function route(){
-    if(!isset($_ENV['route.戻り値'])){ $_ENV['route.戻り値'] = true; }
+    if(!isset($_ENV['route.戻り値'])){ $_ENV['route.戻り値'] = 1; }
     function routed(){ return $_ENV['route.戻り値']; }
 
     $_ENV['route.dir'] = dirname(debug_backtrace()[0]['file']);
