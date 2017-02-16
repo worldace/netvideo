@@ -25,7 +25,7 @@ function route(array $route, $arg = 1){
         if(preg_match("#^(?!(/|\w:|http)).+#", $_ENV['route.file'])){ //相対パスなら
             $_ENV['route.file'] = $_ENV['route.dir'] . "/" . $_ENV['route.file'];
         }
-        $func = function (){ require_once $_ENV['route.file']; };
+        $func = function (){ return require_once $_ENV['route.file']; };
         $_ENV['route.return'] = $func();
     }
     exit;
