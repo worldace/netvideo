@@ -9,7 +9,7 @@
 function クラスローダ($dir = __DIR__){
     spl_autoload_register(function($class) use($dir){
         $class = str_replace("_", "/", $class);
-        include_once "{$dir}/{$class}.php";
+        require_once "{$dir}/{$class}.php";
     });
 }
 
