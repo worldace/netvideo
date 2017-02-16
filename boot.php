@@ -13,7 +13,7 @@ set_exception_handler(function($e){
 
 
 クラスローダ();
-検証::$例外 = true;
+検査::$例外 = true;
 部品::設定("{$_ENV['ディレクトリ.action']}/parts");
 開発用の設定();
 
