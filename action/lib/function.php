@@ -15,11 +15,14 @@ function クラスローダ($dir = __DIR__){
 
 
 function route(){
+    if(!isset($_ENV['route.戻り値'])){ $_ENV['route.戻り値'] = true; }
+    function required(){ return $_ENV['route.戻り値']; }
+
     foreach(func_get_args() as $_ENV['route.現在のファイル']){
         $func = function (){
             require_once $_ENV['route.現在のファイル'];
         };
-        $_ENV['前ファイルの戻り値'] = $func();
+        $_ENV['route.戻り値'] = $func();
     }
     exit;
 }
