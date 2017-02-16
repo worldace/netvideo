@@ -21,7 +21,7 @@ function route(){
     $_ENV['route.dir'] = dirname(debug_backtrace()[0]['file']);
 
     foreach(func_get_args() as $_ENV['route.現在のファイル']){
-        if(preg_match("#^(?!(/|\w:)).+#", $_ENV['route.現在のファイル'])){ //相対パスなら
+        if(preg_match("#^(?!(/|\w:|http)).+#", $_ENV['route.現在のファイル'])){ //相対パスなら
             $_ENV['route.現在のファイル'] = $_ENV['route.dir'] . "/" . $_ENV['route.現在のファイル'];
         }
         $func = function (){ require_once $_ENV['route.現在のファイル']; };
