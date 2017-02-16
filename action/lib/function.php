@@ -14,13 +14,13 @@ function クラスローダ($dir = __DIR__){
 }
 
 
-function route(){
-    if(!isset($_ENV['route.戻り値'])){ $_ENV['route.戻り値'] = 1; }
+function route(array $route, $arg = null){
+    $_ENV['route.戻り値'] = $arg;
     function routed(){ return $_ENV['route.戻り値']; }
 
     $_ENV['route.dir'] = dirname(debug_backtrace()[0]['file']);
 
-    foreach(func_get_args() as $_ENV['route.現在のファイル']){
+    foreach((array)$route as $_ENV['route.現在のファイル']){
         if(preg_match("#^(?!(/|\w:|http)).+#", $_ENV['route.現在のファイル'])){ //相対パスなら
             $_ENV['route.現在のファイル'] = $_ENV['route.dir'] . "/" . $_ENV['route.現在のファイル'];
         }
