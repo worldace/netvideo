@@ -1144,7 +1144,7 @@ class 部品{
 
     public static function 作成($部品名, $自動エスケープ, $引数){
         if($部品名 === null){ throw new プログラミングバグ('部品名がありません'); }
-        if(!self::$初期化済み){ self::初期化(); }
+        if(!self::$初期化済み){ throw new 設定バグ('部品::設定()で部品ディレクトリを指定してください'); }
         if($自動エスケープ){ $引数 = self::h($引数); }
 
         if(!self::$記憶[$部品名]['読み込み済み']){
@@ -1153,6 +1153,7 @@ class 部品{
             self::$記憶[$部品名]['html'] = $html;
 
             if($cssfile){
+                $cssfile = is_callable($cssfile) ? call_user_func_array($cssfile, $引数) : $cssfile;
                 foreach((array)$cssfile as $_url){
                     if(in_array($_url, (array)self::$記憶['読み込み済みURL'])){ continue; }
                     $_cssfile .= "<link rel=\"stylesheet\" href=\"{$_url}\">\n";
@@ -1167,6 +1168,7 @@ class 部品{
             self::$結果['css'] .= $_cssfile . $_css;
 
             if($jsfile){
+                $jsfile = is_callable($jsfile) ? call_user_func_array($jsfile, $引数) : $jsfile;
                 foreach((array)$jsfile as $_url){
                     if(in_array($_url, (array)self::$記憶['読み込み済みURL'])){ continue; }
                     $_jsfile .= "<script src=\"{$_url}\"></script>\n";
