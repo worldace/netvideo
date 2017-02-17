@@ -17,8 +17,8 @@ function クラスローダ($dir = __DIR__){
 function route(array $route, $arg = 1){
     $_ENV['route.return'] = $arg;
     $_ENV['route.dir'] = dirname(debug_backtrace()[0]['file']);
-    if(!function_exists("required")){
-        function required(){ return $_ENV['route.return']; }
+    if(!function_exists("routed")){
+        function routed(){ return $_ENV['route.return']; }
     }
 
     foreach((array)$route as $_ENV['route.file']){
@@ -409,6 +409,7 @@ function 経過($time){
     if(!preg_match("/^\d+$/", $time)){ return ""; }
     $時間差 = time() - $time;
     switch($時間差){
+        case $時間差 < 0        : return "未来";
         case $時間差 < 1        : return "今";
         case $時間差 < 60       : return "{$時間差}秒前";
         case $時間差 < 3600     : return floor($時間差/60)."分前";
