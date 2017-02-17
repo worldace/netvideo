@@ -346,11 +346,9 @@ function 現在のURL($no_query = false){
 
 
 function ホームURL($url){
-    $parsed_url = parse_url($url);
-    $scheme = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
-    $host   = isset($parsed_url['host']) ? $parsed_url['host'] : '';
-    $port   = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
-    return $scheme . $host . $port . "/";
+    $parsed = explode("/", $url);
+    if(count($parsed) < 2){ return $url; }
+    return $parsed[0] . "//" . $parsed[2] . "/";
 }
 
 
