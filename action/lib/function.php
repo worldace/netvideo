@@ -347,12 +347,12 @@ function 現在のURL($no_query = false){
 
 function ホームURL($url){
     $parsed = explode("/", $url);
-    if(count($parsed) < 2 or empty($parsed[2])){ return false; }
+    if(!isset($parsed[2])){ return false; }
     return $parsed[0] . "//" . $parsed[2] . "/";
 }
 
 
-function 親URL($url){
+function トップURL($url){
     $url = preg_replace("/\?.*/", "", $url);
     return (substr_count($url, "/") === 2) ? $url."/" : dirname($url."a")."/";
 }
@@ -1205,7 +1205,7 @@ class 部品{
 
     public static function 差し込み($buf){
         $code_in_head = self::$結果['css'] . self::$結果['jsinhead']; //面倒なので合成してしまう
-        
+
         if(self::$結果['jsinbody']){
             $pos = strripos($buf, "</body>");
             if($pos !== false){
