@@ -475,11 +475,7 @@ function 属性文字列(array $attr = []){
             trigger_error("[$name]は属性名に使用できません");
             continue;
         }
-        if(!is_string($value)){
-            trigger_error("[$name]の値は属性値に使用できません");
-            continue;
-        }
-        $str .= " $name=\"" . htmlspecialchars($value, ENT_COMPAT, "UTF-8") . '"';
+        $str .= " $name=\"" . htmlspecialchars((string)$value, ENT_COMPAT, "UTF-8") . '"';
     }
     return $str;
 }
