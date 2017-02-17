@@ -482,17 +482,6 @@ function 配列→table(array $array, array $attr = []){
 }
 
 
-function dd(){
-    foreach(func_get_args() as $var){
-        $out = var_export($var, true);
-        if(php_sapi_name() === 'cli'){ $str .= $out; }
-        else{ $str .= "<pre>$out</pre>"; }
-        $str .= "\n\n";
-    }
-    return $str;
-}
-
-
 function newa($class = null, $args = null, $trait = null){
     if($class !== null){
         if(class_exists($class)){ $class_code = "extends $class"; }
