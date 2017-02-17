@@ -462,9 +462,10 @@ function 終了タグ($tag){
 }
 
 
-function 自動リンク($arg = "", array $attr = []){
+function 自動リンク($arg = "", array $attr = [], $dont_escape = false){
     if(is_array($arg)){ return array_map(function($str) use($attr){ return 自動リンク($str, $attr); }, $arg); }
     foreach($attr as $name => $value){ $attr_str .= " $name=\"$value\""; }
+    if($dont_escape === false){ $arg = h($arg); }
     return preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $arg);
 }
 
@@ -771,8 +772,8 @@ function 連想配列ソート(array &$array){
 }
 
 
-function テンプレート変換($テンプレート, array $変換関係 = [], $自動エスケープ = true){
-    if($自動エスケープ === true){ $変換関係 = h($変換関係); }
+function テンプレート変換($テンプレート, array $変換関係 = [], $dont_escpae = false){
+    if($dont_escpae === false){ $変換関係 = h($変換関係); }
     return preg_replace_callback("|《([^》]*)》|u", function($match) use($変換関係){ return $変換関係[$match[1]]; }, $テンプレート);
 }
 
