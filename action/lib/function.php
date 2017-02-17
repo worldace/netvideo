@@ -452,19 +452,42 @@ function 制御文字削除($arg = "", $LF = false){ // http://blog.sarabande.jp
 
 
 function 開始タグ($tag, array $attr = []){
-    foreach($attr as $name => $value){ $attr_str .= " $name=\"$value\""; }
-    return "<$tag$attr_str>";
+    if(preg_match("/[^a-zA-Z0-9\-]/", $tag)){
+        trigger_error("[$name]はタグ名に使用できません");
+        return;
+    }
+    return "<$tag" . 属性文字列($attr) . ">";
 }
 
 
 function 終了タグ($tag){
+    if(preg_match("/[^a-zA-Z0-9\-]/", $tag)){
+        trigger_error("[$name]はタグ名に使用できません");
+        return;
+    }
     return "</$tag>";
+}
+
+
+function 属性文字列(array $attr = []){
+    foreach($attr as $name => $value){
+        if(preg_match("/[^a-zA-Z\-]/", $name)){
+            trigger_error("[$name]は属性名に使用できません");
+            continue;
+        }
+        if(!is_string($value)){
+            trigger_error("[$name]の値は属性値に使用できません");
+            continue;
+        }
+        $str .= " $name=\"" . htmlspecialchars($value, ENT_COMPAT, "UTF-8") . '"';
+    }
+    return $str;
 }
 
 
 function 自動リンク($arg = "", array $attr = [], $dont_escape = false){
     if(is_array($arg)){ return array_map(function($str) use($attr){ return 自動リンク($str, $attr); }, $arg); }
-    foreach($attr as $name => $value){ $attr_str .= " $name=\"$value\""; }
+    $attr_str = 属性文字列($attr);
     if($dont_escape === false){ $arg = h($arg); }
     return preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $arg);
 }
@@ -478,7 +501,7 @@ function 配列→table(array $array, array $attr = []){
         foreach((array)$value1 as $key2 => $value2){ $tag .= "<td>" . h($value2) . "</td>\n"; }
         $tag .= "</tr>\n";
     }
-    foreach($attr as $name => $value){ $attr_str .= " $name=\"$value\""; }
+    $attr_str = 属性文字列($attr);
     return "<table$attr_str>\n$tag\n</table>";
 }
 
