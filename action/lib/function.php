@@ -32,6 +32,63 @@ function route(array $route, $arg = 1){
 }
 
 
+function テキスト表示($str = ""){
+    header("Content-Type: text/plain; charset=utf-8");
+    print $str;
+    exit;
+}
+
+
+function JSON表示($json = [], $allow = null){
+    if(!$allow){
+        $allow = ($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : "*";
+    }
+    else{
+        $allow = implode(" ", (array)$allow);
+    }
+    header("Access-Control-Allow-Origin: $allow");
+    header("Access-Control-Allow-Credentials: true");
+    if(is_string($_GET['callback'])){ //JSONP
+        header("Content-Type: application/javascript; charset=utf-8");
+        print $_GET['callback'] . "(" . json_encode($json) . ");";
+    }
+    else{ //JSON
+        header("Content-Type: application/json; charset=utf-8");
+        print json_encode($json);
+    }
+    exit;
+}
+
+
+function RSS表示(array $channel, array $items){ // http://www.futomi.com/lecture/japanese/rss20.html
+    $tag = function ($name, $value){
+        return "<$name>$value</$name>\n";
+    };
+    
+    if(isset($channel["title"])){ $rss .= $tag("title", h($channel['title'])); }
+    if(isset($channel["link"])){ $rss .= $tag("link", h($channel['link'])); }
+    if(isset($channel["description"])){ $rss .= $tag("description", h($channel['description'])); }
+    
+    foreach($items as $item){
+        $rss .= "<item>\n";
+        if(isset($item["title"])){ $rss .= $tag("title", h($item['title'])); }
+        if(isset($item["link"])){ $rss .= $tag("link", h($item['link'])); }
+        if(isset($item["pubDate"])){ $rss .= $tag("pubDate", date("r", $item["pubDate"])); }
+        $rss .= "</item>\n";
+    }
+    
+    header("Content-Type: application/xml; charset=UTF-8");
+    print "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\">\n<channel>\n{$rss}</channel>\n</rss>";
+    exit;
+}
+
+
+function リダイレクト($url){
+    header("Location: $url");
+    exit;
+}
+
+
 function 検査($type, $name, $func){
     if(preg_match("/^get$/i", $type)){
         $value = $_GET[$name];
@@ -140,63 +197,6 @@ function 整形($type, $name, $func){
         $result = $_COOKIE[$name] = $func($_COOKIE[$name]);
     }
     return $result;
-}
-
-
-function テキスト表示($str = ""){
-    header("Content-Type: text/plain; charset=utf-8");
-    print $str;
-    exit;
-}
-
-
-function JSON表示($json = [], $allow = null){
-    if(!$allow){
-        $allow = ($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : "*";
-    }
-    else{
-        $allow = implode(" ", (array)$allow);
-    }
-    header("Access-Control-Allow-Origin: $allow");
-    header("Access-Control-Allow-Credentials: true");
-    if(is_string($_GET['callback'])){ //JSONP
-        header("Content-Type: application/javascript; charset=utf-8");
-        print $_GET['callback'] . "(" . json_encode($json) . ");";
-    }
-    else{ //JSON
-        header("Content-Type: application/json; charset=utf-8");
-        print json_encode($json);
-    }
-    exit;
-}
-
-
-function RSS表示(array $channel, array $items){ // http://www.futomi.com/lecture/japanese/rss20.html
-    $tag = function ($name, $value){
-        return "<$name>$value</$name>\n";
-    };
-    
-    if(isset($channel["title"])){ $rss .= $tag("title", h($channel['title'])); }
-    if(isset($channel["link"])){ $rss .= $tag("link", h($channel['link'])); }
-    if(isset($channel["description"])){ $rss .= $tag("description", h($channel['description'])); }
-    
-    foreach($items as $item){
-        $rss .= "<item>\n";
-        if(isset($item["title"])){ $rss .= $tag("title", h($item['title'])); }
-        if(isset($item["link"])){ $rss .= $tag("link", h($item['link'])); }
-        if(isset($item["pubDate"])){ $rss .= $tag("pubDate", date("r", $item["pubDate"])); }
-        $rss .= "</item>\n";
-    }
-    
-    header("Content-Type: application/xml; charset=UTF-8");
-    print "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\">\n<channel>\n{$rss}</channel>\n</rss>";
-    exit;
-}
-
-
-function リダイレクト($url){
-    header("Location: $url");
-    exit;
 }
 
 
