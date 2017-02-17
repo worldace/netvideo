@@ -347,7 +347,7 @@ function 現在のURL($no_query = false){
 
 function ホームURL($url){
     $parsed = explode("/", $url);
-    if(count($parsed) < 2){ return $url; }
+    if(count($parsed) < 2 or empty($parsed[2])){ return false; }
     return $parsed[0] . "//" . $parsed[2] . "/";
 }
 
