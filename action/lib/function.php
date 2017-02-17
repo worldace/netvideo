@@ -471,10 +471,10 @@ function 自動リンク($arg = "", array $attr = []){
 
 function 配列→table(array $array, array $attr = []){
     $firstkey = key($array);
-    if(is_array($array[$firstkey])){ $tag = "<tr>\n<th></th>\n<th>" . implode("</th>\n<th>",array_keys($array[$firstkey])) . "</th>\n</tr>\n"; }
+    if(is_array($array[$firstkey])){ $tag = "<tr>\n<th></th>\n<th>" . implode("</th>\n<th>",h(array_keys($array[$firstkey]))) . "</th>\n</tr>\n"; }
     foreach($array as $key1 => $value1){
-        $tag .= "<tr>\n<th>$key1</th>\n";
-        foreach((array)$value1 as $key2 => $value2){ $tag .= "<td>$value2</td>\n"; }
+        $tag .= "<tr>\n<th>" . h($key1) . "</th>\n";
+        foreach((array)$value1 as $key2 => $value2){ $tag .= "<td>" . h($value2) . "</td>\n"; }
         $tag .= "</tr>\n";
     }
     foreach($attr as $name => $value){ $attr_str .= " $name=\"$value\""; }
