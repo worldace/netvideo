@@ -630,7 +630,8 @@ function 一時取得($name){
 
 
 function JSON保存($file, $data){
-    $result = file_put_contents($file, "<?php\n".json_encode($data, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES), LOCK_EX);
+    $prefix = preg_match("/\.php$/i", $file) ? "<?php\n" : "";
+    $result = file_put_contents($file, $prefix.json_encode($data, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES), LOCK_EX);
     return ($result === false) ? false : $file;
 }
 
@@ -638,7 +639,7 @@ function JSON保存($file, $data){
 function JSON取得($file){
     $json = file_get_contents($file);
     if($json === false){ return false; }
-    $json = preg_replace("/^<\?php\r?\n/i", "", $json);
+    $json = preg_replace("/^<\?php\s*/i", "", $json);
     return json_decode($json, true);
 }
 
