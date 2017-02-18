@@ -98,6 +98,15 @@ function 関数読み込み($file){
 }
 
 
+function クラス読み込み($file, array $引数 = []){
+    if(preg_match("#^(?!(/|\w:|http)).+#", $file)){ //相対パスなら
+        $dir  = dirname(debug_backtrace()[0]['file']);
+        $file = "$dir/$file";
+    }
+    return require $file;
+}
+
+
 function 検査($type, $name, $func){
     if(preg_match("/^get$/i", $type)){
         $value = $_GET[$name];
