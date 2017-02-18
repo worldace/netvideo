@@ -12,9 +12,9 @@ set_exception_handler(function($e){
 });
 
 
-クラスローダ();
+クラスローダ("./action/class/");
+部品::設定("./action/parts");
 検査::$例外 = true;
-部品::設定("{$_ENV['ディレクトリ.action']}/parts");
 開発用の設定();
 
 
