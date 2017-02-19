@@ -22,7 +22,7 @@ function route(array $route, $arg = 1){
     }
 
     foreach((array)$route as $_ENV['route.file']){
-        if(preg_match("#^(?!(/|\w:|http)).+#", $_ENV['route.file'])){ //相対パスなら
+        if(preg_match("#^(?!(/|\w:|https*://)).+#", $_ENV['route.file'])){ //相対パスなら
             $_ENV['route.file'] = $_ENV['route.dir'] . "/" . $_ENV['route.file'];
         }
         $func = function (){ return require_once $_ENV['route.file']; };
@@ -90,7 +90,7 @@ function リダイレクト($url){
 
 
 function 関数読み込み($file){
-    if(preg_match("#^(?!(/|\w:|http)).+#", $file)){ //相対パスなら
+    if(preg_match("#^(?!(/|\w:|https*://)).+#", $file)){ //相対パスなら
         $dir  = dirname(debug_backtrace()[0]['file']);
         $file = "$dir/$file";
     }
@@ -99,7 +99,7 @@ function 関数読み込み($file){
 
 
 function クラス読み込み($file, array $引数 = []){
-    if(preg_match("#^(?!(/|\w:|http)).+#", $file)){ //相対パスなら
+    if(preg_match("#^(?!(/|\w:|https*://)).+#", $file)){ //相対パスなら
         $dir  = dirname(debug_backtrace()[0]['file']);
         $file = "$dir/$file";
     }
@@ -242,7 +242,7 @@ function データダウンロード($data, $filename = "data", $timeout = 60*60
     header("Content-Disposition: attachment; filename=\"$filename\"; filename*=UTF-8''$filenameE");
 
     while(ob_get_level()){ ob_end_clean(); }
-    print($data);
+    print $data;
 }
 
 
