@@ -218,6 +218,24 @@ function 整形($type, $name, $func){
 }
 
 
+function 設定($name = null, $value = null){
+    static $記憶 = [];
+
+    if(!isset($name)){ return $記憶; }
+
+    if(isset($value)){
+        if(!isset($記憶[$name])){
+            $記憶[$name] = $value;
+            return $value;
+        }
+    }
+    else{
+        return (isset($記憶[$name])) ? $記憶[$name] : null;
+    }
+}
+$_ENV['設定'] = function($name, $value){ return 設定($name, $value); };
+
+
 function ファイルダウンロード($data, $filename = null, $timeout = 60*60*12){
     ini_set("max_execution_time", $timeout);
     if(!file_exists($data)){ エラー404("ダウンロードファイルが存在しません"); }
