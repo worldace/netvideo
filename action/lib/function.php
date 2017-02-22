@@ -874,6 +874,9 @@ function MIMEタイプ($path){ // http://www.iana.org/assignments/media-types/me
 }
 
 
+$_ENV['定数'] = function ($v){ return $v; };
+
+
 function データベース($table, $driver = null, $user = null, $pass = null){
     return new データベース($table, $driver, $user, $pass);
 }
