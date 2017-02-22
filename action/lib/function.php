@@ -733,6 +733,16 @@ function tojs($data){
 }
 
 
+function 当たり($確率){
+    $確率 = str_replace("%", "", $確率);
+    if($確率 <= 0){ return false; }
+    if($確率 >= 100){ return true; }
+
+    $i = mt_rand(1, round(100/$確率*100000));
+    return ($i <= 100000) ? true : false;
+}
+
+
 function uuid($hyphen = false) { //uuid v4
     $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
     mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0x0fff)|0x4000,mt_rand(0,0x3fff)|0x8000,mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff));
