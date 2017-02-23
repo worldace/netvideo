@@ -17,9 +17,6 @@ function クラスローダ($dir = __DIR__){
 function route(array $route, $arg = 1){
     $_ENV['route.return'] = $arg;
     $_ENV['route.dir'] = dirname(debug_backtrace()[0]['file']);
-    if(!function_exists("routed")){
-        function routed(){ return $_ENV['route.return']; }
-    }
 
     foreach((array)$route as $_ENV['route.file']){
         if(preg_match("#^(?!(/|\\|\w+:)).+#", $_ENV['route.file'])){ //相対パスなら
@@ -29,6 +26,11 @@ function route(array $route, $arg = 1){
         $_ENV['route.return'] = $func();
     }
     exit;
+}
+
+
+function routed(){
+    return $_ENV['route.return'];
 }
 
 
