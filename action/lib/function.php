@@ -636,14 +636,14 @@ function zip解凍($zipfile, $where = ""){
 
 function 一時保存($name, $data){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
-    $result = file_put_contents($tempfile, serialize($data), LOCK_EX);
+    $result = file_put_contents($tempfile, json_encode($data), LOCK_EX);
     return ($result === false) ? false : $name;
 }
 
 
 function 一時取得($name){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
-    return (file_exists($tempfile)) ? unserialize(file_get_contents($tempfile)) : false;
+    return (file_exists($tempfile)) ? json_decode(file_get_contents($tempfile)) : false;
 }
 
 
