@@ -131,7 +131,7 @@ function 検査($type, $name, $func){
         else if(preg_match("/^(-?[0-9\.]+)より大きい$/u", $func, $m)){ $result = 検査::より大きい($value, (int)$m[1]); }
         else if(preg_match("/^(-?[0-9\.]+)より小さい$/u", $func, $m)){ $result = 検査::より小さい($value, (int)$m[1]); }
         else if(preg_match("/^(-?[0-9\.]+)と同じ$/u", $func, $m))    { $result = 検査::と同じ($value, (int)$m[1]); }
-        else                                                         { throw new プログラミングバグ(__function__."() 第3引数の関数名が間違っています"); }
+        else                                                         { throw new プログラムミス(__function__."() 第3引数の関数名が間違っています"); }
     }
     
     if(検査::$例外 === true and $result === false){
@@ -140,7 +140,7 @@ function 検査($type, $name, $func){
     
     if($result === true){ return true; }
     elseif($result === false){ return false; }
-    else{ throw new プログラミングバグ(__function__."() 第3引数の関数はtrueまたはfalseを返してください"); }
+    else{ throw new プログラムミス(__function__."() 第3引数の関数はtrueまたはfalseを返してください"); }
 }
 
 
@@ -543,11 +543,11 @@ function newa($trait = null, $class = null, $args = null){
     if($class !== null){
         if(class_exists($class)){ $class_code = "extends $class"; }
         else if(interface_exists($class)){ $class_code = "implements $class"; }
-        else{ throw new プログラミングバグ(__function__."() 第2引数の[$class]クラス/インターフェースが見つかりません"); }
+        else{ throw new プログラムミス(__function__."() 第2引数の[$class]クラス/インターフェースが見つかりません"); }
     }
     if($trait !== null){
         foreach((array)$trait as $value){
-            if(!trait_exists($value)){ throw new プログラミングバグ(__function__."() 第1引数の[$value]トレイトが見つかりません"); };
+            if(!trait_exists($value)){ throw new プログラムミス(__function__."() 第1引数の[$value]トレイトが見つかりません"); };
         }
         $trait_code = "use " . implode(",", (array)$trait) . ";";
     }
@@ -906,7 +906,7 @@ class データベース{
             $driver   = $_ENV['データベース.ドライバー'];
             $user     = $_ENV['データベース.ユーザー名'];
             $password = $_ENV['データベース.パスワード'];
-            if(!$driver){ throw new 設定バグ('データベースの設定がありません。$_ENV[\'データベース.ドライバー\']に値を設定してください');}
+            if(!$driver){ throw new プログラムミス('データベースの設定がありません。$_ENV[\'データベース.ドライバー\']に値を設定してください');}
         }
         $this->ドライバー = $driver;
         $this->接続名     = md5($driver.$user.$password);
@@ -927,7 +927,7 @@ class データベース{
             $pdo = new PDO($driver, $user, $password, $setting);
         }
         catch(PDOException $e){
-            throw new 設定バグ("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください", 0, $e);
+            throw new プログラムミス("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください", 0, $e);
         }
         return $pdo;
     }
@@ -1202,8 +1202,8 @@ class 部品{
     }
 
     public static function 作成($部品名, $自動エスケープ, $引数){
-        if($部品名 === null){ throw new プログラミングバグ('部品名がありません'); }
-        if(!self::$初期化済み){ throw new 設定バグ('部品::設定()で部品ディレクトリを指定してください'); }
+        if($部品名 === null){ throw new プログラムミス('部品名がありません'); }
+        if(!self::$初期化済み){ throw new プログラムミス('部品::設定()で部品ディレクトリを指定してください'); }
         if($自動エスケープ){ $引数 = self::h($引数); }
 
         if(!self::$記憶[$部品名]['読み込み済み']){
@@ -1300,11 +1300,7 @@ class 実行エラー extends RuntimeException{
     use 例外の実装;
 }
 
-class プログラミングバグ extends LogicException{
-    use 例外の実装;
-}
-
-class 設定バグ extends LogicException{
+class プログラムミス extends LogicException{
     use 例外の実装;
 }
 
