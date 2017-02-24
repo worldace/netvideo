@@ -1216,8 +1216,6 @@ class 部品{
     }
 
     public static function 作成($部品パス, $引数){
-        if(!self::$開始){ throw new プログラムミス('部品::開始() を行っていません'); }
-
         //部品変数を初期化
         $html = $css = $cssfile = $js = $jsfile = $jsinhead = "";
 
@@ -1259,6 +1257,7 @@ class 部品{
             $path = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[1]['file']) . $部品名; //絶対パスor相対パス
         }
         else{
+            if(!self::$ディレクトリ){ throw new プログラムミス("部品::開始() を行っていません"); }
             $path = self::$ディレクトリ . "/$部品名.php";
         }
         $path = realpath($path);
