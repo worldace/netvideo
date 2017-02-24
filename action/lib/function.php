@@ -1227,7 +1227,6 @@ class 部品{
             }
             if($css){
                 $_css = is_callable($css) ? call_user_func_array($css, $引数) : $css;
-                $_css = ltrim($_css);
                 $_css = preg_match("/^</", $_css) ? "$_css\n" : "<style>\n$_css\n</style>\n";
             }
             self::$結果['css'] .= $_cssfile . $_css;
@@ -1242,7 +1241,6 @@ class 部品{
             }
             if($js){
                 $_js = is_callable($js) ? call_user_func_array($js, $引数) : $js;
-                $_js = ltrim($_js);
                 $_js = preg_match("/^</", $_js) ? "$_js\n" : "<script>\n$_js\n</script>\n";
             }
 

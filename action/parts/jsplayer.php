@@ -884,7 +884,6 @@ $v.type = function(target){
 
 
 $css = <<<'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
-
 .jsplayer{
     visibility: hidden;
 }
