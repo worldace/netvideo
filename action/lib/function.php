@@ -1258,12 +1258,12 @@ class 部品{
 
     private static function 部品パス($部品名){
         if(preg_match("/\.php$/i", $部品名)){
-            $部品パス = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[2]['file']) . $部品名; //絶対パスor相対パス
+            $path = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[2]['file']) . $部品名; //絶対パスor相対パス
         }
         else{
-            $部品パス = self::$ディレクトリ . "/$部品名.php";
+            $path = self::$ディレクトリ . "/$部品名.php";
         }
-        return realpath($部品パス);
+        return realpath($path);
     }
 
     private static function CSS変数処理($css, $cssfile, $引数){

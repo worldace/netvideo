@@ -13,7 +13,7 @@ set_exception_handler(function($e){
 
 
 クラスローダ("./action/class/");
-部品::設定("./action/parts");
+部品::開始("./action/parts");
 検査::$例外 = true;
 開発用の設定();
 
