@@ -1220,10 +1220,7 @@ class 部品{
         $部品パス = self::パス($部品名);
 
         //キャッシュの有無により分岐
-        if(isset(self::$記憶[$部品パス])){
-            $html = self::$記憶[$部品パス];
-        }
-        else{
+        if(!isset(self::$記憶[$部品パス])){
             require $部品パス;
             self::$記憶[$部品パス] = $html;
 
@@ -1231,6 +1228,9 @@ class 部品{
             self::$結果['css'] .= self::CSS変数処理($css, $cssfile, $引数);
             if($jsinhead){ self::$結果['jsinhead'] .= self::JS変数処理($js, $jsfile, $引数); }
             else         { self::$結果['jsinbody'] .= self::JS変数処理($js, $jsfile, $引数); }
+        }
+        else{
+            $html = self::$記憶[$部品パス];
         }
 
         return is_callable($html)  ?  call_user_func_array($html, $引数)  :  $html;
@@ -1253,11 +1253,12 @@ class 部品{
     }
 
     private static function パス($部品名){
+        if(!self::$ディレクトリ){ throw new プログラムミス("部品::開始() を行っていません"); }
+
         if(preg_match("/\.php$/i", $部品名)){
             $path = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[2]['file']) . $部品名; //絶対パスor相対パス
         }
         else{
-            if(!self::$ディレクトリ){ throw new プログラムミス("部品::開始() を行っていません"); }
             $path = self::$ディレクトリ . "/$部品名.php";
         }
         $path = realpath($path);
@@ -1350,5 +1351,4 @@ trait 例外の実装{
     public function getTitle() {
         return get_class($this);
     }
-
 }
