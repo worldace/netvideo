@@ -1193,8 +1193,8 @@ function 生部品(){
 
 class 部品{
     private static $開始;
-    private static $記憶 = [];
-    private static $結果 = [];
+    private static $記憶;
+    private static $結果;
 
 
     public static function 開始($dir){
