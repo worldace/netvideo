@@ -1212,10 +1212,11 @@ class 部品{
         $html = $css = $cssfile = $js = $jsfile = $jsinhead = "";
 
         //部品ファイル読み込み
-        $once = require_once(self::部品パス($部品名));
+        $部品パス = self::部品パス($部品名);
+        $once = require_once($部品パス);
         if($once !== true){
             //キャッシュする
-            self::$記憶[$部品名] = $html;
+            self::$記憶[$部品パス] = $html;
 
             //部品変数を処理して結果にまとめる
             self::$結果['css'] .= self::CSS変数処理($css, $cssfile, $引数);
@@ -1223,7 +1224,7 @@ class 部品{
             else         { self::$結果['jsinbody'] .= self::JS変数処理($js, $jsfile, $引数); }
         }
         else{
-            $html = self::$記憶[$部品名];
+            $html = self::$記憶[$部品パス];
         }
         return is_callable($html)  ?  call_user_func_array($html, $引数)  :  $html;
     }
