@@ -1222,7 +1222,7 @@ class 部品{
                     require $部品名;
                 }
                 else{
-                    require dirname(debug_backtrace()[1]['file']) . $部品名; //部品()経由なので[1]。作成()を直接呼び出すと[0]である必要があり動かない
+                    require dirname(debug_backtrace()[1]['file']) . $部品名; //部品()経由なので[1]。当関数を直接呼び出すと[0]である必要があり動かない
                 }
             }
             else{
@@ -1273,19 +1273,17 @@ class 部品{
         return is_callable($html) ? call_user_func_array($html, $引数) : $html;
     }
 
-    public static function 差し込み($buf){
-        $code_in_head = self::$結果['css'] . self::$結果['jsinhead']; //面倒なので合成してしまう
-
+    public static function 差し込み($buf = ""){
         if(self::$結果['jsinbody']){
             $pos = strripos($buf, "</body>");
             if($pos !== false){
                 $buf = substr_replace($buf, self::$結果['jsinbody'], $pos, 0); //最後に出現する</body>の前にJSを挿入する
             }
         }
-        if($code_in_head){
+        if(self::$結果['css'] || self::$結果['jsinhead']){
             $pos = stripos($buf, "</head>");
             if($pos !== false){
-                $buf = substr_replace($buf, $code_in_head, $pos, 0); //最初に出現する</head>の前に挿入する
+                $buf = substr_replace($buf, self::$結果['css'].self::$結果['jsinhead'], $pos, 0); //最初に出現する</head>の前に挿入する
             }
         }
         return $buf;
