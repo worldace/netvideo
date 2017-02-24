@@ -19,7 +19,7 @@ function route(array $route, $arg = 1){
     $_ENV['route.dir'] = dirname(debug_backtrace()[0]['file']);
 
     foreach((array)$route as $_ENV['route.file']){
-        if(preg_match("#^(?!(/|\\|\w+:)).+#", $_ENV['route.file'])){ //相対パスなら
+        if(!preg_match("#^(/|\\\\|\w+:)#", $_ENV['route.file'])){ //相対パスなら
             $_ENV['route.file'] = $_ENV['route.dir'] . "/" . $_ENV['route.file'];
         }
         $func = function (){ return require_once $_ENV['route.file']; };
@@ -92,7 +92,7 @@ function リダイレクト($url){
 
 
 function 関数読み込み($file){
-    if(preg_match("#^(?!(/|\\|\w+:)).+#", $file)){ //相対パスなら
+    if(!preg_match("#^(/|\\\\|\w+:)#", $file)){ //相対パスなら
         $dir  = dirname(debug_backtrace()[0]['file']);
         $file = "$dir/$file";
     }
@@ -101,7 +101,7 @@ function 関数読み込み($file){
 
 
 function クラス読み込み($file, array $引数 = []){
-    if(preg_match("#^(?!(/|\\|\w+:)).+#", $file)){ //相対パスなら
+    if(!preg_match("#^(/|\\\\|\w+:)#", $file)){ //相対パスなら
         $dir  = dirname(debug_backtrace()[0]['file']);
         $file = "$dir/$file";
     }
@@ -1212,7 +1212,17 @@ class 部品{
             $html = self::$記憶[$部品名]['html'];
         }
         else{
-            require (preg_match("/\.php$/", $部品名)) ? $部品名 : self::$ディレクトリ."/$部品名.php";
+            if(preg_match("/\.php$/", $部品名)){
+                if(preg_match("#^(/|\\\\|\w+:)#", $部品名)){ //絶対パスなら
+                    require $部品名;
+                }
+                else{
+                    require dirname(debug_backtrace()[1]['file']) . $部品名; //部品()経由なので[1]。作成()を直接呼び出すと[0]である必要があり動かない
+                }
+            }
+            else{
+                require self::$ディレクトリ . "/$部品名.php";
+            }
 
             self::$記憶[$部品名]['読み込み済み'] = true;
             self::$記憶[$部品名]['html'] = $html;
