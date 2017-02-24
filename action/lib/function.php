@@ -1193,18 +1193,18 @@ function 生部品(){
 
 class 部品{
     private static $ディレクトリ = "./parts";
-    private static $初期化済み = false;
+    private static $開始 = false;
     private static $記憶 = [];
     private static $結果 = [];
 
 
     public static function 設定($dir = "./parts"){
         self::$ディレクトリ = $dir;
-        if(!self::$初期化済み){ self::初期化(); }
+        if(!self::$開始){ self::開始(); }
     }
 
     public static function 作成($部品名, $自動エスケープ, $引数){
-        if(!self::$初期化済み){ throw new プログラムミス('部品::設定()で部品ディレクトリを指定してください'); }
+        if(!self::$開始){ throw new プログラムミス('部品::設定()で部品ディレクトリを指定してください'); }
         if($自動エスケープ){ $引数 = self::h($引数); }
 
         //部品変数を初期化
@@ -1247,20 +1247,23 @@ class 部品{
     }
 
     public static function キャンセル(){
-        if(self::$初期化済み){
-            $buf = ob_get_contents();
-            ob_end_clean();
-            return self::差し込み($buf);
-        }
+        if(!self::$開始){ return; }
+        //初期化
+        self::$開始 = false;
+        self::$結果 = self::$記憶 = [];
+        
+        $buf = ob_get_contents();
+        ob_end_clean();
+        return self::差し込み($buf);
     }
 
-    private static function 初期化(){
-        self::$初期化済み = true;
+    private static function 開始(){
+        self::$開始 = true;
         ob_start(["部品", "差し込み"]);
     }
 
     private static function 部品パス($部品名){
-        if(preg_match("/\.php$/", $部品名)){
+        if(preg_match("/\.php$/i", $部品名)){
             $部品パス = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[2]['file']) . $部品名; //絶対パスor相対パス
         }
         else{
