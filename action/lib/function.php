@@ -1211,11 +1211,15 @@ class 部品{
         //部品変数を初期化
         $html = $css = $cssfile = $js = $jsfile = $jsinhead = "";
 
-        //部品ファイル読み込み
+        //部品パスの決定
         $部品パス = self::部品パス($部品名);
-        $once = require_once($部品パス);
-        if($once !== true){
-            //キャッシュする
+
+        //キャッシュの有無により分岐
+        if(isset(self::$記憶[$部品パス])){
+            $html = self::$記憶[$部品パス];
+        }
+        else{
+            require $部品パス;
             self::$記憶[$部品パス] = $html;
 
             //部品変数を処理して結果にまとめる
@@ -1223,9 +1227,7 @@ class 部品{
             if($jsinhead){ self::$結果['jsinhead'] .= self::JS変数処理($js, $jsfile, $引数); }
             else         { self::$結果['jsinbody'] .= self::JS変数処理($js, $jsfile, $引数); }
         }
-        else{
-            $html = self::$記憶[$部品パス];
-        }
+
         return is_callable($html)  ?  call_user_func_array($html, $引数)  :  $html;
     }
 
@@ -1265,7 +1267,7 @@ class 部品{
         else{
             $部品パス = self::$ディレクトリ . "/$部品名.php";
         }
-        return $部品パス;
+        return realpath($部品パス);
     }
 
     private static function CSS変数処理($css, $cssfile, $引数){
