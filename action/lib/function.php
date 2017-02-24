@@ -1192,29 +1192,29 @@ function 生部品(){
 
 
 class 部品{
-    private static $開始;
+    private static $ディレクトリ; //開始()を行っているかのフラグも兼ねる
     private static $記憶;
     private static $結果;
 
 
     public static function 開始($dir){
-        if(!self::$開始){
+        if(!self::$ディレクトリ){
             if(!is_dir($dir)){ throw new プログラムミス("[$dir] ディレクトリが存在しません"); }
-            self::$開始 = $dir;
+            self::$ディレクトリ = $dir;
             self::$結果 = self::$記憶 = [];
             ob_start(["部品", "差し込み"]);
         }
     }
 
     public static function キャンセル(){
-        if(self::$開始){
-            self::$開始 = false;
+        if(self::$ディレクトリ){
+            self::$ディレクトリ = null;
             return self::差し込み(ob_get_clean());
         }
     }
 
     public static function 作成($部品パス, $引数){
-        if(!self::$開始){ throw new プログラムミス('部品::開始() を行っていません'); }
+        if(!self::$ディレクトリ){ throw new プログラムミス('部品::開始() を行っていません'); }
 
         //部品変数を初期化
         $html = $css = $cssfile = $js = $jsfile = $jsinhead = "";
@@ -1257,7 +1257,7 @@ class 部品{
             $path = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[1]['file']) . $部品名; //絶対パスor相対パス
         }
         else{
-            $path = self::$開始 . "/$部品名.php"; //$開始=部品ディレクトリのパス
+            $path = self::$ディレクトリ . "/$部品名.php";
         }
         $path = realpath($path);
         if(!$path){ throw new プログラムミス("部品ファイルが見つかりません\n部品名: $部品名\n部品パス: $path"); }
