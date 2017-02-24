@@ -1180,14 +1180,14 @@ class データベース{
 function 部品(){
     $引数   = func_get_args();
     $部品名 = array_shift($引数);
-    return 部品::作成($部品名, h($引数));
+    return 部品::作成(部品::パス($部品名), h($引数));
 }
 
 
 function 生部品(){
     $引数   = func_get_args();
     $部品名 = array_shift($引数);
-    return 部品::作成($部品名, $引数);
+    return 部品::作成(部品::パス($部品名), $引数);
 }
 
 
@@ -1214,14 +1214,11 @@ class 部品{
         }
     }
 
-    public static function 作成($部品名, $引数){
-        if(!self::$開始){ throw new プログラムミス('部品::開始()を行っていません'); }
+    public static function 作成($部品パス, $引数){
+        if(!self::$開始){ throw new プログラムミス('部品::開始() を行っていません'); }
 
         //部品変数を初期化
         $html = $css = $cssfile = $js = $jsfile = $jsinhead = "";
-
-        $部品パス = self::部品パス($部品名);
-        if(!$部品パス){ throw new プログラムミス("[$部品名] 部品ファイルが見つかりません\nパス: $部品パス"); }
 
         //キャッシュの有無により分岐
         if(isset(self::$記憶[$部品パス])){
@@ -1256,14 +1253,17 @@ class 部品{
         return $buf;
     }
 
-    private static function 部品パス($部品名){
+    public static function パス($部品名){
         if(preg_match("/\.php$/i", $部品名)){
-            $path = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[2]['file']) . $部品名; //絶対パスor相対パス
+            $path = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[1]['file']) . $部品名; //絶対パスor相対パス
         }
         else{
             $path = self::$ディレクトリ . "/$部品名.php";
         }
-        return realpath($path);
+        $path = realpath($path);
+        if(!$path){ throw new プログラムミス("部品ファイルが見つかりません\n部品名: $部品名\n部品パス: $path"); }
+
+        return $path;
     }
 
     private static function CSS変数処理($css, $cssfile, $引数){
