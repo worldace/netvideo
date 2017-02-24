@@ -1177,16 +1177,12 @@ class データベース{
 }
 
 
-function 部品(){
-    $引数   = func_get_args();
-    $部品名 = array_shift($引数);
+function 部品($部品名, ...$引数){
     return 部品::作成($部品名, h($引数));
 }
 
 
-function 生部品(){
-    $引数   = func_get_args();
-    $部品名 = array_shift($引数);
+function 生部品($部品名, ...$引数){
     return 部品::作成($部品名, $引数);
 }
 
