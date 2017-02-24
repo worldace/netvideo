@@ -1195,18 +1195,20 @@ class 部品{
 
 
     public static function 開始($dir){
+        if(!is_dir($dir)){ throw new プログラムミス("[$dir] ディレクトリが存在しません"); }
         if(!self::$開始){
-            if(!is_dir($dir)){ throw new プログラムミス("[$dir] ディレクトリが存在しません"); }
             self::$ディレクトリ = $dir;
             self::$開始 = true;
-            self::$結果 = self::$記憶 = [];
+            self::$結果 = [];
+            self::$記憶 = [];
             ob_start(["部品", "差し込み"]);
         }
     }
 
     public static function キャンセル(){
         if(self::$開始){
-            self::$開始 = self::$ディレクトリ = null;
+            self::$開始 = null;
+            self::$ディレクトリ = null;
             return self::差し込み(ob_get_clean());
         }
     }
