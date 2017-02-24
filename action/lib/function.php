@@ -1180,14 +1180,14 @@ class データベース{
 function 部品(){
     $引数   = func_get_args();
     $部品名 = array_shift($引数);
-    return 部品::作成($部品名, true, $引数);
+    return 部品::作成($部品名, h($引数));
 }
 
 
 function 生部品(){
     $引数   = func_get_args();
     $部品名 = array_shift($引数);
-    return 部品::作成($部品名, false, $引数);
+    return 部品::作成($部品名, $引数);
 }
 
 
@@ -1203,9 +1203,8 @@ class 部品{
         if(!self::$開始){ self::開始(); }
     }
 
-    public static function 作成($部品名, $自動エスケープ, $引数){
+    public static function 作成($部品名, $引数){
         if(!self::$開始){ throw new プログラムミス('部品::設定()で部品ディレクトリを指定してください'); }
-        if($自動エスケープ){ $引数 = self::h($引数); }
 
         //部品変数を初期化
         $html = $css = $cssfile = $js = $jsfile = $jsinhead = "";
@@ -1301,11 +1300,6 @@ class 部品{
             }
         }
         return $_jsfile . $_js;
-    }
-
-    private static function h($arg = ""){
-        if(is_array($arg)){ return array_map("部品::h", $arg); }
-        return htmlspecialchars($arg, ENT_QUOTES, "UTF-8");
     }
 }
 
