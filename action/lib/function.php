@@ -1212,17 +1212,15 @@ class 部品{
         $html = $css = $cssfile = $js = $jsfile = $jsinhead = "";
 
         //ファイル読み込み(キャッシュの有無により分岐)
-        if(self::$記憶[$部品名]['読み込み済み']){
-            $html = self::$記憶[$部品名]['html'];
-        }
-        else{
+        if(!self::$記憶[$部品名]['読み込み済み']){
             if(preg_match("/\.php$/", $部品名)){
                 require (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[1]['file']) . $部品名;
-                //絶対パスか相対パスか？ 当関数を直接呼び出すとbacktraceは[0]であり動かない
+                //絶対パスか相対パスか？ 相対時に当関数を直接呼び出すとbacktraceは[0]であり動かない
             }
             else{
                 require self::$ディレクトリ . "/$部品名.php";
             }
+            //ファイル読み込みはキャッシュする
             self::$記憶[$部品名]['読み込み済み'] = true;
             self::$記憶[$部品名]['html'] = $html;
 
@@ -1230,6 +1228,9 @@ class 部品{
             self::$結果['css'] .= self::CSS変数処理($css, $cssfile, $引数);
             if($jsinhead){ self::$結果['jsinhead'] .= self::JS変数処理($js, $jsfile, $引数); }
             else         { self::$結果['jsinbody'] .= self::JS変数処理($js, $jsfile, $引数); }
+        }
+        else{
+            $html = self::$記憶[$部品名]['html'];
         }
         return is_callable($html)  ?  call_user_func_array($html, $引数)  :  $html;
     }
