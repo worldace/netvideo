@@ -1208,6 +1208,11 @@ class 部品{
         if(!self::$初期化済み){ throw new プログラムミス('部品::設定()で部品ディレクトリを指定してください'); }
         if($自動エスケープ){ $引数 = self::h($引数); }
 
+        //部品変数初期化
+        $html = $css = $cssfile = $js = $jsfile = "";
+        $jsinhead = false;
+
+        //ファイルキャッシュにより分岐
         if(self::$記憶[$部品名]['読み込み済み']){
             $html = self::$記憶[$部品名]['html'];
         }
@@ -1256,7 +1261,8 @@ class 部品{
                 $_js = preg_match("/^</", $_js) ? "$_js\n" : "<script>\n$_js\n</script>\n";
             }
 
-            if($jsinhead){
+            $_jsinhead = is_callable($jsinhead) ? call_user_func_array($jsinhead, $引数) : $jsinhead;
+            if($_jsinhead){
                 self::$結果['jsinhead'] .= $_jsfile . $_js;
             }
             else{
