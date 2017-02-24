@@ -1247,18 +1247,15 @@ class 部品{
     }
 
     public static function キャンセル(){
-        if(!self::$開始){ return; }
-        //初期化
-        self::$開始 = false;
-        self::$結果 = self::$記憶 = [];
-        
-        $buf = ob_get_contents();
-        ob_end_clean();
-        return self::差し込み($buf);
+        if(self::$開始){
+            self::$開始 = false;
+            return self::差し込み(ob_get_clean());
+        }
     }
 
     private static function 開始(){
         self::$開始 = true;
+        self::$結果 = self::$記憶 = [];
         ob_start(["部品", "差し込み"]);
     }
 
