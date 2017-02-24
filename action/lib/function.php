@@ -1209,13 +1209,12 @@ class 部品{
         if($自動エスケープ){ $引数 = self::h($引数); }
 
         //部品変数を初期化
-        $html = $css = $cssfile = $js = $jsfile = "";
-        $jsinhead = false;
+        $html = $css = $cssfile = $js = $jsfile = $jsinhead = "";
 
         //ファイルが読み込み済みなら早期リターン
         if(self::$記憶[$部品名]['読み込み済み']){
             $html = self::$記憶[$部品名]['html'];
-            return is_callable($html) ? call_user_func_array($html, $引数) : $html;
+            return is_callable($html)  ?  call_user_func_array($html, $引数)  :  $html;
         }
 
         //ファイルが未読み込みの場合は読み込み
@@ -1224,7 +1223,7 @@ class 部品{
             //絶対パスか相対パスか？ 部品()経由なのでbacktraceは[1]。当関数を直接呼び出すと[0]である必要があり動かない
         }
         else{
-            require self::$ディレクトリ."/$部品名.php";
+            require self::$ディレクトリ . "/$部品名.php";
         }
 
         self::$記憶[$部品名]['読み込み済み'] = true;
@@ -1232,31 +1231,31 @@ class 部品{
 
         //部品変数の処理
         if($cssfile){
-            $cssfile = is_callable($cssfile) ? call_user_func_array($cssfile, $引数) : $cssfile;
+            $cssfile = is_callable($cssfile)  ?  call_user_func_array($cssfile, $引数)  :  $cssfile;
             foreach((array)$cssfile as $url){
                 if(in_array($url, (array)self::$記憶['読み込み済みURL'])){ continue; }
                 self::$記憶['読み込み済みURL'][] = $url;
-                $_cssfile .= "<link rel=\"stylesheet\" href=\"{$url}\">\n";
+                $_cssfile .= "<link rel=\"stylesheet\" href=\"$url\">\n";
             }
         }
         if($css){
-            $_css = is_callable($css) ? call_user_func_array($css, $引数) : $css;
+            $_css = is_callable($css)  ?  call_user_func_array($css, $引数)  :  $css;
             $_css = ltrim($_css);
-            $_css = preg_match("/^</", $_css) ? "$_css\n" : "<style>\n$_css\n</style>\n";
+            $_css = preg_match("/^</", $_css)  ?  "$_css\n"  :  "<style>\n$_css\n</style>\n";
         }
 
         if($jsfile){
-            $jsfile = is_callable($jsfile) ? call_user_func_array($jsfile, $引数) : $jsfile;
+            $jsfile = is_callable($jsfile)  ?  call_user_func_array($jsfile, $引数)  :  $jsfile;
             foreach((array)$jsfile as $url){
                 if(in_array($url, (array)self::$記憶['読み込み済みURL'])){ continue; }
                 self::$記憶['読み込み済みURL'][] = $url;
-                $_jsfile .= "<script src=\"{$url}\"></script>\n";
+                $_jsfile .= "<script src=\"$url\"></script>\n";
             }
         }
         if($js){
-            $_js = is_callable($js) ? call_user_func_array($js, $引数) : $js;
+            $_js = is_callable($js)  ?  call_user_func_array($js, $引数)  :  $js;
             $_js = ltrim($_js);
-            $_js = preg_match("/^</", $_js) ? "$_js\n" : "<script>\n$_js\n</script>\n";
+            $_js = preg_match("/^</", $_js)  ?  "$_js\n"  :  "<script>\n$_js\n</script>\n";
         }
 
         //結果をまとめる
@@ -1265,7 +1264,7 @@ class 部品{
         if($jsinhead){ self::$結果['jsinhead'] .= $_jsfile . $_js; }
         else         { self::$結果['jsinbody'] .= $_jsfile . $_js; }
 
-        return is_callable($html) ? call_user_func_array($html, $引数) : $html;
+        return is_callable($html)  ?  call_user_func_array($html, $引数)  :  $html;
     }
 
     public static function 差し込み($buf){
