@@ -1292,9 +1292,11 @@ class 部品{
     }
 
     public static function キャンセル(){
-        $buf = ob_get_contents();
-        ob_end_clean();
-        return self::差し込み($buf);
+        if(self::$初期化済み){
+            $buf = ob_get_contents();
+            ob_end_clean();
+            return self::差し込み($buf);
+        }
     }
 
     private static function 初期化(){
