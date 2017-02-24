@@ -1220,7 +1220,7 @@ class 部品{
         //ファイルが未読み込みの場合は読み込み
         if(preg_match("/\.php$/", $部品名)){
             require (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[1]['file']).$部品名;
-            //絶対パスか相対パスか？ 部品()経由なのでbacktraceは[1]。当関数を直接呼び出すと[0]である必要があり動かない
+            //絶対パスか相対パスか？ 当関数を直接呼び出すとbacktraceは[0]であり動かない
         }
         else{
             require self::$ディレクトリ . "/$部品名.php";
@@ -1230,6 +1230,11 @@ class 部品{
         self::$記憶[$部品名]['html'] = $html;
 
         //部品変数の処理
+        if($css){
+            $_css = is_callable($css)  ?  call_user_func_array($css, $引数)  :  $css;
+            $_css = ltrim($_css);
+            $_css = preg_match("/^</", $_css)  ?  "$_css\n"  :  "<style>\n$_css\n</style>\n";
+        }
         if($cssfile){
             $cssfile = is_callable($cssfile)  ?  call_user_func_array($cssfile, $引数)  :  $cssfile;
             foreach((array)$cssfile as $url){
@@ -1238,12 +1243,12 @@ class 部品{
                 $_cssfile .= "<link rel=\"stylesheet\" href=\"$url\">\n";
             }
         }
-        if($css){
-            $_css = is_callable($css)  ?  call_user_func_array($css, $引数)  :  $css;
-            $_css = ltrim($_css);
-            $_css = preg_match("/^</", $_css)  ?  "$_css\n"  :  "<style>\n$_css\n</style>\n";
-        }
 
+        if($js){
+            $_js = is_callable($js)  ?  call_user_func_array($js, $引数)  :  $js;
+            $_js = ltrim($_js);
+            $_js = preg_match("/^</", $_js)  ?  "$_js\n"  :  "<script>\n$_js\n</script>\n";
+        }
         if($jsfile){
             $jsfile = is_callable($jsfile)  ?  call_user_func_array($jsfile, $引数)  :  $jsfile;
             foreach((array)$jsfile as $url){
@@ -1251,11 +1256,6 @@ class 部品{
                 self::$記憶['読み込み済みURL'][] = $url;
                 $_jsfile .= "<script src=\"$url\"></script>\n";
             }
-        }
-        if($js){
-            $_js = is_callable($js)  ?  call_user_func_array($js, $引数)  :  $js;
-            $_js = ltrim($_js);
-            $_js = preg_match("/^</", $_js)  ?  "$_js\n"  :  "<script>\n$_js\n</script>\n";
         }
 
         //結果をまとめる
