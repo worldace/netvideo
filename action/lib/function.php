@@ -1192,16 +1192,15 @@ function 生部品(){
 
 
 class 部品{
-    private static $ディレクトリ;
-    private static $開始 = false;
+    private static $開始;
     private static $記憶 = [];
     private static $結果 = [];
 
 
     public static function 開始($dir){
-        self::$ディレクトリ = $dir;
         if(!self::$開始){
-            self::$開始 = true;
+            if(!is_dir($dir)){ throw new プログラムミス("[$dir] ディレクトリが存在しません"); }
+            self::$開始 = $dir;
             self::$結果 = self::$記憶 = [];
             ob_start(["部品", "差し込み"]);
         }
@@ -1258,8 +1257,7 @@ class 部品{
             $path = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[1]['file']) . $部品名; //絶対パスor相対パス
         }
         else{
-            if(!self::$ディレクトリ){ throw new プログラムミス("部品ディレクトリが設定されていません\n部品::開始() の第1引数に部品ディレクトリを指定してください"); }
-            $path = self::$ディレクトリ . "/$部品名.php";
+            $path = self::$開始 . "/$部品名.php"; //$開始=部品ディレクトリのパス
         }
         $path = realpath($path);
         if(!$path){ throw new プログラムミス("部品ファイルが見つかりません\n部品名: $部品名\n部品パス: $path"); }
