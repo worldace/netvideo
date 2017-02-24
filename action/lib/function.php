@@ -1208,8 +1208,12 @@ class 部品{
         if(!self::$初期化済み){ throw new プログラムミス('部品::設定()で部品ディレクトリを指定してください'); }
         if($自動エスケープ){ $引数 = self::h($引数); }
 
-        if(!self::$記憶[$部品名]['読み込み済み']){
-            require self::$ディレクトリ . "/$部品名.php";
+        if(self::$記憶[$部品名]['読み込み済み']){
+            $html = self::$記憶[$部品名]['html'];
+        }
+        else{
+            require (preg_match("/\.php$/", $部品名)) ? $部品名 : self::$ディレクトリ."/$部品名.php";
+
             self::$記憶[$部品名]['読み込み済み'] = true;
             self::$記憶[$部品名]['html'] = $html;
 
@@ -1217,8 +1221,8 @@ class 部品{
                 $cssfile = is_callable($cssfile) ? call_user_func_array($cssfile, $引数) : $cssfile;
                 foreach((array)$cssfile as $_url){
                     if(in_array($_url, (array)self::$記憶['読み込み済みURL'])){ continue; }
-                    $_cssfile .= "<link rel=\"stylesheet\" href=\"{$_url}\">\n";
                     self::$記憶['読み込み済みURL'][] = $_url;
+                    $_cssfile .= "<link rel=\"stylesheet\" href=\"{$_url}\">\n";
                 }
             }
             if($css){
@@ -1232,8 +1236,8 @@ class 部品{
                 $jsfile = is_callable($jsfile) ? call_user_func_array($jsfile, $引数) : $jsfile;
                 foreach((array)$jsfile as $_url){
                     if(in_array($_url, (array)self::$記憶['読み込み済みURL'])){ continue; }
-                    $_jsfile .= "<script src=\"{$_url}\"></script>\n";
                     self::$記憶['読み込み済みURL'][] = $_url;
+                    $_jsfile .= "<script src=\"{$_url}\"></script>\n";
                 }
             }
             if($js){
@@ -1248,9 +1252,6 @@ class 部品{
             else{
                 self::$結果['jsinbody'] .= $_jsfile . $_js;
             }
-        }
-        else{
-            $html = self::$記憶[$部品名]['html'];
         }
         
         return is_callable($html) ? call_user_func_array($html, $引数) : $html;
