@@ -1192,29 +1192,31 @@ function 生部品(){
 
 
 class 部品{
-    private static $ディレクトリ; //開始()を行っているかのフラグも兼ねる
+    private static $ディレクトリ;
+    private static $開始;
     private static $記憶;
     private static $結果;
 
 
     public static function 開始($dir){
-        if(!self::$ディレクトリ){
+        if(!self::$開始){
             if(!is_dir($dir)){ throw new プログラムミス("[$dir] ディレクトリが存在しません"); }
             self::$ディレクトリ = $dir;
+            self::$開始 = true;
             self::$結果 = self::$記憶 = [];
             ob_start(["部品", "差し込み"]);
         }
     }
 
     public static function キャンセル(){
-        if(self::$ディレクトリ){
-            self::$ディレクトリ = null;
+        if(self::$開始){
+            self::$開始 = self::$ディレクトリ = null;
             return self::差し込み(ob_get_clean());
         }
     }
 
     public static function 作成($部品パス, $引数){
-        if(!self::$ディレクトリ){ throw new プログラムミス('部品::開始() を行っていません'); }
+        if(!self::$開始){ throw new プログラムミス('部品::開始() を行っていません'); }
 
         //部品変数を初期化
         $html = $css = $cssfile = $js = $jsfile = $jsinhead = "";
