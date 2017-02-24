@@ -1199,12 +1199,12 @@ class 部品{
 
 
     public static function 設定($dir = "./parts"){
-        self::$ディレクトリ   = preg_replace("|/$|", "", $dir);
+        self::$ディレクトリ = preg_replace("|/$|", "", $dir);
         if(!self::$初期化済み){ self::初期化(); }
     }
 
     public static function 作成($部品名, $自動エスケープ, $引数){
-        if($部品名 === null){ throw new プログラムミス('部品名がありません'); }
+        if(!$部品名){ throw new プログラムミス('部品名がありません'); }
         if(!self::$初期化済み){ throw new プログラムミス('部品::設定()で部品ディレクトリを指定してください'); }
         if($自動エスケープ){ $引数 = self::h($引数); }
 
@@ -1214,7 +1214,7 @@ class 部品{
         //ファイル読み込み(キャッシュの有無により分岐)
         if(!isset(self::$記憶[$部品名])){
             if(preg_match("/\.php$/", $部品名)){
-                //絶対パスか相対パスか？ 相対時に当関数を直接呼び出すとbacktraceは[0]であり動かない
+                //絶対パスか相対パスか？
                 require (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[1]['file']) . $部品名;
             }
             else{
