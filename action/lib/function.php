@@ -1198,9 +1198,20 @@ class 部品{
     private static $結果 = [];
 
 
-    public static function 設定($dir = "./parts"){
+    public static function 開始($dir = "./parts"){
         self::$ディレクトリ = $dir;
-        if(!self::$開始){ self::開始(); }
+        if(!self::$開始){
+            self::$開始 = true;
+            self::$結果 = self::$記憶 = [];
+            ob_start(["部品", "差し込み"]);
+        }
+    }
+
+    public static function キャンセル(){
+        if(self::$開始){
+            self::$開始 = false;
+            return self::差し込み(ob_get_clean());
+        }
     }
 
     public static function 作成($部品名, $引数){
@@ -1243,19 +1254,6 @@ class 部品{
             }
         }
         return $buf;
-    }
-
-    public static function キャンセル(){
-        if(self::$開始){
-            self::$開始 = false;
-            return self::差し込み(ob_get_clean());
-        }
-    }
-
-    private static function 開始(){
-        self::$開始 = true;
-        self::$結果 = self::$記憶 = [];
-        ob_start(["部品", "差し込み"]);
     }
 
     private static function 部品パス($部品名){
