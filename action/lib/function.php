@@ -1211,16 +1211,10 @@ class 部品{
         //部品変数を初期化
         $html = $css = $cssfile = $js = $jsfile = $jsinhead = "";
 
-        //ファイル読み込み(キャッシュの有無により分岐)
-        if(!isset(self::$記憶[$部品名])){
-            if(preg_match("/\.php$/", $部品名)){
-                //絶対パスか相対パスか？
-                require (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[1]['file']) . $部品名;
-            }
-            else{
-                require self::$ディレクトリ . "/$部品名.php";
-            }
-            //ファイル読み込みはキャッシュする
+        //部品ファイル読み込み
+        $once = require_once(self::部品パス($部品名));
+        if($once !== true){
+            //キャッシュする
             self::$記憶[$部品名] = $html;
 
             //部品変数を処理して結果にまとめる
@@ -1261,6 +1255,16 @@ class 部品{
     private static function 初期化(){
         self::$初期化済み = true;
         ob_start(["部品", "差し込み"]);
+    }
+
+    private static function 部品パス($部品名){
+        if(preg_match("/\.php$/", $部品名)){
+            $部品パス = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[1]['file']) . $部品名;
+        }
+        else{
+            $部品パス = self::$ディレクトリ . "/$部品名.php";
+        }
+        return $部品パス;
     }
 
     private static function CSS変数処理($css, $cssfile, $引数){
