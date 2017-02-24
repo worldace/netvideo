@@ -1258,6 +1258,7 @@ class 部品{
             $path = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[1]['file']) . $部品名; //絶対パスor相対パス
         }
         else{
+            if(!self::$ディレクトリ){ throw new プログラムミス("部品ディレクトリが設定されていません\n部品::開始() の第1引数に部品ディレクトリを指定してください"); }
             $path = self::$ディレクトリ . "/$部品名.php";
         }
         $path = realpath($path);
