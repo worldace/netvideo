@@ -1192,13 +1192,13 @@ function 生部品(){
 
 
 class 部品{
-    private static $ディレクトリ = "./parts";
+    private static $ディレクトリ;
     private static $開始 = false;
     private static $記憶 = [];
     private static $結果 = [];
 
 
-    public static function 開始($dir = "./parts"){
+    public static function 開始($dir){
         self::$ディレクトリ = $dir;
         if(!self::$開始){
             self::$開始 = true;
