@@ -1215,7 +1215,7 @@ class 部品{
     }
 
     public static function 作成($部品名, $引数){
-        if(!self::$開始){ throw new プログラムミス('部品::設定()で部品ディレクトリを指定してください'); }
+        if(!self::$開始){ throw new プログラムミス('部品::開始()を行っていません'); }
 
         //部品変数を初期化
         $html = $css = $cssfile = $js = $jsfile = $jsinhead = "";
