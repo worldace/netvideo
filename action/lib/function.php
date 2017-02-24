@@ -1199,7 +1199,7 @@ class 部品{
 
 
     public static function 設定($dir = "./parts"){
-        self::$ディレクトリ = preg_replace("|/$|", "", $dir);
+        self::$ディレクトリ = $dir;
         if(!self::$初期化済み){ self::初期化(); }
     }
 
@@ -1210,7 +1210,6 @@ class 部品{
         //部品変数を初期化
         $html = $css = $cssfile = $js = $jsfile = $jsinhead = "";
 
-        //部品パスの決定
         $部品パス = self::部品パス($部品名);
         if(!$部品パス){ throw new プログラムミス("[$部品名] 部品ファイルが見つかりません\nパス: $部品パス"); }
 
@@ -1262,7 +1261,7 @@ class 部品{
 
     private static function 部品パス($部品名){
         if(preg_match("/\.php$/", $部品名)){
-            $部品パス = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[2]['file']) . $部品名;
+            $部品パス = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[2]['file']) . $部品名; //絶対パスor相対パス
         }
         else{
             $部品パス = self::$ディレクトリ . "/$部品名.php";
