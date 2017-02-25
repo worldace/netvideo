@@ -771,13 +771,17 @@ function パスワード認証($password, $hash){
 }
 
 
-function 暗号化($str, $key, $type = 'aes-256-ecb'){
-    return openssl_encrypt($str, $type, $key);
+function 暗号化($str, $key){
+    $iv = openssl_random_pseudo_bytes(16); // openssl_cipher_iv_length('aes-256-cbc') == 16
+    $en = openssl_encrypt($str, 'aes-256-cbc', $key, 0, $iv);
+    return bin2hex($iv) . $en; //先頭32バイトがiv
 }
 
 
-function 復号化($str, $key, $type = 'aes-256-ecb'){
-    return openssl_decrypt($str, $type, $key);
+function 復号化($str, $key){
+    $iv  = substr($str, 0, 32);
+    $str = substr($str, 32);
+    return openssl_decrypt($str, 'aes-256-cbc', $key, 0, hex2bin($iv));
 }
 
 
@@ -1270,8 +1274,8 @@ class 部品{
 
     private static function CSS変数処理($css, $cssfile, $引数){
         if($css){
-            $css = is_callable($css)  ?  call_user_func_array($css, $引数)  :  $css;
-            $css = ltrim($css);
+            $css  = is_callable($css)  ?  call_user_func_array($css, $引数)  :  $css;
+            $css  = ltrim($css);
             $_css = preg_match("/^</", $css)  ?  "$css\n"  :  "<style>\n$css\n</style>\n";
         }
         if($cssfile){
@@ -1287,8 +1291,8 @@ class 部品{
 
     private static function JS変数処理($js, $jsfile, $引数){
         if($js){
-            $js = is_callable($js)  ?  call_user_func_array($js, $引数)  :  $js;
-            $js = ltrim($js);
+            $js  = is_callable($js)  ?  call_user_func_array($js, $引数)  :  $js;
+            $js  = ltrim($js);
             $_js = preg_match("/^</", $js)  ?  "$js\n"  :  "<script>\n$js\n</script>\n";
         }
         if($jsfile){
