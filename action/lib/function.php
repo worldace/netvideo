@@ -772,16 +772,14 @@ function パスワード認証($password, $hash){
 
 
 function 暗号化($str, $key){
-    $iv = openssl_random_pseudo_bytes(16); // openssl_cipher_iv_length('aes-256-cbc') == 16
-    $en = openssl_encrypt($str, 'aes-256-cbc', $key, 0, $iv);
-    return bin2hex($iv) . $en; //先頭32バイトがiv
+    $iv = openssl_random_pseudo_bytes(16); // openssl_cipher_iv_length('aes-128-cbc') == 16
+    return bin2hex($iv) . openssl_encrypt($str, 'aes-128-cbc', $key, 0, $iv); //先頭32バイトがiv
 }
 
 
 function 復号化($str, $key){
-    $iv  = substr($str, 0, 32);
-    $str = substr($str, 32);
-    return openssl_decrypt($str, 'aes-256-cbc', $key, 0, hex2bin($iv));
+    $iv = substr($str, 0, 32);
+    return openssl_decrypt(substr($str, 32), 'aes-128-cbc', $key, 0, hex2bin($iv));
 }
 
 
