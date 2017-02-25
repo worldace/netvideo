@@ -93,15 +93,18 @@ function 自動読み込み($dir = __DIR__){
 
 
 function 関数読み込み($file){
+    static $記憶;
     if(!preg_match("#^(/|\\\\|\w+:)#", $file)){ //相対パスなら
         $dir  = dirname(debug_backtrace()[0]['file']);
         $file = "$dir/$file";
     }
-    return require $file;
+    $file = realpath($file);
+    if(!isset($記憶[$file])){ $記憶[$file] = require $file; }
+    return $記憶[$file];
 }
 
 
-function クラス読み込み($file, array $引数 = []){
+function オブジェクト読み込み($file, array $引数 = []){
     if(!preg_match("#^(/|\\\\|\w+:)#", $file)){ //相対パスなら
         $dir  = dirname(debug_backtrace()[0]['file']);
         $file = "$dir/$file";
