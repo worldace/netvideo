@@ -1270,9 +1270,9 @@ class 部品{
 
     private static function CSS変数処理($css, $cssfile, $引数){
         if($css){
-            $_css = is_callable($css)  ?  call_user_func_array($css, $引数)  :  $css;
-            $_css = ltrim($_css);
-            $_css = preg_match("/^</", $_css)  ?  "$_css\n"  :  "<style>\n$_css\n</style>\n";
+            $css = is_callable($css)  ?  call_user_func_array($css, $引数)  :  $css;
+            $css = ltrim($css);
+            $_css = preg_match("/^</", $css)  ?  "$css\n"  :  "<style>\n$css\n</style>\n";
         }
         if($cssfile){
             $cssfile = is_callable($cssfile)  ?  call_user_func_array($cssfile, $引数)  :  $cssfile;
@@ -1287,9 +1287,9 @@ class 部品{
 
     private static function JS変数処理($js, $jsfile, $引数){
         if($js){
-            $_js = is_callable($js)  ?  call_user_func_array($js, $引数)  :  $js;
-            $_js = ltrim($_js);
-            $_js = preg_match("/^</", $_js)  ?  "$_js\n"  :  "<script>\n$_js\n</script>\n";
+            $js = is_callable($js)  ?  call_user_func_array($js, $引数)  :  $js;
+            $js = ltrim($js);
+            $_js = preg_match("/^</", $js)  ?  "$js\n"  :  "<script>\n$js\n</script>\n";
         }
         if($jsfile){
             $jsfile = is_callable($jsfile)  ?  call_user_func_array($jsfile, $引数)  :  $jsfile;
