@@ -6,14 +6,6 @@
 //======================================================
 
 
-function クラスローダ($dir = __DIR__){
-    spl_autoload_register(function($class) use($dir){
-        $class = str_replace("_", "/", $class);
-        require_once "{$dir}/{$class}.php";
-    });
-}
-
-
 function route(array $route, $arg = 1){
     $_ENV['route.return'] = $arg;
     $_ENV['route.dir'] = dirname(debug_backtrace()[0]['file']);
@@ -88,6 +80,15 @@ function RSS表示(array $channel, array $items){ // http://www.futomi.com/lectu
 function リダイレクト($url){
     header("Location: $url");
     exit;
+}
+
+
+function 自動読み込み($dir = __DIR__){
+    if(!preg_match("#^(/|\\\\|\w+:)#", $dir)){ $dir  = dirname(debug_backtrace()[0]['file']); }
+    spl_autoload_register(function($class) use($dir){
+        $class = str_replace(["_","\\"], "/", $class);
+        require_once "{$dir}/{$class}.php";
+    });
 }
 
 
@@ -1205,7 +1206,7 @@ class 部品{
         }
     }
 
-    public static function キャンセル(){
+    public static function 中止(){
         if(self::$開始){
             self::$開始 = null;
             self::$ディレクトリ = null;
@@ -1345,6 +1346,7 @@ trait 例外の実装{
         $str .= "---------------------------------------------------\n";
         $str .= $this->getTraceAsString();
         $str .= "\n---------------------------------------------------\n";
+
         return $str;
     }
 
