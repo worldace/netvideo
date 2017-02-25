@@ -104,7 +104,7 @@ function 関数読み込み($file){
 }
 
 
-function オブジェクト読み込み($file, array $引数 = []){
+function 無名クラス読み込み($file, array $引数 = []){
     if(!preg_match("#^(/|\\\\|\w+:)#", $file)){ //相対パスなら
         $dir  = dirname(debug_backtrace()[0]['file']);
         $file = "$dir/$file";
