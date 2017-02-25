@@ -84,10 +84,10 @@ function リダイレクト($url){
 
 
 function 自動読み込み($dir = __DIR__){
-    if(!preg_match("#^(/|\\\\|\w+:)#", $dir)){ $dir  = dirname(debug_backtrace()[0]['file']); }
+    if(!preg_match("#^(/|\\\\|\w+:)#", $dir)){ $dir  = dirname(debug_backtrace()[0]['file']) . "/$dir"; }
     spl_autoload_register(function($class) use($dir){
         $class = str_replace(["_","\\"], "/", $class);
-        require_once "{$dir}/{$class}.php";
+        require_once "$dir/$class.php";
     });
 }
 

@@ -12,7 +12,7 @@ set_exception_handler(function($e){
 });
 
 
-クラスローダ("./action/class/");
+自動読み込み("./action/class/");
 部品::開始("./action/parts");
 検査::$例外 = true;
 開発用の設定();
