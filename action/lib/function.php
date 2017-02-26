@@ -545,23 +545,6 @@ function 配列→table(array $array, array $attr = []){
 }
 
 
-function newa($trait = null, $class = null, $args = null){
-    if($class !== null){
-        if(class_exists($class)){ $class_code = "extends $class"; }
-        else if(interface_exists($class)){ $class_code = "implements $class"; }
-        else{ throw new プログラムミス(__function__."() 第2引数の[$class]クラス/インターフェースが見つかりません"); }
-    }
-    if($trait !== null){
-        foreach((array)$trait as $value){
-            if(!trait_exists($value)){ throw new プログラムミス(__function__."() 第1引数の[$value]トレイトが見つかりません"); };
-        }
-        $trait_code = "use " . implode(",", (array)$trait) . ";";
-    }
-    eval("\$object = new class(...(array)\$args) $class_code{ $trait_code };");
-    return $object;
-}
-
-
 function パーミッション($path, $permission = null){
     if(!preg_match("/^0/", $permission) and $permission >= 100 and $permission <= 777){
         chmod($path, octdec($permission));
