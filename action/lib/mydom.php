@@ -1,6 +1,6 @@
 <?php
 
-$doc = new myDOM('<div id="div1"><span id="span1">12</span><span id="span3">36</span></div>');
+$doc = new myDOM('<div id="div1"><span id="span1">12</span><span id="span3">&36</span></div>');
 $doc->長男に追加('<p id="p1"><span id="span2">hello</span></p>', "#div1");
 
 print $doc;
@@ -11,6 +11,7 @@ class myDOM{
     private $doc;
 
     public function __construct($str){
+        libxml_use_internal_errors(true);
         $this->doc = $this->新規文書($str);
     }
 
@@ -37,14 +38,17 @@ class myDOM{
 
 
     private function 新規文書($str){
-        $doc = new DOMDocument();
-        $doc->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR); // https://php.net/manual/ja/libxml.constants.php
+        $doc = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
+        $doc->encoding = "utf-8";
+        //$doc->substituteEntities = true;
+        $doc->formatOutput = true;
+        $doc->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
         return $doc;
     }
 
     private function 検索($selector){
         $xpath = new DOMXPath($this->doc);
-        return $xpath->query($this->selector2XPath($selector));
+        return $xpath->query($this->selector2XPath($selector)); //DOMNodeではなくDOMNodeList(複数形)が返る
     }
 
     private function 追加($str, $selector, $relation){
