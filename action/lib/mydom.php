@@ -1,61 +1,48 @@
 <?php
 
-$doc = new myDOM('<div id="div1"><span id="span1">12</span><span id="span3">&36</span></div>');
-$doc->長男に追加('<p id="p1"><span id="span2">hello</span></p>', "#div1");
+$html = new myDOM();
+$html->追加("body", "長男", '<p id="p1"><span id="span2">hello</span></p>');
 
-print $doc;
-
-
+$html->削除("#span2");
+print $html->出力();
 
 class myDOM{
     private $doc;
 
-    public function __construct($str){
+    public function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
         libxml_use_internal_errors(true);
         $this->doc = $this->新規文書($str);
     }
 
-    public function 兄に追加($str, $selector){
-        $this->追加($str, $selector, "兄");
+    public function 内容($selector, $value = null){
+        $where = $this->検索($selector)[0];
+        if($value === null){
+            return $where->textContent;
+        }
+        else{
+            $where->textContent = $value;
+        }
     }
 
-    public function 弟に追加($str, $selector){
-        $this->追加($str, $selector, "弟");
+    public function 属性($selector, $name, $value = null){
+        $where = $this->検索($selector)[0];
+        if($value === null){
+            return $where->getAttribute($name);
+        }
+        else{
+            $where->setAttribute($name, $value);
+        }
     }
 
-    public function 長男に追加($str, $selector){
-        $this->追加($str, $selector, "長男");
+    public function 属性削除($selector, $name){
+        $where = $this->検索($selector)[0];
+        return $where->removeAttribute($name);
     }
 
-    public function 末っ子に追加($str, $selector){
-        $this->追加($str, $selector, "末っ子");
-    }
-
-    public function __toString(){
-        return $this->doc->saveHTML();
-    }
-
-
-
-    private function 新規文書($str){
-        $doc = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
-        $doc->encoding = "utf-8";
-        //$doc->substituteEntities = true;
-        $doc->formatOutput = true;
-        $doc->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
-        return $doc;
-    }
-
-    private function 検索($selector){
-        $xpath = new DOMXPath($this->doc);
-        return $xpath->query($this->selector2XPath($selector)); //DOMNodeではなくDOMNodeList(複数形)が返る
-    }
-
-    private function 追加($str, $selector, $relation){
+    public function 追加($selector, $relation, $str){
         $newdoc = $this->新規文書($str);
         $where  = $this->検索($selector)[0];
-
-        $add = $this->doc->importNode($newdoc->documentElement, true);
+        $add    = $this->doc->importNode($newdoc->documentElement, true);
 
         switch($relation){
             case "兄": 
@@ -71,6 +58,39 @@ class myDOM{
                 $where->appendChild($add);
                 break;
         }
+    }
+
+    public function 削除($selector){
+        $where = $this->検索($selector)[0];
+        $where->parentNode->removeChild($where);
+    }
+
+    public function 出力($selector = null){
+        if($selector === null){
+            return $this->doc->saveHTML();
+        }
+        else{
+            $where = $this->検索($selector)[0];
+            return $this->doc->saveHTML($where);
+        }
+    }
+
+    public function __toString(){
+        return $this->doc->saveHTML();
+    }
+
+
+    private function 新規文書($str){
+        $doc = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
+        $doc->encoding = "utf-8";
+        $doc->formatOutput = true;
+        $doc->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
+        return $doc;
+    }
+
+    private function 検索($selector){
+        $xpath = new DOMXPath($this->doc);
+        return $xpath->query($this->selector2XPath($selector)); //DOMNodeではなくDOMNodeList(複数形)が返る
     }
 
     /**
