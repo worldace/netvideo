@@ -1200,13 +1200,13 @@ class 部品{
     private static $結果;
 
 
-    public static function 開始($dir){
+    public static function 開始($dir, $manual = false){
         if(!is_dir($dir)){ throw new プログラムミス("[$dir] ディレクトリが存在しません"); }
-        if(!self::$開始){
-            self::$ディレクトリ = $dir;
+        self::$ディレクトリ = $dir;
+        self::$結果 = [];
+        self::$記憶 = [];
+        if(!self::$開始 and !$manual){
             self::$開始 = true;
-            self::$結果 = [];
-            self::$記憶 = [];
             ob_start(["部品", "差し込み"]);
         }
     }
