@@ -3,8 +3,7 @@
 $html = new myDOM();
 $html->追加("body", "長男", '<p id="p1"><span id="span2">hello</span></p>');
 
-$html->削除("#span2");
-print $html->出力();
+print $html->HTML();
 
 class myDOM{
     private $doc;
@@ -16,6 +15,8 @@ class myDOM{
 
     public function 内容($selector, $value = null){
         $where = $this->検索($selector)[0];
+        if(!$where){ return false; }
+
         if($value === null){
             return $where->textContent;
         }
@@ -26,6 +27,8 @@ class myDOM{
 
     public function 属性($selector, $name, $value = null){
         $where = $this->検索($selector)[0];
+        if(!$where){ return false; }
+
         if($value === null){
             return $where->getAttribute($name);
         }
@@ -36,12 +39,16 @@ class myDOM{
 
     public function 属性削除($selector, $name){
         $where = $this->検索($selector)[0];
+        if(!$where){ return false; }
+
         return $where->removeAttribute($name);
     }
 
     public function 追加($selector, $relation, $str){
-        $newdoc = $this->新規文書($str);
         $where  = $this->検索($selector)[0];
+        if(!$where){ return false; }
+
+        $newdoc = $this->新規文書($str);
         $add    = $this->doc->importNode($newdoc->documentElement, true);
 
         switch($relation){
@@ -62,15 +69,17 @@ class myDOM{
 
     public function 削除($selector){
         $where = $this->検索($selector)[0];
+        if(!$where){ return false; }
         $where->parentNode->removeChild($where);
     }
 
-    public function 出力($selector = null){
+    public function HTML($selector = null){
         if($selector === null){
             return $this->doc->saveHTML();
         }
         else{
             $where = $this->検索($selector)[0];
+            if(!$where){ return false; }
             return $this->doc->saveHTML($where);
         }
     }
@@ -89,7 +98,7 @@ class myDOM{
     }
 
     private function 検索($selector){
-        $xpath = new DOMXPath($this->doc);
+        $xpath = new DOMXPath($this->doc); // https://secure.php.net/manual/ja/class.domxpath.php
         return $xpath->query($this->selector2XPath($selector)); //DOMNodeではなくDOMNodeList(複数形)が返る
     }
 
