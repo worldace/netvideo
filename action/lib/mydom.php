@@ -11,8 +11,7 @@ class myDOM{
     private $doc;
 
     public function __construct($str){
-        $this->doc = new DOMDocument();
-        $this->doc->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR); // https://php.net/manual/ja/libxml.constants.php
+        $this->doc = $this->新規文書($str);
     }
 
     public function 兄に追加($str, $selector){
@@ -36,14 +35,23 @@ class myDOM{
     }
 
 
-    private function 追加($str, $selector, $relation){
+
+    private function 新規文書($str){
+        $doc = new DOMDocument();
+        $doc->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR); // https://php.net/manual/ja/libxml.constants.php
+        return $doc;
+    }
+
+    private function 検索($selector){
         $xpath = new DOMXPath($this->doc);
-        $where = $xpath->query($this->Selector2XPath($selector))[0];
+        return $xpath->query($this->selector2XPath($selector));
+    }
 
-        $new = new DOMDocument();
-        $new->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR);
+    private function 追加($str, $selector, $relation){
+        $newdoc = $this->新規文書($str);
+        $where  = $this->検索($selector)[0];
 
-        $add = $this->doc->importNode($new->documentElement, true);
+        $add = $this->doc->importNode($newdoc->documentElement, true);
 
         switch($relation){
             case "兄": 
@@ -66,7 +74,7 @@ class myDOM{
      * Copyright (c) 2008 Daichi Kamemoto <daikame@gmail.com>
      * Copyright (c) 2009 Daichi Kamemoto <daikame@gmail.com>, TANAKA Koichi <tanaka@ensites.com>
      */
-    private function Selector2XPath($input_selector, $throw_exception = false){
+    private function selector2XPath($input_selector, $throw_exception = false){
         $regex = [
             'element'    => '/^(\*|[a-z_][a-z0-9_-]*|(?=[#:.\[]))/i',
             'id_class'   => '/^([#.])([a-z0-9*_-]*)/i',
