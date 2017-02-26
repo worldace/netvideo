@@ -92,7 +92,7 @@ function 自動読み込み($dir = __DIR__){
 }
 
 
-function 関数読み込み($file){
+function 関数($file){
     static $記憶;
     if(!preg_match("#^(/|\\\\|\w+:)#", $file)){ //相対パスなら
         $dir  = dirname(debug_backtrace()[0]['file']);
@@ -104,7 +104,7 @@ function 関数読み込み($file){
 }
 
 
-function 無名クラス読み込み($file, array $引数 = []){
+function 無名クラス($file, array $引数 = []){
     if(!preg_match("#^(/|\\\\|\w+:)#", $file)){ //相対パスなら
         $dir  = dirname(debug_backtrace()[0]['file']);
         $file = "$dir/$file";
