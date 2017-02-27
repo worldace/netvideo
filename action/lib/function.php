@@ -1456,7 +1456,12 @@ class HTML文書{
     }
 
     private function 全体出力(){
-        return $this->doc->saveXML($this->doc->doctype).$this->doc->saveHTML($this->doc->documentElement);
+        if($this->hasDoctype === true){
+            return $this->doc->saveXML($this->doc->doctype).$this->doc->saveHTML($this->doc->documentElement);
+        }
+        else{
+            return $this->doc->saveHTML($this->doc->documentElement);
+        }
     }
 
     private function 検索($selector){
