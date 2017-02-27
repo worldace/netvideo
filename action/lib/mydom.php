@@ -1,20 +1,23 @@
 <?php
 
 $html = new myDOM();
-$html->生追加("body", "長男", '<p class="b a">aa</p><p class="a">bb</p>');
-$html->生追加(".a", "末っ子", '<div></div>');
+$html->生追加("body", "長男", '<p class="b a">たぶん</p><p class="a">bb</p>');
+$html->生追加(".a", "末っ子", '<div>まな</div>');
 
-$html->削除("div");
-print $html;
+print $html->HTML();
 class myDOM{
     private $doc;
 
     public function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
-        libxml_use_internal_errors(true);
+        $str = preg_replace("/^[^<]+/", "", $str);
+        if(!preg_match("/^<\!DOCTYPE\shtml/i", $str)){ $str = "<!DOCTYPE html>\n$str"; }
+        $str = '<?xml encoding="UTF-8">' . $str; //文字化けのおまじない。出力時のsaveXML($this->doc->doctype).saveHTML($this->doc->documentElement)とセットで使う
+        libxml_use_internal_errors(true);  // loadHTML() の警告抑制
+
         $this->doc = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
         $this->doc->encoding = "utf-8";
         $this->doc->formatOutput = true;
-        $this->doc->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
+        $this->doc->loadHTML($str, LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
     }
 
     public function 内容($selector, $value = null){
@@ -99,7 +102,7 @@ class myDOM{
 
     public function HTML($selector = null){
         if($selector === null){
-            return $this->doc->saveHTML();
+            return $this->doc->saveXML($this->doc->doctype).$this->doc->saveHTML($this->doc->documentElement);
         }
         else{
             $selections = $this->検索($selector);
@@ -112,7 +115,7 @@ class myDOM{
     }
 
     public function __toString(){
-        return $this->doc->saveHTML();
+        return $this->doc->saveXML($this->doc->doctype).$this->doc->saveHTML($this->doc->documentElement);
     }
 
 
