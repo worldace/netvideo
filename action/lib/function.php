@@ -1376,6 +1376,11 @@ class HTML文書{
                     $where->appendChild($add->cloneNode(true));
                 }
                 break;
+            case "置換":
+                foreach($selection as $where){
+                    $where->parentNode->replaceChild($add->cloneNode(true), $where);
+                }
+                break;
         }
     }
 
@@ -1407,6 +1412,12 @@ class HTML文書{
                 foreach($selection as $where){
                     $add->appendXML($str);
                     $where->appendChild($add);
+                }
+                break;
+            case "置換":
+                foreach($selection as $where){
+                    $add->appendXML($str);
+                    $where->parentNode->replaceChild($add, $where);
                 }
                 break;
         }
