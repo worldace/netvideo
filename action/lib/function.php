@@ -660,7 +660,7 @@ function XML取得($xml, $options = array()) {
         else{
             $xmlstr = $xml;
         }
-        $xmlstr = preg_replace("/&(?!amp;)/", "&amp;" ,$xmlstr);
+        $xmlstr = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,4};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$xmlstr);
         $xml = simplexml_load_string($xmlstr);
         if(!$xml){ return false; }
     }
