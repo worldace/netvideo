@@ -1,68 +1,91 @@
 <?php
 
 $html = new myDOM();
-$html->追加("body", "長男", '<p id="p1"><span id="span2">hello</span></p>');
+$html->生追加("body", "長男", '<p class="b a">aa</p><p class="a">bb</p>');
+$html->生追加(".a", "末っ子", '<div></div>');
 
-print $html->HTML();
-
+print_r();
+print $html;
 class myDOM{
     private $doc;
 
     public function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
         libxml_use_internal_errors(true);
-        $this->doc = $this->新規文書($str);
+        $this->doc = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
+        $this->doc->encoding = "utf-8";
+        $this->doc->formatOutput = true;
+        $this->doc->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
     }
 
     public function 内容($selector, $value = null){
-        $where = $this->検索($selector)[0];
-        if(!$where){ return false; }
+        $where = $this->検索($selector);
 
         if($value === null){
-            return $where->textContent;
+            $return = [];
+            for($i = 0; $i < $where->length; $i++){
+                $return[] = $where[$i]->textContent;
+            }
+            return $return;
         }
         else{
-            $where->textContent = $value;
+            for($i = 0; $i < $where->length; $i++){
+                $where[$i]->textContent = $value;
+            }
         }
     }
 
     public function 属性($selector, $name, $value = null){
-        $where = $this->検索($selector)[0];
-        if(!$where){ return false; }
+        $where = $this->検索($selector);
 
         if($value === null){
-            return $where->getAttribute($name);
+            $return = [];
+            for($i = 0; $i < $where->length; $i++){
+                $return[] = $where[$i]->getAttribute($name);
+            }
+            return $return;
         }
         else{
-            $where->setAttribute($name, $value);
+            for($i = 0; $i < $where->length; $i++){
+                $where[$i]->setAttribute($name, $value);
+            }
         }
     }
 
     public function 属性削除($selector, $name){
-        $where = $this->検索($selector)[0];
-        if(!$where){ return false; }
-
-        return $where->removeAttribute($name);
+        $where = $this->検索($selector);
+        for($i = 0; $i < $where->length; $i++){
+            $where[$i]->removeAttribute($name);
+        }
     }
 
-    public function 追加($selector, $relation, $str){
-        $where  = $this->検索($selector)[0];
-        if(!$where){ return false; }
-
-        $newdoc = $this->新規文書($str);
-        $add    = $this->doc->importNode($newdoc->documentElement, true);
+    public function 生追加($selector, $relation, $str){
+        $where = $this->検索($selector);
+        $add   = $this->doc->createDocumentFragment();
 
         switch($relation){
-            case "兄": 
-                $where->parentNode->insertBefore($add, $where);
+            case "兄":
+                for($i = 0; $i < $where->length; $i++){
+                    $add->appendXML($str);
+                    $where[$i]->parentNode->insertBefore($add, $where[$i]);
+                }
                 break;
-            case "弟": 
-                $where->parentNode->insertBefore($add, $where->nextSibling);
+            case "弟":
+                for($i = 0; $i < $where->length; $i++){
+                    $add->appendXML($str);
+                    $where[$i]->parentNode->insertBefore($add, $where[$i]->nextSibling);
+                }
                 break;
-            case "長男": 
-                $where->insertBefore($add, $where->firstChild);
+            case "長男":
+                for($i = 0; $i < $where->length; $i++){
+                    $add->appendXML($str);
+                    $where[$i]->insertBefore($add, $where[$i]->firstChild);
+                }
                 break;
-            case "末っ子": 
-                $where->appendChild($add);
+            case "末っ子":
+                for($i = 0; $i < $where->length; $i++){
+                    $add->appendXML($str);
+                    $where[$i]->appendChild($add);
+                }
                 break;
         }
     }
@@ -89,17 +112,10 @@ class myDOM{
     }
 
 
-    private function 新規文書($str){
-        $doc = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
-        $doc->encoding = "utf-8";
-        $doc->formatOutput = true;
-        $doc->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
-        return $doc;
-    }
-
     private function 検索($selector){
-        $xpath = new DOMXPath($this->doc); // https://secure.php.net/manual/ja/class.domxpath.php
-        return $xpath->query($this->selector2XPath($selector)); //DOMNodeではなくDOMNodeList(複数形)が返る
+        $xpath  = new DOMXPath($this->doc); // https://secure.php.net/manual/ja/class.domxpath.php
+        $return = $xpath->query($this->selector2XPath($selector)); //DOMNodeではなくDOMNodeList(複数形)が返る
+        return $return ?? [];
     }
 
     /**
