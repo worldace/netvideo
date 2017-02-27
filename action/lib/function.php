@@ -1305,10 +1305,10 @@ class HTML文書{
         $this->doc = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
         $this->doc->encoding = "utf-8";
         $this->doc->formatOutput = true;
-        $this->doc->loadHTML($str, LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
+        $this->doc->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
     }
 
-    public function 内容($selector, $value = null){
+    public function 本文($selector, $value = null){
         $selection = $this->検索($selector);
 
         if($value === null){
