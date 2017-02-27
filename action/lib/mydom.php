@@ -2,7 +2,7 @@
 
 $html = new myDOM();
 $html->生追加("body", "長男", '<p class="b a">たぶん</p><p class="a">bb</p>');
-$html->生追加(".a", "末っ子", '<div></div>');
+$html->生追加(".a", "末っ子", '<div>1MA</div>');
 
 print $html->HTML();
 class myDOM{
@@ -10,7 +10,10 @@ class myDOM{
 
     public function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
         $str = preg_replace("/^[^<]+/", "", $str);
-        if(!preg_match("/^<\!DOCTYPE\shtml/i", $str)){ $str = "<!DOCTYPE html>\n$str"; }
+        if(!preg_match("/^<\!DOCTYPE\s+html/i", $str)){ $str = "<!DOCTYPE html>\n$str"; } //ドキュメントタイプがないと古いドキュメントタイプが勝手に追加されるので対策
+
+        $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$str); //XMLは&があるとエラーになるので(文字実態・数値文字10進・16進は除く)
+
         $str = '<?xml encoding="UTF-8">' . $str; //文字化け対策のおまじない。出力時のsaveXML($this->doc->doctype).saveHTML($this->doc->documentElement)とセットで使う
         libxml_use_internal_errors(true);  // loadHTML() の警告抑制
 
@@ -64,6 +67,7 @@ class myDOM{
     public function 生追加($selector, $relation, $str){
         $selections = $this->検索($selector);
         $add = $this->doc->createDocumentFragment();
+        $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$str); //XMLは実態参照でない&があるとエラーになるので
 
         switch($relation){
             case "兄":
