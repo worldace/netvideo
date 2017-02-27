@@ -1,95 +1,125 @@
 <?php
 
-$html = new myDOM();
+$html = new HTML文書();
 $html->生追加("body", "長男", '<p class="b a">たぶん</p><p class="a">bb</p>');
-$html->生追加(".a", "末っ子", '<div>1MA</div>');
+$html->追加(".a", "末っ子", 'a', ["href"=>"http://musou.s38.xrea.com/"], "リンク");
+//$html->生追加(".a", "末っ子", '<a>pp</a>');
 
 print $html->HTML();
-class myDOM{
+class HTML文書{
     private $doc;
 
     public function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
         $str = preg_replace("/^[^<]+/", "", $str);
-        if(!preg_match("/^<\!DOCTYPE\s+html/i", $str)){ $str = "<!DOCTYPE html>\n$str"; } //ドキュメントタイプがないと古いドキュメントタイプが勝手に追加されるので対策
-
         $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$str); //XMLは&があるとエラーになるので(文字実態・数値文字10進・16進は除く)
-
+        if(!preg_match("/^<\!DOCTYPE\s+html/i", $str)){ $str = "<!DOCTYPE html>\n$str"; } //ドキュメントタイプがないと古いドキュメントタイプが勝手に追加されるので対策
         $str = '<?xml encoding="UTF-8">' . $str; //文字化け対策のおまじない。出力時のsaveXML($this->doc->doctype).saveHTML($this->doc->documentElement)とセットで使う
+
         libxml_use_internal_errors(true);  // loadHTML() の警告抑制
 
         $this->doc = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
         $this->doc->encoding = "utf-8";
         $this->doc->formatOutput = true;
-        $this->doc->loadHTML($str, LIBXML_NOENT | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
+        $this->doc->loadHTML($str, LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
     }
 
     public function 内容($selector, $value = null){
-        $selections = $this->検索($selector);
+        $selection = $this->検索($selector);
 
         if($value === null){
-            $return = [];
-            foreach($selections as $where){
+            foreach($selection as $where){
                 $return[] = $where->textContent;
             }
-            return $return;
+            return (array)$return;
         }
         else{
-            foreach($selections as $where){
+            foreach($selection as $where){
                 $where->textContent = $value;
             }
         }
     }
 
     public function 属性($selector, $name, $value = null){
-        $selections = $this->検索($selector);
+        $selection = $this->検索($selector);
 
         if($value === null){
-            $return = [];
-            foreach($selections as $where){
+            foreach($selection as $where){
                 $return[] = $where->getAttribute($name);
             }
-            return $return;
+            return (array)$return;
         }
         else{
-            foreach($selections as $where){
+            foreach($selection as $where){
                 $where->setAttribute($name, $value);
             }
         }
     }
 
     public function 属性削除($selector, $name){
-        $selections = $this->検索($selector);
-        foreach($selections as $where){
+        $selection = $this->検索($selector);
+        foreach($selection as $where){
             $where->removeAttribute($name);
         }
     }
 
-    public function 生追加($selector, $relation, $str){
-        $selections = $this->検索($selector);
-        $add = $this->doc->createDocumentFragment();
-        $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$str); //XMLは実態参照でない&があるとエラーになるので
+    public function 追加($selector, $relation, $tag, array $attr = [], $content = ""){
+        $selection = $this->検索($selector);
+        $add = $this->doc->createElement($tag);
+        $add->textContent = $content;
+        foreach($attr as $k => $v){
+            $add->setAttribute($k, $v);
+        }
 
         switch($relation){
             case "兄":
-                foreach($selections as $where){
+                foreach($selection as $where){
+                    $where->parentNode->insertBefore($add->cloneNode(true), $where);
+                }
+                break;
+            case "弟":
+                foreach($selection as $where){
+                    $where->parentNode->insertBefore($add->cloneNode(true), $where->nextSibling);
+                }
+                break;
+            case "長男":
+                foreach($selection as $where){
+                    $where->insertBefore($add->cloneNode(true), $where->firstChild);
+                }
+                break;
+            case "末っ子":
+                foreach($selection as $where){
+                    $where->appendChild($add->cloneNode(true));
+                }
+                break;
+        }
+    }
+
+    public function 生追加($selector, $relation, $str){
+        $selection = $this->検索($selector);
+        $add = $this->doc->createDocumentFragment();
+        $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$str);
+
+        switch($relation){
+            case "兄":
+                foreach($selection as $where){
                     $add->appendXML($str);
                     $where->parentNode->insertBefore($add, $where);
                 }
                 break;
             case "弟":
-                foreach($selections as $where){
+                foreach($selection as $where){
                     $add->appendXML($str);
                     $where->parentNode->insertBefore($add, $where->nextSibling);
                 }
                 break;
             case "長男":
-                foreach($selections as $where){
+                foreach($selection as $where){
                     $add->appendXML($str);
                     $where->insertBefore($add, $where->firstChild);
                 }
                 break;
             case "末っ子":
-                foreach($selections as $where){
+                foreach($selection as $where){
                     $add->appendXML($str);
                     $where->appendChild($add);
                 }
@@ -98,9 +128,9 @@ class myDOM{
     }
 
     public function 削除($selector){
-        $selections = $this->検索($selector);
-        for($i = $selections->length - 1; $i >= 0; $i--){
-            $selections[$i]->parentNode->removeChild($selections[$i]);
+        $selection = $this->検索($selector);
+        for($i = $selection->length - 1; $i >= 0; $i--){
+            $selection[$i]->parentNode->removeChild($selection[$i]);
         }
     }
 
@@ -109,12 +139,11 @@ class myDOM{
             return $this->doc->saveXML($this->doc->doctype).$this->doc->saveHTML($this->doc->documentElement);
         }
         else{
-            $selections = $this->検索($selector);
-            $return = [];
-            foreach($selections as $where){
+            $selection = $this->検索($selector);
+            foreach($selection as $where){
                 $return[] = $this->doc->saveHTML($where);
             }
-            return $return;
+            return (array)$return;
         }
     }
 
