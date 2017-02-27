@@ -4,7 +4,7 @@ $html = new myDOM();
 $html->生追加("body", "長男", '<p class="b a">aa</p><p class="a">bb</p>');
 $html->生追加(".a", "末っ子", '<div></div>');
 
-print_r();
+$html->削除("div");
 print $html;
 class myDOM{
     private $doc;
@@ -18,82 +18,83 @@ class myDOM{
     }
 
     public function 内容($selector, $value = null){
-        $where = $this->検索($selector);
+        $selections = $this->検索($selector);
 
         if($value === null){
             $return = [];
-            for($i = 0; $i < $where->length; $i++){
-                $return[] = $where[$i]->textContent;
+            foreach($selections as $where){
+                $return[] = $where->textContent;
             }
             return $return;
         }
         else{
-            for($i = 0; $i < $where->length; $i++){
-                $where[$i]->textContent = $value;
+            foreach($selections as $where){
+                $where->textContent = $value;
             }
         }
     }
 
     public function 属性($selector, $name, $value = null){
-        $where = $this->検索($selector);
+        $selections = $this->検索($selector);
 
         if($value === null){
             $return = [];
-            for($i = 0; $i < $where->length; $i++){
-                $return[] = $where[$i]->getAttribute($name);
+            foreach($selections as $where){
+                $return[] = $where->getAttribute($name);
             }
             return $return;
         }
         else{
-            for($i = 0; $i < $where->length; $i++){
-                $where[$i]->setAttribute($name, $value);
+            foreach($selections as $where){
+                $where->setAttribute($name, $value);
             }
         }
     }
 
     public function 属性削除($selector, $name){
-        $where = $this->検索($selector);
-        for($i = 0; $i < $where->length; $i++){
-            $where[$i]->removeAttribute($name);
+        $selections = $this->検索($selector);
+        foreach($selections as $where){
+            $where->removeAttribute($name);
         }
     }
 
     public function 生追加($selector, $relation, $str){
-        $where = $this->検索($selector);
-        $add   = $this->doc->createDocumentFragment();
+        $selections = $this->検索($selector);
+        $add = $this->doc->createDocumentFragment();
 
         switch($relation){
             case "兄":
-                for($i = 0; $i < $where->length; $i++){
+                foreach($selections as $where){
                     $add->appendXML($str);
-                    $where[$i]->parentNode->insertBefore($add, $where[$i]);
+                    $where->parentNode->insertBefore($add, $where);
                 }
                 break;
             case "弟":
-                for($i = 0; $i < $where->length; $i++){
+                foreach($selections as $where){
                     $add->appendXML($str);
-                    $where[$i]->parentNode->insertBefore($add, $where[$i]->nextSibling);
+                    $where->parentNode->insertBefore($add, $where->nextSibling);
                 }
                 break;
             case "長男":
-                for($i = 0; $i < $where->length; $i++){
+                foreach($selections as $where){
                     $add->appendXML($str);
-                    $where[$i]->insertBefore($add, $where[$i]->firstChild);
+                    $where->insertBefore($add, $where->firstChild);
                 }
                 break;
             case "末っ子":
-                for($i = 0; $i < $where->length; $i++){
+                foreach($selections as $where){
                     $add->appendXML($str);
-                    $where[$i]->appendChild($add);
+                    $where->appendChild($add);
                 }
                 break;
         }
     }
 
     public function 削除($selector){
-        $where = $this->検索($selector)[0];
-        if(!$where){ return false; }
-        $where->parentNode->removeChild($where);
+        $selections = $this->検索($selector);
+        for($i = $selections->length - 1; $i >= 0; $i--){
+            $selections[$i]->parentNode->removeChild($selections[$i]);
+        }
     }
 
     public function HTML($selector = null){
@@ -101,9 +102,12 @@ class myDOM{
             return $this->doc->saveHTML();
         }
         else{
-            $where = $this->検索($selector)[0];
-            if(!$where){ return false; }
-            return $this->doc->saveHTML($where);
+            $selections = $this->検索($selector);
+            $return = [];
+            foreach($selections as $where){
+                $return[] = $this->doc->saveHTML($where);
+            }
+            return $return;
         }
     }
 
@@ -114,8 +118,7 @@ class myDOM{
 
     private function 検索($selector){
         $xpath  = new DOMXPath($this->doc); // https://secure.php.net/manual/ja/class.domxpath.php
-        $return = $xpath->query($this->selector2XPath($selector)); //DOMNodeではなくDOMNodeList(複数形)が返る
-        return $return ?? [];
+        return $xpath->query($this->selector2XPath($selector)); //DOMNodeではなくDOMNodeList(複数形)が返る
     }
 
     /**
