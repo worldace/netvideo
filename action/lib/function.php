@@ -1294,11 +1294,15 @@ class 部品{
 
 class HTML文書{
     private $doc;
+    private $hasDoctype = true;
 
     public function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
         $str = preg_replace("/^[^<]+/", "", $str);
         $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$str); //XMLは&があるとエラーになるので(文字実態・数値文字10進・16進は除く)
-        if(!preg_match("/^<\!DOCTYPE\s+html/i", $str)){ $str = "<!DOCTYPE html>\n$str"; } //ドキュメントタイプがないと古いドキュメントタイプが勝手に追加されるので対策
+        if(!preg_match("/^<\!DOCTYPE\s+html/i", $str)){ //ドキュメントタイプがないと古いドキュメントタイプが勝手に追加されるので対策
+            $str = "<!DOCTYPE html>\n$str";
+            $this->hasDoctype = false;
+        }
         $str = '<?xml encoding="UTF-8">' . $str; //文字化け対策のおまじない。出力時のsaveXML($this->doc->doctype).saveHTML($this->doc->documentElement)とセットで使う
         libxml_use_internal_errors(true);  // loadHTML() の警告抑制
 
@@ -1348,6 +1352,10 @@ class HTML文書{
     }
 
     public function 追加($selector, $relation, $tag, array $attr = null, $content = ""){
+        if(preg_match("/</", $tag)){
+            return $this->生追加($selector, $relation, $tag);
+        }
+
         $selection = $this->検索($selector);
         $add = $this->doc->createElement($tag);
         $add->textContent = $content;
@@ -1356,22 +1364,22 @@ class HTML文書{
         }
 
         switch($relation){
-            case "兄":
+            case "上":
                 foreach($selection as $where){
                     $where->parentNode->insertBefore($add->cloneNode(true), $where);
                 }
                 break;
-            case "弟":
+            case "下":
                 foreach($selection as $where){
                     $where->parentNode->insertBefore($add->cloneNode(true), $where->nextSibling);
                 }
                 break;
-            case "長男":
+            case "中上":
                 foreach($selection as $where){
                     $where->insertBefore($add->cloneNode(true), $where->firstChild);
                 }
                 break;
-            case "末っ子":
+            case "中下":
                 foreach($selection as $where){
                     $where->appendChild($add->cloneNode(true));
                 }
@@ -1390,25 +1398,25 @@ class HTML文書{
         $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$str);
 
         switch($relation){
-            case "兄":
+            case "上":
                 foreach($selection as $where){
                     $add->appendXML($str);
                     $where->parentNode->insertBefore($add, $where);
                 }
                 break;
-            case "弟":
+            case "下":
                 foreach($selection as $where){
                     $add->appendXML($str);
                     $where->parentNode->insertBefore($add, $where->nextSibling);
                 }
                 break;
-            case "長男":
+            case "中上":
                 foreach($selection as $where){
                     $add->appendXML($str);
                     $where->insertBefore($add, $where->firstChild);
                 }
                 break;
-            case "末っ子":
+            case "中下":
                 foreach($selection as $where){
                     $add->appendXML($str);
                     $where->appendChild($add);
@@ -1432,7 +1440,7 @@ class HTML文書{
 
     public function HTML($selector = null){
         if($selector === null){
-            return $this->doc->saveXML($this->doc->doctype).$this->doc->saveHTML($this->doc->documentElement);
+            return $this->全体出力();
         }
         else{
             $selection = $this->検索($selector);
@@ -1444,9 +1452,12 @@ class HTML文書{
     }
 
     public function __toString(){
-        return $this->doc->saveXML($this->doc->doctype).$this->doc->saveHTML($this->doc->documentElement);
+        return $this->全体出力();
     }
 
+    private function 全体出力(){
+        return $this->doc->saveXML($this->doc->doctype).$this->doc->saveHTML($this->doc->documentElement);
+    }
 
     private function 検索($selector){
         $xpath  = new DOMXPath($this->doc); // https://secure.php.net/manual/ja/class.domxpath.php
