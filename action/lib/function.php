@@ -1293,12 +1293,13 @@ class 部品{
 
 
 class HTML文書{
-    private $doc;
+    private $文書;
+    private $選択;
     private $hasDoctype = true;
     private $isXML = false;
 
     public function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
-        $this->doc = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
+        $this->文書 = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
         libxml_use_internal_errors(true);  // loadHTML() の警告抑制
 
         $str = preg_replace("/^[^<]+/", "", $str);
@@ -1309,205 +1310,212 @@ class HTML文書{
                 $str = "<!DOCTYPE html>\n$str";
                 $this->hasDoctype = false;
             }
-            $str = '<?xml encoding="UTF-8">' . $str; //文字化け対策のおまじない。出力時のsaveXML($this->doc->doctype).saveHTML($this->doc->documentElement)とセットで使う
-            $this->doc->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
+            $str = '<?xml encoding="UTF-8">' . $str; //文字化け対策のおまじない。出力時のsaveXML($this->文書->doctype).saveHTML($this->文書->documentElement)とセットで使う
+            $this->文書->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
         }
         else{ //XML
-            $this->doc->loadXML($str, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT);
+            $this->文書->loadXML($str, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT);
             $this->isXML = true;
         }
 
-        $this->doc->formatOutput = true;
-        $this->doc->encoding = "utf-8";
+        $this->文書->formatOutput = true;
+        $this->文書->encoding = "utf-8";
     }
 
-    public function 本文($selector, $value = null){
-        $selection = $this->検索($selector);
-
+    public function 本文($value = null){
         if($value === null){
-            foreach($selection as $where){
+            foreach($this->選択 as $where){
                 $return[] = $where->textContent;
             }
             return (array)$return;
         }
         else{
-            foreach($selection as $where){
+            foreach($this->選択 as $where){
                 $where->textContent = $value;
             }
+            return $this;
         }
     }
 
-    public function 属性($selector, $name = null, $value = null){
-        $selection = $this->検索($selector);
+    public function 属性($name = null, $value = null){
         $return = [];
 
         if(is_string($name) and $value === null){ //属性値を1つ取得
-            foreach($selection as $where){
+            foreach($this->選択 as $where){
                 $return[] = $where->getAttribute($name);
             }
             return $return;
         }
         else if(is_string($name)){ //属性値を1つ設定
-            foreach($selection as $where){
+            foreach($this->選択 as $where){
                 $where->setAttribute($name, $value);
             }
+            return $this;
         }
         else if(is_array($name)){ //属性を複数設定
-            foreach($selection as $where){
+            foreach($this->選択 as $where){
                 foreach($name as $k => $v){
                     $where->setAttribute($k, $v);
                 }
             }
+            return $this;
         }
         else if($name === null){ //全属性取得
-            for($i = 0; $i < $selection->length; $i++){
-                $attrs = $selection[$i]->attributes;
+            $i = 0;
+            foreach($this->選択 as $where){
+                $attrs = $where->attributes;
                 $return[$i] = [];
                 for($j = 0; $j < $attrs->length; $j++){
                     $return[$i][$attrs->item($j)->name] = $attrs->item($j)->value;
                 }
+                $i++;
             }
             return $return;
         }
     }
 
-    public function 属性削除($selector, $name = null){
-        $selection = $this->検索($selector);
+    public function 属性削除($name = null){
         if(is_string($name)){
-            foreach($selection as $where){
+            foreach($this->選択 as $where){
                 $where->removeAttribute($name);
             }
         }
         else{
-            foreach($selection as $where){
+            foreach($this->選択 as $where){
                 $attrs = $where->attributes;
                 for($i = $attrs->length - 1; $i >= 0; $i--){
                     $where->removeAttribute($attrs->item($i)->name);
                 }
             }
         }
+        return $this;
     }
 
-    public function 追加($selector, $relation, $tag, array $attr = null, $content = ""){
+    public function 追加($relation, $tag, array $attr = null, $content = ""){
         if(preg_match("/</", $tag)){
-            return $this->生追加($selector, $relation, $tag);
+            return $this->生追加($relation, $tag);
         }
 
-        $selection = $this->検索($selector);
-        $add = $this->doc->createElement($tag);
+        $add = $this->文書->createElement($tag);
         $add->textContent = $content;
         foreach((array)$attr as $k => $v){
             $add->setAttribute($k, $v);
         }
+        $新選択 = [];
 
         switch($relation){
             case "上":
-                foreach($selection as $where){
-                    $where->parentNode->insertBefore($add->cloneNode(true), $where);
+                foreach($this->選択 as $where){
+                    $新選択[] = $where->parentNode->insertBefore($add->cloneNode(true), $where);
                 }
                 break;
             case "下":
-                foreach($selection as $where){
-                    $where->parentNode->insertBefore($add->cloneNode(true), $where->nextSibling);
+                foreach($this->選択 as $where){
+                    $新選択[] = $where->parentNode->insertBefore($add->cloneNode(true), $where->nextSibling);
                 }
                 break;
             case "中上":
-                foreach($selection as $where){
-                    $where->insertBefore($add->cloneNode(true), $where->firstChild);
+                foreach($this->選択 as $where){
+                    $新選択[] = $where->insertBefore($add->cloneNode(true), $where->firstChild);
                 }
                 break;
             case "中下":
-                foreach($selection as $where){
-                    $where->appendChild($add->cloneNode(true));
+                foreach($this->選択 as $where){
+                    $新選択[] = $where->appendChild($add->cloneNode(true));
                 }
                 break;
             case "置換":
-                foreach($selection as $where){
-                    $where->parentNode->replaceChild($add->cloneNode(true), $where);
+                foreach($this->選択 as $where){
+                    $new = $add->cloneNode(true);
+                    $新選択[] = $new;
+                    $where->parentNode->replaceChild($new, $where);
                 }
                 break;
         }
+        $this->選択 = $新選択;
+        return $this;
     }
 
-    public function 生追加($selector, $relation, $str){
-        $selection = $this->検索($selector);
-        $add = $this->doc->createDocumentFragment();
+    public function 生追加($relation, $str){
+        $add = $this->文書->createDocumentFragment();
         $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$str);
+        $新選択 = [];
 
         switch($relation){
             case "上":
-                foreach($selection as $where){
+                foreach($this->選択 as $where){
                     $add->appendXML($str);
-                    $where->parentNode->insertBefore($add, $where);
+                    $新選択[] = $where->parentNode->insertBefore($add, $where);
                 }
                 break;
             case "下":
-                foreach($selection as $where){
+                foreach($this->選択 as $where){
                     $add->appendXML($str);
-                    $where->parentNode->insertBefore($add, $where->nextSibling);
+                    $新選択[] = $where->parentNode->insertBefore($add, $where->nextSibling);
                 }
                 break;
             case "中上":
-                foreach($selection as $where){
+                foreach($this->選択 as $where){
                     $add->appendXML($str);
-                    $where->insertBefore($add, $where->firstChild);
+                    $新選択[] = $where->insertBefore($add, $where->firstChild);
                 }
                 break;
             case "中下":
-                foreach($selection as $where){
+                foreach($this->選択 as $where){
                     $add->appendXML($str);
-                    $where->appendChild($add);
+                    $新選択[] = $where->appendChild($add);
                 }
                 break;
             case "置換":
-                foreach($selection as $where){
+                foreach($this->選択 as $where){
                     $add->appendXML($str);
+                    $新選択[] = $add->firstChild;
                     $where->parentNode->replaceChild($add, $where);
                 }
                 break;
         }
+        $this->選択 = $新選択;
+        return $this;
     }
 
-    public function 削除($selector){
-        $selection = $this->検索($selector);
-        for($i = $selection->length - 1; $i >= 0; $i--){
-            $selection[$i]->parentNode->removeChild($selection[$i]);
+    public function 削除(){
+        $新選択 = [];
+        foreach($this->選択 as $where){
+            $新選択[] = $where->parentNode->removeChild($where);
         }
+        $this->選択 = $新選択;
+        return $this;
     }
 
-    public function HTML($selector = null){
-        if($selector === null){
-            return $this->全体出力();
+    public function HTML(){
+        foreach($this->選択 as $where){
+            $return[] = $this->文書->saveHTML($where);
         }
-        else{
-            $selection = $this->検索($selector);
-            foreach($selection as $where){
-                $return[] = $this->doc->saveHTML($where);
-            }
-            return (array)$return;
-        }
+        return (array)$return;
     }
 
     public function __toString(){
         return $this->全体出力();
     }
 
+    public function __invoke($selector){
+        $xpath  = new DOMXPath($this->文書); // https://secure.php.net/manual/ja/class.domxpath.php
+        $this->選択 = $xpath->query($this->selector2XPath($selector)); //DOMNodeではなくDOMNodeList(複数形)が返る
+        return $this;
+    }
+    
+
     private function 全体出力(){
         if($this->isXML === true){
-            return $this->doc->saveXML($this->doc->doctype).$this->doc->saveXML($this->doc->documentElement);
+            return $this->文書->saveXML($this->文書->doctype).$this->文書->saveXML($this->文書->documentElement);
         }
 
         if($this->hasDoctype === true){
-            return $this->doc->saveXML($this->doc->doctype).$this->doc->saveHTML($this->doc->documentElement);
+            return $this->文書->saveXML($this->文書->doctype).$this->文書->saveHTML($this->文書->documentElement);
         }
         else{
-            return $this->doc->saveHTML($this->doc->documentElement);
+            return $this->文書->saveHTML($this->文書->documentElement);
         }
-    }
-
-    private function 検索($selector){
-        $xpath  = new DOMXPath($this->doc); // https://secure.php.net/manual/ja/class.domxpath.php
-        return $xpath->query($this->selector2XPath($selector)); //DOMNodeではなくDOMNodeList(複数形)が返る
     }
 
     /**
