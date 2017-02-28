@@ -1295,21 +1295,30 @@ class 部品{
 class HTML文書{
     private $doc;
     private $hasDoctype = true;
+    private $isXML = false;
 
     public function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
-        $str = preg_replace("/^[^<]+/", "", $str);
-        $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$str); //XMLは&があるとエラーになるので(文字実態・数値文字10進・16進は除く)
-        if(!preg_match("/^<\!DOCTYPE\s+html/i", $str)){ //ドキュメントタイプがないと古いドキュメントタイプが勝手に追加されるので対策
-            $str = "<!DOCTYPE html>\n$str";
-            $this->hasDoctype = false;
-        }
-        $str = '<?xml encoding="UTF-8">' . $str; //文字化け対策のおまじない。出力時のsaveXML($this->doc->doctype).saveHTML($this->doc->documentElement)とセットで使う
+        $this->doc = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
         libxml_use_internal_errors(true);  // loadHTML() の警告抑制
 
-        $this->doc = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
-        $this->doc->encoding = "utf-8";
+        $str = preg_replace("/^[^<]+/", "", $str);
+        $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$str); //&があるとエラーになるので(文字実態・数値文字10進・16進は除く)
+
+        if(!preg_match("/^<\?xml\s/i", $str)){ //HTML
+            if(!preg_match("/^<\!DOCTYPE\s+html/i", $str)){ //ドキュメントタイプがないと古いドキュメントタイプが勝手に追加されるので対策
+                $str = "<!DOCTYPE html>\n$str";
+                $this->hasDoctype = false;
+            }
+            $str = '<?xml encoding="UTF-8">' . $str; //文字化け対策のおまじない。出力時のsaveXML($this->doc->doctype).saveHTML($this->doc->documentElement)とセットで使う
+            $this->doc->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
+        }
+        else{ //XML
+            $this->doc->loadXML($str, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT);
+            $this->isXML = true;
+        }
+
         $this->doc->formatOutput = true;
-        $this->doc->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
+        $this->doc->encoding = "utf-8";
     }
 
     public function 本文($selector, $value = null){
@@ -1484,6 +1493,10 @@ class HTML文書{
     }
 
     private function 全体出力(){
+        if($this->isXML === true){
+            return $this->doc->saveXML($this->doc->doctype).$this->doc->saveXML($this->doc->documentElement);
+        }
+
         if($this->hasDoctype === true){
             return $this->doc->saveXML($this->doc->doctype).$this->doc->saveHTML($this->doc->documentElement);
         }
