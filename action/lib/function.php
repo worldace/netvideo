@@ -1328,19 +1328,37 @@ class HTML文書{
         }
     }
 
-    public function 属性($selector, $name, $value = null){
+    public function 属性($selector, $name = null, $value = null){
         $selection = $this->検索($selector);
+        $return = [];
 
-        if($value === null){
+        if(is_string($name) and $value === null){ //属性値を1つ取得
             foreach($selection as $where){
                 $return[] = $where->getAttribute($name);
             }
-            return (array)$return;
+            return $return;
         }
-        else{
+        else if(is_string($name)){ //属性値を1つ設定
             foreach($selection as $where){
                 $where->setAttribute($name, $value);
             }
+        }
+        else if(is_array($name)){ //属性を複数設定
+            foreach($selection as $where){
+                foreach($name as $k => $v){
+                    $where->setAttribute($k, $v);
+                }
+            }
+        }
+        else if($name === null){ //全属性取得
+            for($i = 0; $i < $selection->length; $i++){
+                $attrs = $selection[$i]->attributes;
+                $return[$i] = [];
+                for($j = 0; $j < $attrs->length; $j++){
+                    $return[$i][$attrs->item($j)->name] = $attrs->item($j)->value;
+                }
+            }
+            return $return;
         }
     }
 
