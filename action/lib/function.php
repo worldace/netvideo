@@ -1362,10 +1362,20 @@ class HTML文書{
         }
     }
 
-    public function 属性削除($selector, $name){
+    public function 属性削除($selector, $name = null){
         $selection = $this->検索($selector);
-        foreach($selection as $where){
-            $where->removeAttribute($name);
+        if(is_string($name)){
+            foreach($selection as $where){
+                $where->removeAttribute($name);
+            }
+        }
+        else{
+            foreach($selection as $where){
+                $attrs = $where->attributes;
+                for($i = $attrs->length - 1; $i >= 0; $i--){
+                    $where->removeAttribute($attrs->item($i)->name);
+                }
+            }
         }
     }
 
