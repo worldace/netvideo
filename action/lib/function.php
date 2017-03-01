@@ -1292,9 +1292,9 @@ class 部品{
 }
 
 
-class HTML文書{
+class HTML文書 implements Countable{
     private $文書;
-    private $選択;
+    private $選択 = [];
     private $hasDoctype = true;
     private $isXML = false;
 
@@ -1392,17 +1392,23 @@ class HTML文書{
     }
 
     public function 追加($relation, $tag, array $attr = null, $content = ""){
-        if(preg_match("/</", $tag)){
-            return $this->生追加($relation, $tag);
+        if($tag instanceof DOMElement){ //DOMが渡された場合
+            return $this->DOM追加($relation, $tag);
         }
-
-        $add = $this->文書->createElement($tag);
-        $add->textContent = $content;
-        foreach((array)$attr as $k => $v){
-            $add->setAttribute($k, $v);
+        else if(preg_match("/</", $tag)){ //HTML文字列が渡された場合
+            return $this->HTML追加($relation, $tag);
         }
-        $新選択 = [];
+        else{ //タグ名が渡された時
+            $add = $this->文書->createElement($tag);
+            $add->textContent = $content;
+            foreach((array)$attr as $k => $v){
+                $add->setAttribute($k, $v);
+            }
+            return $this->DOM追加($relation, $add);
+        }
+    }
 
+    public function DOM追加($relation, $add){
         switch($relation){
             case "上":
                 foreach($this->選択 as $where){
@@ -1432,14 +1438,13 @@ class HTML文書{
                 }
                 break;
         }
-        $this->選択 = $新選択;
+        $this->選択 = (array)$新選択;
         return $this;
     }
 
-    public function 生追加($relation, $str){
+    public function HTML追加($relation, $str){
         $add = $this->文書->createDocumentFragment();
         $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$str);
-        $新選択 = [];
 
         switch($relation){
             case "上":
@@ -1469,12 +1474,12 @@ class HTML文書{
             case "置換":
                 foreach($this->選択 as $where){
                     $add->appendXML($str);
-                    $新選択[] = $add->firstChild;
+                    $新選択[] = $add->lastChild;
                     $where->parentNode->replaceChild($add, $where);
                 }
                 break;
         }
-        $this->選択 = $新選択;
+        $this->選択 = (array)$新選択;
         return $this;
     }
 
@@ -1494,6 +1499,18 @@ class HTML文書{
         return (array)$return;
     }
 
+    public function DOM(){
+        if($this->選択 instanceof DOMNodeList){
+            foreach($this->選択 as $where){
+                $return[] = $where;
+            }
+            return (array)$return;
+        }
+        else{
+            return $this->選択;
+        }
+    }
+
     public function __toString(){
         return $this->全体出力();
     }
@@ -1503,7 +1520,12 @@ class HTML文書{
         $this->選択 = $xpath->query($this->selector2XPath($selector)); //DOMNodeではなくDOMNodeList(複数形)が返る
         return $this;
     }
-    
+
+    public function count() { //Countableインターフェースの実装
+        return ($this->選択 instanceof DOMNodeList) ?  $this->選択->length  :  count($this->選択);
+    }
+
+
 
     private function 全体出力(){
         if($this->isXML === true){
