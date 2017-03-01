@@ -1391,22 +1391,21 @@ class HTML文書 implements Countable{
         return $this;
     }
 
-    public function 追加($relation, $tag, array $attr = null, $content = ""){
-        if(is_string($tag)){
-            if(preg_match("/</", $tag)){ //HTML文字列が渡された場合
-                return $this->HTML追加($relation, $tag);
-            }
-            else{ //タグ名が渡された時
-                $add = $this->文書->createElement($tag);
-                $add->textContent = $content;
-                foreach((array)$attr as $k => $v){
-                    $add->setAttribute($k, $v);
-                }
-                return $this->DOM追加($relation, $add);
-            }
+    public function 作成($tag, array $attr = null, $content = ""){
+        $dom = $this->文書->createElement($tag);
+        $dom->textContent = $content;
+        foreach((array)$attr as $k => $v){
+            $dom->setAttribute($k, $v);
         }
-        else if($tag instanceof DOMElement){ //DOMが渡された場合
-            return $this->DOM追加($relation, $tag);
+        return $dom;
+    }
+
+    public function 追加($relation, $add){
+        if(is_string($add) and preg_match("/</", $add)){
+            return $this->HTML追加($relation, $add);
+        }
+        else if($add instanceof DOMElement){ //DOMが渡された場合
+            return $this->DOM追加($relation, $add);
         }
         else{
             return $this;
