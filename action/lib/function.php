@@ -1504,15 +1504,10 @@ class HTML文書 implements Countable{
     }
 
     public function DOM(){
-        if($this->選択 instanceof DOMNodeList){
-            foreach($this->選択 as $where){
-                $return[] = $where;
-            }
-            return (array)$return;
+        foreach($this->選択 as $where){
+            $return[] = $where;
         }
-        else{
-            return $this->選択;
-        }
+        return (array)$return;
     }
 
     public function __toString(){
