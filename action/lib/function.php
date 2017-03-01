@@ -1503,9 +1503,9 @@ class HTML文書 implements Countable{
         return (array)$return;
     }
 
-    public function DOM(){
+    public function DOM($isCopy = false){
         foreach($this->選択 as $where){
-            $return[] = $where;
+            $return[] = ($isCopy === false) ? $where : $where->cloneNode(true);
         }
         return (array)$return;
     }
