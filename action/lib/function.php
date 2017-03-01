@@ -1405,6 +1405,9 @@ class HTML文書 implements Countable{
             return $this->HTML追加($relation, $add);
         }
         else if($add instanceof DOMElement){ //DOMが渡された場合
+            if($add->ownerDocument !== $this->文書){
+                $add = $this->文書->importNode($add, true);
+            }
             return $this->DOM追加($relation, $add);
         }
         else{
