@@ -338,7 +338,7 @@ function GET送信($url, array $querymap = null, array $request_header = []){
 
 
 function POST送信($url, array $querymap = null, array $request_header = []){
-    $content = http_build_query((array)$querymap, "", "&", PHP_QUERY_RFC3986);
+    $content = http_build_query((array)$querymap, "", "&");
     $request_header = $request_header + [
         "Content-Type" => "application/x-www-form-urlencoded; charset=UTF-8",
         "Content-Length" => strlen($content),
