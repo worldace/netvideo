@@ -1373,13 +1373,11 @@ class HTML文書 implements Countable{
     }
 
     public function 属性($name = null, $value = null){
-        $return = [];
-
         if(is_string($name) and $value === null){ //属性値を1つ取得
             foreach($this->選択 as $where){
                 $return[] = $where->getAttribute($name);
             }
-            return $return;
+            return (array)$return;
         }
         else if(is_string($name)){ //属性値を1つ設定
             foreach($this->選択 as $where){
@@ -1405,7 +1403,7 @@ class HTML文書 implements Countable{
                 }
                 $i++;
             }
-            return $return;
+            return (array)$return;
         }
     }
 
@@ -1436,13 +1434,16 @@ class HTML文書 implements Countable{
     }
 
     public function 追加($relation, $add){
-        if(is_string($add) and preg_match("/</", $add)){
-            return $this->HTML追加($relation, $add);
+        if(is_string($add) and preg_match("/</", $add)){ //HTMLの場合
+            $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$add);
+            $add = $this->文書->createDocumentFragment();
+            $add->appendXML($str);
+            return $this->DOM追加($relation, $add);
         }
-        if($add instanceof self){
+        if($add instanceof self){ //HTML文書オブジェクトの場合
             $add = $add->ルートDOM();
         }
-        if($add instanceof DOMElement){ //DOMが渡された場合
+        if($add instanceof DOMElement){ //DOMの場合
             if($add->ownerDocument !== $this->文書){
                 $add = $this->文書->importNode($add, true);
             }
@@ -1480,47 +1481,6 @@ class HTML文書 implements Countable{
                     $new = $add->cloneNode(true);
                     $新選択[] = $new;
                     $where->parentNode->replaceChild($new, $where);
-                }
-                break;
-        }
-        $this->選択 = (array)$新選択;
-        return $this;
-    }
-
-    public function HTML追加($relation, $str){
-        $add = $this->文書->createDocumentFragment();
-        $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$str);
-
-        switch($relation){
-            case "上":
-                foreach($this->選択 as $where){
-                    $add->appendXML($str);
-                    $新選択[] = $where->parentNode->insertBefore($add, $where);
-                }
-                break;
-            case "下":
-                foreach($this->選択 as $where){
-                    $add->appendXML($str);
-                    $新選択[] = $where->parentNode->insertBefore($add, $where->nextSibling);
-                }
-                break;
-            case "中上":
-                foreach($this->選択 as $where){
-                    $add->appendXML($str);
-                    $新選択[] = $where->insertBefore($add, $where->firstChild);
-                }
-                break;
-            case "中下":
-                foreach($this->選択 as $where){
-                    $add->appendXML($str);
-                    $新選択[] = $where->appendChild($add);
-                }
-                break;
-            case "置換":
-                foreach($this->選択 as $where){
-                    $add->appendXML($str);
-                    $新選択[] = $add->lastChild;
-                    $where->parentNode->replaceChild($add, $where);
                 }
                 break;
         }
