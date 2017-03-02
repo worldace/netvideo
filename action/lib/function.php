@@ -327,8 +327,8 @@ function GET送信($url, array $querymap = null, array $request_header = []){
     }
     $context = stream_context_create([
         'http'=>[
-            'method'=>'GET',
-            'header'=>$header
+            'method' => 'GET',
+            'header' => $header,
         ]
     ]);
     $return = file_get_contents($url, false, $context);
@@ -1529,11 +1529,10 @@ class HTML文書 implements Countable{
     }
 
     public function 削除(){
-        $新選択 = [];
         foreach($this->選択 as $where){
             $新選択[] = $where->parentNode->removeChild($where);
         }
-        $this->選択 = $新選択;
+        $this->選択 = (array)$新選択;
         return $this;
     }
 
@@ -1561,14 +1560,17 @@ class HTML文書 implements Countable{
 
     public function __invoke($selector = null){
         if($selector){
+            $this->選択 = [];
             $xpath  = new DOMXPath($this->文書); // https://secure.php.net/manual/ja/class.domxpath.php
-            $this->選択 = $xpath->query($this->selector2XPath($selector)); //DOMNodeではなくDOMNodeList(複数形)が返る
+            foreach($xpath->query($this->selector2XPath($selector)) as $node){ //DOMNodeList(複数形)が返る
+                $this->選択[] = $node;
+            }
         }
         return $this;
     }
 
     public function count() { //Countableインターフェースの実装
-        return ($this->選択 instanceof DOMNodeList) ?  $this->選択->length  :  count($this->選択);
+        return count($this->選択);
     }
 
 
