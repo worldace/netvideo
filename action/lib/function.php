@@ -1462,7 +1462,7 @@ class HTML文書 implements Countable{
         }
     }
 
-    public function を追加($selector, $relation){
+    public function 複製($selector, $relation){
         $add = $this->選択;
         $this->__invoke($selector);
         $this->追加($add, $relation);
