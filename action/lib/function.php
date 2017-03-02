@@ -1404,7 +1404,10 @@ class HTML文書 implements Countable{
         if(is_string($add) and preg_match("/</", $add)){
             return $this->HTML追加($relation, $add);
         }
-        else if($add instanceof DOMElement){ //DOMが渡された場合
+        if($add instanceof HTML文書){
+            $add = $add->ルートDOM();
+        }
+        if($add instanceof DOMElement){ //DOMが渡された場合
             if($add->ownerDocument !== $this->文書){
                 $add = $this->文書->importNode($add, true);
             }
@@ -1511,6 +1514,10 @@ class HTML文書 implements Countable{
             $return[] = ($isCopy === false) ? $where : $where->cloneNode(true);
         }
         return (array)$return;
+    }
+
+    public function ルートDOM(){
+        return $this->文書->documentElement;
     }
 
     public function __toString(){
