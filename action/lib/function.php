@@ -1524,9 +1524,11 @@ class HTML文書 implements Countable{
         return $this->全体出力();
     }
 
-    public function __invoke($selector){
-        $xpath  = new DOMXPath($this->文書); // https://secure.php.net/manual/ja/class.domxpath.php
-        $this->選択 = $xpath->query($this->selector2XPath($selector)); //DOMNodeではなくDOMNodeList(複数形)が返る
+    public function __invoke($selector = null){
+        if($selector){
+            $xpath  = new DOMXPath($this->文書); // https://secure.php.net/manual/ja/class.domxpath.php
+            $this->選択 = $xpath->query($this->selector2XPath($selector)); //DOMNodeではなくDOMNodeList(複数形)が返る
+        }
         return $this;
     }
 
