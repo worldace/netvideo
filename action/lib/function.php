@@ -1444,14 +1444,12 @@ class HTML文書 implements Countable{
             $add = $add->ルートDOM();
         }
         if($add instanceof DOMElement){ //DOMの場合
-            if($add->ownerDocument !== $this->文書){
-                $add = $this->文書->importNode($add, true);
-            }
-            return $this->DOM追加($add, $relation);
+            $add = [$add];
         }
-        else if(is_array($add)){ //配列の場合
+        if(is_array($add)){ //配列の場合
             $fragment = $this->文書->createDocumentFragment();
             foreach($add as $node){
+                if(!($node instanceof DOMElement)){ continue; }
                 if($node->ownerDocument !== $this->文書){
                     $node = $this->文書->importNode($node, true);
                 }
