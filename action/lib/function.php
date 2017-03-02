@@ -1433,12 +1433,12 @@ class HTML文書 implements Countable{
         return $dom;
     }
 
-    public function 追加($relation, $add){
+    public function 追加($add, $relation){
         if(is_string($add) and preg_match("/</", $add)){ //HTMLの場合
             $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$add);
             $add = $this->文書->createDocumentFragment();
             $add->appendXML($str);
-            return $this->DOM追加($relation, $add);
+            return $this->DOM追加($add, $relation);
         }
         if($add instanceof self){ //HTML文書オブジェクトの場合
             $add = $add->ルートDOM();
@@ -1447,14 +1447,20 @@ class HTML文書 implements Countable{
             if($add->ownerDocument !== $this->文書){
                 $add = $this->文書->importNode($add, true);
             }
-            return $this->DOM追加($relation, $add);
+            return $this->DOM追加($add, $relation);
         }
         else{
             return $this;
         }
     }
 
-    public function DOM追加($relation, $add){
+    public function を追加($selector, $relation){
+        $add = $this->選択[0];
+        $this->__invoke($selector);
+        $this->追加($add, $relation);
+    }
+
+    public function DOM追加($add, $relation){
         switch($relation){
             case "上":
                 foreach($this->選択 as $where){
