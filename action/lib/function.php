@@ -1404,7 +1404,7 @@ class HTML文書 implements Countable{
         if(is_string($add) and preg_match("/</", $add)){
             return $this->HTML追加($relation, $add);
         }
-        if($add instanceof HTML文書){
+        if($add instanceof self){
             $add = $add->ルートDOM();
         }
         if($add instanceof DOMElement){ //DOMが渡された場合
