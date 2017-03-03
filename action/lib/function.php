@@ -1438,7 +1438,7 @@ class HTML文書 implements Countable{
             $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$add);
             $fragment = $this->文書->createDocumentFragment();
             $fragment->appendXML($str);
-            return $this->DOM追加($fragment, $relation);
+            return $this->DOM操作($fragment, $relation);
         }
         if($add instanceof self){ //HTML文書オブジェクトの場合
             $add = $add->ルートDOM();
@@ -1455,7 +1455,7 @@ class HTML文書 implements Countable{
                 }
                 $fragment->appendChild($node->cloneNode(true));
             }
-            return $this->DOM追加($fragment, $relation);
+            return $this->DOM操作($fragment, $relation);
         }
         else{
             return $this;
@@ -1468,7 +1468,7 @@ class HTML文書 implements Countable{
         $this->追加($add, $relation);
     }
 
-    public function DOM追加($add, $relation){
+    public function DOM操作($add, $relation){
         switch($relation){
             case "上":
                 foreach($this->選択 as $where){
@@ -1497,17 +1497,18 @@ class HTML文書 implements Countable{
                     $where->parentNode->replaceChild($new, $where);
                 }
                 break;
+            case "削除":
+                foreach($this->選択 as $where){
+                    $新選択[] = $where->parentNode->removeChild($where);
+                }
+                break;
         }
         $this->選択 = (array)$新選択;
         return $this;
     }
 
     public function 削除(){
-        foreach($this->選択 as $where){
-            $新選択[] = $where->parentNode->removeChild($where);
-        }
-        $this->選択 = (array)$新選択;
-        return $this;
+        return $this->DOM操作("", "削除");
     }
 
     public function HTML(){
