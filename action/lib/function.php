@@ -1464,8 +1464,8 @@ class HTML文書 implements Countable{
     }
 
     public function 複製($selector, $relation){
-        $add = $this->選択;
         $this($selector);
+        $add = $this->選択記憶;
         $this->追加($add, $relation);
     }
 
