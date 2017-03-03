@@ -1375,6 +1375,20 @@ class HTML文書 implements Countable, Iterator{
         }
     }
 
+    public function HTML(){
+        foreach($this->選択 as $where){
+            $return[] = $this->文書->saveHTML($where);
+        }
+        return (array)$return;
+    }
+
+    public function DOM($isCopy = false){
+        foreach($this->選択 as $where){
+            $return[] = ($isCopy === false) ? $where : $where->cloneNode(true);
+        }
+        return (array)$return;
+    }
+
     public function 属性($name = null, $value = null){
         if(is_string($name) and $value === null){ //属性値を1つ取得
             foreach($this->選択 as $where){
@@ -1515,20 +1529,6 @@ class HTML文書 implements Countable, Iterator{
         return $this;
     }
 
-    public function HTML(){
-        foreach($this->選択 as $where){
-            $return[] = $this->文書->saveHTML($where);
-        }
-        return (array)$return;
-    }
-
-    public function DOM($isCopy = false){
-        foreach($this->選択 as $where){
-            $return[] = ($isCopy === false) ? $where : $where->cloneNode(true);
-        }
-        return (array)$return;
-    }
-
     public function ルートDOM(){
         return $this->文書->documentElement;
     }
@@ -1549,13 +1549,14 @@ class HTML文書 implements Countable, Iterator{
         return $this;
     }
 
-    public function count() { //Countableインターフェースの実装
+    //Countableインターフェースの実装
+    public function count() { 
         return count($this->選択);
     }
 
     //Iteratorインターフェースの実装 http://php.net/manual/ja/class.iterator.php
-    // 初回ループ時 ： rewind -> validが真なら -> key + current -> コード実行
-    // 2回目ループ時： next   -> validが真なら -> key + current -> コード実行
+    // 初回ループ時 ： rewind -> validが真なら -> key + current -> ユーザコード実行
+    // 2回目ループ時： next   -> validが真なら -> key + current -> ユーザコード実行
     public function rewind() {
         $this->ループ数 = 0;
         $this->ループ記憶 = $this->選択;
