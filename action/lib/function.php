@@ -1327,10 +1327,12 @@ class 部品{
 }
 
 
-class HTML文書 implements Countable{
+class HTML文書 implements Countable, Iterator{
     private $文書;
     private $選択 = [];
     private $選択記憶 = [];
+    private $ループ数;
+    private $ループ記憶 = [];
     private $hasDoctype = true;
     private $isXML = false;
 
@@ -1549,6 +1551,34 @@ class HTML文書 implements Countable{
 
     public function count() { //Countableインターフェースの実装
         return count($this->選択);
+    }
+
+    //Iteratorインターフェースの実装 http://php.net/manual/ja/class.iterator.php
+    // 初回ループ時 ： rewind -> validが真なら -> key + current -> コード実行
+    // 2回目ループ時： next   -> validが真なら -> key + current -> コード実行
+    public function rewind() {
+        $this->ループ数 = 0;
+        $this->ループ記憶 = $this->選択;
+    }
+    public function next() {
+         $this->ループ数++;
+    }
+    public function valid() {
+        $return = isset($this->ループ記憶[$this->ループ数]);
+        if($return === true){
+            $this->選択 = [$this->ループ記憶[$this->ループ数]];
+        }
+        else{
+            unset($this->ループ数);
+            $this->選択 = $this->ループ記憶;
+        }
+        return $return;
+    }
+    public function key() { 
+        return $this->ループ数;
+    }
+    public function current() {
+        return $this;
     }
 
 
