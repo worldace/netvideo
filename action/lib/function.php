@@ -1330,6 +1330,7 @@ class 部品{
 class HTML文書 implements Countable{
     private $文書;
     private $選択 = [];
+    private $選択記憶 = [];
     private $hasDoctype = true;
     private $isXML = false;
 
@@ -1468,6 +1469,10 @@ class HTML文書 implements Countable{
         $this->追加($add, $relation);
     }
 
+    public function 削除(){
+        return $this->DOM操作("", "削除");
+    }
+
     public function DOM操作($add, $relation){
         switch($relation){
             case "上":
@@ -1503,12 +1508,9 @@ class HTML文書 implements Countable{
                 }
                 break;
         }
+        $this->選択記憶 = $this->選択;
         $this->選択 = (array)$新選択;
         return $this;
-    }
-
-    public function 削除(){
-        return $this->DOM操作("", "削除");
     }
 
     public function HTML(){
@@ -1535,6 +1537,7 @@ class HTML文書 implements Countable{
 
     public function __invoke($selector = null){
         if($selector){
+            $this->選択記憶 = $this->選択;
             $this->選択 = [];
             $xpath  = new DOMXPath($this->文書); // https://secure.php.net/manual/ja/class.domxpath.php
             foreach($xpath->query($this->selector2XPath($selector)) as $node){ //DOMNodeList(複数形)が返る
