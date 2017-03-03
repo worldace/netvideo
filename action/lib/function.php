@@ -1365,7 +1365,7 @@ class HTML文書 implements Countable, Iterator{
             foreach($this->選択 as $where){
                 $return[] = $where->textContent;
             }
-            return (array)$return;
+            return (array)$return[0];
         }
         else{
             foreach($this->選択 as $where){
@@ -1379,14 +1379,14 @@ class HTML文書 implements Countable, Iterator{
         foreach($this->選択 as $where){
             $return[] = $this->文書->saveHTML($where);
         }
-        return (array)$return;
+        return (array)$return[0];
     }
 
     public function DOM($isCopy = false){
         foreach($this->選択 as $where){
             $return[] = ($isCopy === false) ? $where : $where->cloneNode(true);
         }
-        return (array)$return;
+        return (array)$return[0];
     }
 
     public function 属性($name = null, $value = null){
@@ -1394,7 +1394,7 @@ class HTML文書 implements Countable, Iterator{
             foreach($this->選択 as $where){
                 $return[] = $where->getAttribute($name);
             }
-            return (array)$return;
+            return (array)$return[0];
         }
         else if(is_string($name)){ //属性値を1つ設定
             foreach($this->選択 as $where){
@@ -1420,7 +1420,7 @@ class HTML文書 implements Countable, Iterator{
                 }
                 $i++;
             }
-            return (array)$return;
+            return (array)$return[0];
         }
     }
 
