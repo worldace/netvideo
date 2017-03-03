@@ -1456,6 +1456,7 @@ class HTML文書 implements Countable, Iterator{
             return $this->DOM操作($fragment, $relation);
         }
         if($add instanceof self){ //HTML文書オブジェクトの場合
+            if($add === $this){ return $this; }
             $add = $add->ルートDOM();
         }
         if($add instanceof DOMElement){ //DOMの場合
