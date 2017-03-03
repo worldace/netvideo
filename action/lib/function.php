@@ -1362,10 +1362,10 @@ class HTML文書 implements Countable, Iterator{
 
     public function 本文($value = null){
         if($value === null){
-            foreach($this->選択 as $where){
-                $return[] = $where->textContent;
+            if(isset($this->選択[0])){
+                $return = $this->選択[0]->textContent;
             }
-            return (array)$return[0];
+            return (string)$return;
         }
         else{
             foreach($this->選択 as $where){
@@ -1376,25 +1376,25 @@ class HTML文書 implements Countable, Iterator{
     }
 
     public function HTML(){
-        foreach($this->選択 as $where){
-            $return[] = $this->文書->saveHTML($where);
+        if(isset($this->選択[0])){
+            $return = $this->文書->saveHTML($this->選択[0]);
         }
-        return (array)$return[0];
+        return (string)$return;
     }
 
     public function DOM($isCopy = false){
-        foreach($this->選択 as $where){
-            $return[] = ($isCopy === false) ? $where : $where->cloneNode(true);
+        if(isset($this->選択[0])){
+            $return = ($isCopy === false) ? $this->選択[0] : $this->選択[0]->cloneNode(true);
         }
-        return (array)$return[0];
+        return $return;
     }
 
     public function 属性($name = null, $value = null){
         if(is_string($name) and $value === null){ //属性値を1つ取得
-            foreach($this->選択 as $where){
-                $return[] = $where->getAttribute($name);
+            if(isset($this->選択[0])){
+                $return = $this->選択[0]->getAttribute($name);
             }
-            return (array)$return[0];
+            return (string)$return;
         }
         else if(is_string($name)){ //属性値を1つ設定
             foreach($this->選択 as $where){
@@ -1411,17 +1411,15 @@ class HTML文書 implements Countable, Iterator{
             return $this;
         }
         else if($name === null){ //全属性取得
-            $i = 0;
-            foreach($this->選択 as $where){
-                $attrs = $where->attributes;
-                $return[$i] = [];
-                for($j = 0; $j < $attrs->length; $j++){
-                    $return[$i][$attrs->item($j)->name] = $attrs->item($j)->value;
+            if(isset($this->選択[0])){
+                $attrs = $this->選択[0]->attributes;
+                for($i = 0; $i < $attrs->length; $i++){
+                    $return[$attrs->item($i)->name] = $attrs->item($i)->value;
                 }
-                $i++;
             }
-            return (array)$return[0];
+            return (array)$return;
         }
+        return $this;
     }
 
     public function 属性削除($name = null){
