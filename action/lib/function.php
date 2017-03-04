@@ -1563,6 +1563,14 @@ class HTML文書 implements Countable, Iterator{
         return $this->選択保存($新選択);
     }
 
+    public function 親全て(){
+        $新選択 = [];
+        foreach($this->選択 as $where){
+            $this->家族探索($where, "parentNode", true);
+        }
+        return $this->選択保存();
+    }
+
     public function 兄全て(){
         $新選択 = [];
         return $this->選択保存($this->家族探索($this->選択[0], "previousSibling", true));
@@ -1686,12 +1694,15 @@ class HTML文書 implements Countable, Iterator{
         return (array)$return;
     }
 
-    private function 重複防止代入(array $array, DOMNode $add){
-        $array = (array)$array;
-        foreach($array as $node){
-            if($node->isSameNode($add)){ return $array; }
+    private function 重複防止代入(array $array, $add){
+        if($add instanceof DOMNode){ $add = [$add]; }
+
+        foreach($add as $node1){
+            foreach($array as $node2){
+                if($node1->isSameNode($node2)){ continue 2; }
+            }
+            $array[] = $node1;
         }
-        $array[] = $add;
         return $array;
     }
 
