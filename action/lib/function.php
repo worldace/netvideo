@@ -1495,46 +1495,6 @@ class HTML文書 implements Countable, Iterator{
         return $this->DOM操作("", "削除");
     }
 
-    public function DOM操作($add, $relation){
-        switch($relation){
-            case "上":
-                foreach($this->選択 as $where){
-                    $新選択[] = $where->parentNode->insertBefore($add->cloneNode(true), $where);
-                }
-                break;
-            case "下":
-                foreach($this->選択 as $where){
-                    $新選択[] = $where->parentNode->insertBefore($add->cloneNode(true), $where->nextSibling);
-                }
-                break;
-            case "中上":
-                foreach($this->選択 as $where){
-                    $新選択[] = $where->insertBefore($add->cloneNode(true), $where->firstChild);
-                }
-                break;
-            case "中下":
-                foreach($this->選択 as $where){
-                    $新選択[] = $where->appendChild($add->cloneNode(true));
-                }
-                break;
-            case "置換":
-                foreach($this->選択 as $where){
-                    $new = $add->cloneNode(true);
-                    $新選択[] = $new;
-                    $where->parentNode->replaceChild($new, $where);
-                }
-                break;
-            case "削除":
-                foreach($this->選択 as $where){
-                    $新選択[] = $where->parentNode->removeChild($where);
-                }
-                break;
-        }
-        $this->選択記憶 = $this->選択;
-        $this->選択 = (array)$新選択;
-        return $this;
-    }
-
     public function ルートDOM(){
         return $this->文書->documentElement;
     }
@@ -1582,6 +1542,46 @@ class HTML文書 implements Countable, Iterator{
     }
 
 
+
+    private function DOM操作($add, $relation){
+        switch($relation){
+            case "上":
+                foreach($this->選択 as $where){
+                    $新選択[] = $where->parentNode->insertBefore($add->cloneNode(true), $where);
+                }
+                break;
+            case "下":
+                foreach($this->選択 as $where){
+                    $新選択[] = $where->parentNode->insertBefore($add->cloneNode(true), $where->nextSibling);
+                }
+                break;
+            case "中上":
+                foreach($this->選択 as $where){
+                    $新選択[] = $where->insertBefore($add->cloneNode(true), $where->firstChild);
+                }
+                break;
+            case "中下":
+                foreach($this->選択 as $where){
+                    $新選択[] = $where->appendChild($add->cloneNode(true));
+                }
+                break;
+            case "置換":
+                foreach($this->選択 as $where){
+                    $new = $add->cloneNode(true);
+                    $新選択[] = $new;
+                    $where->parentNode->replaceChild($new, $where);
+                }
+                break;
+            case "削除":
+                foreach($this->選択 as $where){
+                    $新選択[] = $where->parentNode->removeChild($where);
+                }
+                break;
+        }
+        $this->選択記憶 = $this->選択;
+        $this->選択 = (array)$新選択;
+        return $this;
+    }
 
     private function セレクタ検索($selector = null, $記録する = true){
         $return = [];
