@@ -1382,6 +1382,13 @@ class HTML文書 implements Countable, Iterator{
         return (string)$return;
     }
 
+    public function タグ名(){
+        if(isset($this->選択[0])){
+            $return = strtolower($this->選択[0]->tagName);
+        }
+        return (string)$return;
+    }
+
     public function DOM($isCopy = false){
         if(isset($this->選択[0])){
             $return = ($isCopy === false) ? $this->選択[0] : $this->選択[0]->cloneNode(true);
@@ -1537,14 +1544,7 @@ class HTML文書 implements Countable, Iterator{
     }
 
     public function __invoke($selector = null){
-        if($selector){
-            $this->選択記憶 = $this->選択;
-            $this->選択 = [];
-            $xpath  = new DOMXPath($this->文書); // https://secure.php.net/manual/ja/class.domxpath.php
-            foreach($xpath->query($this->selector2XPath($selector)) as $node){ //DOMNodeList(複数形)が返る
-                $this->選択[] = $node;
-            }
-        }
+        $this->セレクタ検索($selector);
         return $this;
     }
 
@@ -1583,6 +1583,20 @@ class HTML文書 implements Countable, Iterator{
 
 
 
+    private function セレクタ検索($selector = null, $記録する = true){
+        $return = [];
+        if(!$selector){ return $return; }
+        $xpath  = new DOMXPath($this->文書); // https://secure.php.net/manual/ja/class.domxpath.php
+        foreach($xpath->query($this->selector2XPath($selector)) as $node){ //DOMNodeList(複数形)が返る
+            $return[] = $node;
+        }
+        if($記録する === true){
+            $this->選択記憶 = $this->選択;
+            $this->選択 = $return;
+        }
+        return $return;
+    }
+
     private function 全体出力(){
         if($this->isXML === true){
             return $this->文書->saveXML($this->文書->doctype).$this->文書->saveXML($this->文書->documentElement);
@@ -1595,6 +1609,7 @@ class HTML文書 implements Countable, Iterator{
             return $this->文書->saveHTML($this->文書->documentElement);
         }
     }
+
 
     /**
      * HTML_CSS_Selector2XPath.php The MIT License
