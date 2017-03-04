@@ -1529,8 +1529,7 @@ class HTML文書 implements Countable, Iterator{
     public function 親(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $親 = $this->家族探索($where, "parentNode");
-            if($親){ $新選択 = $this->重複防止代入($新選択, $親); }
+            $新選択 = $this->重複防止代入($新選択, $this->家族探索($where, "parentNode"));
         }
         return $this->選択保存($新選択);
     }
@@ -1538,8 +1537,7 @@ class HTML文書 implements Countable, Iterator{
     public function 兄(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $兄 = $this->家族探索($where, "previousSibling");
-            if($兄){ $新選択 = $this->重複防止代入($新選択, $兄); }
+            $新選択 = $this->重複防止代入($新選択, $this->家族探索($where, "previousSibling"));
         }
         return $this->選択保存($新選択);
     }
@@ -1547,8 +1545,7 @@ class HTML文書 implements Countable, Iterator{
     public function 弟(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $弟 = $this->家族探索($where, "nextSibling");
-            if($弟){ $新選択 = $this->重複防止代入($新選択, $弟); }
+            $新選択 = $this->重複防止代入($新選択, $this->家族探索($where, "nextSibling"));
         }
         return $this->選択保存($新選択);
     }
@@ -1566,9 +1563,9 @@ class HTML文書 implements Countable, Iterator{
     public function 親全て(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $this->家族探索($where, "parentNode", true);
+            $探索結果 = $this->家族探索($where, "parentNode", true);
         }
-        return $this->選択保存();
+        return $this->選択保存($新選択);
     }
 
     public function 兄全て(){
@@ -1695,6 +1692,7 @@ class HTML文書 implements Countable, Iterator{
     }
 
     private function 重複防止代入(array $array, $add){
+        if(!$add){ return $array; }
         if($add instanceof DOMNode){ $add = [$add]; }
 
         foreach($add as $node1){
