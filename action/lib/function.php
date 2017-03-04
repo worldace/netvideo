@@ -1500,47 +1500,79 @@ class HTML文書 implements Countable, Iterator{
     }
 
     public function 最初(){
+        $新選択 = [];
         if(isset($this->選択[0])){ $新選択[] = $this->選択[0]; }
         return $this->選択保存($新選択);
     }
 
     public function 最後(){
+        $新選択 = [];
         if(isset($this->選択[0])){ $新選択[] = $this->選択[count($this->選択)-1]; }
         return $this->選択保存($新選択);
     }
-
-    public function 親(){
-        foreach($this->選択 as $where){
-            if($where->parentNode){ $新選択[] = $where->parentNode; }
+    
+    public function n($n, $m = null){
+        $新選択 = [];
+        if($m === null){
+            if(isset($this->選択[$n])){ $新選択[] = $this->選択[$n]; }
         }
-        return $this->選択保存($新選択);
-    }
-
-    public function 兄(){
-        foreach($this->選択 as $where){
-            if($where->previousSibling){ $新選択[] = $where->previousSibling; }
-        }
-        return $this->選択保存($新選択);
-    }
-
-    public function 弟(){
-        foreach($this->選択 as $where){
-            if($where->nextSibling){ $新選択[] = $where->nextSibling; }
-        }
-        return $this->選択保存($新選択);
-    }
-
-    public function 子(){
-        foreach($this->選択 as $where){
-            if($where->childNodes->length){
-                foreach($where->childNodes as $child){
-                    $新選択[] = $child;
+        else{
+            if(isset($this->選択[$n]) and isset($this->選択[$n+$m-1])){
+                for($i = $n; $i < $n+$m;  $i++){
+                    $新選択[] = $this->選択[$i];
                 }
             }
         }
         return $this->選択保存($新選択);
     }
 
+    public function 親(){
+        $新選択 = [];
+        foreach($this->選択 as $where){
+            $親 = $this->家族探索($where, "parentNode");
+            if($親){ $新選択 = $this->重複防止代入($新選択, $親); }
+        }
+        return $this->選択保存($新選択);
+    }
+
+    public function 兄(){
+        $新選択 = [];
+        foreach($this->選択 as $where){
+            $兄 = $this->家族探索($where, "previousSibling");
+            if($兄){ $新選択 = $this->重複防止代入($新選択, $兄); }
+        }
+        return $this->選択保存($新選択);
+    }
+
+    public function 弟(){
+        $新選択 = [];
+        foreach($this->選択 as $where){
+            $弟 = $this->家族探索($where, "nextSibling");
+            if($弟){ $新選択 = $this->重複防止代入($新選択, $弟); }
+        }
+        return $this->選択保存($新選択);
+    }
+
+    public function 子(){
+        $新選択 = [];
+        foreach($this->選択 as $where){
+            foreach($where->childNodes as $child){
+                if($child->nodeType === XML_ELEMENT_NODE){ $新選択[] = $child; }
+            }
+        }
+        return $this->選択保存($新選択);
+    }
+
+    public function 兄全て(){
+        $新選択 = [];
+        return $this->選択保存($this->家族探索($this->選択[0], "previousSibling", true));
+    }
+
+    public function 逆順(){
+        return $this->選択保存(array_reverse($this->選択));
+    }
+
+    //■マジックメソッドの実装
     public function __toString(){
         return $this->全体出力();
     }
@@ -1550,12 +1582,12 @@ class HTML文書 implements Countable, Iterator{
         return $this;
     }
 
-    //Countableインターフェースの実装
+    //■Countableインターフェースの実装
     public function count() { 
         return count($this->選択);
     }
 
-    //Iteratorインターフェースの実装 http://php.net/manual/ja/class.iterator.php
+    //■Iteratorインターフェースの実装 http://php.net/manual/ja/class.iterator.php
     // 初回ループ時 ： rewind -> validが真なら -> key + current -> ユーザコード実行
     // 2回目ループ時： next   -> validが真なら -> key + current -> ユーザコード実行
     public function rewind() {
@@ -1584,8 +1616,9 @@ class HTML文書 implements Countable, Iterator{
     }
 
 
-
+    //■以下プライベートメソッド
     private function DOM操作($add, $relation){
+        $新選択 = [];
         switch($relation){
             case "上":
                 foreach($this->選択 as $where){
@@ -1624,13 +1657,42 @@ class HTML文書 implements Countable, Iterator{
     }
 
     private function セレクタ検索($selector = null, $記録する = true){
-        if(!$selector){ return []; }
+        $return = [];
+        if(!$selector){ return $return; }
         $xpath  = new DOMXPath($this->文書); // https://secure.php.net/manual/ja/class.domxpath.php
         foreach($xpath->query($this->selector2XPath($selector)) as $node){ //DOMNodeList(複数形)が返る
             $return[] = $node;
         }
         if($記録する === true){ $this->選択保存($return); }
         return $return;
+    }
+
+    private function 選択保存(array $array){
+        $this->選択記憶 = $this->選択;
+        $this->選択 = (array)$array;
+        return $this;
+    }
+
+    private function 家族探索(DOMNode $開始ノード, $続柄, $全員 = false){
+        $node = $開始ノード->$続柄;
+        while(true){
+            if(!$node){ break; }
+            if($node->nodeType === XML_ELEMENT_NODE){
+                if(!$全員){ return $node; }
+                $return[] = $node;
+            }
+            $node = $node->$続柄;
+        }
+        return (array)$return;
+    }
+
+    private function 重複防止代入(array $array, DOMNode $add){
+        $array = (array)$array;
+        foreach($array as $node){
+            if($node->isSameNode($add)){ return $array; }
+        }
+        $array[] = $add;
+        return $array;
     }
 
     private function 全体出力(){
@@ -1644,12 +1706,6 @@ class HTML文書 implements Countable, Iterator{
         else{
             return $this->文書->saveHTML($this->文書->documentElement);
         }
-    }
-
-    private function 選択保存($array){
-        $this->選択記憶 = $this->選択;
-        $this->選択 = (array)$array;
-        return $this;
     }
 
     /**
