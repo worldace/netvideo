@@ -1563,14 +1563,25 @@ class HTML文書 implements Countable, Iterator{
     public function 親全て(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $探索結果 = $this->家族探索($where, "parentNode", true);
+            $新選択 = $this->重複防止代入($新選択, $this->家族探索($where, "parentNode", true));
         }
         return $this->選択保存($新選択);
     }
 
     public function 兄全て(){
         $新選択 = [];
-        return $this->選択保存($this->家族探索($this->選択[0], "previousSibling", true));
+        foreach($this->選択 as $where){
+            $新選択 = $this->重複防止代入($新選択, $this->家族探索($where, "previousSibling", true));
+        }
+        return $this->選択保存($新選択);
+    }
+
+    public function 弟全て(){
+        $新選択 = [];
+        foreach($this->選択 as $where){
+            $新選択 = $this->重複防止代入($新選択, $this->家族探索($where, "nextSibling", true));
+        }
+        return $this->選択保存($新選択);
     }
 
     public function 逆順(){
