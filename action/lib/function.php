@@ -1499,6 +1499,48 @@ class HTML文書 implements Countable, Iterator{
         return $this->文書->documentElement;
     }
 
+    public function 最初(){
+        if(isset($this->選択[0])){ $新選択[] = $this->選択[0]; }
+        return $this->選択保存($新選択);
+    }
+
+    public function 最後(){
+        if(isset($this->選択[0])){ $新選択[] = $this->選択[count($this->選択)-1]; }
+        return $this->選択保存($新選択);
+    }
+
+    public function 親(){
+        foreach($this->選択 as $where){
+            if($where->parentNode){ $新選択[] = $where->parentNode; }
+        }
+        return $this->選択保存($新選択);
+    }
+
+    public function 兄(){
+        foreach($this->選択 as $where){
+            if($where->previousSibling){ $新選択[] = $where->previousSibling; }
+        }
+        return $this->選択保存($新選択);
+    }
+
+    public function 弟(){
+        foreach($this->選択 as $where){
+            if($where->nextSibling){ $新選択[] = $where->nextSibling; }
+        }
+        return $this->選択保存($新選択);
+    }
+
+    public function 子(){
+        foreach($this->選択 as $where){
+            if($where->childNodes->length){
+                foreach($where->childNodes as $child){
+                    $新選択[] = $child;
+                }
+            }
+        }
+        return $this->選択保存($新選択);
+    }
+
     public function __toString(){
         return $this->全体出力();
     }
@@ -1578,22 +1620,16 @@ class HTML文書 implements Countable, Iterator{
                 }
                 break;
         }
-        $this->選択記憶 = $this->選択;
-        $this->選択 = (array)$新選択;
-        return $this;
+        return $this->選択保存($新選択);
     }
 
     private function セレクタ検索($selector = null, $記録する = true){
-        $return = [];
-        if(!$selector){ return $return; }
+        if(!$selector){ return []; }
         $xpath  = new DOMXPath($this->文書); // https://secure.php.net/manual/ja/class.domxpath.php
         foreach($xpath->query($this->selector2XPath($selector)) as $node){ //DOMNodeList(複数形)が返る
             $return[] = $node;
         }
-        if($記録する === true){
-            $this->選択記憶 = $this->選択;
-            $this->選択 = $return;
-        }
+        if($記録する === true){ $this->選択保存($return); }
         return $return;
     }
 
@@ -1610,6 +1646,11 @@ class HTML文書 implements Countable, Iterator{
         }
     }
 
+    private function 選択保存($array){
+        $this->選択記憶 = $this->選択;
+        $this->選択 = (array)$array;
+        return $this;
+    }
 
     /**
      * HTML_CSS_Selector2XPath.php The MIT License
