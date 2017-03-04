@@ -1529,25 +1529,49 @@ class HTML文書 implements Countable, Iterator{
     public function 親(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = $this->重複防止代入($新選択, $this->家族探索($where, "parentNode"));
+            $新選択[] = $this->家族探索($where, "parentNode");
         }
-        return $this->選択保存($新選択);
+        return $this->選択保存($this->重複ノード解消($新選択));
     }
 
     public function 兄(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = $this->重複防止代入($新選択, $this->家族探索($where, "previousSibling"));
+            $新選択[] = $this->家族探索($where, "previousSibling");
         }
-        return $this->選択保存($新選択);
+        return $this->選択保存($this->重複ノード解消($新選択));
     }
 
     public function 弟(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = $this->重複防止代入($新選択, $this->家族探索($where, "nextSibling"));
+            $新選択[] = $this->家族探索($where, "nextSibling");
         }
-        return $this->選択保存($新選択);
+        return $this->選択保存($this->重複ノード解消($新選択));
+    }
+
+    public function 親全て(){
+        $新選択 = [];
+        foreach($this->選択 as $where){
+            $新選択 = $新選択 + $this->家族探索($where, "parentNode", true);
+        }
+        return $this->選択保存($this->重複ノード解消($新選択));
+    }
+
+    public function 兄全て(){
+        $新選択 = [];
+        foreach($this->選択 as $where){
+            $新選択 = $新選択 + $this->家族探索($where, "previousSibling", true);
+        }
+        return $this->選択保存($this->重複ノード解消($新選択));
+    }
+
+    public function 弟全て(){
+        $新選択 = [];
+        foreach($this->選択 as $where){
+            $新選択 = $新選択 + $this->家族探索($where, "nextSibling", true);
+        }
+        return $this->選択保存($this->重複ノード解消($新選択));
     }
 
     public function 子(){
@@ -1560,29 +1584,6 @@ class HTML文書 implements Countable, Iterator{
         return $this->選択保存($新選択);
     }
 
-    public function 親全て(){
-        $新選択 = [];
-        foreach($this->選択 as $where){
-            $新選択 = $this->重複防止代入($新選択, $this->家族探索($where, "parentNode", true));
-        }
-        return $this->選択保存($新選択);
-    }
-
-    public function 兄全て(){
-        $新選択 = [];
-        foreach($this->選択 as $where){
-            $新選択 = $this->重複防止代入($新選択, $this->家族探索($where, "previousSibling", true));
-        }
-        return $this->選択保存($新選択);
-    }
-
-    public function 弟全て(){
-        $新選択 = [];
-        foreach($this->選択 as $where){
-            $新選択 = $this->重複防止代入($新選択, $this->家族探索($where, "nextSibling", true));
-        }
-        return $this->選択保存($新選択);
-    }
 
     public function 逆順(){
         return $this->選択保存(array_reverse($this->選択));
@@ -1702,17 +1703,16 @@ class HTML文書 implements Countable, Iterator{
         return (array)$return;
     }
 
-    private function 重複防止代入(array $array, $add){
-        if(!$add){ return $array; }
-        if($add instanceof DOMNode){ $add = [$add]; }
-
-        foreach($add as $node1){
-            foreach($array as $node2){
-                if($node1->isSameNode($node2)){ continue 2; }
+    private function 重複ノード解消(array $array){
+        $return = [];
+        foreach($array as $v1){
+            if(!($v1 instanceof DOMNode)){ continue; }
+            foreach($return as $v2){
+                if($v1->isSameNode($v2)){ continue 2; }
             }
-            $array[] = $node1;
+            $return[] = $v1;
         }
-        return $array;
+        return $return;
     }
 
     private function 全体出力(){
