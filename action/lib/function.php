@@ -1710,7 +1710,7 @@ class 文書 implements Countable, Iterator{
 
         $xpath  = new DOMXPath($this->文書); // https://secure.php.net/manual/ja/class.domxpath.php
         $expression = $this->selector2XPath($selector);
-        if($context){ $expression = preg_replace("|^//|", "./", $expression); } //相対パスにする
+        if($context){ $expression = preg_replace("|^//|", ".//", $expression); } //相対パスにする
 
         foreach($xpath->query($expression, $context) as $node){ //DOMNodeList(複数形)が返る
             $return[] = $node;
