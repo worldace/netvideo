@@ -1327,7 +1327,7 @@ class 部品{
 }
 
 
-class HTML文書 implements Countable, Iterator{
+class 文書 implements Countable, Iterator{
     private $文書;
     private $選択 = [];
     private $選択記憶 = [];
@@ -1462,7 +1462,7 @@ class HTML文書 implements Countable, Iterator{
             $fragment->appendXML($str);
             return $this->DOM操作($fragment, $relation);
         }
-        if($add instanceof self){ //HTML文書オブジェクトの場合
+        if($add instanceof self){ //文書オブジェクトの場合
             if($add === $this){ return $this; }
             $add = $add->セレクタ検索(":root", false);
         }
