@@ -1495,6 +1495,14 @@ class 文書 implements Countable, Iterator{
         return $this->DOM操作("", "削除");
     }
 
+    public function 検索($selector){
+        $新選択 = [];
+        foreach($this->選択 as $where){
+            $新選択 = array_merge($新選択, $this->セレクタ検索($selector, false, $where));
+        }
+        return $this->選択保存($this->重複ノード解消($新選択));
+    }
+
     public function 最初(){
         $新選択 = [];
         if(isset($this->選択[0])){ $新選択[] = $this->選択[0]; }
@@ -1696,11 +1704,15 @@ class 文書 implements Countable, Iterator{
         return $this->選択保存($新選択);
     }
 
-    private function セレクタ検索($selector = null, $記録する = true){
+    private function セレクタ検索($selector = null, $記録する = true, DOMNode $context = null){
         $return = [];
         if(!$selector){ return $return; }
+
         $xpath  = new DOMXPath($this->文書); // https://secure.php.net/manual/ja/class.domxpath.php
-        foreach($xpath->query($this->selector2XPath($selector)) as $node){ //DOMNodeList(複数形)が返る
+        $expression = $this->selector2XPath($selector);
+        if($context){ $expression = preg_replace("|^//|", "./", $expression); } //相対パスにする
+
+        foreach($xpath->query($expression, $context) as $node){ //DOMNodeList(複数形)が返る
             $return[] = $node;
         }
         if($記録する === true){ $this->選択保存($return); }
