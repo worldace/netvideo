@@ -1525,7 +1525,7 @@ class 文書 implements Countable, Iterator{
     public function 親(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = $新選択 + $this->家族探索($where, "parentNode");
+            $新選択 = array_merge($新選択, $this->家族探索($where, "parentNode"));
         }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
@@ -1533,7 +1533,7 @@ class 文書 implements Countable, Iterator{
     public function 兄(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = $新選択 + $this->家族探索($where, "previousSibling");
+            $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling"));
         }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
@@ -1541,7 +1541,7 @@ class 文書 implements Countable, Iterator{
     public function 弟(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = $新選択 + $this->家族探索($where, "nextSibling");
+            $新選択 = array_merge($新選択, $this->家族探索($where, "nextSibling"));
         }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
@@ -1549,7 +1549,7 @@ class 文書 implements Countable, Iterator{
     public function 親全て(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = $新選択 + $this->家族探索($where, "parentNode", true);
+            $新選択 = array_merge($新選択, $this->家族探索($where, "parentNode", true));
         }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
@@ -1557,7 +1557,7 @@ class 文書 implements Countable, Iterator{
     public function 兄全て(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = $新選択 + $this->家族探索($where, "previousSibling", true);
+            $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling", true));
         }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
@@ -1565,7 +1565,15 @@ class 文書 implements Countable, Iterator{
     public function 弟全て(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = $新選択 + $this->家族探索($where, "nextSibling", true);
+            $新選択 = array_merge($新選択, $this->家族探索($where, "nextSibling", true));
+        }
+        return $this->選択保存($this->重複ノード解消($新選択));
+    }
+
+    public function 兄弟全て(){
+        $新選択 = [];
+        foreach($this->選択 as $where){
+            $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling", true), $this->家族探索($where, "nextSibling", true));
         }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
@@ -1580,7 +1588,11 @@ class 文書 implements Countable, Iterator{
         return $this->選択保存($新選択);
     }
 
-
+    public function 前の選択(){
+        list($this->選択記憶, $this->選択) = [$this->選択, $this->選択記憶];
+        return $this;
+    }
+    
     public function 逆順(){
         return $this->選択保存(array_reverse($this->選択));
     }
@@ -1593,11 +1605,6 @@ class 文書 implements Countable, Iterator{
     public function __invoke($selector = null){
         $this->セレクタ検索($selector);
         return $this;
-    }
-
-    //■Countableインターフェースの実装
-    public function count() { 
-        return count($this->選択);
     }
 
     //■Iteratorインターフェースの実装 http://php.net/manual/ja/class.iterator.php
@@ -1626,6 +1633,11 @@ class 文書 implements Countable, Iterator{
     }
     public function current() {
         return $this;
+    }
+
+    //■Countableインターフェースの実装
+    public function count() { 
+        return count($this->選択);
     }
 
 
