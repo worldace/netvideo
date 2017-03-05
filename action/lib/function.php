@@ -1464,7 +1464,7 @@ class HTML文書 implements Countable, Iterator{
         }
         if($add instanceof self){ //HTML文書オブジェクトの場合
             if($add === $this){ return $this; }
-            $add = $add->ルートDOM();
+            $add = $add->セレクタ検索(":root", false);
         }
         if($add instanceof DOMElement){ //DOMの場合
             $add = [$add];
@@ -1493,10 +1493,6 @@ class HTML文書 implements Countable, Iterator{
 
     public function 削除(){
         return $this->DOM操作("", "削除");
-    }
-
-    public function ルートDOM(){
-        return $this->文書->documentElement;
     }
 
     public function 最初(){
@@ -1833,6 +1829,9 @@ class HTML文書 implements Countable, Iterator{
             // 疑似セレクタを処理
             if ($pregMatchDelete($regex['pseudo'], $selector, $e)) {
                 switch ($e[1]) {
+                    case 'root':
+                        $parts = ['.'];
+                        break 2;
                     case 'first-child':
                         $parts[] = '[not(preceding-sibling::*)]';
                         break;
