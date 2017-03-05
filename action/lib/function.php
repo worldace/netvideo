@@ -1597,6 +1597,21 @@ class 文書 implements Countable, Iterator{
         return $this->選択保存(array_reverse($this->選択));
     }
 
+    public function and($selector){
+        $新選択 = $this->積集合($this->選択, $this->セレクタ検索($selector, false));
+        return $this->選択保存($新選択);
+    }
+
+    public function or($selector){
+        $新選択 = array_merge($this->選択, $this->セレクタ検索($selector, false));
+        return $this->選択保存($this->重複ノード解消($新選択));
+    }
+
+    public function not($selector){
+        $新選択 = $this->差集合($this->選択, $this->セレクタ検索($selector, false));
+        return $this->選択保存($新選択);
+    }
+
     //■マジックメソッドの実装
     public function __toString(){
         return $this->全体出力();
@@ -1717,6 +1732,30 @@ class 文書 implements Countable, Iterator{
         foreach($array as $v1){
             if(!($v1 instanceof DOMNode)){ continue; }
             foreach($return as $v2){
+                if($v1->isSameNode($v2)){ continue 2; }
+            }
+            $return[] = $v1;
+        }
+        return $return;
+    }
+
+    private function 積集合(array $a, array $b){
+        $return = [];
+        foreach($a as $v1){
+            foreach($b as $v2){
+                if($v1->isSameNode($v2)){
+                    $return[] = $v1;
+                    continue 2;
+                }
+            }
+        }
+        return $return;
+    }
+
+    private function 差集合(array $a, array $b){
+        $return = [];
+        foreach($a as $v1){
+            foreach($b as $v2){
                 if($v1->isSameNode($v2)){ continue 2; }
             }
             $return[] = $v1;
