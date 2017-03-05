@@ -1525,7 +1525,7 @@ class 文書 implements Countable, Iterator{
     public function 親(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択[] = $this->家族探索($where, "parentNode");
+            $新選択 = $新選択 + $this->家族探索($where, "parentNode");
         }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
@@ -1533,7 +1533,7 @@ class 文書 implements Countable, Iterator{
     public function 兄(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択[] = $this->家族探索($where, "previousSibling");
+            $新選択 = $新選択 + $this->家族探索($where, "previousSibling");
         }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
@@ -1541,7 +1541,7 @@ class 文書 implements Countable, Iterator{
     public function 弟(){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択[] = $this->家族探索($where, "nextSibling");
+            $新選択 = $新選択 + $this->家族探索($where, "nextSibling");
         }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
@@ -1687,16 +1687,17 @@ class 文書 implements Countable, Iterator{
     }
 
     private function 家族探索(DOMNode $開始ノード, $続柄, $全員 = false){
+        $return = [];
         $node = $開始ノード->$続柄;
         while(true){
             if(!$node){ break; }
             if($node->nodeType === XML_ELEMENT_NODE){
-                if(!$全員){ return $node; }
                 $return[] = $node;
+                if(!$全員){ break; }
             }
             $node = $node->$続柄;
         }
-        return (array)$return;
+        return $return;
     }
 
     private function 重複ノード解消(array $array){
