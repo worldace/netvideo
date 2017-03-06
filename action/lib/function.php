@@ -1374,7 +1374,7 @@ class 文書 implements Countable, Iterator{
         }
     }
 
-    public function HTML(){
+    public function html(){
         if(isset($this->選択[0])){
             $return = $this->文書->saveHTML($this->選択[0]);
         }
@@ -1388,7 +1388,7 @@ class 文書 implements Countable, Iterator{
         return (string)$return;
     }
 
-    public function DOM($isCopy = false){
+    public function dom($isCopy = false){
         if(isset($this->選択[0])){
             $return = ($isCopy === false) ? $this->選択[0] : $this->選択[0]->cloneNode(true);
         }
@@ -1639,6 +1639,14 @@ class 文書 implements Countable, Iterator{
     public function 引く($selector){
         $新選択 = $this->差集合($this->選択, $this->セレクタ検索($selector, false));
         return $this->選択保存($新選択);
+    }
+
+    public function d(){
+        $print = "■現在選択中の要素一覧 (" . count($this->選択) . ")\n\n";
+        foreach($this->選択 as $key => $dom){
+            $print .= "[$key]: {$this->文書->saveHTML($dom)}\n";
+        }
+        return $print;
     }
 
     //■マジックメソッドの実装
