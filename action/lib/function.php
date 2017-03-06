@@ -1597,6 +1597,20 @@ class 文書 implements Countable, Iterator{
         $新選択 = [];
         foreach($this->選択 as $where){
             foreach($where->childNodes as $child){
+                if($child->nodeType === XML_ELEMENT_NODE){
+                    $新選択[] = $child;
+                    continue 2;
+                }
+            }
+        }
+        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
+        return $this->選択保存($this->重複ノード解消($新選択));
+    }
+
+    public function 子全て($selector = null){
+        $新選択 = [];
+        foreach($this->選択 as $where){
+            foreach($where->childNodes as $child){
                 if($child->nodeType === XML_ELEMENT_NODE){ $新選択[] = $child; }
             }
         }
