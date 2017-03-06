@@ -1530,70 +1530,78 @@ class 文書 implements Countable, Iterator{
         return $this->選択保存($新選択);
     }
 
-    public function 親(){
+    public function 親($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->家族探索($where, "parentNode"));
         }
+        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 兄(){
+    public function 兄($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling"));
         }
+        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 弟(){
+    public function 弟($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->家族探索($where, "nextSibling"));
         }
+        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 親全て(){
+    public function 親全て($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->家族探索($where, "parentNode", true));
         }
+        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 兄全て(){
+    public function 兄全て($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling", true));
         }
+        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 弟全て(){
+    public function 弟全て($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->家族探索($where, "nextSibling", true));
         }
+        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 兄弟全て(){
+    public function 兄弟全て($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling", true), $this->家族探索($where, "nextSibling", true));
         }
+        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 子(){
+    public function 子($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             foreach($where->childNodes as $child){
                 if($child->nodeType === XML_ELEMENT_NODE){ $新選択[] = $child; }
             }
         }
-        return $this->選択保存($新選択);
+        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
+        return $this->選択保存($this->重複ノード解消($新選択));
     }
 
     public function 前の選択(){
@@ -1605,17 +1613,17 @@ class 文書 implements Countable, Iterator{
         return $this->選択保存(array_reverse($this->選択));
     }
 
-    public function and($selector){
+    public function 絞る($selector){
         $新選択 = $this->積集合($this->選択, $this->セレクタ検索($selector, false));
         return $this->選択保存($新選択);
     }
 
-    public function or($selector){
+    public function 足す($selector){
         $新選択 = array_merge($this->選択, $this->セレクタ検索($selector, false));
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function not($selector){
+    public function 引く($selector){
         $新選択 = $this->差集合($this->選択, $this->セレクタ検索($selector, false));
         return $this->選択保存($新選択);
     }
@@ -1721,7 +1729,7 @@ class 文書 implements Countable, Iterator{
 
     private function 選択保存(array $array){
         $this->選択記憶 = $this->選択;
-        $this->選択 = (array)$array;
+        $this->選択 = $array;
         return $this;
     }
 
