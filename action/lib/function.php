@@ -1356,6 +1356,7 @@ class 文書 implements Countable, Iterator{
 
         $this->文書->formatOutput = true;
         $this->文書->encoding = "utf-8";
+        if($this->文書->documentElement instanceof DOMElement){ $this->選択 = [$this->文書->documentElement]; }
     }
 
     public function 本文($value = null){
@@ -1455,7 +1456,7 @@ class 文書 implements Countable, Iterator{
 
     public function 追加($add, $relation){
         if(is_string($add)){ //HTMLの場合
-            $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$add);
+            $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$add); //&があるとエラーになるので(文字実態・数値文字10進・16進は除く)
             $fragment = $this->文書->createDocumentFragment();
             $fragment->appendXML($str);
             return $this->DOM操作($fragment, $relation);
