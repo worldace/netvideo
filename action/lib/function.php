@@ -1341,10 +1341,8 @@ class 文書 implements Countable, Iterator{
         libxml_use_internal_errors(true);  // loadHTML() の警告抑制
 
         $str = preg_replace("/^[^<]+/", "", $str);
-        $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$str); //&があるとエラーになるので(文字実態・数値文字10進・16進は除く)
-
-        if(!preg_match("/^<\?xml\s/i", $str)){ //HTML
-            if(!preg_match("/^<\!DOCTYPE\s+html/i", $str)){ //ドキュメントタイプがないと古いドキュメントタイプが勝手に追加されるので対策
+        if(!preg_match("/^<\?xml/i", $str)){ //HTML
+            if(!preg_match("/^<\!DOCTYPE/i", $str)){ //ドキュメントタイプがないと変なドキュメントタイプが勝手に追加されるので対策
                 $str = "<!DOCTYPE html>\n$str";
                 $this->hasDoctype = false;
             }
@@ -1456,7 +1454,7 @@ class 文書 implements Countable, Iterator{
     }
 
     public function 追加($add, $relation){
-        if(is_string($add) and preg_match("/</", $add)){ //HTMLの場合
+        if(is_string($add)){ //HTMLの場合
             $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$add);
             $fragment = $this->文書->createDocumentFragment();
             $fragment->appendXML($str);
