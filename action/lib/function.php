@@ -1356,7 +1356,7 @@ class 文書 implements Countable, Iterator{
 
         $this->文書->formatOutput = true;
         $this->文書->encoding = "utf-8";
-        if($this->文書->documentElement instanceof DOMElement){ $this->選択 = [$this->文書->documentElement]; }
+        //if($this->文書->documentElement instanceof DOMElement){ $this->選択 = [$this->文書->documentElement]; }
     }
 
     public function 本文($value = null){
