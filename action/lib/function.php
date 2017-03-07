@@ -1466,7 +1466,7 @@ class 文書 implements Countable, Iterator{
         if($add instanceof DOMElement){ //DOMの場合
             $add = [$add];
         }
-        if(is_array($add)){ //配列の場合
+        if(is_array($add) or ($add instanceof DOMNodeList)){ //配列の場合
             $fragment = $this->文書->createDocumentFragment();
             foreach($add as $node){
                 if(!($node instanceof DOMElement)){ continue; }
