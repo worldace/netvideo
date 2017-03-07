@@ -1331,8 +1331,8 @@ class 文書 implements Countable, Iterator{
     private $文書;
     private $選択 = [];
     private $選択記憶 = [];
-    private $ループ数;
-    private $ループ記憶 = [];
+    private $ループid;
+    private $ループ = [];
     private $hasDoctype = true;
     private $isXML = false;
 
@@ -1661,25 +1661,32 @@ class 文書 implements Countable, Iterator{
     // 初回ループ時 ： rewind -> validが真なら -> key + current -> ユーザコード実行
     // 2回目ループ時： next   -> validが真なら -> key + current -> ユーザコード実行
     public function rewind() {
-        $this->ループ数 = 0;
-        $this->ループ記憶 = $this->選択;
+        $this->ループid = uniqid();
+        $this->ループ[$this->ループid]['選択'] = $this->選択;
+        $this->ループ[$this->ループid]['カウント'] = 0;
     }
     public function next() {
-         $this->ループ数++;
+        if(!$this->ループid){
+            end($this->ループ);
+            $this->ループid = key($this->ループ);
+        }
+         $this->ループ[$this->ループid]['カウント']++;
     }
     public function valid() {
-        $return = isset($this->ループ記憶[$this->ループ数]);
-        if($return === true){
-            $this->選択 = [$this->ループ記憶[$this->ループ数]];
+        $選択     = $this->ループ[$this->ループid]['選択'];
+        $カウント = $this->ループ[$this->ループid]['カウント'];
+        $return = isset($選択[$カウント]);
+        if($return){
+            $this->選択 = [$選択[$カウント]];
         }
         else{
-            unset($this->ループ数);
-            $this->選択 = $this->ループ記憶;
+            unset($this->ループ[$this->ループid]);
+            unset($this->ループid);
         }
         return $return;
     }
     public function key() { 
-        return $this->ループ数;
+        return $this->ループ[$this->ループid]['カウント'];
     }
     public function current() {
         return $this;
