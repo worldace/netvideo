@@ -1645,7 +1645,7 @@ class 文書 implements Countable, Iterator{
         foreach($this->選択 as $key => $dom){
             $print .= "[$key]: {$this->文書->saveHTML($dom)}\n";
         }
-
+/*
         $要素一覧 = $this->セレクタ検索("*", false);
         $print .= "\n■要素一覧 (" . count($要素一覧) . ")\n";
         foreach($要素一覧 as $key => $dom){
@@ -1655,7 +1655,7 @@ class 文書 implements Countable, Iterator{
             $xpath = preg_replace("#\[(\d+)\]#", ":nth-of-type($1)", $xpath);
             $print .= "[$key]: '$xpath'\n{$this->文書->saveHTML($dom)}\n\n";
         }
-
+*/
         return $print;
     }
 
