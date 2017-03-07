@@ -1388,13 +1388,6 @@ class 文書 implements Countable, Iterator{
         return (string)$return;
     }
 
-    public function dom($isCopy = false){
-        if(isset($this->選択[0])){
-            $return = ($isCopy === false) ? $this->選択[0] : $this->選択[0]->cloneNode(true);
-        }
-        return $return;
-    }
-
     public function 属性($name = null, $value = null){
         if(is_string($name) and $value === null){ //属性値を1つ取得
             if(isset($this->選択[0])){
@@ -1445,13 +1438,18 @@ class 文書 implements Countable, Iterator{
         return $this;
     }
 
-    public function 作成($tag, array $attr = null, $content = ""){
-        $dom = $this->文書->createElement($tag);
-        $dom->textContent = $content;
-        foreach((array)$attr as $k => $v){
-            $dom->setAttribute($k, $v);
+    public function dom($tag = null, array $attr = null, $content = ""){
+        if(is_string($tag)){
+            $dom = $this->文書->createElement($tag);
+            $dom->textContent = $content;
+            foreach((array)$attr as $k => $v){
+                $dom->setAttribute($k, $v);
+            }
+            return $dom;
         }
-        return $dom;
+        else{
+            return isset($this->選択[0]) ? $this->選択[0] : null;
+        }
     }
 
     public function 追加($add, $relation){
