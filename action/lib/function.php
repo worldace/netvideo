@@ -1483,7 +1483,7 @@ class 文書 implements Countable, Iterator{
         }
     }
 
-    public function 複製($selector, $relation){
+    public function コピー($selector, $relation){
         $this($selector);
         $add = $this->選択記憶;
         $this->追加($add, $relation);
