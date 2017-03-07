@@ -1339,6 +1339,7 @@ class 文書 implements Countable, Iterator{
     public function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
         $this->文書 = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
         libxml_use_internal_errors(true);  // loadHTML() の警告抑制
+        libxml_disable_entity_loader(true);
 
         $str = preg_replace("/^[^<]+/", "", $str);
         if(!preg_match("/^<\?xml/i", $str)){ //HTML
@@ -1670,14 +1671,13 @@ class 文書 implements Countable, Iterator{
             end($this->ループ);
             $this->ループid = key($this->ループ);
         }
-         $this->ループ[$this->ループid]['カウント']++;
+        $this->ループ[$this->ループid]['カウント']++;
     }
     public function valid() {
-        $選択     = $this->ループ[$this->ループid]['選択'];
-        $カウント = $this->ループ[$this->ループid]['カウント'];
-        $return = isset($選択[$カウント]);
+        $現在の選択 = $this->ループ[$this->ループid]['選択'][$this->ループ[$this->ループid]['カウント']];
+        $return = isset($現在の選択);
         if($return){
-            $this->選択 = [$選択[$カウント]];
+            $this->選択 = [$現在の選択];
         }
         else{
             unset($this->ループ[$this->ループid]);
