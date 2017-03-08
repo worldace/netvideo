@@ -1457,8 +1457,8 @@ class 文書 implements Countable, Iterator{
         if(is_string($add)){ //HTMLの場合
             $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$add); //&があるとエラーになるので(文字実態・数値文字10進・16進は除く)
             $fragment = $this->文書->createDocumentFragment();
-            $fragment->appendXML($str);
-            return $this->DOM操作($fragment, $relation);
+            if($fragment->appendXML($str)){ $this->DOM操作($fragment, $relation); }
+            return $this;
         }
         if($add instanceof self){ //文書オブジェクトの場合
             if($add === $this){ return $this; }
