@@ -1529,7 +1529,7 @@ class 文書 implements Countable, IteratorAggregate{
     public function 親($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = array_merge($新選択, $this->家族探索($where, "parentNode"));
+            $新選択 = array_merge($新選択, $this->家族探索($where, "parentNode", true));
         }
         if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
         return $this->選択保存($this->重複ノード解消($新選択));
@@ -1538,7 +1538,7 @@ class 文書 implements Countable, IteratorAggregate{
     public function 兄($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling"));
+            $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling", true));
         }
         if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
         return $this->選択保存($this->重複ノード解消($新選択));
@@ -1547,7 +1547,7 @@ class 文書 implements Countable, IteratorAggregate{
     public function 弟($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = array_merge($新選択, $this->家族探索($where, "nextSibling"));
+            $新選択 = array_merge($新選択, $this->家族探索($where, "nextSibling", true));
         }
         if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
         return $this->選択保存($this->重複ノード解消($新選択));
@@ -1556,7 +1556,7 @@ class 文書 implements Countable, IteratorAggregate{
     public function 親全て($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = array_merge($新選択, $this->家族探索($where, "parentNode", true));
+            $新選択 = array_merge($新選択, $this->家族探索($where, "parentNode", false));
         }
         if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
         return $this->選択保存($this->重複ノード解消($新選択));
@@ -1565,7 +1565,7 @@ class 文書 implements Countable, IteratorAggregate{
     public function 兄全て($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling", true));
+            $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling", false));
         }
         if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
         return $this->選択保存($this->重複ノード解消($新選択));
@@ -1574,7 +1574,7 @@ class 文書 implements Countable, IteratorAggregate{
     public function 弟全て($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = array_merge($新選択, $this->家族探索($where, "nextSibling", true));
+            $新選択 = array_merge($新選択, $this->家族探索($where, "nextSibling", false));
         }
         if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
         return $this->選択保存($this->重複ノード解消($新選択));
@@ -1583,7 +1583,7 @@ class 文書 implements Countable, IteratorAggregate{
     public function 兄弟全て($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
-            $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling", true), $this->家族探索($where, "nextSibling", true));
+            $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling", false), $this->家族探索($where, "nextSibling", false));
         }
         if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
         return $this->選択保存($this->重複ノード解消($新選択));
@@ -1735,14 +1735,13 @@ class 文書 implements Countable, IteratorAggregate{
         $return = [];
         if(!$selector){ return $return; }
 
-        $xpath  = new DOMXPath($this->文書); // https://secure.php.net/manual/ja/class.domxpath.php
         $expression = $this->selector2XPath($selector);
         if($context){ $expression = preg_replace("|^//|", ".//", $expression); } //相対パスにする
 
-        foreach($xpath->query($expression, $context) as $node){ //DOMNodeList(複数形)が返る
+        foreach((new DOMXPath($this->文書))->query($expression, $context) as $node){ //DOMNodeList(複数形)が返る https://secure.php.net/manual/ja/class.domxpath.php
             $return[] = $node;
         }
-        if($記録する === true){ $this->選択保存($return); }
+        if($記録する){ $this->選択保存($return); }
         return $return;
     }
 
@@ -1752,14 +1751,13 @@ class 文書 implements Countable, IteratorAggregate{
         return $this;
     }
 
-    private function 家族探索(DOMNode $開始ノード, $続柄, $全員 = false){
+    private function 家族探索(DOMNode $開始ノード, $続柄, $一人だけ){
         $return = [];
         $node = $開始ノード->$続柄;
-        while(true){
-            if(!$node){ break; }
+        while($node){
             if($node->nodeType === XML_ELEMENT_NODE){
                 $return[] = $node;
-                if(!$全員){ break; }
+                if($一人だけ){ break; }
             }
             $node = $node->$続柄;
         }
