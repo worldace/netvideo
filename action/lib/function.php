@@ -1331,8 +1331,6 @@ class 文書 implements Countable, IteratorAggregate{
     private $文書;
     private $選択 = [];
     private $選択記憶 = [];
-    private $ループid;
-    private $ループ = [];
     private $hasDoctype = true;
     private $isXML = false;
 
