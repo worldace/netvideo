@@ -1327,7 +1327,7 @@ class 部品{
 }
 
 
-class 文書 implements Countable, Iterator{
+class 文書 implements Countable, IteratorAggregate{
     private $文書;
     private $選択 = [];
     private $選択記憶 = [];
@@ -1483,7 +1483,7 @@ class 文書 implements Countable, Iterator{
         }
     }
 
-    public function コピー($selector, $relation){
+    public function 貼り付け($selector, $relation){
         $this($selector);
         $add = $this->選択記憶;
         $this->追加($add, $relation);
@@ -1669,38 +1669,14 @@ class 文書 implements Countable, Iterator{
         return $this;
     }
 
-    //■Iteratorインターフェースの実装 http://php.net/manual/ja/class.iterator.php
-    // 初回ループ時 ： rewind -> validが真なら -> key + current -> ユーザコード実行
-    // 2回目ループ時： next   -> validが真なら -> key + current -> ユーザコード実行
-    public function rewind() {
-        $this->ループid = uniqid();
-        $this->ループ[$this->ループid]['選択'] = $this->選択;
-        $this->ループ[$this->ループid]['カウント'] = 0;
-    }
-    public function next() {
-        if(!$this->ループid){
-            end($this->ループ);
-            $this->ループid = key($this->ループ);
+    //■IteratorAggregateインターフェースの実装
+    public function getIterator(){
+        $clone = [];
+        for($i = 0; $i < count($this->選択);  $i++){
+            $clone[] = clone $this;
+            $clone[$i]->選択 = [$this->選択[$i]];
         }
-        $this->ループ[$this->ループid]['カウント']++;
-    }
-    public function valid() {
-        $現在の選択 = $this->ループ[$this->ループid]['選択'][$this->ループ[$this->ループid]['カウント']];
-        $return = isset($現在の選択);
-        if($return){
-            $this->選択 = [$現在の選択];
-        }
-        else{
-            unset($this->ループ[$this->ループid]);
-            unset($this->ループid);
-        }
-        return $return;
-    }
-    public function key() { 
-        return $this->ループ[$this->ループid]['カウント'];
-    }
-    public function current() {
-        return $this;
+        return new ArrayObject($clone);
     }
 
     //■Countableインターフェースの実装
