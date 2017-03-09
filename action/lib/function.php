@@ -1671,12 +1671,11 @@ class 文書 implements Countable, IteratorAggregate{
 
     //■IteratorAggregateインターフェースの実装
     public function getIterator(){
-        $clone = [];
-        for($i = 0; $i < count($this->選択);  $i++){
-            $clone[] = clone $this;
-            $clone[$i]->選択 = [$this->選択[$i]];
+        foreach($this->選択 as $選択){
+            $clone = clone $this;
+            $clone->選択 = [$選択];
+            yield $clone;
         }
-        return new ArrayObject($clone);
     }
 
     //■Countableインターフェースの実装
