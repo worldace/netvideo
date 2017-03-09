@@ -1363,13 +1363,13 @@ class 文書 implements Countable, IteratorAggregate{
     public function 本文($value = null){
         if($value === null){
             if(isset($this->選択[0])){
-                $return = $this->選択[0]->textContent;
+                $return = $this->選択[0]->nodeValue;
             }
             return (string)$return;
         }
         else{
             foreach($this->選択 as $where){
-                $where->textContent = $value;
+                $where->nodeValue = $value;
             }
             return $this;
         }
@@ -1442,7 +1442,7 @@ class 文書 implements Countable, IteratorAggregate{
     public function dom($tag = null, array $attr = null, $content = ""){
         if(is_string($tag)){
             $dom = $this->文書->createElement($tag);
-            $dom->textContent = $content;
+            $dom->nodeValue = $content;
             foreach((array)$attr as $k => $v){
                 $dom->setAttribute($k, $v);
             }
@@ -1671,7 +1671,8 @@ class 文書 implements Countable, IteratorAggregate{
 
     //■IteratorAggregateインターフェースの実装
     public function getIterator(){
-        /*foreach($this->選択 as $選択){
+        /* ジェネレータバージョン
+        foreach($this->選択 as $選択){
             $clone = clone $this;
             $clone->選択 = [$選択];
             yield $clone;
