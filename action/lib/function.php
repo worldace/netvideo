@@ -1623,7 +1623,7 @@ class 文書 implements Countable, IteratorAggregate{
         return $this->選択保存(array_reverse($this->選択));
     }
 
-    public function 絞る($selector){
+    public function 条件($selector){
         $新選択 = $this->積集合($this->選択, $this->セレクタ検索($selector, false));
         return $this->選択保存($新選択);
     }
