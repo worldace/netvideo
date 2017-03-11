@@ -1450,39 +1450,12 @@ class 文書 implements Countable, IteratorAggregate{
     }
 
     public function 追加($add, $relation){
-        if(is_string($add)){ //HTMLの場合
-            $str = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$add); //&があるとエラーになるので(文字実態・数値文字10進・16進は除く)
-            $fragment = $this->文書->createDocumentFragment();
-            if($fragment->appendXML($str)){ $this->DOM操作($fragment, $relation); }
-            return $this;
-        }
-        if($add instanceof self){ //文書オブジェクトの場合
-            if($add === $this){ return $this; }
-            $add = $add->セレクタ検索(":root", false);
-        }
-        if($add instanceof DOMElement){ //DOMの場合
-            $add = [$add];
-        }
-        if(is_array($add) or ($add instanceof DOMNodeList)){ //配列の場合
-            $fragment = $this->文書->createDocumentFragment();
-            foreach($add as $node){
-                if(!($node instanceof DOMElement)){ continue; }
-                if($node->ownerDocument !== $this->文書){
-                    $node = $this->文書->importNode($node, true);
-                }
-                $fragment->appendChild($node->cloneNode(true));
-            }
-            return $this->DOM操作($fragment, $relation);
-        }
-        else{
-            return $this;
-        }
+        return $this->DOM操作($this->フラグメント作成($add), $relation);
     }
 
     public function 貼り付け($selector, $relation){
         $this($selector);
-        $add = $this->選択記憶;
-        $this->追加($add, $relation);
+        $this->追加($this->選択記憶, $relation);
     }
 
     public function 削除(){
@@ -1657,7 +1630,7 @@ class 文書 implements Countable, IteratorAggregate{
 
     //■マジックメソッドの実装
     public function __toString(){
-        return $this->全体出力();
+        return $this->HTML全体文字列();
     }
 
     public function __invoke($selector = null){
@@ -1690,6 +1663,35 @@ class 文書 implements Countable, IteratorAggregate{
 
 
     //■以下プライベートメソッド
+    private function フラグメント作成($input){
+        $fragment = $this->文書->createDocumentFragment();
+        if(is_string($input)){
+            //$input = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$input); //&があるとエラーになるので(文字実態・数値文字10進・16進は除く)
+            $fragment->appendXML($input);
+            return $fragment;
+        }
+        if($input instanceof self){ //文書オブジェクトの場合
+            if($input === $this){ return $fragment; }
+            $root = $input->文書->documentElement;
+            $input = [];
+            while($root){
+                if($root->nodeType === XML_ELEMENT_NODE){ $input[] = $root; }
+                $root = $root->nextSibling;
+            }
+        }
+        if($input instanceof DOMElement){ //DOMの場合
+            $input = [$input];
+        }
+        if(is_array($input) or ($input instanceof DOMNodeList)){ //配列の場合
+            foreach($input as $node){
+                if(!($node instanceof DOMElement)){ continue; }
+                if($node->ownerDocument !== $this->文書){ $node = $this->文書->importNode($node, true); }
+                $fragment->appendChild($node->cloneNode(true));
+            }
+        }
+        return $fragment;
+    }
+
     private function DOM操作($add, $relation){
         $新選択 = [];
         switch($relation){
@@ -1798,9 +1800,10 @@ class 文書 implements Countable, IteratorAggregate{
         return $return;
     }
 
-    private function 全体出力(){
+    private function HTML全体文字列(){
         $type = $this->文書->doctype;
         $node = $this->文書->documentElement;
+
         switch($this->種類){
             case "html":
                 return $this->文書->saveXML($type) . "\n" . $this->文書->saveHTML($node);
