@@ -1332,6 +1332,7 @@ class 文書 implements Countable, IteratorAggregate{
     private $選択 = [];
     private $選択記憶 = [];
     private $種類 = "html";
+    private $フラグメント記憶;
 
     public function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
         $this->文書 = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
@@ -1455,7 +1456,7 @@ class 文書 implements Countable, IteratorAggregate{
 
     public function 貼り付け($selector, $relation){
         $this($selector);
-        $this->追加($this->選択記憶, $relation);
+        return $this->追加($this->選択記憶, $relation);
     }
 
     public function 削除(){
@@ -1634,21 +1635,25 @@ class 文書 implements Countable, IteratorAggregate{
     }
 
     public function __invoke($selector = null){
-        $this->セレクタ検索($selector);
-        return $this;
+        if(!$selector){ return $this; }
+        if(is_string($selector) and !preg_match("/^</", $selector)){
+            $this->セレクタ検索($selector);
+            return $this;
+        }
+        else{
+            $新選択 = [];
+            $this->フラグメント記憶 = $this->フラグメント作成($selector);
+            foreach($this->フラグメント記憶->childNodes as $child){
+                if($child->nodeType === XML_ELEMENT_NODE){ $新選択[] = $child; }
+            }
+            return $this->選択保存($新選択);
+        }
     }
 
     //■IteratorAggregateインターフェースの実装
     public function getIterator(){
-        /* ジェネレータバージョン
-        foreach($this->選択 as $選択){
-            $clone = clone $this;
-            $clone->選択 = [$選択];
-            $clone->選択記憶 = [];
-            yield $clone;
-        }*/
         $clone = [];
-        for($i = 0; $i < count($this->選択);  $i++){
+        for($i = 0; $i < count($this->選択); $i++){
             $clone[] = clone $this;
             $clone[$i]->選択 = [$this->選択[$i]];
             $clone[$i]->選択記憶 = [];
