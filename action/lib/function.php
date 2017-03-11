@@ -1803,12 +1803,12 @@ class 文書 implements Countable, IteratorAggregate{
         $node = $this->文書->documentElement;
         switch($this->種類){
             case "html":
-                return $this->文書->saveXML($type) .$this->文書->saveHTML($node);
+                return $this->文書->saveXML($type) . "\n" . $this->文書->saveHTML($node);
             case "xml":
-                return $this->文書->saveXML($type) . $this->文書->saveXML($node);
+                return $this->文書->saveXML($type) . "\n" . $this->文書->saveXML($node);
             case "断片":
                 while($node){
-                    if($node->nodeType === XML_ELEMENT_NODE){ $return .= $this->文書->saveHTML($node); }
+                    if($node->nodeType === XML_ELEMENT_NODE){ $return .= $this->文書->saveHTML($node) . "\n"; }
                     $node = $node->nextSibling;
                 }
                 return (string)$return;
