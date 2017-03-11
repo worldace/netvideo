@@ -1800,15 +1800,13 @@ class 文書 implements Countable, IteratorAggregate{
     }
 
     private function 全体出力(){
-        if($this->種類 === "xml"){
-            return $this->文書->saveXML($this->文書->doctype).$this->文書->saveXML($this->文書->documentElement);
-        }
-
-        if($this->種類 === "断片"){
-            return $this->文書->saveXML($this->文書->doctype).$this->文書->saveHTML($this->文書->documentElement);
-        }
-        else{
-            return $this->文書->saveHTML($this->文書->documentElement);
+        switch($this->種類){
+            case "html":
+                return $this->文書->saveXML($this->文書->doctype).$this->文書->saveHTML($this->文書->documentElement);
+            case "xml":
+                return $this->文書->saveXML($this->文書->doctype).$this->文書->saveXML($this->文書->documentElement);
+            case "断片":
+                return $this->文書->saveHTML($this->文書->documentElement);
         }
     }
 
