@@ -1331,8 +1331,7 @@ class 文書 implements Countable, IteratorAggregate{
     private $文書;
     private $選択 = [];
     private $選択記憶 = [];
-    private $hasDoctype = true;
-    private $isXML = false;
+    private $種類 = "html";
 
     public function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
         $this->文書 = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
@@ -1343,14 +1342,14 @@ class 文書 implements Countable, IteratorAggregate{
         if(!preg_match("/^<\?xml/i", $str)){ //HTML
             if(!preg_match("/^<\!DOCTYPE/i", $str)){ //ドキュメントタイプがないと変なドキュメントタイプが勝手に追加されるので対策
                 $str = "<!DOCTYPE html>\n$str";
-                $this->hasDoctype = false;
+                $this->種類 = "断片";
             }
             $str = '<?xml encoding="UTF-8">' . $str; //文字化け対策のおまじない。出力時のsaveXML($this->文書->doctype).saveHTML($this->文書->documentElement)とセットで使う
             $this->文書->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
         }
         else{ //XML
             $this->文書->loadXML($str, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT);
-            $this->isXML = true;
+            $this->種類 = "xml";
         }
 
         $this->文書->formatOutput = true;
@@ -1801,11 +1800,11 @@ class 文書 implements Countable, IteratorAggregate{
     }
 
     private function 全体出力(){
-        if($this->isXML === true){
+        if($this->種類 === "xml"){
             return $this->文書->saveXML($this->文書->doctype).$this->文書->saveXML($this->文書->documentElement);
         }
 
-        if($this->hasDoctype === true){
+        if($this->種類 === "断片"){
             return $this->文書->saveXML($this->文書->doctype).$this->文書->saveHTML($this->文書->documentElement);
         }
         else{
