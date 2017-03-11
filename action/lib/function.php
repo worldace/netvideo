@@ -1354,7 +1354,6 @@ class 文書 implements Countable, IteratorAggregate{
 
         $this->文書->formatOutput = true;
         $this->文書->encoding = "utf-8";
-        //if($this->文書->documentElement instanceof DOMElement){ $this->選択 = [$this->文書->documentElement]; }
     }
 
     public function 本文($value = null){
@@ -1806,7 +1805,12 @@ class 文書 implements Countable, IteratorAggregate{
             case "xml":
                 return $this->文書->saveXML($this->文書->doctype).$this->文書->saveXML($this->文書->documentElement);
             case "断片":
-                return $this->文書->saveHTML($this->文書->documentElement);
+                $node = $this->文書->documentElement;
+                while($node){
+                    if($node->nodeType === XML_ELEMENT_NODE){ $return .= $this->文書->saveHTML($node); }
+                    $node = $node->nextSibling;
+                }
+                return (string)$return;
         }
     }
 
