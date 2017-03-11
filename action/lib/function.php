@@ -1665,10 +1665,8 @@ class 文書 implements Countable, IteratorAggregate{
     //■以下プライベートメソッド
     private function フラグメント作成($input){
         $fragment = $this->文書->createDocumentFragment();
-        if(is_string($input)){
-            //$input = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$input); //&があるとエラーになるので(文字実態・数値文字10進・16進は除く)
-            $fragment->appendXML($input);
-            return $fragment;
+        if(is_string($input)){ //文字の場合
+            $input = new self($input);
         }
         if($input instanceof self){ //文書オブジェクトの場合
             if($input === $this){ return $fragment; }
