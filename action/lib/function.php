@@ -1332,7 +1332,6 @@ class 文書 implements Countable, IteratorAggregate{
     private $選択 = [];
     private $選択記憶 = [];
     private $種類 = "html";
-    private $フラグメント記憶;
 
     public function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
         $this->文書 = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
@@ -1451,16 +1450,16 @@ class 文書 implements Countable, IteratorAggregate{
     }
 
     public function 追加($add, $relation){
-        return $this->DOM操作($this->フラグメント作成($add), $relation);
+        return $this->DOM操作($this->DOM箱作成($add), $relation);
     }
 
     public function 貼り付け($selector, $relation){
         $this($selector);
-        return $this->追加($this->選択記憶, $relation);
+        return $this->DOM操作($this->選択記憶, $relation);
     }
 
     public function 削除(){
-        return $this->DOM操作("", "削除");
+        return $this->DOM操作(null, "削除");
     }
 
     public function 検索($selector){
@@ -1635,18 +1634,15 @@ class 文書 implements Countable, IteratorAggregate{
     }
 
     public function __invoke($selector = null){
-        if(!$selector){ return $this; }
-        if(is_string($selector) and !preg_match("/^</", $selector)){
+        if(!$selector){
+            return $this;
+        }
+        else if(is_string($selector) and !preg_match("/^</", $selector)){
             $this->セレクタ検索($selector);
             return $this;
         }
         else{
-            $新選択 = [];
-            $this->フラグメント記憶 = $this->フラグメント作成($selector);
-            foreach($this->フラグメント記憶->childNodes as $child){
-                if($child->nodeType === XML_ELEMENT_NODE){ $新選択[] = $child; }
-            }
-            return $this->選択保存($新選択);
+            return $this->選択保存($this->DOM箱作成($selector));
         }
     }
 
@@ -1668,13 +1664,13 @@ class 文書 implements Countable, IteratorAggregate{
 
 
     //■以下プライベートメソッド
-    private function フラグメント作成($input){
-        $fragment = $this->文書->createDocumentFragment();
+    private function DOM箱作成($input){
+        $dom箱 = [];
         if(is_string($input)){ //文字の場合
             $input = new self($input);
         }
         if($input instanceof self){ //文書オブジェクトの場合
-            if($input === $this){ return $fragment; }
+            if($input === $this){ return $dom箱; }
             $root = $input->文書->documentElement;
             $input = [];
             while($root){
@@ -1689,40 +1685,49 @@ class 文書 implements Countable, IteratorAggregate{
             foreach($input as $node){
                 if(!($node instanceof DOMElement)){ continue; }
                 if($node->ownerDocument !== $this->文書){ $node = $this->文書->importNode($node, true); }
-                $fragment->appendChild($node->cloneNode(true));
+                $dom箱[] = $node->cloneNode(true);
             }
         }
-        return $fragment;
+        return $dom箱;
     }
 
-    private function DOM操作($add, $relation){
+    private function DOM操作(array $dom箱 = null, $relation){
         $新選択 = [];
         switch($relation){
             case "上":
                 foreach($this->選択 as $where){
-                    $新選択[] = $where->parentNode->insertBefore($add->cloneNode(true), $where);
+                    foreach($dom箱 as $add){
+                        $新選択[] = $where->parentNode->insertBefore($add->cloneNode(true), $where);
+                    }
                 }
                 break;
             case "下":
                 foreach($this->選択 as $where){
-                    $新選択[] = $where->parentNode->insertBefore($add->cloneNode(true), $where->nextSibling);
+                    foreach(array_reverse($dom箱) as $add){
+                        $新選択[] = $where->parentNode->insertBefore($add->cloneNode(true), $where->nextSibling);
+                    }
                 }
                 break;
             case "中上":
                 foreach($this->選択 as $where){
-                    $新選択[] = $where->insertBefore($add->cloneNode(true), $where->firstChild);
+                    foreach(array_reverse($dom箱) as $add){
+                        $新選択[] = $where->insertBefore($add->cloneNode(true), $where->firstChild);
+                    }
                 }
                 break;
             case "中下":
                 foreach($this->選択 as $where){
-                    $新選択[] = $where->appendChild($add->cloneNode(true));
+                    foreach($dom箱 as $add){
+                        $新選択[] = $where->appendChild($add->cloneNode(true));
+                    }
                 }
                 break;
             case "置換":
                 foreach($this->選択 as $where){
-                    $new = $add->cloneNode(true);
-                    $新選択[] = $new;
-                    $where->parentNode->replaceChild($new, $where);
+                    foreach($dom箱 as $add){
+                        $新選択[] = $where->parentNode->insertBefore($add->cloneNode(true), $where);
+                    }
+                    $where->parentNode->removeChild($where);
                 }
                 break;
             case "削除":
