@@ -1799,13 +1799,14 @@ class 文書 implements Countable, IteratorAggregate{
     }
 
     private function 全体出力(){
+        $type = $this->文書->doctype;
+        $node = $this->文書->documentElement;
         switch($this->種類){
             case "html":
-                return $this->文書->saveXML($this->文書->doctype).$this->文書->saveHTML($this->文書->documentElement);
+                return $this->文書->saveXML($type) .$this->文書->saveHTML($node);
             case "xml":
-                return $this->文書->saveXML($this->文書->doctype).$this->文書->saveXML($this->文書->documentElement);
+                return $this->文書->saveXML($type) . $this->文書->saveXML($node);
             case "断片":
-                $node = $this->文書->documentElement;
                 while($node){
                     if($node->nodeType === XML_ELEMENT_NODE){ $return .= $this->文書->saveHTML($node); }
                     $node = $node->nextSibling;
