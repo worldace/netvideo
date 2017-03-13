@@ -1201,15 +1201,6 @@ class データベース{
 }
 
 
-function 部品($部品名, ...$引数){
-    return 部品::作成($部品名, h($引数));
-}
-
-
-function 生部品($部品名, ...$引数){
-    return 部品::作成($部品名, $引数);
-}
-
 
 class 部品{
     private static $ディレクトリ;
@@ -1223,6 +1214,7 @@ class 部品{
         self::$ディレクトリ = $dir;
         self::$結果 = [];
         self::$記憶 = [];
+        self::関数定義();
         if(!self::$開始 and !$manual){
             self::$開始 = true;
             ob_start(["部品", "差し込み"]);
@@ -1274,6 +1266,16 @@ class 部品{
             }
         }
         return $buf;
+    }
+
+    public static function 関数定義(){
+        if(function_exists("部品")){ return; }
+        function 部品($部品名, ...$引数){
+            return 部品::作成($部品名, h($引数));
+        }
+        function 生部品($部品名, ...$引数){
+            return 部品::作成($部品名, $引数);
+        }
     }
 
     private static function パス($部品名){
