@@ -1209,12 +1209,12 @@ class 部品{
     private static $結果;
 
 
-    public static function 開始($dir, $manual = false){
-        if(!is_dir($dir)){ throw new プログラムミス("[$dir] ディレクトリが存在しません"); }
+    public static function 開始($dir = __DIR__."/部品", $manual = false){
+        if(!is_dir($dir)){ throw new プログラムミス("部品ディレクトリが存在しません"); }
         self::$ディレクトリ = $dir;
         self::$結果 = [];
         self::$記憶 = [];
-        self::関数定義();
+        self::関数登録();
         if(!self::$開始 and !$manual){
             self::$開始 = true;
             ob_start(["部品", "差し込み"]);
@@ -1268,7 +1268,7 @@ class 部品{
         return $buf;
     }
 
-    public static function 関数定義(){
+    public static function 関数登録(){
         if(function_exists("部品")){ return; }
         function 部品($部品名, ...$引数){
             return 部品::作成($部品名, h($引数));
