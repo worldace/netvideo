@@ -1212,7 +1212,7 @@ class 部品{
     public static function 開始($dir = __DIR__."/部品", $manual = false){
         if(!is_dir($dir)){ throw new プログラムミス("部品ディレクトリが存在しません"); }
         self::$ディレクトリ = $dir;
-        self::$結果 = [];
+        self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>''];
         self::$記憶 = [];
         self::関数登録();
         if(!self::$開始 and !$manual){
@@ -1221,7 +1221,7 @@ class 部品{
         }
     }
 
-    public static function 中止(){
+    public static function 終了(){
         if(self::$開始){
             self::$開始 = null;
             self::$ディレクトリ = null;
@@ -1277,6 +1277,11 @@ class 部品{
             return 部品::作成($部品名, $引数);
         }
     }
+
+    public static function コード取得(){
+        return $this->結果;
+    }
+
 
     private static function パス($部品名){
         if(!self::$ディレクトリ){ throw new プログラムミス("部品::開始() を行っていません"); }
