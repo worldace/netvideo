@@ -1235,7 +1235,7 @@ class 部品{
         //キャッシュの有無により分岐
         if(!isset(self::$記憶[$部品パス])){
             $file = file_get_contents($部品パス);
-            preg_match("|<script\s+type\s*=\s*[\"\']*php[\"\']*\s*>([\s\S]*?)</script>|i", $file, $code);
+            preg_match("|<script\s+type\s*=\s*[\"\']php[\"\']\s*>([\s\S]*?)</script>|i", $file, $code);
             eval($code[1] . ";");
             self::$記憶[$部品パス] = isset($php) ? $php : "";
 
@@ -1302,7 +1302,7 @@ class 部品{
         preg_match_all("|<link[^>]+>|i", $html, $link);
         foreach((array)$link[0] as $v){
             preg_match("|^([^>]+)|", $v, $attr);
-            if(preg_match("|\s+href\s*=\s*[\"\']([\s\S]*?)[\"\']|i", $attr[0], $href)){
+            if(preg_match("|\shref\s*=\s*[\"\']([\s\S]*?)[\"\']|i", $attr[0], $href)){
                 if(in_array($href[1], (array)self::$記憶['読み込み済みURL'])){ continue; }
                 self::$記憶['読み込み済みURL'][] = $href[1];
             }
@@ -1321,8 +1321,8 @@ class 部品{
         preg_match_all("|<script([\s\S]*?)</script>|i", $html, $script);
         foreach((array)$script[0] as $v){
             preg_match("|^([^>]+)|", $v, $attr);
-            if(preg_match("|\s+type\s*=\s*[\"\']*php|i", $attr[0])){ continue; }
-            if(preg_match("|\s+src\s*=\s*[\"\']([\s\S]*?)[\"\']|i", $attr[0], $src)){
+            if(preg_match("|\stype\s*=\s*[\"\']php|i", $attr[0])){ continue; }
+            if(preg_match("|\ssrc\s*=\s*[\"\']([\s\S]*?)[\"\']|i", $attr[0], $src)){
                 if(in_array($src[1], (array)self::$記憶['読み込み済みURL'])){ continue; }
                 self::$記憶['読み込み済みURL'][] = $src[1];
             }
