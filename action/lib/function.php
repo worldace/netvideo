@@ -242,6 +242,37 @@ function 設定($name = null, $value = null){
 $_ENV['設定'] = function($name, $value){ return 設定($name, $value); };
 
 
+function テンプレート($_file_, array $_data_ = null, $エスケープしない = false){
+    if(!preg_match("#^(/|\\\\|\w+:)#", $_file_)){ //相対パスなら
+        $_file_ = dirname(debug_backtrace()[0]['file']) . "/$_file_";
+    }
+    $_h_ = function($data) use (&$_h_){
+        if(!is_array($data)){ return htmlspecialchars($data, ENT_QUOTES, 'UTF-8'); }
+        foreach($data as &$value) {
+            if(is_array($value)){ $value = $_h_($value); }
+            else { $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8'); } 
+        }
+        return $data;
+    }; 
+    
+    if($エスケープしない){
+        foreach((array)$_data_ as $_key1_ => $_val_){
+            $$_key1_ = $_val_;
+        }
+    }
+    else{
+        foreach((array)$_data_ as $_key1_ => $_val_){
+            $$_key1_ = $_h_($_val_);
+            $_key2_ = "__" . $_key1_;
+            $$_key2_ = $_val_;
+        }
+    }
+    ob_start();
+    require $_file_;
+    return ob_get_clean();
+}
+
+
 function ファイルダウンロード($data, $filename = null, $timeout = 60*60*12){
     ini_set("max_execution_time", $timeout);
     if(!file_exists($data)){ エラー404("ダウンロードファイルが存在しません"); }
@@ -862,12 +893,6 @@ function ベーシック認証($認証関数, $realm="member only"){
 
 function 連想配列ソート(array &$array){
     array_multisort(array_values($array), SORT_DESC, SORT_NATURAL, array_keys($array), SORT_ASC, SORT_NATURAL, $array);
-}
-
-
-function テンプレート変換($テンプレート, array $変換関係 = [], $dont_escpae = false){
-    if($dont_escpae === false){ $変換関係 = h($変換関係); }
-    return preg_replace_callback("|《([^》]*)》|u", function($match) use($変換関係){ return $変換関係[$match[1]]; }, $テンプレート);
 }
 
 
@@ -2006,50 +2031,6 @@ class 文書 implements Countable, IteratorAggregate{
         }
 
         return implode('', $parts);
-    }
-}
-
-
-class テンプレート{
-    private $_file_;
-    private $_data_;
-
-    public function __construct($file){
-        if(!preg_match("#^(/|\\\\|\w+:)#", $file)){ //相対パスなら
-            $dir  = dirname(debug_backtrace()[0]['file']);
-            $file = "$dir/$file";
-        }
-        $this->_file_ = $file;
-    }
-
-    public function __get($name){
-        if(strpos($name, "__") === 0){
-            $name = substr($name, 2);
-            return isset($this->_data_[$name]) ? $this->_data_[$name] : '';
-        }
-        else{
-            return isset($this->_data_[$name]) ? $this->h($this->_data_[$name]) : '';
-        }
-    }
-
-    public function __set($name, $value){
-        $this->_data_[$name] = $value;
-    }
-
-    public function __invoke(){
-        $v = $this;
-        ob_start();
-        require $this->_file_;
-        return ob_get_clean();
-    }
-
-    public function __toString(){
-        return $this();
-    }
-
-    public function h($value = ""){
-        if(is_array($value)){ return array_map([$this, "h"], $value); }
-        return htmlspecialchars($value, ENT_QUOTES, "UTF-8");
     }
 }
 
