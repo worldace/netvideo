@@ -1282,11 +1282,14 @@ class 部品{
             if($pos !== false){
                 $buf = substr_replace($buf, self::$結果['jsinbody'], $pos, 0); //最後に出現する</body>の前にJSを挿入する
             }
+            else{
+                $buf = $buf . self::$結果['jsinbody'];
+            }
         }
         if(self::$結果['css'] || self::$結果['jsinhead']){
-            $pos = stripos($buf, "</head>");
+            $pos = stripos($buf, "</title>");
             if($pos !== false){
-                $buf = substr_replace($buf, self::$結果['css'].self::$結果['jsinhead'], $pos, 0); //最初に出現する</head>の前に挿入する
+                $buf = substr_replace($buf, self::$結果['css'].self::$結果['jsinhead'], $pos+8, 0); //最初に出現する</title>の前に挿入する
             }
         }
         return $buf;
