@@ -246,14 +246,10 @@ function テンプレート($_file_, array $_data_ = null, $エスケープし�
     if(!preg_match("#^(/|\\\\|\w+:)#", $_file_)){ //相対パスなら
         $_file_ = dirname(debug_backtrace()[0]['file']) . "/$_file_";
     }
-    $_h_ = function($data) use (&$_h_){
-        if(!is_array($data)){ return htmlspecialchars($data, ENT_QUOTES, 'UTF-8'); }
-        foreach($data as &$value) {
-            if(is_array($value)){ $value = $_h_($value); }
-            else { $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8'); } 
-        }
-        return $data;
-    }; 
+    $_h_ = function($arg) use (&$_h_){
+        if(is_array($arg)){ return array_map($_h_, $arg); }
+        return htmlspecialchars($arg, ENT_QUOTES, "UTF-8");
+    };
     
     if($エスケープしない){
         foreach((array)$_data_ as $_key1_ => $_val_){
