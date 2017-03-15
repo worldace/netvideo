@@ -486,11 +486,6 @@ function 連想配列なら($array){
 }
 
 
-function 本番環境なら(){
-    return ini_get("display_errors") ? false : true;
-}
-
-
 function 開発環境なら(){
     return ini_get("display_errors") ? true : false;
 }
