@@ -1236,7 +1236,7 @@ class 部品{
         if(!isset(self::$記憶[$部品パス])){
             $file = file_get_contents($部品パス);
             preg_match("|<script\s+type\s*=\s*[\"\']php[\"\']\s*>([\s\S]*?)</script>|i", $file, $code);
-            eval($code[1] . ";");
+            eval($code[1].";");
             self::$記憶[$部品パス] = isset($php) ? $php : "";
 
             //部品変数を処理して結果にまとめる
@@ -2006,6 +2006,50 @@ class 文書 implements Countable, IteratorAggregate{
         }
 
         return implode('', $parts);
+    }
+}
+
+
+class テンプレート{
+    private $_file_;
+    private $_data_;
+
+    public function __construct($file){
+        if(!preg_match("#^(/|\\\\|\w+:)#", $file)){ //相対パスなら
+            $dir  = dirname(debug_backtrace()[0]['file']);
+            $file = "$dir/$file";
+        }
+        $this->_file_ = $file;
+    }
+
+    public function __get($name){
+        if(strpos($name, "__") === 0){
+            $name = substr($name, 2);
+            return isset($this->_data_[$name]) ? $this->_data_[$name] : '';
+        }
+        else{
+            return isset($this->_data_[$name]) ? $this->h($this->_data_[$name]) : '';
+        }
+    }
+
+    public function __set($name, $value){
+        $this->_data_[$name] = $value;
+    }
+
+    public function __invoke(){
+        $v = $this;
+        ob_start();
+        require $this->_file_;
+        return ob_get_clean();
+    }
+
+    public function __toString(){
+        return $this();
+    }
+
+    public function h($value = ""){
+        if(is_array($value)){ return array_map([$this, "h"], $value); }
+        return htmlspecialchars($value, ENT_QUOTES, "UTF-8");
     }
 }
 
