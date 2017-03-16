@@ -1635,21 +1635,25 @@ class 文書 implements Countable, IteratorAggregate{
     }
 
     public function d(){
-        $print = "■現在選択中の要素一覧 (" . count($this->選択) . ")\n\n";
+        $print = "■現在選択中の要素 (" . count($this->選択) . ")\n\n";
         foreach($this->選択 as $key => $dom){
             $print .= "[$key]: {$this->文書->saveHTML($dom)}\n";
         }
-/*
-        $要素一覧 = $this->セレクタ検索("*", false);
-        $print .= "\n■要素一覧 (" . count($要素一覧) . ")\n";
-        foreach($要素一覧 as $key => $dom){
-            $xpath = $dom->getNodePath();
-            $xpath = str_replace("/", ">", $xpath);
-            $xpath = preg_replace("#^>#", "", $xpath);
-            $xpath = preg_replace("#\[(\d+)\]#", ":nth-of-type($1)", $xpath);
-            $print .= "[$key]: '$xpath'\n{$this->文書->saveHTML($dom)}\n\n";
+        
+        $print .= "\n\n■エラー情報\n\n";
+        foreach(libxml_get_errors() as $error){
+            switch ($error->level) {
+                case LIBXML_ERR_WARNING:
+                    $print .= "警告: {$error->line}行目 {$error->message}\n";
+                    break;
+                 case LIBXML_ERR_ERROR:
+                    $print .= "エラー: {$error->line}行目 {$error->message}\n";
+                    break;
+                case LIBXML_ERR_FATAL:
+                    $print .= "致命的なエラー: {$error->line}行目 {$error->message}\n";
+                    break;
+            }
         }
-*/
         return $print;
     }
 
