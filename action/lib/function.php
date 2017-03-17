@@ -530,8 +530,9 @@ function 日本語設定(){
 
 
 function h($arg = ""){
-    if(is_array($arg)){ return array_map("h", $arg); }
-    return htmlspecialchars($arg, ENT_QUOTES, "UTF-8");
+    if(is_string($arg)){ return htmlspecialchars($arg, ENT_QUOTES, "UTF-8"); }
+    else if(is_array($arg)){ return array_map("h", $arg); }
+    else { return $arg; }
 }
 
 
@@ -1226,7 +1227,7 @@ class 部品{
 
 
     public static function 開始($dir = __DIR__."/部品", $manual = false){
-        if(!is_dir($dir)){ throw new プログラムミス("部品ディレクトリが存在しません"); }
+        if(!is_dir($dir)){ throw new Exception("部品ディレクトリが存在しません"); }
         self::$ディレクトリ = $dir;
         self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>''];
         self::$記憶 = [];
@@ -1293,7 +1294,7 @@ class 部品{
     public static function 関数登録(){
         if(function_exists("部品")){ return; }
         function 部品($部品名, ...$引数){
-            return 部品::作成($部品名, h($引数));
+            return 部品::作成($部品名, 部品::h($引数));
         }
         function 生部品($部品名, ...$引数){
             return 部品::作成($部品名, $引数);
@@ -1304,9 +1305,15 @@ class 部品{
         return $this->結果;
     }
 
+    public static function h($arg = ""){
+        if(is_string($arg)){ return htmlspecialchars($arg, ENT_QUOTES, "UTF-8"); }
+        else if(is_array($arg)){ return array_map("部品::h", $arg); }
+        else { return $arg; }
+    }
+
 
     private static function パス($部品名){
-        if(!self::$ディレクトリ){ throw new プログラムミス("部品::開始() を行っていません"); }
+        if(!self::$ディレクトリ){ throw new Exception("部品::開始() を行っていません"); }
 
         if(preg_match("/\.html$/i", $部品名)){
             $path = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[2]['file']) . $部品名; //絶対パスor相対パス
@@ -1315,7 +1322,7 @@ class 部品{
             $path = self::$ディレクトリ . "/$部品名.html";
         }
         $path = realpath($path);
-        if(!$path){ throw new プログラムミス("部品ファイルが見つかりません\n部品名: $部品名\n部品パス: $path"); }
+        if(!$path){ throw new Exception("部品ファイルが見つかりません\n部品名: $部品名\n部品パス: $path"); }
 
         return $path;
     }
