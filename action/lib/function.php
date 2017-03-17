@@ -1248,7 +1248,7 @@ class 部品{
     public static function 作成($部品名, $引数){
         $部品パス = self::パス($部品名);
         self::$記憶['stack'][] = $部品パス;
-        if(count(self::$記憶['stack']) > 100){ throw new Exception("[$部品パス]:スタックオーバーフロー"); }
+        if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品パス]:入れ子制限"); }
 
         //キャッシュの有無により分岐
         if(!isset(self::$記憶[$部品パス])){
