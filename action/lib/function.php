@@ -1253,9 +1253,9 @@ class 部品{
         //キャッシュの有無により分岐
         if(!isset(self::$記憶[$部品パス])){
             $file = file_get_contents($部品パス);
-            preg_match("|<script\s+type\s*=\s*[\"\']part[\"\']\s*>([\s\S]*?)</script>|i", $file, $code);
+            preg_match("|<script\s+type\s*=\s*[\"\']部品[\"\']\s*>([\s\S]*?)</script>|i", $file, $code);
             eval($code[1].";");
-            self::$記憶[$部品パス] = isset($part) ? $part : "";
+            self::$記憶[$部品パス] = isset($部品) ? $部品 : "";
 
             //部品変数を処理して結果にまとめる
             self::$結果['css'] .= self::CSS処理($file);
@@ -1263,10 +1263,10 @@ class 部品{
             self::$結果['jsinbody'] .= self::JS処理(substr($file, stripos($file, "</head")));
         }
         else{
-            $part = self::$記憶[$部品パス];
+            $部品 = self::$記憶[$部品パス];
         }
 
-        $html = is_callable($part) ? call_user_func_array($part, $引数) : $part;
+        $html = is_callable($部品) ? call_user_func_array($部品, $引数) : $部品;
         array_pop(self::$記憶['stack']);
         return $html;
     }
@@ -1344,7 +1344,7 @@ class 部品{
         preg_match_all("|<script([\s\S]*?)</script>|i", $html, $script);
         foreach((array)$script[0] as $v){
             preg_match("|^([^>]+)|", $v, $attr);
-            if(preg_match("|\stype\s*=\s*[\"\']part|i", $attr[0])){ continue; }
+            if(preg_match("|\stype\s*=\s*[\"\']部品|i", $attr[0])){ continue; }
             if(preg_match("|\ssrc\s*=\s*[\"\']([\s\S]*?)[\"\']|i", $attr[0], $src)){
                 if(in_array($src[1], (array)self::$記憶['読み込み済みURL'])){ continue; }
                 self::$記憶['読み込み済みURL'][] = $src[1];
