@@ -487,7 +487,7 @@ function 開発環境なら(){
 }
 
 
-function PHPが($str){
+function PHP≧($str){
     return version_compare(PHP_VERSION, $str) >= 0;
 }
 
