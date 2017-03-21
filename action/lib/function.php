@@ -1507,30 +1507,15 @@ class 文書 implements Countable, IteratorAggregate{
     }
 
     public function 最初(){
-        $新選択 = [];
-        if(isset($this->選択[0])){ $新選択[] = $this->選択[0]; }
-        return $this->選択保存($新選択);
+        return $this->選択保存(array_slice($this->選択, 0, 1));
     }
 
     public function 最後(){
-        $新選択 = [];
-        if(isset($this->選択[0])){ $新選択[] = $this->選択[count($this->選択)-1]; }
-        return $this->選択保存($新選択);
+        return $this->選択保存(array_slice($this->選択, -1, 1));
     }
     
-    public function n($n, $m = null){
-        $新選択 = [];
-        if($m === null){
-            if(isset($this->選択[$n])){ $新選択[] = $this->選択[$n]; }
-        }
-        else{
-            if(isset($this->選択[$n]) and isset($this->選択[$n+$m-1])){
-                for($i = $n; $i < $n+$m;  $i++){
-                    $新選択[] = $this->選択[$i];
-                }
-            }
-        }
-        return $this->選択保存($新選択);
+    public function n($n, $m = 1){
+        return $this->選択保存(array_slice($this->選択, $n, $m));
     }
 
     public function 親($selector = null){
