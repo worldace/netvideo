@@ -1224,7 +1224,6 @@ class 部品{
     private static $開始;
     private static $記憶;
     private static $結果;
-    public  static $部品名;
 
 
     public static function 開始($dir = __DIR__."/部品", $manual = false){
@@ -1249,7 +1248,6 @@ class 部品{
 
     public static function 作成($部品名, $引数){
         $部品パス = self::パス($部品名);
-        self::$部品名 = $部品名;
         self::$記憶['stack'][] = $部品パス;
         if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品パス]:入れ子制限", 500); }
 
@@ -1270,7 +1268,6 @@ class 部品{
         }
 
         $html = is_callable($部品) ? call_user_func_array($部品, $引数) : $部品;
-        self::$部品名 = "";
         array_pop(self::$記憶['stack']);
         return $html;
     }
