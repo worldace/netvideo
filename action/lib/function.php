@@ -44,11 +44,11 @@ function JSON表示($json = [], $allow = null){
     header("Access-Control-Allow-Credentials: true");
     if(is_string($_GET['callback'])){ //JSONP
         header("Content-Type: application/javascript; charset=utf-8");
-        print $_GET['callback'] . "(" . json_encode($json) . ");";
+        print $_GET['callback'] . "(" . json_encode($json, JSON_PARTIAL_OUTPUT_ON_ERROR) . ");";
     }
     else{ //JSON
         header("Content-Type: application/json; charset=utf-8");
-        print json_encode($json);
+        print json_encode($json, JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
     exit;
 }
@@ -683,7 +683,7 @@ function zip解凍($zipfile, $where = ""){
 
 function 一時保存($name, $data){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
-    $result = file_put_contents($tempfile, json_encode($data), LOCK_EX);
+    $result = file_put_contents($tempfile, json_encode($data, JSON_PARTIAL_OUTPUT_ON_ERROR), LOCK_EX);
     return ($result === false) ? false : $name;
 }
 
@@ -696,7 +696,7 @@ function 一時取得($name){
 
 function JSON保存($file, $data){
     $prefix = preg_match("/\.php$/i", $file) ? "<?php\n" : "";
-    $result = file_put_contents($file, $prefix.json_encode($data, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES), LOCK_EX);
+    $result = file_put_contents($file, $prefix.json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR), LOCK_EX);
     return ($result === false) ? false : $file;
 }
 
@@ -775,8 +775,8 @@ function XML取得($xml, $options = array()) {
 }
 
 
-function tojs($data){
-    return json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+function fromphp($data){
+    return json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
 }
 
 
@@ -830,8 +830,8 @@ function 復号化($str, $key){
 function jwt発行($data, $key){
     $header     = ['typ'=>'jwt', 'alg'=>'HS256'];
     $segments   = [];
-    $segments[] = base64_encode_urlsafe(json_encode($header));
-    $segments[] = base64_encode_urlsafe(json_encode($data));
+    $segments[] = base64_encode_urlsafe(json_encode($header), JSON_PARTIAL_OUTPUT_ON_ERROR);
+    $segments[] = base64_encode_urlsafe(json_encode($data), JSON_PARTIAL_OUTPUT_ON_ERROR);
 
     $sign       = hash_hmac('sha256', implode('.', $segments), $key, true);
     $segments[] = base64_encode_urlsafe($sign);
@@ -1224,13 +1224,14 @@ class 部品{
     private static $開始;
     private static $記憶;
     private static $結果;
+    public  static $部品名;
 
 
     public static function 開始($dir = __DIR__."/部品", $manual = false){
         if(!is_dir($dir)){ throw new Exception("部品ディレクトリが存在しません"); }
         self::$ディレクトリ = $dir;
         self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>''];
-        self::$記憶 = [];
+        self::$記憶 = ['html'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[]];
         self::関数登録();
         if(!self::$開始 and !$manual){
             self::$開始 = true;
@@ -1248,6 +1249,7 @@ class 部品{
 
     public static function 作成($部品名, $引数){
         $部品パス = self::パス($部品名);
+        self::$部品名 = $部品名;
         self::$記憶['stack'][] = $部品パス;
         if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品パス]:入れ子制限"); }
 
@@ -1268,11 +1270,21 @@ class 部品{
         }
 
         $html = is_callable($部品) ? call_user_func_array($部品, $引数) : $部品;
+        self::$部品名 = "";
         array_pop(self::$記憶['stack']);
         return $html;
     }
 
     public static function 差し込み($buf){
+        if(self::$記憶['fromphp']){
+            $fromphp = "<script>\nvar fromphp = {};\n";
+            foreach(self::$記憶['fromphp'] as $key => $val){
+                $fromphp .= "fromphp['$key'] = $val;\n";
+            }
+            $fromphp .= "</script>\n";
+            self::$結果['jsinhead'] = $fromphp . self::$結果['jsinhead'];
+        }
+        
         if(self::$結果['jsinbody']){
             $pos = strripos($buf, "</body>");
             if($pos !== false){
@@ -1311,20 +1323,20 @@ class 部品{
         else { return $arg; }
     }
 
-    public function json($data){
-        return rawurlencode(json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT));
+    public static function fromphp($data){
+        if(isset(self::$部品名)){
+            $fromphp = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
+            self::$記憶['fromphp'][self::$部品名] = $fromphp;
+            return rawurlencode($fromphp);
+        }
     }
 
 
     private static function パス($部品名){
         if(!self::$ディレクトリ){ throw new Exception("部品::開始() を行っていません"); }
 
-        if(preg_match("/\.html$/i", $部品名)){
-            $path = (preg_match("#^(/|\\\\|\w+:)#", $部品名))  ?  $部品名  :  dirname(debug_backtrace()[2]['file']) . $部品名; //絶対パスor相対パス
-        }
-        else{
-            $path = self::$ディレクトリ . "/$部品名.html";
-        }
+        $部品名 = str_replace("_", "/", $部品名);
+        $path = self::$ディレクトリ . "/$部品名.html";
         $path = realpath($path);
         if(!$path){ throw new Exception("部品ファイルが見つかりません\n部品名: $部品名\n部品パス: $path"); }
 
