@@ -1311,6 +1311,10 @@ class 部品{
         else { return $arg; }
     }
 
+    public function json($data){
+        return rawurlencode(json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT));
+    }
+
 
     private static function パス($部品名){
         if(!self::$ディレクトリ){ throw new Exception("部品::開始() を行っていません"); }
