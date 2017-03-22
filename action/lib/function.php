@@ -1254,11 +1254,11 @@ class 部品{
         if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品パス]:入れ子制限"); }
 
         //キャッシュの有無により分岐
-        if(!isset(self::$記憶[$部品パス])){
+        if(!isset(self::$記憶['html'][$部品パス])){
             $file = file_get_contents($部品パス);
             preg_match("|<script\s+type\s*=\s*[\"\']部品[\"\']\s*>([\s\S]*?)</script>|i", $file, $code);
             eval($code[1].";");
-            self::$記憶[$部品パス] = isset($部品) ? $部品 : "";
+            self::$記憶['html'][$部品パス] = isset($部品) ? $部品 : "";
 
             //部品変数を処理して結果にまとめる
             self::$結果['css'] .= self::CSS処理($file);
@@ -1266,7 +1266,7 @@ class 部品{
             self::$結果['jsinbody'] .= self::JS処理(substr($file, stripos($file, "</head")));
         }
         else{
-            $部品 = self::$記憶[$部品パス];
+            $部品 = self::$記憶['html'][$部品パス];
         }
 
         $html = is_callable($部品) ? call_user_func_array($部品, $引数) : $部品;
