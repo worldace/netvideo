@@ -1276,15 +1276,8 @@ class 部品{
     }
 
     public static function 差し込み($buf){
-        if(self::$記憶['fromphp']){
-            $fromphp = "<script>\nvar fromphp = {};\n";
-            foreach(self::$記憶['fromphp'] as $key => $val){
-                $fromphp .= "fromphp['$key'] = $val;\n";
-            }
-            $fromphp .= "</script>\n";
-            self::$結果['jsinhead'] = $fromphp . self::$結果['jsinhead'];
-        }
-        
+        self::$結果['fromphp'] = self::fromphp作成();
+
         if(self::$結果['jsinbody']){
             $pos = strripos($buf, "</body>");
             if($pos !== false){
@@ -1294,10 +1287,10 @@ class 部品{
                 $buf = $buf . self::$結果['jsinbody'];
             }
         }
-        if(self::$結果['css'] || self::$結果['jsinhead']){
+        if(self::$結果['css'] || self::$結果['jsinhead'] || self::$結果['fromphp']){
             $pos = stripos($buf, "</title>");
             if($pos !== false){
-                $buf = substr_replace($buf, self::$結果['css'].self::$結果['jsinhead'], $pos+8, 0); //最初に出現する</title>の前に挿入する
+                $buf = substr_replace($buf, "\n".self::$結果['css'].self::$結果['fromphp'].self::$結果['jsinhead'], $pos+8, 0); //最初に出現する</title>の前に挿入する
             }
         }
         return $buf;
@@ -1314,6 +1307,7 @@ class 部品{
     }
 
     public static function コード取得(){
+        $this->結果['fromphp'] = self::fromphp作成();
         return $this->結果;
     }
 
@@ -1375,6 +1369,16 @@ class 部品{
             $return .= $v . "\n";
         }
         return $return;
+    }
+
+    private static function fromphp作成(){
+        if(!self::$記憶['fromphp']){ return ""; }
+        $fromphp = "<script>\nvar fromphp = {};\n";
+        foreach(self::$記憶['fromphp'] as $key => $val){
+            $fromphp .= "fromphp['$key'] = $val;\n";
+        }
+        $fromphp .= "</script>\n";
+        return $fromphp;
     }
 }
 
