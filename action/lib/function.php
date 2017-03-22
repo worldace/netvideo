@@ -137,16 +137,16 @@ function 検査($type, $name, $func){
         else if(preg_match("/^(-?[0-9\.]+)より大きい$/u", $func, $m)){ $result = 検査::より大きい($value, (int)$m[1]); }
         else if(preg_match("/^(-?[0-9\.]+)より小さい$/u", $func, $m)){ $result = 検査::より小さい($value, (int)$m[1]); }
         else if(preg_match("/^(-?[0-9\.]+)と同じ$/u", $func, $m))    { $result = 検査::と同じ($value, (int)$m[1]); }
-        else                                                         { throw new プログラムミス(__function__."() 第3引数の関数名が間違っています"); }
+        else                                                         { throw new Exception(__function__."() 第3引数の関数名が間違っています", 500); }
     }
     
     if(検査::$例外 === true and $result === false){
-        エラー400("{$name}の値が間違っています");
+        throw new Exception("{$name}の値が間違っています", 400);
     }
     
     if($result === true){ return true; }
     elseif($result === false){ return false; }
-    else{ throw new プログラムミス(__function__."() 第3引数の関数はtrueまたはfalseを返してください"); }
+    else{ throw new Exception(__function__."() 第3引数の関数はtrueまたはfalseを返してください", 500); }
 }
 
 
@@ -271,7 +271,7 @@ function テンプレート($_file_, array $_data_ = null, $エスケープし�
 
 function ファイルダウンロード($data, $filename = null, $timeout = 60*60*12){
     ini_set("max_execution_time", $timeout);
-    if(!file_exists($data)){ エラー404("ダウンロードファイルが存在しません"); }
+    if(!file_exists($data)){ throw new Exception("ファイルが存在しません", 404); }
     $filesize = filesize($data);
     if(!$filename){ $filename = basename($data); }
     $filenameE = rawurlencode($filename);
@@ -949,7 +949,7 @@ class データベース{
             $driver   = $_ENV['データベース.ドライバー'];
             $user     = $_ENV['データベース.ユーザー名'];
             $password = $_ENV['データベース.パスワード'];
-            if(!$driver){ throw new プログラムミス('データベースの設定がありません。$_ENV[\'データベース.ドライバー\']に値を設定してください');}
+            if(!$driver){ throw new Exception('データベースの設定がありません。$_ENV[\'データベース.ドライバー\']に値を設定してください', 500);}
         }
         $this->ドライバー = $driver;
         $this->接続名     = md5($driver.$user.$password);
@@ -970,7 +970,7 @@ class データベース{
             $pdo = new PDO($driver, $user, $password, $setting);
         }
         catch(PDOException $e){
-            throw new プログラムミス("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください", 0, $e);
+            throw new Exception("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください", 500, $e);
         }
         return $pdo;
     }
@@ -1152,7 +1152,7 @@ class データベース{
     }
 
     private function 文字列検証($str){
-        if(preg_match("/[[:cntrl:][:punct:][:space:]]/", $str)){ エラー500("引数に不正な文字列が含まれています"); }
+        if(preg_match("/[[:cntrl:][:punct:][:space:]]/", $str)){ throw new Exception("引数に不正な文字列が含まれています", 500); }
     }
 
     private function 追加SQL文(array $条件 = null, $WHEREorAND = "where"){
@@ -1228,7 +1228,7 @@ class 部品{
 
 
     public static function 開始($dir = __DIR__."/部品", $manual = false){
-        if(!is_dir($dir)){ throw new Exception("部品ディレクトリが存在しません"); }
+        if(!is_dir($dir)){ throw new Exception("部品ディレクトリが存在しません", 500); }
         self::$ディレクトリ = $dir;
         self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>''];
         self::$記憶 = ['html'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[]];
@@ -1251,7 +1251,7 @@ class 部品{
         $部品パス = self::パス($部品名);
         self::$部品名 = $部品名;
         self::$記憶['stack'][] = $部品パス;
-        if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品パス]:入れ子制限"); }
+        if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品パス]:入れ子制限", 500); }
 
         //キャッシュの有無により分岐
         if(!isset(self::$記憶['html'][$部品パス])){
@@ -1327,12 +1327,12 @@ class 部品{
 
 
     private static function パス($部品名){
-        if(!self::$ディレクトリ){ throw new Exception("部品::開始() を行っていません"); }
+        if(!self::$ディレクトリ){ throw new Exception("部品::開始() を行っていません", 500); }
 
         $部品名 = str_replace("_", "/", $部品名);
         $path = self::$ディレクトリ . "/$部品名.html";
         $path = realpath($path);
-        if(!$path){ throw new Exception("部品ファイルが見つかりません\n部品名: $部品名\n部品パス: $path"); }
+        if(!$path){ throw new Exception("部品ファイルが見つかりません\n部品名: $部品名\n部品パス: $path", 500); }
 
         return $path;
     }
@@ -2048,26 +2048,6 @@ class 文書 implements Countable, IteratorAggregate{
     }
 }
 
-
-function エラー400($str){
-    throw new 実行エラー($str, 400);
-}
-
-function エラー404($str){
-    throw new 実行エラー($str, 404);
-}
-
-function エラー500($str){
-    throw new 実行エラー($str, 500);
-}
-
-class 実行エラー extends RuntimeException{
-    use 例外の実装;
-}
-
-class プログラムミス extends LogicException{
-    use 例外の実装;
-}
 
 trait 例外の実装{
     public function __toString() {
