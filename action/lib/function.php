@@ -1327,7 +1327,8 @@ class 部品{
 
 
     private static function パス($部品名){
-        if(!self::$ディレクトリ){ throw new Exception("部品::開始() を行っていません", 500); }
+        if(!self::$ディレクトリ){ throw new Exception("部品::開始() を行ってください", 500); }
+        if(preg_match("/[^a-zA-Z_\x7f-\xff]/", $部品名)){ throw new Exception("部品名に使用できない文字が含まれています", 500); }
 
         $部品名 = str_replace("_", "/", $部品名);
         $path = self::$ディレクトリ . "/$部品名.html";
