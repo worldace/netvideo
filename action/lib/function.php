@@ -1375,15 +1375,9 @@ class 部品{
     }
 
     private static function fromphp処理(){
-        $return = "";
-        if(!self::$記憶['fromphp']){ return $return; }
+        if(!self::$記憶['fromphp']){ return ""; }
 
-        if(isset(self::$設定['nonce'])){
-            $return = "<script nonce='" . self::$設定['nonce'] . "'>\n";
-        }
-        else{
-            $return = "<script>\n";
-        }
+        $return = isset(self::$設定['nonce'])  ?  "<script nonce='".self::$設定['nonce']."'>\n"  :  "<script>\n";
         $return .= "var fromphp = {};\n";
 
         foreach(self::$記憶['fromphp'] as $key => $val){
