@@ -554,7 +554,7 @@ function 制御文字削除($arg = "", $LF = false){ // http://blog.sarabande.jp
 
 function 開始タグ($tag, array $attr = []){
     if(preg_match("/[^a-zA-Z0-9\-]/", $tag)){
-        trigger_error("[$name]はタグ名に使用できません");
+        trigger_error("[$tag]はタグ名に使用できません");
         return;
     }
     return "<$tag" . 属性文字列($attr) . ">";
@@ -563,7 +563,7 @@ function 開始タグ($tag, array $attr = []){
 
 function 終了タグ($tag){
     if(preg_match("/[^a-zA-Z0-9\-]/", $tag)){
-        trigger_error("[$name]はタグ名に使用できません");
+        trigger_error("[$tag]はタグ名に使用できません");
         return;
     }
     return "</$tag>";
@@ -1220,19 +1220,23 @@ class データベース{
 
 
 class 部品{
-    private static $ディレクトリ;
+    private static $設定;
     private static $開始;
     private static $記憶;
     private static $結果;
 
 
-    public static function 開始($dir = __DIR__."/部品", $manual = false){
+    public static function 開始($dir = __DIR__."/部品", array $option = []){
         if(!is_dir($dir)){ throw new Exception("部品ディレクトリが存在しません", 500); }
-        self::$ディレクトリ = $dir;
-        self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>''];
+        self::$設定 = $option + [
+            "手動モード"=>false,
+        ];
+        self::$設定["ディレクトリ"] = $dir;
+
+        self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
         self::$記憶 = ['html'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[]];
         self::関数登録();
-        if(!self::$開始 and !$manual){
+        if(!self::$開始 and !self::$設定['手動モード']){
             self::$開始 = true;
             ob_start(["部品", "差し込み"]);
         }
@@ -1241,7 +1245,7 @@ class 部品{
     public static function 終了(){
         if(self::$開始){
             self::$開始 = null;
-            self::$ディレクトリ = null;
+            self::$設定 = null;
             return self::差し込み(ob_get_clean());
         }
     }
@@ -1299,7 +1303,7 @@ class 部品{
     }
 
     public static function h($arg = ""){
-        if(is_string($arg)){ return htmlspecialchars($arg, ENT_QUOTES, "UTF-8"); }
+        if(is_string($arg)){ return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false); }
         else if(is_array($arg)){ return array_map("部品::h", $arg); }
         else { return $arg; }
     }
@@ -1326,10 +1330,10 @@ class 部品{
     }
 
     private static function パス($部品名){
-        if(!self::$ディレクトリ){ throw new Exception("部品::開始() を行ってください", 500); }
+        if(!self::$設定['ディレクトリ']){ throw new Exception("部品::開始() を行ってください", 500); }
         if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){ throw new Exception("部品名はPHPの変数の命名規則に沿ってください", 500); }
 
-        $path = realpath(self::$ディレクトリ . "/" . str_replace("_", "/", $部品名) . ".html");
+        $path = realpath(self::$設定['ディレクトリ'] . "/" . str_replace("_", "/", $部品名) . ".html");
         if(!$path){ throw new Exception("部品ファイルが見つかりません: $path", 500); }
         return $path;
     }
