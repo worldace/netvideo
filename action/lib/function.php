@@ -1230,6 +1230,7 @@ class 部品{
         if(!is_dir($dir)){ throw new Exception("部品ディレクトリが存在しません", 500); }
         self::$設定 = $option + [
             "手動モード"=>false,
+            "nonce"=>null,
         ];
         self::$設定["ディレクトリ"] = $dir;
 
@@ -1313,9 +1314,8 @@ class 部品{
     public static function fromphp($data){
         $部品名 = end(self::$記憶['stack']);
         if($部品名){
-            $fromphp = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
-            self::$記憶['fromphp'][$部品名] = $fromphp;
-            return rawurlencode($fromphp);
+            self::$記憶['fromphp'][$部品名] = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
+            return rawurlencode(self::$記憶['fromphp'][$部品名]);
         }
     }
 
@@ -1377,7 +1377,7 @@ class 部品{
     private static function fromphp処理(){
         if(!self::$記憶['fromphp']){ return ""; }
 
-        $return = isset(self::$設定['nonce'])  ?  "<script nonce='".self::$設定['nonce']."'>\n"  :  "<script>\n";
+        $return  = isset(self::$設定['nonce'])  ?  "<script nonce='".self::$設定['nonce']."'>\n"  :  "<script>\n";
         $return .= "var fromphp = {};\n";
 
         foreach(self::$記憶['fromphp'] as $key => $val){
@@ -1385,7 +1385,7 @@ class 部品{
         }
         return $return."</script>\n";
     }
-    
+
     private static function nonce処理($nonce){
         self::$結果['css']      = str_replace(" nonce=\"\"", " nonce=\"$nonce\"", self::$結果['css']);
         self::$結果['jsinhead'] = str_replace(" nonce=\"\"", " nonce=\"$nonce\"", self::$結果['jsinhead']);
