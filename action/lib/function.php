@@ -1248,15 +1248,15 @@ class 部品{
 
     public static function 作成($部品名, $引数){
         $部品パス = self::パス($部品名);
-        self::$記憶['stack'][] = $部品パス;
-        if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品パス]:入れ子制限", 500); }
+        self::$記憶['stack'][] = $部品名;
+        if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品名]:ループ数が上限に達しました", 500); }
 
         //キャッシュの有無により分岐
-        if(!isset(self::$記憶['html'][$部品パス])){
+        if(!isset(self::$記憶['html'][$部品名])){
             $file = file_get_contents($部品パス);
             preg_match("|<script\s+type\s*=\s*[\"\']部品[\"\']\s*>([\s\S]*?)</script>|i", $file, $code);
             eval($code[1].";");
-            self::$記憶['html'][$部品パス] = isset($部品) ? $部品 : "";
+            self::$記憶['html'][$部品名] = isset($部品) ? $部品 : "";
 
             //部品変数を処理して結果にまとめる
             self::$結果['css'] .= self::CSS処理($file);
@@ -1264,7 +1264,7 @@ class 部品{
             self::$結果['jsinbody'] .= self::JS処理(substr($file, stripos($file, "</head")));
         }
         else{
-            $部品 = self::$記憶['html'][$部品パス];
+            $部品 = self::$記憶['html'][$部品名];
         }
 
         $html = is_callable($部品) ? call_user_func_array($部品, $引数) : $部品;
@@ -1293,16 +1293,6 @@ class 部品{
         return $buf;
     }
 
-    public static function 関数登録(){
-        if(function_exists("部品")){ return; }
-        function 部品($部品名, ...$引数){
-            return 部品::作成($部品名, 部品::h($引数));
-        }
-        function 生部品($部品名, ...$引数){
-            return 部品::作成($部品名, $引数);
-        }
-    }
-
     public static function コード取得(){
         $this->結果['fromphp'] = self::fromphp作成();
         return $this->結果;
@@ -1315,13 +1305,25 @@ class 部品{
     }
 
     public static function fromphp($data){
-        if(isset(self::$部品名)){
+        $部品名 = end(self::$記憶['stack']);
+        if($部品名){
             $fromphp = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
-            self::$記憶['fromphp'][self::$部品名] = $fromphp;
+            self::$記憶['fromphp'][$部品名] = $fromphp;
             return rawurlencode($fromphp);
         }
     }
 
+
+
+    private static function 関数登録(){
+        if(function_exists("部品")){ return; }
+        function 部品($部品名, ...$引数){
+            return 部品::作成($部品名, 部品::h($引数));
+        }
+        function 生部品($部品名, ...$引数){
+            return 部品::作成($部品名, $引数);
+        }
+    }
 
     private static function パス($部品名){
         if(!self::$ディレクトリ){ throw new Exception("部品::開始() を行ってください", 500); }
