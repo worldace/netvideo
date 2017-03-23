@@ -1278,6 +1278,7 @@ class 部品{
 
     public static function 差し込み($buf){
         self::$結果['fromphp'] = self::fromphp処理();
+        //self::$結果に対するCSP nonce処理
 
         if(self::$結果['jsinbody']){
             $pos = strripos($buf, "</body>");
@@ -1299,6 +1300,7 @@ class 部品{
 
     public static function コード取得(){
         $this->結果['fromphp'] = self::fromphp処理();
+        //self::$結果に対するCSP nonce処理
         return $this->結果;
     }
 
