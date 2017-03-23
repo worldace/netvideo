@@ -1387,9 +1387,9 @@ class 部品{
     }
 
     private static function nonce処理($nonce){
-        self::$結果['css']      = str_replace(" nonce=\"\"", " nonce=\"$nonce\"", self::$結果['css']);
-        self::$結果['jsinhead'] = str_replace(" nonce=\"\"", " nonce=\"$nonce\"", self::$結果['jsinhead']);
-        self::$結果['jsinbody'] = str_replace(" nonce=\"\"", " nonce=\"$nonce\"", self::$結果['jsinbody']);
+        self::$結果['css']      = str_ireplace("<style", "<style nonce=\"$nonce\" ", self::$結果['css']);
+        self::$結果['jsinhead'] = str_ireplace("<script", "<script nonce=\"$nonce\" ", self::$結果['jsinhead']);
+        self::$結果['jsinbody'] = str_ireplace("<script", "<script nonce=\"$nonce\" ", self::$結果['jsinbody']);
     }
 }
 
