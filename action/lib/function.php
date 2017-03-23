@@ -1278,7 +1278,7 @@ class 部品{
 
     public static function 差し込み($buf){
         self::$結果['fromphp'] = self::fromphp処理();
-        //self::$結果に対するCSP nonce処理
+        if(isset(self::$設定['nonce'])){ self::nonce処理(self::$設定['nonce']); }
 
         if(self::$結果['jsinbody']){
             $pos = strripos($buf, "</body>");
@@ -1299,9 +1299,9 @@ class 部品{
     }
 
     public static function コード取得(){
-        $this->結果['fromphp'] = self::fromphp処理();
-        //self::$結果に対するCSP nonce処理
-        return $this->結果;
+        self::$結果['fromphp'] = self::fromphp処理();
+        if(isset(self::$設定['nonce'])){ self::nonce処理(self::$設定['nonce']); }
+        return self::$結果;
     }
 
     public static function h($arg = ""){
@@ -1377,10 +1377,25 @@ class 部品{
     private static function fromphp処理(){
         $return = "";
         if(!self::$記憶['fromphp']){ return $return; }
+
+        if(isset(self::$設定['nonce'])){
+            $return = "<script nonce='" . self::$設定['nonce'] . "'>\n";
+        }
+        else{
+            $return = "<script>\n";
+        }
+        $return .= "var fromphp = {};\n";
+
         foreach(self::$記憶['fromphp'] as $key => $val){
             $return .= "fromphp['$key'] = $val;\n";
         }
-        return "<script>\nvar fromphp = {};\n$return</script>\n";
+        return $return."</script>\n";
+    }
+    
+    private static function nonce処理($nonce){
+        self::$結果['css']      = str_replace(" nonce=\"\"", " nonce=\"$nonce\"", self::$結果['css']);
+        self::$結果['jsinhead'] = str_replace(" nonce=\"\"", " nonce=\"$nonce\"", self::$結果['jsinhead']);
+        self::$結果['jsinbody'] = str_replace(" nonce=\"\"", " nonce=\"$nonce\"", self::$結果['jsinbody']);
     }
 }
 
