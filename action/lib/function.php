@@ -1273,7 +1273,7 @@ class 部品{
     }
 
     public static function 差し込み($buf){
-        self::$結果['fromphp'] = self::fromphp作成();
+        self::$結果['fromphp'] = self::fromphp処理();
 
         if(self::$結果['jsinbody']){
             $pos = strripos($buf, "</body>");
@@ -1294,7 +1294,7 @@ class 部品{
     }
 
     public static function コード取得(){
-        $this->結果['fromphp'] = self::fromphp作成();
+        $this->結果['fromphp'] = self::fromphp処理();
         return $this->結果;
     }
 
@@ -1368,14 +1368,13 @@ class 部品{
         return $return;
     }
 
-    private static function fromphp作成(){
-        if(!self::$記憶['fromphp']){ return ""; }
-        $fromphp = "<script>\nvar fromphp = {};\n";
+    private static function fromphp処理(){
+        $return = "";
+        if(!self::$記憶['fromphp']){ return $return; }
         foreach(self::$記憶['fromphp'] as $key => $val){
-            $fromphp .= "fromphp['$key'] = $val;\n";
+            $return .= "fromphp['$key'] = $val;\n";
         }
-        $fromphp .= "</script>\n";
-        return $fromphp;
+        return "<script>\nvar fromphp = {};\n$return</script>\n";
     }
 }
 
