@@ -1329,11 +1329,8 @@ class 部品{
         if(!self::$ディレクトリ){ throw new Exception("部品::開始() を行ってください", 500); }
         if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){ throw new Exception("部品名はPHPの変数の命名規則に沿ってください", 500); }
 
-        $部品名 = str_replace("_", "/", $部品名);
-        $path = self::$ディレクトリ . "/$部品名.html";
-        $path = realpath($path);
-        if(!$path){ throw new Exception("部品ファイルが見つかりません\n部品名: $部品名\n部品パス: $path", 500); }
-
+        $path = realpath(self::$ディレクトリ . "/" . str_replace("_", "/", $部品名) . ".html");
+        if(!$path){ throw new Exception("部品ファイルが見つかりません: $path", 500); }
         return $path;
     }
 
