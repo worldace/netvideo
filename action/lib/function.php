@@ -1266,7 +1266,7 @@ class 部品{
             //部品変数を処理して結果にまとめる
             self::$結果['css'] .= self::CSS処理($file);
             $pos = stripos($file, "</head");
-            if($pos >= 0){
+            if($pos !== false){
                 self::$結果['jsinhead'] .= self::JS処理(substr($file, 0, $pos));
                 self::$結果['jsinbody'] .= self::JS処理(substr($file, $pos));
             }
