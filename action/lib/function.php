@@ -574,7 +574,9 @@ function タグ($tag, array $attr = []){
             trigger_error("[$key]は属性名に使用できません");
             continue;
         }
-        $return .= " $key=\"" . htmlspecialchars($val, ENT_COMPAT, "UTF-8", false) . '"';
+        $val = htmlspecialchars($val, ENT_QUOTES, "UTF-8", false);
+        $val = str_replace("(", "&#40;", $val);
+        $return .= " $key=\"$val\"";
     }
     $return .= ">";
     
@@ -590,12 +592,14 @@ function タグ($tag, array $attr = []){
 
 
 function 属性文字列(array $attr = []){
-    foreach($attr as $name => $value){
-        if(preg_match("/[^a-zA-Z\-]/", $name)){
-            trigger_error("[$name]は属性名に使用できません");
+    foreach($attr as $key => $val){
+        if(preg_match("/[^a-zA-Z\-]/", $key)){
+            trigger_error("[$key]は属性名に使用できません");
             continue;
         }
-        $str .= " $name=\"" . htmlspecialchars((string)$value, ENT_COMPAT, "UTF-8", false) . '"';
+        $val = htmlspecialchars($val, ENT_QUOTES, "UTF-8", false);
+        $val = str_replace("(", "&#40;", $val);
+        $str .= " $key=\"$val\"";
     }
     return $str;
 }
