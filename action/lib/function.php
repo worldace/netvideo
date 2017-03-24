@@ -1265,8 +1265,14 @@ class 部品{
 
             //部品変数を処理して結果にまとめる
             self::$結果['css'] .= self::CSS処理($file);
-            self::$結果['jsinhead'] .= self::JS処理(substr($file, 0, stripos($file, "</head")));
-            self::$結果['jsinbody'] .= self::JS処理(substr($file, stripos($file, "</head")));
+            $pos = stripos($file, "</head");
+            if($pos >= 0){
+                self::$結果['jsinhead'] .= self::JS処理(substr($file, 0, $pos));
+                self::$結果['jsinbody'] .= self::JS処理(substr($file, $pos));
+            }
+            else{
+                self::$結果['jsinhead'] .= self::JS処理($file);
+            }
         }
         else{
             $部品 = self::$記憶['html'][$部品名];
@@ -1378,8 +1384,8 @@ class 部品{
     private static function fromphp処理(){
         if(!self::$記憶['fromphp']){ return ""; }
 
-        $return  = isset(self::$設定['nonce'])  ?  "<script nonce=\"".self::$設定['nonce']."\">\n"  :  "<script>\n";
-        $return .= "var fromphp = {};\n";
+        $return  = isset(self::$設定['nonce'])  ?  '<script nonce="'.self::$設定['nonce'].'">'  :  '<script>';
+        $return .= "\nvar fromphp = {};\n";
 
         foreach(self::$記憶['fromphp'] as $key => $val){
             $return .= "fromphp['$key'] = $val;\n";
