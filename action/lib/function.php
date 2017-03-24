@@ -1234,8 +1234,8 @@ class 部品{
         ];
         self::$設定["ディレクトリ"] = $dir;
 
+        self::$記憶 = ['部品変数'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[]];
         self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
-        self::$記憶 = ['html'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[]];
         self::関数登録();
         if(!self::$開始 and !self::$設定['手動モード']){
             self::$開始 = true;
@@ -1246,24 +1246,25 @@ class 部品{
     public static function 終了(){
         if(self::$開始){
             self::$開始 = null;
-            self::$設定 = null;
             return self::差し込み(ob_get_clean());
         }
     }
 
     public static function 作成($部品名, $引数){
         $部品パス = self::パス($部品名);
-        self::$記憶['stack'][] = $部品名;
-        if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品名]:ループ数が上限に達しました", 500); }
 
-        //キャッシュの有無により分岐
-        if(!isset(self::$記憶['html'][$部品名])){
+        //キャッシュの有無
+        if(!isset(self::$記憶['部品変数'][$部品名])){
             $file = file_get_contents($部品パス);
+
+            //部品変数を取り出して実行
             preg_match("|<script\s+type\s*=\s*[\"\']部品[\"\']\s*>([\s\S]*?)</script>|i", $file, $code);
             eval($code[1].";");
-            self::$記憶['html'][$部品名] = isset($部品) ? $部品 : "";
 
-            //部品変数を処理して結果にまとめる
+            //部品変数をキャッシュ
+            self::$記憶['部品変数'][$部品名] = isset($部品) ? $部品 : "";
+
+            //部品ファイルからCSSとJSを取り出して結果にまとめる
             self::$結果['css'] .= self::CSS処理($file);
             $pos = stripos($file, "</head");
             if($pos !== false){
@@ -1275,10 +1276,14 @@ class 部品{
             }
         }
         else{
-            $部品 = self::$記憶['html'][$部品名];
+            $部品 = self::$記憶['部品変数'][$部品名];
         }
 
+        self::$記憶['stack'][] = $部品名;
+        if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品名]:ループ数が上限に達しました", 500); }
+
         $html = is_callable($部品) ? call_user_func_array($部品, $引数) : $部品;
+
         array_pop(self::$記憶['stack']);
         return $html;
     }
