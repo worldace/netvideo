@@ -1271,7 +1271,7 @@ class 部品{
                 self::$結果['jsinbody'] .= self::JS処理(substr($file, $pos));
             }
             else{
-                self::$結果['jsinhead'] .= self::JS処理($file);
+                self::$結果['jsinbody'] .= self::JS処理($file);
             }
         }
         else{
