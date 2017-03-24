@@ -248,7 +248,9 @@ function テンプレート($_file_, array $_data_ = null, $エスケープし�
     }
     $_h_ = function($arg) use (&$_h_){
         if(is_array($arg)){ return array_map($_h_, $arg); }
-        return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
+        $arg =htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
+        $arg = str_replace("(", "&#40;", $arg);
+        return $arg;
     };
     
     if($エスケープしない){
@@ -530,7 +532,11 @@ function 日本語設定(){
 
 
 function h($arg = ""){
-    if(is_string($arg)){ return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false); }
+    if(is_string($arg)){
+        $arg = htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
+        $arg = str_replace("(", "&#40;", $arg);
+        return $arg;
+    }
     else if(is_array($arg)){ return array_map("h", $arg); }
     else { return $arg; }
 }
@@ -1338,7 +1344,11 @@ class 部品{
     }
 
     public static function h($arg = ""){
-        if(is_string($arg)){ return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false); }
+        if(is_string($arg)){
+            $arg = htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
+            $arg = str_replace("(", "&#40;", $arg);
+            return $arg;
+        }
         else if(is_array($arg)){ return array_map("部品::h", $arg); }
         else { return $arg; }
     }
