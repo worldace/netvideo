@@ -1245,8 +1245,9 @@ class 部品{
 
     public static function 終了(){
         if(self::$開始){
-            self::$開始 = null;
-            return self::差し込み(ob_get_clean());
+            $return = self::差し込み(ob_get_clean());
+            self::$設定 = self::$開始 = self::$記憶 = self::$結果 = null;
+            return $return;
         }
     }
 
