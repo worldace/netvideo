@@ -1279,7 +1279,6 @@ class 部品{
 
     public static function 差し込み($buf){
         self::$結果['fromphp'] = self::fromphp処理();
-        if(isset(self::$設定['nonce'])){ self::nonce処理(self::$設定['nonce']); }
 
         if(self::$結果['jsinbody']){
             $pos = strripos($buf, "</body>");
@@ -1301,7 +1300,6 @@ class 部品{
 
     public static function コード取得(){
         self::$結果['fromphp'] = self::fromphp処理();
-        if(isset(self::$設定['nonce'])){ self::nonce処理(self::$設定['nonce']); }
         return self::$結果;
     }
 
@@ -1349,11 +1347,13 @@ class 部品{
                 if(in_array($href[1], (array)self::$記憶['読み込み済みURL'])){ continue; }
                 self::$記憶['読み込み済みURL'][] = $href[1];
             }
+            if(isset(self::$設定['nonce'])){ $v = preg_replace("/^<link/i", '<link nonce="'.self::$設定['nonce'].'" ', $v); }
             $return .= $v . "\n";
         }
 
         preg_match_all("|<style([\s\S]*?)</style>|i", $html, $style);
         foreach((array)$style[0] as $v){
+            if(isset(self::$設定['nonce'])){ $v = preg_replace("/^<style/i", '<style nonce="'.self::$設定['nonce'].'" ', $v); }
             $return .= $v . "\n";
         }
         return $return;
@@ -1369,6 +1369,7 @@ class 部品{
                 if(in_array($src[1], (array)self::$記憶['読み込み済みURL'])){ continue; }
                 self::$記憶['読み込み済みURL'][] = $src[1];
             }
+            if(isset(self::$設定['nonce'])){ $v = preg_replace("/^<script/i", '<script nonce="'.self::$設定['nonce'].'" ', $v); }
             $return .= $v . "\n";
         }
         return $return;
@@ -1377,20 +1378,13 @@ class 部品{
     private static function fromphp処理(){
         if(!self::$記憶['fromphp']){ return ""; }
 
-        $return  = isset(self::$設定['nonce'])  ?  "<script nonce='".self::$設定['nonce']."'>\n"  :  "<script>\n";
+        $return  = isset(self::$設定['nonce'])  ?  "<script nonce=\"".self::$設定['nonce']."\">\n"  :  "<script>\n";
         $return .= "var fromphp = {};\n";
 
         foreach(self::$記憶['fromphp'] as $key => $val){
             $return .= "fromphp['$key'] = $val;\n";
         }
         return $return."</script>\n";
-    }
-
-    private static function nonce処理($nonce){
-        self::$結果['css']      = str_ireplace("<style", "<style nonce=\"$nonce\" ", self::$結果['css']);
-        self::$結果['css']      = str_ireplace("<link", "<link nonce=\"$nonce\" ", self::$結果['css']);
-        self::$結果['jsinhead'] = str_ireplace("<script", "<script nonce=\"$nonce\" ", self::$結果['jsinhead']);
-        self::$結果['jsinbody'] = str_ireplace("<script", "<script nonce=\"$nonce\" ", self::$結果['jsinbody']);
     }
 }
 
