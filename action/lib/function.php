@@ -1323,7 +1323,6 @@ class 部品{
         $部品名 = end(self::$記憶['stack']);
         if($部品名){
             self::$記憶['fromphp'][$部品名] = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
-            return rawurlencode(self::$記憶['fromphp'][$部品名]);
         }
     }
 
