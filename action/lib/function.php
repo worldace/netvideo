@@ -1234,17 +1234,17 @@ class 部品{
         ];
         self::$設定["ディレクトリ"] = $dir;
 
-        self::$記憶 = ['部品変数'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[], '開始'=>false];
+        self::$記憶 = ['部品変数'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[], 'キャプチャ開始'=>false];
         self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
         self::関数登録();
         if(!self::$設定['手動']){
-            self::$記憶['開始'] = true;
+            self::$記憶['キャプチャ開始'] = true;
             ob_start(["部品", "差し込み"]);
         }
     }
 
     public static function 終了(){
-        $return = (self::$記憶['開始'])  ?  self::差し込み(ob_get_clean())  :  "";
+        $return = (self::$記憶['キャプチャ開始'] === true)  ?  self::差し込み(ob_get_clean())  :  "";
         self::$設定 = self::$記憶 = self::$結果 = null;
         return $return;
     }
