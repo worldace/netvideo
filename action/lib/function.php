@@ -248,7 +248,7 @@ function テンプレート($_file_, array $_data_ = null, $エスケープし�
     }
     $_h_ = function($arg) use (&$_h_){
         if(is_array($arg)){ return array_map($_h_, $arg); }
-        $arg =htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
+        $arg = htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
         $arg = str_replace("(", "&#40;", $arg);
         return $arg;
     };
@@ -1311,6 +1311,7 @@ class 部品{
         self::$記憶['stack'][] = $部品名;
         if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品名]:ループ数が上限に達しました", 500); }
 
+        $引数 = array_merge(self::h($引数), $引数);
         $html = is_callable($部品) ? call_user_func_array($部品, $引数) : $部品;
 
         array_pop(self::$記憶['stack']);
@@ -1365,9 +1366,6 @@ class 部品{
     private static function 関数登録(){
         if(function_exists("部品")){ return; }
         function 部品($部品名, ...$引数){
-            return 部品::作成($部品名, 部品::h($引数));
-        }
-        function 生部品($部品名, ...$引数){
             return 部品::作成($部品名, $引数);
         }
     }
