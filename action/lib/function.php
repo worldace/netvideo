@@ -248,7 +248,7 @@ function テンプレート($_file_, array $_data_ = null, $エスケープし�
     }
     $_h_ = function($arg) use (&$_h_){
         if(is_array($arg)){ return array_map($_h_, $arg); }
-        return htmlspecialchars($arg, ENT_QUOTES, "UTF-8");
+        return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
     };
     
     if($エスケープしない){
@@ -530,7 +530,7 @@ function 日本語設定(){
 
 
 function h($arg = ""){
-    if(is_string($arg)){ return htmlspecialchars($arg, ENT_QUOTES, "UTF-8"); }
+    if(is_string($arg)){ return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false); }
     else if(is_array($arg)){ return array_map("h", $arg); }
     else { return $arg; }
 }
@@ -552,21 +552,40 @@ function 制御文字削除($arg = "", $LF = false){ // http://blog.sarabande.jp
 }
 
 
-function 開始タグ($tag, array $attr = []){
+function タグ($tag, array $attr = []){
+    $閉じる   = true;
+    $単独タグ = false;
+    if(preg_match("|^\!|", $tag)){
+        $閉じる = false;
+        $tag = ltrim($tag, "!");
+    }
     if(preg_match("/[^a-zA-Z0-9\-]/", $tag)){
         trigger_error("[$tag]はタグ名に使用できません");
         return;
     }
-    return "<$tag" . 属性文字列($attr) . ">";
-}
-
-
-function 終了タグ($tag){
-    if(preg_match("/[^a-zA-Z0-9\-]/", $tag)){
-        trigger_error("[$tag]はタグ名に使用できません");
-        return;
+    if(in_array($tag, ["br","wbr","hr","img","col","base","link","meta","input","keygen","area","param","embed","source","track","command"], true)){
+        $単独タグ = true;
     }
-    return "</$tag>";
+
+    $return = "<$tag";
+    foreach($attr as $key => $val){
+        if($key === "text"){ continue; }
+        if(preg_match("/[^a-zA-Z\-]/", $key)){
+            trigger_error("[$key]は属性名に使用できません");
+            continue;
+        }
+        $return .= " $key=\"" . htmlspecialchars($val, ENT_COMPAT, "UTF-8", false) . '"';
+    }
+    $return .= ">";
+    
+    if($単独タグ === false and isset($attr['text'])){
+        $return .= htmlspecialchars($attr['text'], ENT_QUOTES, "UTF-8", false);
+    }
+    if($単独タグ === false and $閉じる === true){
+        $return .= "</$tag>";
+    }
+
+    return $return;
 }
 
 
@@ -576,7 +595,7 @@ function 属性文字列(array $attr = []){
             trigger_error("[$name]は属性名に使用できません");
             continue;
         }
-        $str .= " $name=\"" . htmlspecialchars((string)$value, ENT_COMPAT, "UTF-8") . '"';
+        $str .= " $name=\"" . htmlspecialchars((string)$value, ENT_COMPAT, "UTF-8", false) . '"';
     }
     return $str;
 }
@@ -1259,9 +1278,9 @@ class 部品{
             //部品変数を取り出して実行
             preg_match("|<script\s+type\s*=\s*[\"\']部品[\"\']\s*>([\s\S]*?)</script>|i", $file, $code);
             eval($code[1].";");
+            if(!isset($部品)){ $部品 = ""; }
 
             //部品変数をキャッシュ
-            if(!isset($部品)){ $部品 = ""; }
             self::$記憶['部品変数'][$部品名] = $部品;
 
             //部品ファイルからCSSとJSを取り出して結果にまとめる
