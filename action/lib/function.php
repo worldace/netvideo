@@ -1255,7 +1255,7 @@ class 部品{
 
 
     public static function 開始($dir = __DIR__."/部品", array $option = []){
-        if(isset(self::$設定)){ return; }
+        if(self::$設定){ return; }
         if(!is_dir($dir)){ throw new Exception("部品ディレクトリが存在しません", 500); }
         self::$設定 = $option + [
             "手動"=>false,
@@ -1380,22 +1380,24 @@ class 部品{
 
     private static function CSS処理($html){
         $return = "";
-        preg_match_all("|<link[^>]+>|i", $html, $link);
-        foreach((array)$link[0] as $v){
+        preg_match_all("|<style([\s\S]*?)</style>|i", $html, $style, PREG_OFFSET_CAPTURE);
+        preg_match_all("|<link[^>]+>|i", $html, $link, PREG_OFFSET_CAPTURE);
+
+        $css = [];
+        foreach(array_merge($style[0], $link[0]) as $tag){
+            $css[$tag[1]] = $tag[0];
+        }
+        ksort($css);
+
+        foreach($css as $v){
             preg_match("|^([^>]+)|", $v, $attr);
             if(preg_match("|\shref\s*=\s*[\"\']([\s\S]*?)[\"\']|i", $attr[0], $href)){
-                if(in_array($href[1], (array)self::$記憶['読み込み済みURL'])){ continue; }
+                if(in_array($href[1], self::$記憶['読み込み済みURL'])){ continue; }
                 self::$記憶['読み込み済みURL'][] = $href[1];
             }
             if(isset(self::$設定['nonce'])){ $v = preg_replace("/^<link/i", '<link nonce="'.self::$設定['nonce'].'" ', $v); }
             $return .= $v . "\n";
-        }
-
-        preg_match_all("|<style([\s\S]*?)</style>|i", $html, $style);
-        foreach((array)$style[0] as $v){
-            if(isset(self::$設定['nonce'])){ $v = preg_replace("/^<style/i", '<style nonce="'.self::$設定['nonce'].'" ', $v); }
-            $return .= $v . "\n";
-        }
+       }
         return $return;
     }
 
