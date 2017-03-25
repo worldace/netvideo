@@ -1283,10 +1283,10 @@ class 部品{
 
         //キャッシュの有無
         if(!isset(self::$記憶['部品変数'][$部品名])){
-            $file = file_get_contents($部品パス);
+            $部品ファイル = file_get_contents($部品パス);
 
             //部品変数を取り出して実行
-            preg_match("|<script\s+type\s*=\s*[\"\']部品[\"\']\s*>([\s\S]*?)</script>|i", $file, $code);
+            preg_match("|<script\s+type\s*=\s*[\"\']部品[\"\']\s*>([\s\S]*?)</script>|i", $部品ファイル, $code);
             eval($code[1].";");
             if(!isset($部品)){ $部品 = ""; }
 
@@ -1294,14 +1294,14 @@ class 部品{
             self::$記憶['部品変数'][$部品名] = $部品;
 
             //部品ファイルからCSSとJSを取り出して結果にまとめる
-            self::$結果['css'] .= self::CSS処理($file);
-            $pos = stripos($file, "</head");
+            self::$結果['css'] .= self::CSS処理($部品ファイル);
+            $pos = stripos($部品ファイル, "</head");
             if($pos !== false){
-                self::$結果['jsinhead'] .= self::JS処理(substr($file, 0, $pos));
-                self::$結果['jsinbody'] .= self::JS処理(substr($file, $pos));
+                self::$結果['jsinhead'] .= self::JS処理(substr($部品ファイル, 0, $pos));
+                self::$結果['jsinbody'] .= self::JS処理(substr($部品ファイル, $pos));
             }
             else{
-                self::$結果['jsinbody'] .= self::JS処理($file);
+                self::$結果['jsinbody'] .= self::JS処理($部品ファイル);
             }
         }
         else{
