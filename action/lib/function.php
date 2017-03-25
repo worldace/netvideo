@@ -642,12 +642,16 @@ function パーミッション($path, $permission = null){
 
 function ファイル一覧($dir = ".", $pattern = "/./"){
     if(!is_dir($dir)){ return false; }
+    $dir = realpath($dir);
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
-        if(is_file("$dir/$file") and preg_match($pattern, $file)){
-            yield realpath("$dir/$file");
+        $path = $dir . DIRECTORY_SEPARATOR . $file;
+        if(is_file($path)){
+            if(preg_match($pattern, $file)){
+                yield $path;
+            }
         }
-        if(is_dir("$dir/$file")) {
-            foreach(ファイル一覧("$dir/$file", $pattern) as $sub){
+        elseif(is_dir($path)){
+            foreach(ファイル一覧($path, $pattern) as $sub){
                 yield $sub;
             }
         }
@@ -657,12 +661,14 @@ function ファイル一覧($dir = ".", $pattern = "/./"){
 
 function ディレクトリ一覧($dir = ".", $pattern = "/./"){
     if(!is_dir($dir)){ return false; }
+    $dir = realpath($dir);
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
-        if(is_dir("$dir/$file")) {
+        $path = $dir . DIRECTORY_SEPARATOR . $file;
+        if(is_dir($path)) {
             if(preg_match($pattern, $file)){
-                yield realpath("$dir/$file");
+                yield $path;
             }
-            foreach(ディレクトリ一覧("$dir/$file", $pattern) as $sub){
+            foreach(ディレクトリ一覧($path, $pattern) as $sub){
                 yield $sub;
             }
         }
