@@ -1311,8 +1311,7 @@ class 部品{
         self::$記憶['stack'][] = $部品名;
         if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品名]:ループ数が上限に達しました", 500); }
 
-        $引数 = array_merge(self::h($引数), $引数);
-        $html = is_callable($部品) ? call_user_func_array($部品, $引数) : $部品;
+        $html = is_callable($部品) ? call_user_func_array($部品, self::h($引数)) : $部品;
 
         array_pop(self::$記憶['stack']);
         return $html;
