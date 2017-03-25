@@ -738,6 +738,12 @@ function JSON取得($file){
 }
 
 
+function 配列保存($file, array $array){
+    $return = file_put_contents($file, "<?php\nreturn " . var_export($array,true) . ";", LOCK_EX);
+    return ($return === false) ? false : true;
+}
+
+
 function XML取得($xml, $options = array()) {
     if(!is_object($xml)){
         $xml = ltrim($xml);
@@ -1383,6 +1389,7 @@ class 部品{
         preg_match_all("|<style([\s\S]*?)</style>|i", $html, $style, PREG_OFFSET_CAPTURE);
         preg_match_all("|<link[^>]+>|i", $html, $link, PREG_OFFSET_CAPTURE);
 
+        //styleとlinkを1つにまとめて出現順にソート
         $css = [];
         foreach(array_merge($style[0], $link[0]) as $tag){
             $css[$tag[1]] = $tag[0];
@@ -1397,7 +1404,7 @@ class 部品{
             }
             if(isset(self::$設定['nonce'])){ $v = preg_replace("/^<link/i", '<link nonce="'.self::$設定['nonce'].'" ', $v); }
             $return .= $v . "\n";
-       }
+        }
         return $return;
     }
 
