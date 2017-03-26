@@ -1328,6 +1328,9 @@ class 部品{
             if($pos !== false){
                 $buf = substr_replace($buf, self::$結果['jsinbody'], $pos, 0); //最後に出現する</body>の前にJSを挿入する
             }
+            else{
+                $buf = $buf . self::$結果['jsinbody'];
+            }
         }
         if(self::$結果['css'] || self::$結果['jsinhead'] || self::$結果['fromphp']){
             $pos = stripos($buf, "</title>");
