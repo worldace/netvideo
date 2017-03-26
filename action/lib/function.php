@@ -1262,9 +1262,9 @@ class データベース{
 
 class 部品{
     private static $設定;
-    private static $解析;
     private static $記憶;
     private static $結果;
+    private static $解析;
 
 
     public static function 開始($dir = __DIR__."/部品", array $option = []){
@@ -1272,22 +1272,27 @@ class 部品{
         if(!is_dir($dir)){ throw new Exception("部品ディレクトリが存在しません", 500); }
         self::$設定 = $option + [
             "手動"=>false,
+            "コンパイル"=>false,
             "nonce"=>null,
         ];
         self::$設定["ディレクトリ"] = $dir;
 
         self::$記憶 = ['実行済み'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[], 'キャプチャ開始'=>false];
         self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
+        self::$解析 = [];
         self::関数登録();
         if(!self::$設定['手動']){
             self::$記憶['キャプチャ開始'] = true;
             ob_start(["部品", "差し込み"]);
         }
+        if(self::$設定['コンパイル']){
+            self::$解析 = require($dir . "/_.php");
+        }
     }
 
     public static function 終了(){
         $return = (self::$記憶['キャプチャ開始'] === true)  ?  self::差し込み(ob_get_clean())  :  "";
-        self::$設定 = self::$記憶 = self::$結果 = null;
+        self::$設定 = self::$記憶 = self::$結果 = self::$解析 = null;
         return $return;
     }
 
