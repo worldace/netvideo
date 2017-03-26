@@ -641,8 +641,20 @@ function パーミッション($path, $permission = null){
 
 
 function ファイル一覧($dir = ".", $pattern = "/./"){
-    foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(realpath($dir))) as $file){ //$fileはSplFileInfoオブジェクト
-        if($file->isFile() and preg_match($pattern, $file->getFilename())){ yield $file->getPathname(); }
+    if(!is_dir($dir)){ return false; }
+    $dir = realpath($dir);
+    foreach(array_diff(scandir($dir), ['.','..']) as $file){
+        $path = $dir . DIRECTORY_SEPARATOR . $file;
+        if(is_file($path)){
+            if(preg_match($pattern, $file)){
+                yield $path;
+            }
+        }
+        elseif(is_dir($path)){
+            foreach(ファイル一覧($path, $pattern) as $sub){
+                yield $sub;
+            }
+        }
     }
 }
 
