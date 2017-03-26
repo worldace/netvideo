@@ -1441,7 +1441,7 @@ class 部品{
         }
         return $return."</script>\n";
     }
-    
+
     public static function コンパイル(array $部品指定 = []){
         $dir = realpath(self::$設定["ディレクトリ"]) . DIRECTORY_SEPARATOR;
         foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir)) as $path => $file){ //$file=SplFileInfoオブジェクト
@@ -1454,8 +1454,37 @@ class 部品{
         }
         return file_put_contents($dir . "_.php", "<?php\nreturn " . var_export($結果,true) . ";", LOCK_EX);
     }
-    
+
     private static function ファイル解析($path){
+        $return = ["css"=>[], "jsh"=>[], "jsb"=>[], "php"=>""];
+        $html = file_get_contents($path);
+
+        //CSS処理
+        preg_match_all("|<style([\s\S]*?)</style>|i", $html, $style, PREG_OFFSET_CAPTURE);
+        preg_match_all("|<link[^>]+>|i", $html, $link, PREG_OFFSET_CAPTURE);
+
+        $css = [];
+        foreach(array_merge($style[0], $link[0]) as $val){
+            $css[$val[1]] = $val[0];
+        }
+        ksort($css);
+        $return["css"] = array_values($css);
+
+        //JS処理
+        preg_match_all("|<script([\s\S]*?)</script>|i", $html, $script, PREG_OFFSET_CAPTURE);
+        $pos = stripos($html, "</head");
+        foreach($script[0] as $val){
+            if(preg_match("|^<script\s+type\s*=\s*[\"\']部品[\"\']\s*>([\s\S]*?)</script>|i", $val[0], $code)){
+                $return["php"] = $code[1] . ";";
+            }
+            elseif($val[1] < $pos){
+                $return["jsh"][] = $val[0];
+            }
+            else{
+                $return["jsb"][] = $val[0];
+            }
+        }
+        return $return;
     }
 
 }
