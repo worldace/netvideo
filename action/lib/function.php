@@ -1262,6 +1262,7 @@ class データベース{
 
 class 部品{
     private static $設定;
+    private static $解析;
     private static $記憶;
     private static $結果;
 
@@ -1275,7 +1276,7 @@ class 部品{
         ];
         self::$設定["ディレクトリ"] = $dir;
 
-        self::$記憶 = ['部品変数'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[], 'キャプチャ開始'=>false];
+        self::$記憶 = ['実行済み'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[], 'キャプチャ開始'=>false];
         self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
         self::関数登録();
         if(!self::$設定['手動']){
@@ -1292,38 +1293,19 @@ class 部品{
 
     public static function 作成($部品名, $引数){
         $部品パス = self::パス($部品名);
+        if(!isset(self::$解析[$部品名])){ self::$解析[$部品名] = self::ファイル解析($部品パス); }
 
-        //キャッシュの有無
-        if(!isset(self::$記憶['部品変数'][$部品名])){
-            $部品ファイル = file_get_contents($部品パス);
-
-            //部品変数を取り出して実行
-            preg_match("|<script\s+type\s*=\s*[\"\']部品[\"\']\s*>([\s\S]*?)</script>|i", $部品ファイル, $code);
-            eval($code[1].";");
-            if(!isset($部品)){ $部品 = ""; }
-
-            //部品変数をキャッシュ
-            self::$記憶['部品変数'][$部品名] = $部品;
-
-            //部品ファイルからCSSとJSを取り出して結果にまとめる
-            self::$結果['css'] .= self::CSS処理($部品ファイル);
-            $pos = stripos($部品ファイル, "</head");
-            if($pos !== false){
-                self::$結果['jsinhead'] .= self::JS処理(substr($部品ファイル, 0, $pos));
-                self::$結果['jsinbody'] .= self::JS処理(substr($部品ファイル, $pos));
-            }
-            else{
-                self::$結果['jsinbody'] .= self::JS処理($部品ファイル);
-            }
-        }
-        else{
-            $部品 = self::$記憶['部品変数'][$部品名];
+        if(!isset(self::$記憶['実行済み'][$部品名])){
+            self::$記憶['実行済み'][$部品名] = true;
+            self::$結果['css'] .= self::解析済み配列処理(self::$解析[$部品名]['css'], "href");
+            self::$結果['jsinhead'] .= self::解析済み配列処理(self::$解析[$部品名]['jsh'], "src");
+            self::$結果['jsinbody'] .= self::解析済み配列処理(self::$解析[$部品名]['jsb'], "src");
         }
 
         self::$記憶['stack'][] = $部品名;
         if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品名]:ループ数が上限に達しました", 500); }
 
-        $html = is_callable($部品) ? call_user_func_array($部品, self::h($引数)) : $部品;
+        $html = is_callable(self::$解析[$部品名]['php']) ? call_user_func_array(self::$解析[$部品名]['php'], self::h($引数)) : self::$解析[$部品名]['php'];
 
         array_pop(self::$記憶['stack']);
         return $html;
@@ -1372,6 +1354,19 @@ class 部品{
         }
     }
 
+    public static function コンパイル(array $部品指定 = []){
+        $dir = realpath(self::$設定["ディレクトリ"]) . DIRECTORY_SEPARATOR;
+        foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir)) as $path => $file){ //$file=SplFileInfoオブジェクト
+            if(!$file->isFile() or !preg_match("/\.html$/", $path)){ continue; }
+            $部品名 = rtrim(ltrim($path, $dir), ".html");
+            $部品名 = str_replace(["/", "\\"], "_", $部品名);
+            
+            if($部品指定 and !in_array($部品名, $部品指定, true)){ continue; }
+            $結果[$部品名] = self::ファイル解析($path);
+        }
+        return file_put_contents($dir . "_.php", "<?php\nreturn " . var_export($結果,true) . ";", LOCK_EX);
+    }
+
 
 
     private static function 関数登録(){
@@ -1388,71 +1383,6 @@ class 部品{
         $path = realpath(self::$設定['ディレクトリ'] . "/" . str_replace("_", "/", $部品名) . ".html");
         if(!$path){ throw new Exception("部品ファイルが見つかりません: $path", 500); }
         return $path;
-    }
-
-    private static function CSS処理($html){
-        $return = "";
-        preg_match_all("|<style([\s\S]*?)</style>|i", $html, $style, PREG_OFFSET_CAPTURE);
-        preg_match_all("|<link[^>]+>|i", $html, $link, PREG_OFFSET_CAPTURE);
-
-        //styleとlinkを1つにまとめて出現順にソート
-        $css = [];
-        foreach(array_merge($style[0], $link[0]) as $tag){
-            $css[$tag[1]] = $tag[0];
-        }
-        ksort($css);
-
-        foreach($css as $v){
-            preg_match("|^([^>]+)|", $v, $attr);
-            if(preg_match("|\shref\s*=\s*[\"\']([\s\S]*?)[\"\']|i", $attr[0], $href)){
-                if(in_array($href[1], self::$記憶['読み込み済みURL'])){ continue; }
-                self::$記憶['読み込み済みURL'][] = $href[1];
-            }
-            if(isset(self::$設定['nonce'])){ $v = preg_replace("/^<link/i", '<link nonce="'.self::$設定['nonce'].'" ', $v); }
-            $return .= $v . "\n";
-        }
-        return $return;
-    }
-
-    private static function JS処理($html){
-        $return = "";
-        preg_match_all("|<script([\s\S]*?)</script>|i", $html, $script);
-        foreach((array)$script[0] as $v){
-            preg_match("|^([^>]+)|", $v, $attr);
-            if(preg_match("|\stype\s*=\s*[\"\']部品|i", $attr[0])){ continue; }
-            if(preg_match("|\ssrc\s*=\s*[\"\']([\s\S]*?)[\"\']|i", $attr[0], $src)){
-                if(in_array($src[1], (array)self::$記憶['読み込み済みURL'])){ continue; }
-                self::$記憶['読み込み済みURL'][] = $src[1];
-            }
-            if(isset(self::$設定['nonce'])){ $v = preg_replace("/^<script/i", '<script nonce="'.self::$設定['nonce'].'" ', $v); }
-            $return .= $v . "\n";
-        }
-        return $return;
-    }
-
-    private static function fromphp処理(){
-        if(!self::$記憶['fromphp']){ return ""; }
-
-        $return  = isset(self::$設定['nonce'])  ?  '<script nonce="'.self::$設定['nonce'].'">'  :  '<script>';
-        $return .= "\nvar fromphp = {};\n";
-
-        foreach(self::$記憶['fromphp'] as $key => $val){
-            $return .= "fromphp['$key'] = $val;\n";
-        }
-        return $return."</script>\n";
-    }
-
-    public static function コンパイル(array $部品指定 = []){
-        $dir = realpath(self::$設定["ディレクトリ"]) . DIRECTORY_SEPARATOR;
-        foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir)) as $path => $file){ //$file=SplFileInfoオブジェクト
-            if(!$file->isFile() or !preg_match("/\.html$/", $path)){ continue; }
-            $部品名 = rtrim(ltrim($path, $dir), ".html");
-            $部品名 = str_replace(["/", "\\"], "_", $部品名);
-            
-            if($部品指定 and !in_array($部品名, $部品指定, true)){ continue; }
-            $結果[$部品名] = self::ファイル解析($path);
-        }
-        return file_put_contents($dir . "_.php", "<?php\nreturn " . var_export($結果,true) . ";", LOCK_EX);
     }
 
     private static function ファイル解析($path){
@@ -1475,7 +1405,9 @@ class 部品{
         $pos = stripos($html, "</head");
         for($i=0; $i<count($script[0]); $i++){
             if(preg_match("/部品/u", $script[1][$i][0])){
-                $return["php"] = $script[2][$i][0] . ";";
+                $部品 = "";
+                eval($script[2][$i][0].";");
+                $return["php"] = $部品;
             }
             elseif($script[0][$i][1] < $pos){
                 $return["jsh"][] = $script[0][$i][0];
@@ -1487,6 +1419,31 @@ class 部品{
         return $return;
     }
 
+    private static function 解析済み配列処理(array $array, $link){
+        $return = "";
+        foreach($array as $v){
+            preg_match("|^([^>]+)|", $v, $attr);
+            if(preg_match("|\s$link\s*=\s*[\"\']([\s\S]*?)[\"\']|i", $attr[0], $url)){
+                if(in_array($url[1], self::$記憶['読み込み済みURL'])){ continue; }
+                self::$記憶['読み込み済みURL'][] = $url[1];
+            }
+            if(isset(self::$設定['nonce'])){ $v = preg_replace("/^<(\w+)/", '<$1 nonce="'.self::$設定['nonce'].'" ', $v); }
+            $return .= $v . "\n";
+        }
+        return $return;
+    }
+
+    private static function fromphp処理(){
+        if(!self::$記憶['fromphp']){ return ""; }
+
+        $return  = isset(self::$設定['nonce'])  ?  '<script nonce="'.self::$設定['nonce'].'">'  :  '<script>';
+        $return .= "\nvar fromphp = {};\n";
+
+        foreach(self::$記憶['fromphp'] as $key => $val){
+            $return .= "fromphp['$key'] = $val;\n";
+        }
+        return $return."</script>\n";
+    }
 }
 
 
