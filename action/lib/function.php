@@ -1281,6 +1281,7 @@ class 部品{
         self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
         self::$解析 = [];
         self::関数登録();
+
         if(!self::$設定['手動']){
             self::$記憶['キャプチャ開始'] = true;
             ob_start(["部品", "差し込み"]);
@@ -1326,9 +1327,6 @@ class 部品{
             $pos = strripos($buf, "</body>");
             if($pos !== false){
                 $buf = substr_replace($buf, self::$結果['jsinbody'], $pos, 0); //最後に出現する</body>の前にJSを挿入する
-            }
-            else{
-                $buf = $buf . self::$結果['jsinbody'];
             }
         }
         if(self::$結果['css'] || self::$結果['jsinhead'] || self::$結果['fromphp']){
