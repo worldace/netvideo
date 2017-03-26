@@ -1471,17 +1471,17 @@ class 部品{
         $return["css"] = array_values($css);
 
         //JS処理
-        preg_match_all("|<script([\s\S]*?)</script>|i", $html, $script, PREG_OFFSET_CAPTURE);
+        preg_match_all("|<script([^>]*>)([\s\S]*?)</script>|i", $html, $script, PREG_OFFSET_CAPTURE);
         $pos = stripos($html, "</head");
-        foreach($script[0] as $val){
-            if(preg_match("|^<script\s+type\s*=\s*[\"\']部品[\"\']\s*>([\s\S]*?)</script>|i", $val[0], $code)){
-                $return["php"] = $code[1] . ";";
+        for($i=0; $i<count($script[0]); $i++){
+            if(preg_match("/部品/u", $script[1][$i][0])){
+                $return["php"] = $script[2][$i][0] . ";";
             }
-            elseif($val[1] < $pos){
-                $return["jsh"][] = $val[0];
+            elseif($script[0][$i][1] < $pos){
+                $return["jsh"][] = $script[0][$i][0];
             }
             else{
-                $return["jsb"][] = $val[0];
+                $return["jsb"][] = $script[0][$i][0];
             }
         }
         return $return;
