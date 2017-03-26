@@ -1277,7 +1277,7 @@ class 部品{
         ];
         self::$設定["ディレクトリ"] = $dir;
 
-        self::$記憶 = ['実行済み'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[], 'キャプチャ開始'=>false];
+        self::$記憶 = ['部品変数'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[], 'キャプチャ開始'=>false];
         self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
         self::$解析 = [];
         self::関数登録();
@@ -1300,17 +1300,23 @@ class 部品{
         $部品パス = self::パス($部品名);
         if(!isset(self::$解析[$部品名])){ self::$解析[$部品名] = self::ファイル解析($部品パス); }
 
-        if(!isset(self::$記憶['実行済み'][$部品名])){
-            self::$記憶['実行済み'][$部品名] = true;
+        if(!isset(self::$記憶['部品変数'][$部品名])){
+            $部品 = "";
+            eval(self::$解析[$部品名]['php']);
+            self::$記憶['部品変数'][$部品名] = $部品;
+
             self::$結果['css'] .= self::解析済み配列処理(self::$解析[$部品名]['css'], "href");
             self::$結果['jsinhead'] .= self::解析済み配列処理(self::$解析[$部品名]['jsh'], "src");
             self::$結果['jsinbody'] .= self::解析済み配列処理(self::$解析[$部品名]['jsb'], "src");
+        }
+        else{
+            $部品 = self::$記憶['部品変数'][$部品名];
         }
 
         self::$記憶['stack'][] = $部品名;
         if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品名]:ループ数が上限に達しました", 500); }
 
-        $html = is_callable(self::$解析[$部品名]['php']) ? call_user_func_array(self::$解析[$部品名]['php'], self::h($引数)) : self::$解析[$部品名]['php'];
+        $html = is_callable($部品)  ?  call_user_func_array($部品, self::h($引数))  :  $部品;
 
         array_pop(self::$記憶['stack']);
         return $html;
@@ -1410,9 +1416,7 @@ class 部品{
         $pos = stripos($html, "</head");
         for($i=0; $i<count($script[0]); $i++){
             if(preg_match("/部品/u", $script[1][$i][0])){
-                $部品 = "";
-                eval($script[2][$i][0].";");
-                $return["php"] = $部品;
+                $return["php"] = $script[2][$i][0].";";
             }
             elseif($script[0][$i][1] < $pos){
                 $return["jsh"][] = $script[0][$i][0];
