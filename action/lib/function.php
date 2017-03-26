@@ -1309,14 +1309,11 @@ class 部品{
             self::$結果['jsinhead'] .= self::解析済み配列処理(self::$解析[$部品名]['jsh'], "src");
             self::$結果['jsinbody'] .= self::解析済み配列処理(self::$解析[$部品名]['jsb'], "src");
         }
-        else{
-            $部品 = self::$記憶['部品変数'][$部品名];
-        }
 
         self::$記憶['stack'][] = $部品名;
         if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品名]:ループ数が上限に達しました", 500); }
 
-        $html = is_callable($部品)  ?  call_user_func_array($部品, self::h($引数))  :  $部品;
+        $html = is_callable(self::$記憶['部品変数'][$部品名])  ?  call_user_func_array(self::$記憶['部品変数'][$部品名], self::h($引数))  :  self::$記憶['部品変数'][$部品名];
 
         array_pop(self::$記憶['stack']);
         return $html;
