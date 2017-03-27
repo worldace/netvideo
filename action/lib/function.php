@@ -1318,12 +1318,11 @@ class 部品{
 
         if(is_callable(self::$記憶['部品コード'][$部品名])){
             $html = self::$記憶['部品コード'][$部品名](...self::h($引数));
-            if(stripos($html, "<script") !== false){
+            /*if(stripos($html, "<script") !== false){
                 trigger_error("[$部品名] scriptタグが含まれています", E_USER_WARNING);
                 $html = "";
             }
-            $html = str_replace("(", "&#40;", $html);
-            $html = str_replace("=", "&#61;", $html);
+            $html = str_replace("(", "&#40;", $html);*/
         }
         else{
             $html = self::$記憶['部品コード'][$部品名];
