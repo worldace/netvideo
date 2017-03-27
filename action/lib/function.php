@@ -1301,9 +1301,12 @@ class 部品{
         if(!isset(self::$記憶['部品変数'][$部品名])){
             if(!isset(self::$解析[$部品名])){ self::$解析[$部品名] = self::ファイル解析(self::ファイルパス($部品名)); }
 
-            $部品 = "";
-            eval(self::$解析[$部品名]['php']);
-            self::$記憶['部品変数'][$部品名] = $部品;
+            if(preg_match("/^function/", self::$解析[$部品名]['php'])){
+                self::$記憶['部品変数'][$部品名] = eval("return " . self::$解析[$部品名]['php'] . ";");
+            }
+            else{
+                self::$記憶['部品変数'][$部品名] = self::$解析[$部品名]['php'];
+            }
 
             self::$結果['css'] .= self::タグ完成(self::$解析[$部品名]['css'], "href");
             self::$結果['jsinhead'] .= self::タグ完成(self::$解析[$部品名]['jsh'], "src");
@@ -1413,7 +1416,7 @@ class 部品{
         $pos = stripos($html, "</head");
         for($i=0; $i<count($script[0]); $i++){
             if(preg_match("/部品/u", $script[1][$i][0])){
-                $return["php"] = $script[2][$i][0].";";
+                $return["php"] = preg_replace("/^function[^\(]*/", "function", ltrim($script[2][$i][0]));
             }
             elseif($script[0][$i][1] < $pos){
                 $return["jsh"][] = $script[0][$i][0];
