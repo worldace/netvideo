@@ -1299,15 +1299,15 @@ class 部品{
 
     public static function 作成($部品名, $引数){
         if(!isset(self::$記憶['部品変数'][$部品名])){
-            if(!isset(self::$解析[$部品名])){ self::$解析[$部品名] = self::ファイル解析(self::パス($部品名)); }
+            if(!isset(self::$解析[$部品名])){ self::$解析[$部品名] = self::ファイル解析(self::ファイルパス($部品名)); }
 
             $部品 = "";
             eval(self::$解析[$部品名]['php']);
             self::$記憶['部品変数'][$部品名] = $部品;
 
-            self::$結果['css'] .= self::解析済み配列処理(self::$解析[$部品名]['css'], "href");
-            self::$結果['jsinhead'] .= self::解析済み配列処理(self::$解析[$部品名]['jsh'], "src");
-            self::$結果['jsinbody'] .= self::解析済み配列処理(self::$解析[$部品名]['jsb'], "src");
+            self::$結果['css'] .= self::タグ完成(self::$解析[$部品名]['css'], "href");
+            self::$結果['jsinhead'] .= self::タグ完成(self::$解析[$部品名]['jsh'], "src");
+            self::$結果['jsinbody'] .= self::タグ完成(self::$解析[$部品名]['jsb'], "src");
         }
 
         self::$記憶['stack'][] = $部品名;
@@ -1320,7 +1320,7 @@ class 部品{
     }
 
     public static function 差し込み($buf){
-        self::$結果['fromphp'] = self::fromphp処理();
+        self::$結果['fromphp'] = self::fromphpタグ完成();
 
         if(self::$結果['jsinbody']){
             $pos = strripos($buf, "</body>");
@@ -1341,7 +1341,7 @@ class 部品{
     }
 
     public static function コード取得(){
-        self::$結果['fromphp'] = self::fromphp処理();
+        self::$結果['fromphp'] = self::fromphpタグ完成();
         return self::$結果;
     }
 
@@ -1384,7 +1384,7 @@ class 部品{
         }
     }
 
-    private static function パス($部品名){
+    private static function ファイルパス($部品名){
         if(!self::$設定['ディレクトリ']){ throw new Exception("部品::開始() を行ってください", 500); }
         if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){ throw new Exception("部品名はPHPの変数の命名規則に沿ってください", 500); }
 
@@ -1425,7 +1425,7 @@ class 部品{
         return $return;
     }
 
-    private static function 解析済み配列処理(array $array, $link){
+    private static function タグ完成(array $array, $link){
         $return = "";
         foreach($array as $v){
             preg_match("|^([^>]+)|", $v, $attr);
@@ -1439,7 +1439,7 @@ class 部品{
         return $return;
     }
 
-    private static function fromphp処理(){
+    private static function fromphpタグ完成(){
         if(!self::$記憶['fromphp']){ return ""; }
 
         $return  = isset(self::$設定['nonce'])  ?  '<script nonce="'.self::$設定['nonce'].'">'  :  '<script>';
