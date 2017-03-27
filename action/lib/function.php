@@ -248,9 +248,7 @@ function テンプレート($_file_, array $_data_ = null, $エスケープし�
     }
     $_h_ = function($arg) use (&$_h_){
         if(is_array($arg)){ return array_map($_h_, $arg); }
-        $arg = htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
-        $arg = str_replace("(", "&#40;", $arg);
-        return $arg;
+        return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
     };
     
     if($エスケープしない){
@@ -532,11 +530,7 @@ function 日本語設定(){
 
 
 function h($arg = ""){
-    if(is_string($arg)){
-        $arg = htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
-        $arg = str_replace("(", "&#40;", $arg);
-        return $arg;
-    }
+    if(is_string($arg)){ return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false); }
     else if(is_array($arg)){ return array_map("h", $arg); }
     else { return $arg; }
 }
@@ -581,7 +575,6 @@ function タグ($tag, array $attr = []){
             continue;
         }
         $val = htmlspecialchars($val, ENT_QUOTES, "UTF-8", false);
-        $val = str_replace("(", "&#40;", $val);
         $return .= " $key=\"$val\"";
     }
     $return .= ">";
@@ -604,7 +597,6 @@ function 属性文字列(array $attr = []){
             continue;
         }
         $val = htmlspecialchars($val, ENT_QUOTES, "UTF-8", false);
-        $val = str_replace("(", "&#40;", $val);
         $str .= " $key=\"$val\"";
     }
     return $str;
