@@ -1323,6 +1323,7 @@ class 部品{
                 $html = "";
             }
             $html = str_replace("(", "&#40;", $html);
+            $html = str_replace("=", "&#61;", $html);
         }
         else{
             $html = self::$記憶['部品コード'][$部品名];
