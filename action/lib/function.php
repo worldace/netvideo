@@ -1276,7 +1276,7 @@ class 部品{
 
         if(!self::$設定['手動']){
             self::$記憶['キャプチャ開始'] = true;
-            ob_start(["部品", "差し込み"]);
+            ob_start(["部品", "差し込む"]);
         }
         if(self::$設定['コンパイル']){
             self::$解析 = require($dir . "/_.php");
@@ -1284,7 +1284,7 @@ class 部品{
     }
 
     public static function 終了(){
-        $return = (self::$記憶['キャプチャ開始'] === true)  ?  self::差し込み(ob_get_clean())  :  "";
+        $return = (self::$記憶['キャプチャ開始'] === true)  ?  self::差し込む(ob_get_clean())  :  "";
         self::$設定 = self::$記憶 = self::$結果 = self::$解析 = null;
         return $return;
     }
@@ -1314,7 +1314,7 @@ class 部品{
         return $html;
     }
 
-    public static function 差し込み($buf){
+    public static function 差し込む($buf){
         self::$結果['fromphp'] = self::fromphpタグ完成();
 
         if(self::$結果['jsinbody']){
