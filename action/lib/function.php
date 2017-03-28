@@ -1308,7 +1308,16 @@ class 部品{
         self::$記憶['stack'][] = $部品名;
         if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品名]:ループ数が上限に達しました", 500); }
 
-        $html = is_callable(self::$記憶['部品コード'][$部品名])  ?  self::$記憶['部品コード'][$部品名](...self::h($引数))  :  self::$記憶['部品コード'][$部品名];
+        if(is_callable(self::$記憶['部品コード'][$部品名])){
+            $html = self::$記憶['部品コード'][$部品名](...self::h($引数));
+            if(stripos($html, "<script") !== false){
+                trigger_error("部品コードにscriptタグを含めることはできません", E_USER_WARNING);
+                $html = "";
+            }
+        }
+        else{
+            $html = self::$記憶['部品コード'][$部品名];
+        }
 
         array_pop(self::$記憶['stack']);
         return $html;
