@@ -567,20 +567,7 @@ function タグ($tag, array $attr = []){
         $単独タグ = true;
     }
 
-    $return = "<$tag";
-    foreach($attr as $key => $val){
-        if($key === "本文"){ continue; }
-        if(preg_match("/[^a-zA-Z\-]/", $key)){
-            trigger_error("[$key]は属性名に使用できません");
-            continue;
-        }
-        if(in_array($key, ["src", "href", "action", "formaction", "poster"], true)){ //cite, srcset
-            if(strlen($val) > 0 and !preg_match("%^(https*://|/|\./|#)%", $val)){ $val = "./" . $val; }
-        }
-        $val = htmlspecialchars($val, ENT_QUOTES, "UTF-8", false);
-        $return .= " $key=\"$val\"";
-    }
-    $return .= ">";
+    $return = "<$tag" . 属性文字列($attr) . ">";
     
     if($単独タグ === false and isset($attr['本文'])){
         $return .= htmlspecialchars($attr['本文'], ENT_QUOTES, "UTF-8", false);
@@ -594,7 +581,9 @@ function タグ($tag, array $attr = []){
 
 
 function 属性文字列(array $attr = []){
+    $str = "";
     foreach($attr as $key => $val){
+        if($key === "本文"){ continue; }
         if(preg_match("/[^a-zA-Z\-]/", $key)){
             trigger_error("[$key]は属性名に使用できません");
             continue;
