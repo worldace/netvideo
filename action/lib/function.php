@@ -1335,7 +1335,7 @@ class 部品{
         return $buf;
     }
 
-    public static function コード取得(){
+    public static function タグ取得(){
         self::$結果['fromphp'] = self::fromphpタグ完成();
         return self::$結果;
     }
