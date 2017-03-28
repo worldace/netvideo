@@ -561,7 +561,7 @@ function タグ($tag, array $attr = []){
     }
     if(preg_match("/[^a-zA-Z0-9\-]/", $tag)){
         trigger_error("[$tag]はタグ名に使用できません");
-        return;
+        return "";
     }
     if(in_array($tag, ["br","wbr","hr","img","col","base","link","meta","input","keygen","area","param","embed","source","track","command"], true)){
         $単独タグ = true;
@@ -569,18 +569,21 @@ function タグ($tag, array $attr = []){
 
     $return = "<$tag";
     foreach($attr as $key => $val){
-        if($key === "text"){ continue; }
+        if($key === "本文"){ continue; }
         if(preg_match("/[^a-zA-Z\-]/", $key)){
             trigger_error("[$key]は属性名に使用できません");
             continue;
+        }
+        if(in_array($key, ["src", "href", "action", "formaction", "poster"], true)){ //cite, srcset
+            if(!preg_match("%^(https*://|/|\./|#)%", $value)){ $value = "./" . $value; }
         }
         $val = htmlspecialchars($val, ENT_QUOTES, "UTF-8", false);
         $return .= " $key=\"$val\"";
     }
     $return .= ">";
     
-    if($単独タグ === false and isset($attr['text'])){
-        $return .= htmlspecialchars($attr['text'], ENT_QUOTES, "UTF-8", false);
+    if($単独タグ === false and isset($attr['本文'])){
+        $return .= htmlspecialchars($attr['本文'], ENT_QUOTES, "UTF-8", false);
     }
     if($単独タグ === false and $閉じる === true){
         $return .= "</$tag>";
@@ -1485,13 +1488,13 @@ class 文書 implements Countable, IteratorAggregate{
     public function 本文($value = null){
         if($value === null){
             if(isset($this->選択[0])){
-                $return = $this->選択[0]->nodeValue;
+                $return = $this->選択[0]->textContent;
             }
             return (string)$return;
         }
         else{
             foreach($this->選択 as $where){
-                $where->nodeValue = $value;
+                $where->textContent = $value;
             }
             return $this;
         }
@@ -1564,7 +1567,7 @@ class 文書 implements Countable, IteratorAggregate{
     public function dom($tag = null, array $attr = null, $content = ""){
         if(is_string($tag)){
             $dom = $this->文書->createElement($tag);
-            $dom->nodeValue = $content;
+            $dom->textContent = $content;
             foreach((array)$attr as $k => $v){
                 $dom->setAttribute($k, $v);
             }
