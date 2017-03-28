@@ -559,7 +559,7 @@ function タグ($tag, array $attr = []){
         $閉じる = false;
         $tag = ltrim($tag, "!");
     }
-    if(preg_match("/[^a-zA-Z0-9\-]/", $tag)){
+    if(preg_match("/[^a-zA-Z0-9\-]/", $tag)){ 
         trigger_error("[$tag]はタグ名に使用できません");
         return "";
     }
@@ -575,7 +575,7 @@ function タグ($tag, array $attr = []){
             continue;
         }
         if(in_array($key, ["src", "href", "action", "formaction", "poster"], true)){ //cite, srcset
-            if(!preg_match("%^(https*://|/|\./|#)%", $value)){ $value = "./" . $value; }
+            if(strlen($val) > 0 and !preg_match("%^(https*://|/|\./|#)%", $val)){ $val = "./" . $val; }
         }
         $val = htmlspecialchars($val, ENT_QUOTES, "UTF-8", false);
         $return .= " $key=\"$val\"";
@@ -598,6 +598,9 @@ function 属性文字列(array $attr = []){
         if(preg_match("/[^a-zA-Z\-]/", $key)){
             trigger_error("[$key]は属性名に使用できません");
             continue;
+        }
+        if(in_array($key, ["src", "href", "action", "formaction", "poster"], true)){ //cite, srcset
+            if(strlen($val) > 0 and !preg_match("%^(https*://|/|\./|#)%", $val)){ $val = "./" . $val; }
         }
         $val = htmlspecialchars($val, ENT_QUOTES, "UTF-8", false);
         $str .= " $key=\"$val\"";
@@ -1312,11 +1315,11 @@ class 部品{
         if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品名]:ループ数が上限に達しました", 500); }
 
         if(is_callable(self::$記憶['部品コード'][$部品名])){
-            $html = self::$記憶['部品コード'][$部品名](...self::h($引数));
-            if(stripos($html, "<script") !== false){
+            $html = self::$記憶['部品コード'][$部品名](...$引数);
+            /*if(stripos($html, "<script") !== false){
                 trigger_error("部品コードにscriptタグを含めることはできません", E_USER_WARNING);
                 $html = "";
-            }
+            }*/
         }
         else{
             $html = self::$記憶['部品コード'][$部品名];
