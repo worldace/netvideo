@@ -1259,7 +1259,6 @@ class 部品{
         if(!is_dir($dir)){ throw new Exception("部品ディレクトリが存在しません", 500); }
         self::$設定 = $option + [
             "手動"=>false,
-            "コンパイル"=>false,
             "nonce"=>null,
         ];
         self::$設定["ディレクトリ"] = $dir;
@@ -1272,9 +1271,6 @@ class 部品{
         if(!self::$設定['手動']){
             self::$記憶['キャプチャ開始'] = true;
             ob_start(["部品", "差し込む"]);
-        }
-        if(self::$設定['コンパイル']){
-            self::$解析 = require($dir . "/_.php");
         }
     }
 
@@ -1344,12 +1340,6 @@ class 部品{
         return self::$結果;
     }
 
-    public static function h($arg = ""){
-        if(is_string($arg)){ return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false); }
-        else if(is_array($arg)){ return array_map("部品::h", $arg); }
-        else { return $arg; }
-    }
-
     public static function fromphp($data){
         $部品名 = end(self::$記憶['stack']);
         if($部品名){
@@ -1357,18 +1347,6 @@ class 部品{
         }
     }
 
-    public static function コンパイル(array $部品指定 = []){
-        $dir = realpath(self::$設定["ディレクトリ"]) . DIRECTORY_SEPARATOR;
-        foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir)) as $path => $file){ //$file=SplFileInfoオブジェクト
-            if(!$file->isFile() or !preg_match("/\.html$/", $path)){ continue; }
-            $部品名 = rtrim(ltrim($path, $dir), ".html");
-            $部品名 = str_replace(["/", "\\"], "_", $部品名);
-            
-            if($部品指定 and !in_array($部品名, $部品指定, true)){ continue; }
-            $結果[$部品名] = self::ファイル解析($path);
-        }
-        return file_put_contents($dir . "_.php", "<?php\nreturn " . var_export($結果,true) . ";", LOCK_EX);
-    }
 
 
 
