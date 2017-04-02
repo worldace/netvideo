@@ -1385,7 +1385,7 @@ class 部品{
         preg_match_all("|<script([^>]*>)([\s\S]*?)</script>|i", $html, $script, PREG_OFFSET_CAPTURE);
         $pos = stripos($html, "</head");
         for($i=0; $i<count($script[0]); $i++){
-            if(preg_match("/部品/u", $script[1][$i][0])){
+            if(preg_match("/\stype=[\"']部品[\"']/ui", $script[1][$i][0])){
                 $return["php"] = preg_replace("/^function[^\(]*/", "function", ltrim($script[2][$i][0]));
             }
             elseif($script[0][$i][1] < $pos){
