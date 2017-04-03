@@ -1357,16 +1357,18 @@ class 部品{
         }
     }
 
-    private static function ファイル解析($部品名){
-        $return = ["css"=>[], "jsh"=>[], "jsb"=>[], "php"=>""];
-
-        //ファイルパスを求める
+    private static function ファイル取得($部品名){
         if(!self::$設定['ディレクトリ']){ throw new Exception("部品::開始() を行ってください", 500); }
         if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){ throw new Exception("部品名はPHPの変数の命名規則に沿ってください", 500); }
 
         $path = realpath(self::$設定['ディレクトリ'] . "/" . str_replace("_", "/", $部品名) . ".html");
         if(!$path){ throw new Exception("部品ファイルが見つかりません: $path", 500); }
-        $html = file_get_contents($path);
+        return file_get_contents($path);
+    }
+
+    private static function ファイル解析($部品名){
+        $return = ["css"=>[], "jsh"=>[], "jsb"=>[], "php"=>""];
+        $html = self::ファイル取得($部品名);
 
         //部品定数処理
         $html = str_replace("__部品__", $部品名, $html);
