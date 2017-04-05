@@ -1131,13 +1131,18 @@ $v.contentFit = function(screenW, screenH, objectW, objectH){
 };
 
 
-$v.getFormData = function(form){ //Multipla非対応、配列非対応、jQuery.serializeArray()参考
+$v.getFormData = function(form){ //value属性必須、Multipla非対応、配列非対応、jQuery.serializeArray()参考
     var data = {};
     var elements = form.querySelectorAll("[name]");
     for(var i = 0; i < elements.length; i++){
-        if(elements[i].value == null || elements[i].disabled === true || elements[i].type.match(/^(?:submit)$/i)){ continue; }
-        if(elements[i].type.match(/^(?:checkbox|radio)$/i)){
+        if(elements[i].value == null || elements[i].disabled === true || elements[i].type.match(/^submit$/i)){ continue; }
+        if(elements[i].type.match(/^checkbox$/i)){
             data[elements[i].name] = elements[i].checked;
+        }
+        else if(elements[i].type.match(/^radio$/i)){
+            if(elements[i].checked === true){
+                data[elements[i].name] = elements[i].value;
+            }
         }
         else{
             data[elements[i].name] = elements[i].value.trim();
@@ -1150,10 +1155,15 @@ $v.getFormData = function(form){ //Multipla非対応、配列非対応、jQuery.
 $v.setFormData = function(form, data){
     var elements = form.querySelectorAll("[name]");
     for(var i = 0; i < elements.length; i++){
-        if(!(elements[i].name in data) || elements[i].disabled === true || elements[i].type.match(/^(?:submit)$/i)){ continue; }
-        if(elements[i].type.match(/^(?:checkbox|radio)$/i)){
+        if(!(elements[i].name in data) || elements[i].disabled === true || elements[i].type.match(/^submit$/i)){ continue; }
+        if(elements[i].type.match(/^checkbox$/i)){
             if(data[elements[i].name] === true){ elements[i].checked = true; }
             else if(data[elements[i].name] === false){ elements[i].checked = false; }
+        }
+        else if(elements[i].type.match(/^radio$/i)){
+            if(elements[i].value === data[elements[i].name]){
+                elements[i].checked = true;
+            }
         }
         else{
             elements[i].value = data[elements[i].name];
