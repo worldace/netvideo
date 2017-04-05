@@ -1131,6 +1131,37 @@ $v.contentFit = function(screenW, screenH, objectW, objectH){
 };
 
 
+$v.getFormData = function(form){ //Multipla非対応、配列非対応、jQuery.serializeArray()参考
+    var data = {};
+    var elements = form.querySelectorAll("[name]");
+    for(var i = 0; i < elements.length; i++){
+        if(elements[i].value == null || elements[i].disabled === true || elements[i].type.match(/^(?:submit)$/i)){ continue; }
+        if(elements[i].type.match(/^(?:checkbox|radio)$/i)){
+            data[elements[i].name] = elements[i].checked;
+        }
+        else{
+            data[elements[i].name] = elements[i].value.trim();
+        }
+    }
+    return data;
+};
+
+
+$v.setFormData = function(form, data){
+    var elements = form.querySelectorAll("[name]");
+    for(var i = 0; i < elements.length; i++){
+        if(!(elements[i].name in data) || elements[i].disabled === true || elements[i].type.match(/^(?:submit)$/i)){ continue; }
+        if(elements[i].type.match(/^(?:checkbox|radio)$/i)){
+            if(data[elements[i].name] === true){ elements[i].checked = true; }
+            else if(data[elements[i].name] === false){ elements[i].checked = false; }
+        }
+        else{
+            elements[i].value = data[elements[i].name];
+        }
+    }
+};
+
+
 $v.type = function(target){
     return Object.prototype.toString.call(target).replace(/^\[object (.+)\]$/, '$1').toLowerCase();
 };
