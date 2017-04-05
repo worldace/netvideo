@@ -1141,11 +1141,11 @@ $v.getFormData = function(form){ //value属性必須、Multipla非対応、配�
         }
         else if(elements[i].type.match(/^radio$/i)){
             if(elements[i].checked === true){
-                data[elements[i].name] = elements[i].value;
+                data[elements[i].name] = String(elements[i].value);
             }
         }
         else{
-            data[elements[i].name] = elements[i].value.trim();
+            data[elements[i].name] = String(elements[i].value).trim();
         }
     }
     return data;
@@ -1166,7 +1166,7 @@ $v.setFormData = function(form, data){
             }
         }
         else{
-            elements[i].value = data[elements[i].name];
+            elements[i].value = String(data[elements[i].name]);
         }
     }
 };
