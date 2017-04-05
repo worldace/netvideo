@@ -100,8 +100,7 @@ function 無名クラス($file, ...$args){
         $file = "$dir/$file";
     }
     $file = realpath($file);
-    if(!$file){ return false; }
-    
+
     if(!isset($記憶[$file])){
         $記憶[$file] = require($file);
     }
