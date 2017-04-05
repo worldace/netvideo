@@ -1161,7 +1161,7 @@ $v.setFormData = function(form, data){
             else if(data[elements[i].name] === false){ elements[i].checked = false; }
         }
         else if(elements[i].type.match(/^radio$/i)){
-            if(elements[i].value === data[elements[i].name]){
+            if(String(elements[i].value) === String(data[elements[i].name])){
                 elements[i].checked = true;
             }
         }
