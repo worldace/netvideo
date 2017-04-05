@@ -11,7 +11,7 @@ function route(array $route, $arg = 1){
     $_ENV['route.dir'] = dirname(debug_backtrace()[0]['file']);
 
     foreach((array)$route as $_ENV['route.file']){
-        if(!preg_match("#^(/|\\\\|\w+:)#", $_ENV['route.file'])){ //相対パスなら
+        if(!preg_match("#^(/|\\\\|\w:)#", $_ENV['route.file'])){ //相対パスなら
             $_ENV['route.file'] = $_ENV['route.dir'] . "/" . $_ENV['route.file'];
         }
         $func = function (){ return require_once $_ENV['route.file']; };
@@ -84,7 +84,7 @@ function リダイレクト($url){
 
 
 function 自動読み込み($dir = __DIR__){
-    if(!preg_match("#^(/|\\\\|\w+:)#", $dir)){ $dir  = dirname(debug_backtrace()[0]['file']) . "/$dir"; }
+    if(!preg_match("#^(/|\\\\|\w:)#", $dir)){ $dir  = dirname(debug_backtrace()[0]['file']) . "/$dir"; }
     spl_autoload_register(function($class) use($dir){
         $class = str_replace(["_","\\"], "/", $class);
         require_once "$dir/$class.php";
@@ -92,24 +92,20 @@ function 自動読み込み($dir = __DIR__){
 }
 
 
-function 関数($file){
-    static $記憶;
-    if(!preg_match("#^(/|\\\\|\w+:)#", $file)){ //相対パスなら
+function 無名クラス($file, ...$args){
+    static $記憶 = [];
+
+    if(!preg_match("#^(/|\\\\|\w:)#", $file)){ //相対パスなら
         $dir  = dirname(debug_backtrace()[0]['file']);
         $file = "$dir/$file";
     }
     $file = realpath($file);
-    if(!isset($記憶[$file])){ $記憶[$file] = require $file; }
-    return $記憶[$file];
-}
-
-
-function 無名クラス($file, array $引数 = []){
-    if(!preg_match("#^(/|\\\\|\w+:)#", $file)){ //相対パスなら
-        $dir  = dirname(debug_backtrace()[0]['file']);
-        $file = "$dir/$file";
+    if(!$file){ return false; }
+    
+    if(!isset($記憶[$file])){
+        $記憶[$file] = require($file);
     }
-    return require $file;
+    return $記憶[$file]($args);
 }
 
 
@@ -243,7 +239,7 @@ $_ENV['設定'] = function($name, $value){ return 設定($name, $value); };
 
 
 function テンプレート($_file_, array $_data_ = null, $エスケープしない = false){
-    if(!preg_match("#^(/|\\\\|\w+:)#", $_file_)){ //相対パスなら
+    if(!preg_match("#^(/|\\\\|\w:)#", $_file_)){ //相対パスなら
         $_file_ = dirname(debug_backtrace()[0]['file']) . "/$_file_";
     }
     $_h_ = function($arg) use (&$_h_){
