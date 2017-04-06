@@ -1148,7 +1148,8 @@ $v.setFormData = function(form, data){
     for(var i = 0; i < elements.length; i++){
         if(!(elements[i].name in data) || elements[i].disabled === true || elements[i].type.match(/^submit$/i)){ continue; }
         if(elements[i].type.match(/^checkbox$/i)){
-            elements[i].checked = (data[elements[i].name] === true) ? true : false;
+            if(data[elements[i].name] === true){ elements[i].checked = true; }
+            else if(data[elements[i].name] === false){ elements[i].checked = false; }
         }
         else if(elements[i].type.match(/^radio$/i)){
             if(elements[i].value === data[elements[i].name]){
