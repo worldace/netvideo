@@ -1136,17 +1136,8 @@ $v.getFormData = function(form){ //value属性必須、Multipla非対応、配�
     var elements = form.querySelectorAll("[name]");
     for(var i = 0; i < elements.length; i++){
         if(elements[i].value == null || elements[i].disabled === true || elements[i].type.match(/^submit$/i)){ continue; }
-        if(elements[i].type.match(/^checkbox$/i)){
-            data[elements[i].name] = elements[i].checked;
-        }
-        else if(elements[i].type.match(/^radio$/i)){
-            if(elements[i].checked === true){
-                data[elements[i].name] = String(elements[i].value);
-            }
-        }
-        else{
-            data[elements[i].name] = String(elements[i].value).trim();
-        }
+        if(elements[i].type.match(/^radio$/i) && elements[i].checked === false){ continue; }
+        data[elements[i].name] = elements[i].type.match(/^checkbox$/i) ? elements[i].checked : String(elements[i].value).trim();
     }
     return data;
 };
@@ -1157,11 +1148,10 @@ $v.setFormData = function(form, data){
     for(var i = 0; i < elements.length; i++){
         if(!(elements[i].name in data) || elements[i].disabled === true || elements[i].type.match(/^submit$/i)){ continue; }
         if(elements[i].type.match(/^checkbox$/i)){
-            if(data[elements[i].name] === true){ elements[i].checked = true; }
-            else if(data[elements[i].name] === false){ elements[i].checked = false; }
+            elements[i].checked = (data[elements[i].name] === true) ? true : false;
         }
         else if(elements[i].type.match(/^radio$/i)){
-            if(String(elements[i].value) === String(data[elements[i].name])){
+            if(elements[i].value === data[elements[i].name]){
                 elements[i].checked = true;
             }
         }
