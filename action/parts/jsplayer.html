@@ -326,7 +326,7 @@ $v.player.entrypoint = function(url, width, height){
     $v.comment.keyframe(width);
     $v.comment.setting(height);
 
-    $v.user = $v.loadObject("jsplayer") || {};
+    $v.user = $v.func.loadObject("jsplayer") || {};
     $v.user.volume = Number($v.user.volume) || 1;
     $v.controller.setSeeker($v.user.volume, $v.controller.volumeSeeker);
 
@@ -403,7 +403,7 @@ $v.player.addEventListener('keydown', function(event){
 
 
 window.addEventListener('unload', function(event){
-    $v.saveObject("jsplayer", $v.user);
+    $v.func.saveObject("jsplayer", $v.user);
 });
 
 
@@ -489,7 +489,7 @@ $v.video = $v.player.querySelector(".jsplayer-video");
 
 $v.video.fit = function(){
     if(!$v.screen.pos.width || !$v.video.videoWidth){ return; }
-    var pos = $v.contentFit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+    var pos = $v.func.contentFit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 
     $v.video.style.width  = pos.w + "px";
     $v.video.style.height = pos.h + "px";
@@ -756,7 +756,7 @@ $v.comment.get = function(){
     $v.comment.list = Array(sec+1); //動画時間+1の箱を作る [[],[],[],[]...]
     for(var i = 0; i < $v.comment.list.length; i++){ $v.comment.list[i] = []; }
 
-    var url = "?" + $v.param({
+    var url = "?" + $v.func.param({
         "action"   : "commentget",
         "id"       : $v.form.hiddenId.value,
         "登録時間" : $v.form.hiddenTime.value,
@@ -764,7 +764,7 @@ $v.comment.get = function(){
         "nocache"  : Date.now()
     });
 
-    $v.get(url, function(xhr){
+    $v.func.get(url, function(xhr){
         try{ var comments = JSON.parse(xhr.responseText); } catch(e){ return; }
 
         for(var i = 0; i < comments.length; i++){
@@ -788,7 +788,7 @@ $v.comment.post = function(){
     var formdata = new FormData($v.form);
     formdata.append("本文", text);
     formdata.append("位置", sec.toFixed(2)*100);
-    $v.post('?action=commentpost', formdata);
+    $v.func.post('?action=commentpost', formdata);
 };
 
 
@@ -1012,17 +1012,20 @@ $v.form.input.addEventListener('focus', function(event){
 
 
 //■ function
-$v.get = function(url, success){
-    $v.ajax(url, {method:"GET", success:success});
+$v.func = {};
+
+
+$v.func.get = function(url, success){
+    $v.func.ajax(url, {method:"GET", success:success});
 };
 
 
-$v.post = function(url, data, success){
-    $v.ajax(url, {method:"POST", data:data, success:success});
+$v.func.post = function(url, data, success){
+    $v.func.ajax(url, {method:"POST", data:data, success:success});
 };
 
 
-$v.ajax = function(url, option){ //method, data, timeout, credential, header, success, error, complete
+$v.func.ajax = function(url, option){ //method, data, timeout, credential, header, success, error, complete
     option = option || {};
     option.method  = option.method  || "GET";
     option.timeout = option.timeout || 60;
@@ -1063,7 +1066,7 @@ $v.ajax = function(url, option){ //method, data, timeout, credential, header, su
 };
 
 
-$v.param = function(param){
+$v.func.param = function(param){
     var str = "";
     for(var key in param){
         if(!param.hasOwnProperty(key)){ continue; }
@@ -1073,7 +1076,7 @@ $v.param = function(param){
 };
 
 
-$v.deparam = function(str){
+$v.func.deparam = function(str){
     if(str == null){ return {}; }
     str = String(str);
     str = str.replace(/^\?/, "");
@@ -1090,17 +1093,17 @@ $v.deparam = function(str){
 };
 
 
-$v.saveObject = function(name, value){
+$v.func.saveObject = function(name, value){
     try{ window.localStorage.setItem(name, JSON.stringify(value)); } catch(e){}
 };
 
 
-$v.loadObject = function(name){
+$v.func.loadObject = function(name){
     try{ return JSON.parse(window.localStorage.getItem(name)); } catch(e){}
 };
 
 
-$v.objectExtend = function(){
+$v.func.objectExtend = function(){
     if(!arguments.length){ return; }
     if(arguments.lenth == 1){ return arguments[0]; }
     var destination = Array.prototype.shift.call(arguments);
@@ -1109,7 +1112,7 @@ $v.objectExtend = function(){
         for(var property in source){
             if(source[property] && source[property].constructor && source[property].constructor === Object){
                 destination[property] = destination[property] || {};
-                $v.objectExtend(destination[property], source[property]);
+                $v.func.objectExtend(destination[property], source[property]);
             }
             else{
                 destination[property] = source[property];
@@ -1120,7 +1123,7 @@ $v.objectExtend = function(){
 };
 
 
-$v.contentFit = function(screenW, screenH, objectW, objectH){
+$v.func.contentFit = function(screenW, screenH, objectW, objectH){
     var scale = (objectW/objectH > screenW/screenH) ? screenW/objectW : screenH/objectH;
     return {
         w: Math.floor(objectW * scale),
@@ -1131,7 +1134,7 @@ $v.contentFit = function(screenW, screenH, objectW, objectH){
 };
 
 
-$v.getFormData = function(form){ //value属性必須、Multipla非対応、配列非対応、jQuery.serializeArray()参考
+$v.func.getFormData = function(form){ //value属性必須、Multipla非対応、配列非対応、jQuery.serializeArray()参考
     var data = {};
     var elements = form.querySelectorAll("[name]");
     for(var i = 0; i < elements.length; i++){
@@ -1143,13 +1146,12 @@ $v.getFormData = function(form){ //value属性必須、Multipla非対応、配�
 };
 
 
-$v.setFormData = function(form, data){
+$v.func.setFormData = function(form, data){
     var elements = form.querySelectorAll("[name]");
     for(var i = 0; i < elements.length; i++){
         if(!(elements[i].name in data) || elements[i].disabled === true || elements[i].type.match(/^submit$/i)){ continue; }
         if(elements[i].type.match(/^checkbox$/i)){
-            if(data[elements[i].name] === true){ elements[i].checked = true; }
-            else if(data[elements[i].name] === false){ elements[i].checked = false; }
+            elements[i].checked = Boolean(data[elements[i].name]);
         }
         else if(elements[i].type.match(/^radio$/i)){
             if(elements[i].value === data[elements[i].name]){
@@ -1163,10 +1165,14 @@ $v.setFormData = function(form, data){
 };
 
 
-$v.type = function(target){
+$v.func.type = function(target){
     return Object.prototype.toString.call(target).replace(/^\[object (.+)\]$/, '$1').toLowerCase();
 };
 
+
+
+
+//■ entrypoint
 $v.player.entrypoint(fromphp.jsplayer, 640, 360);
 </script>
 </body>
