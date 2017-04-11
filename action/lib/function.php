@@ -1694,8 +1694,8 @@ class 文書 implements Countable, IteratorAggregate{
     }
 
     public function ＝($selector){
-        foreach($this->選択 as $where){
-            foreach($this->セレクタ検索($selector, false) as $val){
+        foreach($this->セレクタ検索($selector, false) as $val){
+            foreach($this->選択 as $where){
                 if($where->isSameNode($val)){ return true; }
             }
         }
