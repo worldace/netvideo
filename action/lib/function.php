@@ -1693,7 +1693,7 @@ class 文書 implements Countable, IteratorAggregate{
         return $this->選択保存($新選択);
     }
 
-    public function ＝($selector){
+    public function 同じ($selector){
         foreach($this->セレクタ検索($selector, false) as $val){
             foreach($this->選択 as $where){
                 if($where->isSameNode($val)){ return true; }
