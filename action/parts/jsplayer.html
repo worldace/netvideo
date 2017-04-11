@@ -1134,7 +1134,7 @@ $v.func.contentFit = function(screenW, screenH, objectW, objectH){
 };
 
 
-$v.func.getFormData = function(form){ //value属性必須、Multipla非対応、配列非対応、jQuery.serializeArray()参考
+$v.func.getForm = function(form){ //value属性必須、Multipla非対応、配列非対応、jQuery.serializeArray()参考
     var data = {};
     var elements = form.querySelectorAll("[name]");
     for(var i = 0; i < elements.length; i++){
@@ -1146,7 +1146,7 @@ $v.func.getFormData = function(form){ //value属性必須、Multipla非対応、
 };
 
 
-$v.func.setFormData = function(form, data){
+$v.func.setForm = function(form, data){
     var elements = form.querySelectorAll("[name]");
     for(var i = 0; i < elements.length; i++){
         if(!(elements[i].name in data) || elements[i].disabled === true || elements[i].type.match(/^submit$/i)){ continue; }

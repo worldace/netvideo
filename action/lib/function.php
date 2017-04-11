@@ -1606,6 +1606,17 @@ class 文書 implements Countable, IteratorAggregate{
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
+    public function 子持ち($selector = null){
+        $新選択 = [];
+        if(!$selector){ $selector = "*"; }
+        foreach($this->選択 as $where){
+            if(count($this->セレクタ検索($selector, false, $where))){
+                $新選択[] = $where;
+            }
+        }
+        return $this->選択保存($新選択);
+    }
+
     public function 親全て($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
