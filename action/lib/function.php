@@ -1678,15 +1678,6 @@ class 文書 implements Countable, IteratorAggregate{
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 前の選択(){
-        list($this->選択記憶, $this->選択) = [$this->選択, $this->選択記憶];
-        return $this;
-    }
-    
-    public function 逆順(){
-        return $this->選択保存(array_reverse($this->選択));
-    }
-
     public function かつ($selector){
         $新選択 = $this->積集合($this->選択, $this->セレクタ検索($selector, false));
         return $this->選択保存($新選択);
@@ -1700,6 +1691,24 @@ class 文書 implements Countable, IteratorAggregate{
     public function 引く($selector){
         $新選択 = $this->差集合($this->選択, $this->セレクタ検索($selector, false));
         return $this->選択保存($新選択);
+    }
+
+    public function ＝($selector){
+        foreach($this->選択 as $where){
+            foreach($this->セレクタ検索($selector, false) as $val){
+                if($where->isSameNode($val)){ return true; }
+            }
+        }
+        return false;
+    }
+
+    public function 逆順(){
+        return $this->選択保存(array_reverse($this->選択));
+    }
+
+    public function 前の選択(){
+        list($this->選択記憶, $this->選択) = [$this->選択, $this->選択記憶];
+        return $this;
     }
 
     public function d(){
