@@ -1424,7 +1424,7 @@ class 部品{
 }
 
 
-class 文書 implements Countable, IteratorAggregate{
+class 文書 implements Countable, IteratorAggregate, ArrayAccess{
     private $文書;
     private $選択 = [];
     private $選択記憶 = [];
@@ -1767,6 +1767,14 @@ class 文書 implements Countable, IteratorAggregate{
     public function count() { 
         return count($this->選択);
     }
+
+    //■ArrayAccessインターフェースの実装
+    public function offsetGet($offset){
+        return $this->選択保存(array_slice($this->選択, $offset, 1));
+    }
+    public function offsetSet($offset, $value){}
+    public function offsetExists($offset){}
+    public function offsetUnset($offset) {}
 
 
     //■以下プライベートメソッド
