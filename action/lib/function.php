@@ -92,22 +92,6 @@ function 自動読み込み($dir = __DIR__){
 }
 
 
-function 無名クラス($file, ...$args){
-    static $記憶 = [];
-
-    if(!preg_match("#^(/|\\\\|\w:)#", $file)){ //相対パスなら
-        $dir  = dirname(debug_backtrace()[0]['file']);
-        $file = "$dir/$file";
-    }
-    $file = realpath($file);
-
-    if(!isset($記憶[$file])){
-        $記憶[$file] = require($file);
-    }
-    return $記憶[$file]($args);
-}
-
-
 function 検査($type, $name, $func){
     if(preg_match("/^get$/i", $type)){
         $value = $_GET[$name];
