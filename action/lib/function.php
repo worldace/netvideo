@@ -1457,7 +1457,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         if($str === null){ //innerHTML
             if(isset($this->選択[0])){
                 foreach($this->選択[0]->childNodes as $child){
-                    $return .= $this->選択[0]->ownerDocument->saveHTML($child);
+                    $return .= $this->文書->saveHTML($child);
                 }
             }
             return (string)$return;
