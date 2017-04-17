@@ -1437,8 +1437,8 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         $this->文書->encoding = "utf-8";
     }
 
-    public function 本文($value = null){
-        if($value === null){
+    public function 本文($str = null){
+        if($str === null){
             if(isset($this->選択[0])){
                 $return = $this->選択[0]->textContent;
             }
@@ -1446,18 +1446,30 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         }
         else{
             foreach($this->選択 as $where){
-                $where->textContent = $value;
+                $where->textContent = $str;
             }
             return $this;
         }
     }
 
-    public function html(){
-        if(isset($this->選択[0])){
-            $return = $this->文書->saveHTML($this->選択[0]);
+
+    public function html($str = null){
+        if($str === null){
+            if(isset($this->選択[0])){
+                $return = $this->文書->saveHTML($this->選択[0]);
+            }
+            return (string)$return;
         }
-        return (string)$return;
+        else{
+            $add = $this->文字列DOM化($str);
+            foreach($this->選択 as $where){
+                $where->textContent = "";
+                $where->appendChild($add->cloneNode(true));
+            }
+            return $this;
+        }
     }
+
 
     public function タグ名(){
         if(isset($this->選択[0])){
@@ -1762,6 +1774,16 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
 
     //■以下プライベートメソッド
+    private function 文字列DOM化($str = ""){
+        $fragment = $this->文書->createDocumentFragment();
+        $elements = (new self("<dummy>$str</dummy>"))->文書->documentElement->childNodes;
+        foreach($elements as $child){
+            $fragment->appendChild($this->文書->importNode($child, true));
+        }
+        return $fragment;
+    }
+
+
     private function DOM箱作成($input){
         $dom箱 = [];
         if(is_string($input)){ //文字の場合
