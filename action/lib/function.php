@@ -1454,7 +1454,15 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
 
     public function html($str = null){
-        if($str === null){
+        if($str === null){ //innerHTML
+            if(isset($this->選択[0])){
+                foreach($this->選択[0]->childNodes as $child){
+                    $return .= $this->選択[0]->ownerDocument->saveHTML($child);
+                }
+            }
+            return (string)$return;
+        }
+        if($str === true){ //outerHTML
             if(isset($this->選択[0])){
                 $return = $this->文書->saveHTML($this->選択[0]);
             }
@@ -1464,7 +1472,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
             $add = $this->文字列DOM化($str);
             foreach($this->選択 as $where){
                 $where->textContent = "";
-                $where->appendChild($add->cloneNode(true));
+                if($str !== ""){ $where->appendChild($add->cloneNode(true)); }
             }
             return $this;
         }
