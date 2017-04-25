@@ -895,6 +895,7 @@ $v.controller.intoScreen = function(){
     var controller = $v.controller.getBoundingClientRect();
     $v.controller.style.top  = screen.height - controller.height + "px";
     $v.controller.style.left = (screen.width/2) - (controller.width/2) + "px";
+    $v.controller.style.visibility = "hidden";
 };
 
 
