@@ -462,16 +462,28 @@ $v.screen.fullscreenEvent = function(){
     if($v.screen.isFullscreen()){
         $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
         $v.screen.addEventListener('click', $v.controller.toggle);
+        $v.screen.addEventListener('mousemove', $v.screen.mousemoveEvent);
+        $v.screen.style.cursor = "none";
         $v.controller.intoScreen();
     }
     else{
         $v.screen.pos = $v.screen.getBoundingClientRect();
         $v.screen.removeEventListener('click', $v.controller.toggle);
-        $v.controller.intoPlayer();
+        $v.screen.removeEventListener('mousemove', $v.screen.mousemoveEvent);
+        if($v.screen.mousemoveTimer){ window.clearTimeout($v.screen.mousemoveTimer); }
+        $v.screen.style.cursor = "auto";
+        $v.controller.outofScreen();
     }
     $v.video.fit();
     $v.comment.setting($v.screen.pos.height);
     $v.comment.clear();
+};
+
+
+$v.screen.mousemoveEvent = function(){
+    $v.screen.style.cursor = "auto";
+    if($v.screen.mousemoveTimer){ window.clearTimeout($v.screen.mousemoveTimer); }
+    $v.screen.mousemoveTimer = window.setTimeout(function(){ $v.screen.style.cursor = "none"; }, 2500);
 };
 
 
@@ -899,7 +911,7 @@ $v.controller.intoScreen = function(){
 };
 
 
-$v.controller.intoPlayer = function(){
+$v.controller.outofScreen = function(){
     $v.player.appendChild($v.controller);
     $v.controller.style.top  = 0;
     $v.controller.style.left = 0;
