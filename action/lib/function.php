@@ -1761,14 +1761,14 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
     public function __invoke($selector = null){
         if(!$selector){
-            return $this;
+            return clone $this;
         }
         else if(is_string($selector) and !preg_match("/^</", $selector)){
             $this->セレクタ検索($selector);
-            return $this;
+            return clone $this;
         }
         else{
-            return $this->選択保存($this->DOM箱作成($selector));
+            return clone $this->選択保存($this->DOM箱作成($selector));
         }
     }
 
