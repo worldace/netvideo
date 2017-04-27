@@ -1760,15 +1760,26 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
     }
 
     public function __invoke($selector = null){
-        if(!$selector){
-            return clone $this;
+        if(is_string($selector)){
+            if(!preg_match("/^</", $selector)){
+                $this->セレクタ検索($selector);
+                return clone $this;
+            }
+            else{
+                return clone $this->選択保存($this->DOM箱作成($selector));
+            }
         }
-        else if(is_string($selector) and !preg_match("/^</", $selector)){
-            $this->セレクタ検索($selector);
-            return clone $this;
+        else if($selector instanceof self){
+            return clone $this->選択保存($this->DOM箱作成($selector));
+        }
+        else if($selector instanceof DOMElement){
+            return clone $this->選択保存($this->DOM箱作成($selector));
+        }
+        else if(is_array($selector)){
+            return clone $this->選択保存($this->DOM箱作成($selector));
         }
         else{
-            return clone $this->選択保存($this->DOM箱作成($selector));
+            return clone $this;
         }
     }
 
