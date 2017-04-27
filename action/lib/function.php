@@ -1552,12 +1552,19 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         return $this;
     }
 
-    public function dom($tag = null, array $attr = null, $content = ""){
+    public function dom($tag = null, $attr = null, $content = null){
         if(is_string($tag)){
             $dom = $this->文書->createElement($tag);
-            $dom->textContent = $content;
-            foreach((array)$attr as $k => $v){
-                $dom->setAttribute($k, $v);
+            if(is_array($attr)){
+                foreach($attr as $k => $v){
+                    $dom->setAttribute($k, $v);
+                }
+            }
+            else if(is_string($attr)){
+                $dom->textContent = $attr;
+            }
+            if(is_string($content)){
+                $dom->textContent = $content;
             }
             return $dom;
         }
