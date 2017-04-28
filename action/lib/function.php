@@ -2176,6 +2176,7 @@ function functionphpエラー($str, $type = E_USER_WARNING){
     foreach(debug_backtrace() as $trace){
         if(strpos($trace['file'], $除外パス) === 0){ continue; }
         $where = $trace['file'] . " " . $trace['line'] . "行目";
+        break;
     }
 
     trigger_error("[function.phpエラー] $str \n$where\n\n", $type);
