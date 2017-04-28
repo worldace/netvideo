@@ -2174,15 +2174,13 @@ function functionphpエラー($str, $type = E_USER_WARNING){
 
     $除外パス = __FILE__;
     foreach(debug_backtrace() as $trace){
-        if(strpos($trace['file'], $除外パス) === 0){ continue; }
-        if(PHP_SAPI === "cli"){
-            $message = "[function.phpエラー] $str \n{$trace['file']} {$trace['line']}行目\n\n";
-        }
-        else{
-            $str = htmlspecialchars($str, ENT_QUOTES, "UTF-8", false);
-            $message = "[function.phpエラー] $str <br>\n{$trace['file']} {$trace['line']}行目<br>\n<br>\n";
-        }
-        break;
+        if(strpos($trace['file'], $除外パス) !== 0){ break; }
+    }
+    $message = "[function.phpエラー] $str \n{$trace['file']} {$trace['line']}行目\n\n";
+
+    if(PHP_SAPI !== "cli"){
+        $message = htmlspecialchars($message, ENT_QUOTES, "UTF-8", false);
+        $message = nl2br($message);
     }
     trigger_error($message, $type);
 } 
