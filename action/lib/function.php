@@ -2166,16 +2166,17 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 }
 
 
-function functionphpエラー($str, $stop = false, $type = E_USER_ERROR){
+function functionphpエラー($str, $type = E_USER_WARNING){
     //$typeは次の4つ: E_USER_ERROR / E_USER_WARNING / E_USER_NOTICE / E_USER_DEPRECATED
+    //E_USER_ERRORは停止する
+    //1つ目のエラーはdisplay_errors(ini)でSTDOUT、2つ目のエラーはlog_errors(ini)でSTDERR
     //set_error_handler() で捕捉してね
 
-    $除外パス = __FILE__; //プログラムによって変えるべし
+    $除外パス = __FILE__;
     foreach(debug_backtrace() as $trace){
         if(strpos($trace['file'], $除外パス) === 0){ continue; }
         $where = $trace['file'] . " " . $trace['line'] . "行目";
     }
 
-    trigger_error("[function.phpエラー] $str \n$where\n", $type);
-    if($stop === true){ exit; }
+    trigger_error("[function.phpエラー] $str \n$where\n\n", $type);
 } 
