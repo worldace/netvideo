@@ -2166,33 +2166,21 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 }
 
 
-trait 例外の実装{
-    public function __toString() {
-        $trace = $this->getTrace();
-        if(is_array($trace)){
-            for($i=0; $i<count($trace); $i++){
-                if($trace[$i]["file"] !== __FILE__){
-                    $file = $trace[$i]["file"];
-                    $line = $trace[$i]["line"];
-                    break;
-                }
-            }
-        }
-        if(!$file){
-            $file = $this->file;
-            $line = $this->line;
-        }
-
-        $str  = "【" . get_class($this) . "】{$this->message}\n";
-        $str .= "{$file} {$line}行目\n\n";
-        $str .= "---------------------------------------------------\n";
-        $str .= $this->getTraceAsString();
-        $str .= "\n---------------------------------------------------\n";
-
-        return $str;
+function functionphpエラー($type, $str, $stop = false){
+    $除外パス = __FILE__; //プログラムによって変えるべし
+    foreach(debug_backtrace() as $trace){
+        if(strpos($trace['file'], $除外パス) === 0){ continue; }
+        $where = $trace['file'] . " " . $trace['line'] . "行目";
     }
 
-    public function getTitle() {
-        return get_class($this);
+    switch($type){
+        case "エラー": $e_user = E_USER_ERROR; break;
+        case "警告"  : $e_user = E_USER_WARNING; break;
+        case "注意"  : $e_user = E_USER_NOTICE; break;
+        case "非推奨": $e_user = E_USER_DEPRECATED; break;
+        default      : $e_user = E_USER_ERROR; $type = "エラー"; break;
     }
+
+    trigger_error("[function.php$type] $str ($where)", $e_user);
+    if($stop === true){ exit; }
 }
