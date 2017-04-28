@@ -2175,9 +2175,7 @@ function functionphpエラー($str, $type = E_USER_WARNING){
     $除外パス = __FILE__;
     foreach(debug_backtrace() as $trace){
         if(strpos($trace['file'], $除外パス) === 0){ continue; }
-        $where = $trace['file'] . " " . $trace['line'] . "行目";
-        break;
+        trigger_error("[function.phpエラー] $str \n{$trace['file']} {$trace['line']}行目\n\n", $type);
+        return;
     }
-
-    trigger_error("[function.phpエラー] $str \n$where\n\n", $type);
 } 
