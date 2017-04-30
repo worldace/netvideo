@@ -1255,6 +1255,7 @@ class 部品{
         self::$設定 = $option + [
             "手動"=>false,
             "nonce"=>null,
+            "パス変換"=>null,
         ];
         self::$設定["ディレクトリ"] = $dir;
 
@@ -1401,9 +1402,14 @@ class 部品{
         $return = "";
         foreach($array as $v){
             preg_match("|^([^>]+)|", $v, $attr);
-            if(preg_match("|\s$link\s*=\s*[\"\']([\s\S]*?)[\"\']|i", $attr[0], $url)){
-                if(in_array($url[1], self::$記憶['読み込み済みURL'])){ continue; }
-                self::$記憶['読み込み済みURL'][] = $url[1];
+            if(preg_match("|\s$link\s*=\s*[\"\']([\s\S]*?)[\"\']|i", $attr[0], $match)){
+                $url = $match[1];
+                if(isset(self::$設定['パス変換'])){
+                    $url = self::$設定['パス変換']($url);
+                    if(!$url){ continue; }
+                }
+                if(in_array($url, self::$記憶['読み込み済みURL'])){ continue; }
+                self::$記憶['読み込み済みURL'][] = $url;
             }
             if(isset(self::$設定['nonce'])){ $v = preg_replace("/^<(\w+)/", '<$1 nonce="'.self::$設定['nonce'].'" ', $v); }
             $return .= $v . "\n";
