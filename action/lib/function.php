@@ -1398,11 +1398,12 @@ class 部品{
         $return = "";
         foreach($array as $v){
             preg_match("|^([^>]+)|", $v, $attr);
-            if(preg_match("|\s$link\s*=\s*[\"\']([\s\S]*?)[\"\']|i", $attr[0], $match)){
+            if(preg_match("|\s$link=[\"\']([\s\S]*?)[\"\']|i", $attr[0], $match)){
                 $url = $match[1];
                 if(isset(self::$設定['パス変換'])){
                     $url = self::$設定['パス変換']($url, $部品名);
                     if(!$url){ continue; }
+                    $v = preg_replace("|\s$link=[\"\']([\s\S]*?)[\"\']|i", " $link=\"$url\"", $v, 1);
                 }
                 if(in_array($url, self::$記憶['読み込み済みURL'])){ continue; }
                 self::$記憶['読み込み済みURL'][] = $url;
