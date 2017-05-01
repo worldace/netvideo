@@ -1287,9 +1287,9 @@ class 部品{
                 self::$記憶['部品コード'][$部品名] = self::$解析[$部品名]['php'];
             }
 
-            self::$結果['css'] .= self::タグ完成(self::$解析[$部品名]['css'], "href");
-            self::$結果['jsinhead'] .= self::タグ完成(self::$解析[$部品名]['jsh'], "src");
-            self::$結果['jsinbody'] .= self::タグ完成(self::$解析[$部品名]['jsb'], "src");
+            self::$結果['css'] .= self::タグ完成(self::$解析[$部品名]['css'], "href", $部品名);
+            self::$結果['jsinhead'] .= self::タグ完成(self::$解析[$部品名]['jsh'], "src", $部品名);
+            self::$結果['jsinbody'] .= self::タグ完成(self::$解析[$部品名]['jsb'], "src", $部品名);
         }
 
         self::$記憶['stack'][] = $部品名;
@@ -1297,10 +1297,6 @@ class 部品{
 
         if(is_callable(self::$記憶['部品コード'][$部品名])){
             $html = self::$記憶['部品コード'][$部品名](...$引数);
-            /*if(stripos($html, "<script") !== false){
-                trigger_error("部品コードにscriptタグを含めることはできません", E_USER_WARNING);
-                $html = "";
-            }*/
         }
         else{
             $html = self::$記憶['部品コード'][$部品名];
@@ -1398,14 +1394,14 @@ class 部品{
         return $return;
     }
 
-    private static function タグ完成(array $array, $link){
+    private static function タグ完成(array $array, $link, $部品名){
         $return = "";
         foreach($array as $v){
             preg_match("|^([^>]+)|", $v, $attr);
             if(preg_match("|\s$link\s*=\s*[\"\']([\s\S]*?)[\"\']|i", $attr[0], $match)){
                 $url = $match[1];
                 if(isset(self::$設定['パス変換'])){
-                    $url = self::$設定['パス変換']($url);
+                    $url = self::$設定['パス変換']($url, $部品名);
                     if(!$url){ continue; }
                 }
                 if(in_array($url, self::$記憶['読み込み済みURL'])){ continue; }
