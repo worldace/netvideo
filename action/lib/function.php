@@ -1416,11 +1416,6 @@ class 部品{
         }
         return $return;
     }
-    
-    private function ローカルファイル読み込み($パス, $部品名, $タグ名){
-        
-    }
-    
 
     private static function fromphpタグ完成(){
         if(!self::$記憶['fromphp']){ return ""; }
