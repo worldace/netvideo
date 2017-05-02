@@ -1353,8 +1353,9 @@ class 部品{
         if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){ throw new Exception("部品名はPHPの変数の命名規則に沿ってください", 500); }
 
         $path = self::$設定['ディレクトリ'] . "/" . str_replace("_", "/", $部品名) . ".html";
-        if(!$path){ throw new Exception("部品ファイルが見つかりません: $path", 500); }
-        return file_get_contents($path);
+        $return = file_get_contents($path);
+        if(!$return){ throw new Exception("部品ファイルが見つかりません: $path", 500); }
+        return $return;
     }
 
     private static function ファイル解析($部品名){
