@@ -1400,11 +1400,11 @@ class 部品{
             preg_match("|^([^>]+)|", $v, $attr);
             if(preg_match("|\s$link=[\"\']([\s\S]*?)[\"\']|i", $attr[0], $match)){
                 $url = $match[1];
-                if(preg_match("#^(/|https?://)#", $url)){ //相対パスなら
+                if(!preg_match("#^(/|https?://)#", $url)){ //相対パスなら
                     $url = realpath(self::$設定['ディレクトリ'] . "/" . dirname(str_replace("_", "/", $部品名)) . "/" .$url);
                     if(in_array($url, self::$記憶['読み込み済みURL'])){ continue; }
                     $content = file_get_contents($url);
-                    $v = ($link === "href")  ?  "<style>$content</style>"  :  "<script>$content</script>";
+                    $v = ($link === "href")  ?  "<style>\n$content</style>"  :  "<script>\n$content</script>";
                 }
                 else{
                     if(in_array($url, self::$記憶['読み込み済みURL'])){ continue; }
