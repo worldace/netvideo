@@ -1256,7 +1256,7 @@ class 部品{
             "手動"=>false,
             "nonce"=>null,
         ];
-        self::$設定["ディレクトリ"] = $dir;
+        self::$設定["ディレクトリ"] = realpath($dir);
 
         self::$記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[], 'キャプチャ開始'=>false];
         self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
@@ -1352,7 +1352,7 @@ class 部品{
         if(!self::$設定['ディレクトリ']){ throw new Exception("部品::開始() を行ってください", 500); }
         if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){ throw new Exception("部品名はPHPの変数の命名規則に沿ってください", 500); }
 
-        $path = realpath(self::$設定['ディレクトリ'] . "/" . str_replace("_", "/", $部品名) . ".html");
+        $path = self::$設定['ディレクトリ'] . "/" . str_replace("_", "/", $部品名) . ".html";
         if(!$path){ throw new Exception("部品ファイルが見つかりません: $path", 500); }
         return file_get_contents($path);
     }
@@ -1399,6 +1399,9 @@ class 部品{
             preg_match("|^([^>]+)|", $v, $attr);
             if(preg_match("|\s$link=[\"\']([\s\S]*?)[\"\']|i", $attr[0], $match)){
                 $url = $match[1];
+                if(!preg_match("#^(/|https?://)#", $url)){ //相対パスなら
+                
+                }
                 if(in_array($url, self::$記憶['読み込み済みURL'])){ continue; }
                 self::$記憶['読み込み済みURL'][] = $url;
             }
@@ -1407,6 +1410,11 @@ class 部品{
         }
         return $return;
     }
+    
+    private function ローカルファイル読み込み($パス, $部品名, $タグ名){
+        
+    }
+    
 
     private static function fromphpタグ完成(){
         if(!self::$記憶['fromphp']){ return ""; }
