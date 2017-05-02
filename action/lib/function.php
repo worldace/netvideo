@@ -1999,10 +1999,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         }
         foreach ($element->childNodes as $subElement) { // nodeType: http://www.php.net/manual/en/dom.constants.php
             if ($subElement->nodeType == XML_TEXT_NODE) {
-                $return["html"] = $subElement->wholeText;
-            }
-            elseif ($subElement->nodeType == XML_CDATA_SECTION_NODE) {
-                $return["html"] = $subElement->data;
+                $return["text"] = $subElement->textContent;
             }
             else {
                 $return["children"][] = $this->element2array($subElement);
