@@ -1401,7 +1401,7 @@ class 部品{
             if(preg_match("|\s$link=[\"\']([\s\S]*?)[\"\']|i", $attr[0], $match)){
                 $url = $match[1];
                 if(!preg_match("#^(/|https?://)#", $url)){ //相対パスなら
-                    $url = realpath(self::$設定['ディレクトリ'] . "/" . dirname(str_replace("_", "/", $部品名)) . "/" .$url);
+                    $url = realpath(self::$設定['ディレクトリ'] . "/" . dirname(str_replace("_", "/", $部品名)) . "/" . $url);
                     if(in_array($url, self::$記憶['読み込み済みURL'])){ continue; }
                     $content = file_get_contents($url);
                     $v = ($link === "href")  ?  "<style>\n$content</style>"  :  "<script>\n$content</script>";
@@ -2001,11 +2001,11 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
             $return[$attribute->name] = $attribute->value;
         }
         foreach ($element->childNodes as $subElement) { // nodeType: http://www.php.net/manual/en/dom.constants.php
-            if ($subElement->nodeType == XML_TEXT_NODE) {
-                $return["text"] = $subElement->textContent;
+            if ($subElement->nodeType === XML_ELEMENT_NODE) {
+                $return["child"][] = $this->element2array($subElement);
             }
-            else {
-                $return["children"][] = $this->element2array($subElement);
+            elseif ($subElement->nodeType === XML_TEXT_NODE){
+                $return["text"] = $subElement->textContent;
             }
         }
         return $return;
