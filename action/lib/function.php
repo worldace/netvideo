@@ -1362,6 +1362,9 @@ class 部品{
         $return = ["css"=>[], "jsh"=>[], "jsb"=>[], "php"=>""];
         $html = self::ファイル取得($部品名);
 
+        //コメント除去
+        $html = preg_replace("|<!--[\s\S]*?-->|", "", $html);
+
         //部品定数処理
         $html = str_replace("__部品__", $部品名, $html);
 
