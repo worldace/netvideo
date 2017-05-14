@@ -1178,6 +1178,11 @@ $v.func.setForm = function(form, data){
 };
 
 
+$v.func.replaceAll = function(str, before, after){
+    return str.split(before).join(after);
+};
+
+
 $v.func.type = function(target){
     return Object.prototype.toString.call(target).replace(/^\[object (.+)\]$/, '$1').toLowerCase();
 };
