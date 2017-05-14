@@ -487,6 +487,13 @@ function PHP≧($str){
 }
 
 
+function str_replace_once($needle, $replace, $haystack){
+    $pos = strpos($haystack, $needle); 
+    if ($pos === false) { return $haystack; }
+    return substr_replace($haystack, $replace, $pos, strlen($needle));
+}
+
+
 function 日付($str = '[年]/[0月]/[0日] [0時]:[0分]', $time = 0){
     if(!$time){ $time = time(); }
     $week = ['日','月','火','水','木','金','土'][date('w', $time)];
