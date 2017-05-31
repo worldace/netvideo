@@ -2241,21 +2241,8 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
 function functionphpエラー(string $str, string $type = "エラー") :void{
     //1つ目のエラーはdisplay_errors(ini)でSTDOUT、2つ目のエラーはlog_errors(ini)でSTDERR、エラーは set_error_handler() で捕捉できる
-    $設定 = [
-        "タイトル" => "function.php",
-        "除外パス" => __FILE__,
-    ];
-    
-    if($type === "警告"){
-        $e_user = E_USER_WARNING;
-    }
-    else if($type === "注意"){
-        $e_user = E_USER_NOTICE;
-    }
-    else{
-        $type   = "エラー";
-        $e_user = E_USER_ERROR;
-    }
+    $設定["タイトル"] = "function.php";
+    $設定["除外パス"] = __FILE__;
 
     foreach(debug_backtrace() as $trace){
         if(strpos($trace['file'], $設定["除外パス"]) !== 0){ break; }
@@ -2265,5 +2252,6 @@ function functionphpエラー(string $str, string $type = "エラー") :void{
     if(PHP_SAPI !== "cli"){
         $message = nl2br(htmlspecialchars($message, ENT_QUOTES, "UTF-8", false));
     }
-    trigger_error($message, $e_user);
+
+    trigger_error($message, ['エラー'=>E_USER_ERROR, '警告'=>E_USER_WARNING, '注意'=>E_USER_NOTICE][$type]);
 } 
