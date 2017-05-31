@@ -4,9 +4,10 @@
 // 
 // 呼び出し元: "../../index.php"
 //======================================================
+declare(strict_types=1);
 
 
-function route(array $route, $arg = 1){
+function route(array $route, $arg=1) :void{
     $_ENV['route.return'] = $arg;
     $_ENV['route.dir'] = dirname(debug_backtrace()[0]['file']);
 
@@ -26,14 +27,14 @@ function routed(){
 }
 
 
-function テキスト表示($str = ""){
+function テキスト表示(string $str) :void{
     header("Content-Type: text/plain; charset=utf-8");
     print $str;
     exit;
 }
 
 
-function JSON表示($json = [], $allow = null){
+function JSON表示($data, $allow=null) :void{
     if(!$allow){
         $allow = ($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : "*";
     }
@@ -44,17 +45,17 @@ function JSON表示($json = [], $allow = null){
     header("Access-Control-Allow-Credentials: true");
     if(is_string($_GET['callback'])){ //JSONP
         header("Content-Type: application/javascript; charset=utf-8");
-        print $_GET['callback'] . "(" . json_encode($json, JSON_PARTIAL_OUTPUT_ON_ERROR) . ");";
+        print $_GET['callback'] . "(" . json_encode($data, JSON_PARTIAL_OUTPUT_ON_ERROR) . ");";
     }
     else{ //JSON
         header("Content-Type: application/json; charset=utf-8");
-        print json_encode($json, JSON_PARTIAL_OUTPUT_ON_ERROR);
+        print json_encode($data, JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
     exit;
 }
 
 
-function RSS表示(array $channel, array $items){ // http://www.futomi.com/lecture/japanese/rss20.html
+function RSS表示(array $channel, array $items) :void{ // http://www.futomi.com/lecture/japanese/rss20.html
     $tag = function ($name, $value){
         return "<$name>$value</$name>\n";
     };
@@ -77,13 +78,13 @@ function RSS表示(array $channel, array $items){ // http://www.futomi.com/lectu
 }
 
 
-function リダイレクト($url){
+function リダイレクト(string $url) :void{
     header("Location: $url");
     exit;
 }
 
 
-function 自動読み込み($dir = __DIR__){
+function 自動読み込み(string $dir=__DIR__) :void{
     if(!preg_match("#^(/|\\\\|\w:)#", $dir)){ $dir  = dirname(debug_backtrace()[0]['file']) . "/$dir"; }
     spl_autoload_register(function($class) use($dir){
         $class = str_replace(["_","\\"], "/", $class);
@@ -92,7 +93,7 @@ function 自動読み込み($dir = __DIR__){
 }
 
 
-function オブジェクト($file, ...$args){
+function オブジェクト(string $file, ...$args){
     static $記憶 = [];
 
     if(!preg_match("#^(/|\\\\|\w:)#", $file)){ //相対パスなら
@@ -108,7 +109,7 @@ function オブジェクト($file, ...$args){
 }
 
 
-function 検査($type, $name, $func){
+function 検査(string $type, string $name, $func) :bool{
     if(preg_match("/^get$/i", $type)){
         $value = $_GET[$name];
     }
@@ -117,6 +118,9 @@ function 検査($type, $name, $func){
     }
     elseif(preg_match("/^cookie$/i", $type)){
         $value = $_COOKIE[$name];
+    }
+    else{
+        functionphpエラー("検査関数の第1引数には'GET'か'POST'か'COOKIE'のいずれかを渡してください");
     }
 
     if(is_callable($func)){
@@ -132,7 +136,7 @@ function 検査($type, $name, $func){
         else if(preg_match("/^(-?[0-9\.]+)より大きい$/u", $func, $m)){ $result = 検査::より大きい($value, (int)$m[1]); }
         else if(preg_match("/^(-?[0-9\.]+)より小さい$/u", $func, $m)){ $result = 検査::より小さい($value, (int)$m[1]); }
         else if(preg_match("/^(-?[0-9\.]+)と同じ$/u", $func, $m))    { $result = 検査::と同じ($value, (int)$m[1]); }
-        else                                                         { throw new Exception(__function__."() 第3引数の関数名が間違っています", 500); }
+        else                                                         { functionphpエラー("検査関数の第3引数の特別関数名が間違っています"); }
     }
     
     if(検査::$例外 === true and $result === false){
@@ -141,7 +145,7 @@ function 検査($type, $name, $func){
     
     if($result === true){ return true; }
     elseif($result === false){ return false; }
-    else{ throw new Exception(__function__."() 第3引数の関数はtrueまたはfalseを返してください", 500); }
+    else{ functionphpエラー("検査関数の第3引数の無名関数はtrueまたはfalseを返してください"); }
 }
 
 
@@ -205,7 +209,7 @@ class 検査{
 }
 
 
-function 整形($type, $name, $func){
+function 整形(string $type, string $name, callable $func){
     if(preg_match("/^get$/i", $type)){
         $result = $_GET[$name] = $func($_GET[$name]);
     }
@@ -215,29 +219,42 @@ function 整形($type, $name, $func){
     elseif(preg_match("/^cookie$/i", $type)){
         $result = $_COOKIE[$name] = $func($_COOKIE[$name]);
     }
+    else{
+        functionphpエラー("整形関数の第1引数には'GET'か'POST'か'COOKIE'のいずれかを渡してください");
+    }
+
     return $result;
 }
 
 
-function 設定($name = null, $value = null){
+function 設定(string $name, $value="\0\rヌル\0\r"){
     static $記憶 = [];
-
-    if(!isset($name)){ return $記憶; }
-
-    if(isset($value)){
-        if(!isset($記憶[$name])){
+    if($name === "全て"){
+        return $記憶;
+    }
+    if($value === "\0\rヌル\0\r"){ //取得動作
+        if(array_key_exists($name, $記憶)){
+            return $記憶[$name];
+        }
+        else{
+            functionphpエラー("設定関数の $name は未設定です。取得できません", E_USER_WARNING);
+        }
+    }
+    else{ //設定動作
+        if(array_key_exists($name, $記憶)){
+            functionphpエラー("設定関数の $name は設定済みです。再代入はできません", E_USER_WARNING);
+            return $value;
+        }
+        else{
             $記憶[$name] = $value;
             return $value;
         }
     }
-    else{
-        return (isset($記憶[$name])) ? $記憶[$name] : null;
-    }
 }
-$_ENV['設定'] = function($name, $value){ return 設定($name, $value); };
+$_ENV['設定'] = function(string $name){ return 設定($name); };
 
 
-function テンプレート($_file_, array $_data_ = null, $エスケープしない = false){
+function テンプレート(string $_file_, array $_data_=null, bool $エスケープしない=false) :string{
     if(!preg_match("#^(/|\\\\|\w:)#", $_file_)){ //相対パスなら
         $_file_ = dirname(debug_backtrace()[0]['file']) . "/$_file_";
     }
@@ -264,11 +281,15 @@ function テンプレート($_file_, array $_data_ = null, $エスケープし�
 }
 
 
-function ファイルダウンロード($data, $filename = null, $timeout = 60*60*12){
+function ファイルダウンロード(string $file, string $filename=null, int $timeout=60*60*12) :void{
+    if(!file_exists($file)){
+        functionphpエラー("ダウンロードさせるファイル $file は存在しません", E_USER_WARNING);
+        return;
+    }
     ini_set("max_execution_time", $timeout);
-    if(!file_exists($data)){ throw new Exception("ファイルが存在しません", 404); }
-    $filesize = filesize($data);
-    if(!$filename){ $filename = basename($data); }
+
+    $filesize = filesize($file);
+    if(!$filename){ $filename = basename($file); }
     $filenameE = rawurlencode($filename);
     header("Content-Type: application/force-download");
     header("Content-Length: $filesize");
@@ -279,7 +300,7 @@ function ファイルダウンロード($data, $filename = null, $timeout = 60*6
 }
 
 
-function データダウンロード($data, $filename = "data", $timeout = 60*60*12){
+function データダウンロード(string $data, string $filename="data", int $timeout=60*60*12) :void{
     ini_set("max_execution_time", $timeout);
     $filesize = strlen($data);
     $filenameE = rawurlencode($filename);
@@ -292,7 +313,7 @@ function データダウンロード($data, $filename = "data", $timeout = 60*60
 }
 
 
-function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 = "", $本文 = "", array $添付 = null, $cc = "", $bcc = "", array $add = null){
+function メール送信($送信先, string $送信元="", string $送信者="", string $題名="", string $本文="", array $添付=null, $cc="", $bcc="", array $add=null) :bool{
     $送信先 = 改行変換($送信先);
     $送信元 = 改行変換($送信元);
     $送信者 = 改行変換($送信者);
@@ -339,7 +360,7 @@ function メール送信($送信先, $送信元 = "", $送信者 = "", $題名 =
 }
 
 
-function GET送信($url, array $querymap = null, array $request_header = []){
+function GET送信(string $url, array $querymap=null, array $request_header=[]){
     if($querymap){
         $url .= preg_match("/\?/", $url) ? "&" : "?";
         $url .= http_build_query($querymap, "", "&", PHP_QUERY_RFC3986);
@@ -359,7 +380,7 @@ function GET送信($url, array $querymap = null, array $request_header = []){
 }
 
 
-function POST送信($url, array $querymap = null, array $request_header = []){
+function POST送信(string $url, array $querymap=null, array $request_header=[]){
     $content = http_build_query((array)$querymap, "", "&");
     $request_header = $request_header + [
         "Content-Type" => "application/x-www-form-urlencoded; charset=UTF-8",
@@ -381,7 +402,7 @@ function POST送信($url, array $querymap = null, array $request_header = []){
 }
 
 
-function ファイル送信($url, array $querymap = null, array $request_header = []){
+function ファイル送信(string $url, array $querymap=null, array $request_header=[]){
     $区切り = "__" . uuid() . "__";
     foreach((array)$querymap as $name => $value){
         if(is_array($value)){
@@ -430,7 +451,7 @@ function キャッシュ無効(){
 }
 
 
-function 現在のURL($no_query = false){
+function 現在のURL(bool $no_query=false) :string{
     if(filter_input(INPUT_SERVER, 'HTTPS', FILTER_VALIDATE_BOOLEAN)){
         $scheme = "https://";
         if($_SERVER['SERVER_PORT'] != 443){ $port = ":" . $_SERVER['SERVER_PORT']; }
@@ -444,57 +465,60 @@ function 現在のURL($no_query = false){
 }
 
 
-function ホームURL($url){
+function ホームURL(string $url) :string{
     $parsed = explode("/", $url);
-    if(!isset($parsed[2])){ return false; }
+    if(!isset($parsed[2])){
+        functionphpエラー("$url はURL文字列ではありません", E_USER_WARNING);
+        return $url;
+    }
     return $parsed[0] . "//" . $parsed[2] . "/";
 }
 
 
-function トップURL($url){
+function トップURL(string $url) :string{
     $url = preg_replace("/\?.*/", "", $url);
     return (substr_count($url, "/") === 2) ? $url."/" : dirname($url."a")."/";
 }
 
 
-function Windowsなら(){
+function Windowsなら() :bool{
     return preg_match("/^WIN/i", PHP_OS);
 }
 
 
-function GETなら(){
+function GETなら() :bool{
     return (strtoupper(filter_input(INPUT_SERVER, "REQUEST_METHOD")) === 'GET') ? true : false;
 }
 
 
-function POSTなら(){
+function POSTなら() :bool{
     return (strtoupper(filter_input(INPUT_SERVER, "REQUEST_METHOD")) === 'POST') ? true : false;
 }
 
 
-function 連想配列なら($array){
+function 連想配列なら($array) :bool{
     return (is_array($array) and array_values($array) !== $array) ? true : false;
 }
 
 
-function 開発環境なら(){
+function 開発環境なら() :bool{
     return ini_get("display_errors") ? true : false;
 }
 
 
-function PHP≧($str){
+function PHP≧(string $str) :bool{
     return version_compare(PHP_VERSION, $str) >= 0;
 }
 
 
-function str_replace_once($needle, $replace, $haystack){
+function str_replace_once(string $needle, string $replace, string $haystack) :string{
     $pos = strpos($haystack, $needle); 
     if ($pos === false) { return $haystack; }
     return substr_replace($haystack, $replace, $pos, strlen($needle));
 }
 
 
-function 日付($str = '[年]/[0月]/[0日] [0時]:[0分]', $time = 0){
+function 日付(string $str='[年]/[0月]/[0日] [0時]:[0分]', int $time=0) :string{
     if(!$time){ $time = time(); }
     $week = ['日','月','火','水','木','金','土'][date('w', $time)];
     $from = ['[年]','[月]','[0月]','[日]','[0日]','[時]','[0時]','[0分]','[0秒]','[曜日]'];
@@ -506,7 +530,7 @@ function 日付($str = '[年]/[0月]/[0日] [0時]:[0分]', $time = 0){
 }
 
 
-function 経過($time){
+function 経過(int $time) :string{
     if(!preg_match("/^\d+$/", $time)){ return ""; }
     $時間差 = time() - $time;
     switch($時間差){
@@ -522,7 +546,7 @@ function 経過($time){
 }
 
 
-function 日本語設定(){
+function 日本語設定() :void{
     (preg_match("/^WIN/i", PHP_OS)) ? setlocale(LC_ALL, '') : setlocale(LC_ALL, 'ja_JP.UTF-8');
     ini_set("default_charset", "UTF-8");
     ini_set("mbstring.language", "Japanese");
@@ -531,14 +555,14 @@ function 日本語設定(){
 }
 
 
-function h($arg = ""){
+function h($arg){
     if(is_string($arg)){ return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false); }
     else if(is_array($arg)){ return array_map("h", $arg); }
     else { return $arg; }
 }
 
 
-function 改行変換($arg = "", $replace = ""){
+function 改行変換($arg, string $replace=""){
     if(is_array($arg)){ return array_map(function($str) use($replace){ return 改行変換($str, $replace); }, $arg); }
     $arg = str_replace("\r", "", $arg);
     $arg = str_replace("\n", $replace, $arg);
@@ -546,7 +570,7 @@ function 改行変換($arg = "", $replace = ""){
 }
 
 
-function 制御文字削除($arg = "", $LF = false){ // http://blog.sarabande.jp/post/52701231276
+function 制御文字削除($arg, bool $LF=false){ // http://blog.sarabande.jp/post/52701231276
     if(is_array($arg)){ return array_map(function($str) use($LF){ return 制御文字削除($str, $LF); }, $arg); }
     $arg = preg_replace("/\t/", "    ", $arg);
     $arg = preg_replace("/\xC2[\x80-\x9F]/", "", $arg); //Unicode制御文字
@@ -554,7 +578,7 @@ function 制御文字削除($arg = "", $LF = false){ // http://blog.sarabande.jp
 }
 
 
-function タグ($tag, array $attr = []){
+function タグ(string $tag, array $attr=[]) :string{
     $閉じる   = true;
     $単独タグ = false;
     if(preg_match("|^\!|", $tag)){
@@ -562,7 +586,7 @@ function タグ($tag, array $attr = []){
         $tag = ltrim($tag, "!");
     }
     if(preg_match("/[^a-zA-Z0-9\-]/", $tag)){ 
-        trigger_error("[$tag]はタグ名に使用できません");
+        functionphpエラー("タグ名に $tag は使用できません", E_USER_WARNING);
         return "";
     }
     if(in_array($tag, ["br","wbr","hr","img","col","base","link","meta","input","keygen","area","param","embed","source","track","command"], true)){
@@ -582,12 +606,12 @@ function タグ($tag, array $attr = []){
 }
 
 
-function 属性文字列(array $attr = []){
+function 属性文字列(array $attr=[]) :string{
     $str = "";
     foreach($attr as $key => $val){
         if($key === "本文"){ continue; }
         if(preg_match("/[^a-zA-Z\-]/", $key)){
-            trigger_error("[$key]は属性名に使用できません");
+            functionphpエラー("属性名に $key は使用できません", E_USER_WARNING);
             continue;
         }
         if(in_array($key, ["src", "href", "action", "formaction", "poster"], true)){ //cite, srcset
@@ -600,15 +624,7 @@ function 属性文字列(array $attr = []){
 }
 
 
-function 自動リンク($arg = "", array $attr = [], $dont_escape = false){
-    if(is_array($arg)){ return array_map(function($str) use($attr){ return 自動リンク($str, $attr); }, $arg); }
-    $attr_str = 属性文字列($attr);
-    if($dont_escape === false){ $arg = h($arg); }
-    return preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $arg);
-}
-
-
-function 配列→table(array $array, array $attr = []){
+function 配列→table(array $array, array $attr=[]) :string{
     $firstkey = key($array);
     if(is_array($array[$firstkey])){ $tag = "<tr>\n<th></th>\n<th>" . implode("</th>\n<th>",h(array_keys($array[$firstkey]))) . "</th>\n</tr>\n"; }
     foreach($array as $key1 => $value1){
@@ -621,7 +637,19 @@ function 配列→table(array $array, array $attr = []){
 }
 
 
-function パーミッション($path, $permission = null){
+function 自動リンク($arg, array $attr=[], bool $dont_escape=false){
+    if(is_array($arg)){ return array_map(function($str) use($attr){ return 自動リンク($str, $attr); }, $arg); }
+    $attr_str = 属性文字列($attr);
+    if($dont_escape === false){ $arg = h($arg); }
+    return preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $arg);
+}
+
+
+function パーミッション(string $path, string $permission=null) :string{
+    if(!file_exists($path)){
+        functionphpエラー("パス $path は存在しません", E_USER_WARNING);
+        return "";
+    }
     if(!preg_match("/^0/", $permission) and $permission >= 100 and $permission <= 777){
         chmod($path, octdec($permission));
     }
@@ -629,8 +657,11 @@ function パーミッション($path, $permission = null){
 }
 
 
-function ファイル一覧($dir = ".", $pattern = "/./"){
-    if(!is_dir($dir)){ return false; }
+function ファイル一覧(string $dir=".", string $pattern="/./") :iterable{
+    if(!is_dir($dir)){
+        functionphpエラー("ディレクトリ $dir は存在しません", E_USER_WARNING);
+        return;
+    }
     $dir = realpath($dir);
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path = $dir . DIRECTORY_SEPARATOR . $file;
@@ -648,8 +679,11 @@ function ファイル一覧($dir = ".", $pattern = "/./"){
 }
 
 
-function ディレクトリ一覧($dir = ".", $pattern = "/./"){
-    if(!is_dir($dir)){ return false; }
+function ディレクトリ一覧(string $dir=".", string $pattern="/./") :iterable{
+    if(!is_dir($dir)){
+        functionphpエラー("ディレクトリ $dir は存在しません", E_USER_WARNING);
+        return;
+    }
     $dir = realpath($dir);
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path = $dir . DIRECTORY_SEPARATOR . $file;
@@ -665,36 +699,42 @@ function ディレクトリ一覧($dir = ".", $pattern = "/./"){
 }
 
 
-function ディレクトリ作成($path, $permission = 707){
-    if(!$path){ return false; }
-    if(is_dir($path)){ return $path; }
+function ディレクトリ作成(string $dir, string $permission="707") :string{
+    if(is_dir($dir)){
+        functionphpエラー("ディレクトリ $dir は既に存在します", E_USER_NOTICE);
+        パーミッション($dir, $permission);
+        return $dir;
+    }
     $mask = umask();
     umask(0);
-    $result = mkdir($path, octdec($permission), true);
+    $result = mkdir($dir, octdec($permission), true);
     umask($mask);
-    return ($result) ? $path : false;
+    return ($result) ? $dir : "";
 }
 
 
-function ディレクトリ削除($path){
-    if(!$path or !is_dir($path)){ return false; }
-    foreach(array_diff(scandir($path), ['.','..']) as $file){
-        (is_dir("$path/$file")) ? ディレクトリ削除("$path/$file") : unlink("$path/$file");
+function ディレクトリ削除(string $dir) :bool{
+    if(!is_dir($dir)){
+        functionphpエラー("ディレクトリ $dir は存在しません", E_USER_WARNING);
+        return false;
     }
-    return rmdir($path);
+    foreach(array_diff(scandir($dir), ['.','..']) as $file){
+        (is_dir("$dir/$file")) ? ディレクトリ削除("$dir/$file") : unlink("$dir/$file");
+    }
+    return rmdir($dir);
 }
 
 
-function zip圧縮($zipfile, array $filemap){
+function zip圧縮(string $zipfile, array $filemap) :string{
     $zip = new ZipArchive();
-    if(!$zip->open($zipfile, ZipArchive::CREATE)){ return false; }
+    if(!$zip->open($zipfile, ZipArchive::CREATE)){ return ""; }
     foreach($filemap as $name => $value){ $zip->addFromString($name, $value); } //$nameに/を含めるとディレクトリになる
     $zip->close();
     return $zipfile;
 }
 
 
-function zip解凍($zipfile, $where = ""){
+function zip解凍(string $zipfile, string $where = "") :bool{
     $zip = new ZipArchive();
     if(!$zip->open($zipfile)){ return false; }
     if(!$where){ $where = dirname(realpath($zipfile)); }
@@ -705,27 +745,27 @@ function zip解凍($zipfile, $where = ""){
 
 
 
-function 一時保存($name, $data){
+function 一時保存(string $name, $data) :string{
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
     $result = file_put_contents($tempfile, json_encode($data, JSON_PARTIAL_OUTPUT_ON_ERROR), LOCK_EX);
-    return ($result === false) ? false : $name;
+    return ($result === false) ? "" : $name;
 }
 
 
-function 一時取得($name){
+function 一時取得(string $name){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
     return (file_exists($tempfile)) ? json_decode(file_get_contents($tempfile)) : false;
 }
 
 
-function JSON保存($file, $data){
+function JSON保存(string $file, $data) :string{
     $prefix = preg_match("/\.php$/i", $file) ? "<?php\n" : "";
     $result = file_put_contents($file, $prefix.json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR), LOCK_EX);
-    return ($result === false) ? false : $file;
+    return ($result === false) ? "" : $file;
 }
 
 
-function JSON取得($file){
+function JSON取得(string $file){
     $json = file_get_contents($file);
     if($json === false){ return false; }
     $json = preg_replace("/^<\?php\s*/i", "", $json);
@@ -733,13 +773,13 @@ function JSON取得($file){
 }
 
 
-function 配列保存($file, array $array){
+function 配列保存(string $file, array $array) :string{
     $return = file_put_contents($file, "<?php\nreturn " . var_export($array,true) . ";", LOCK_EX);
-    return ($return === false) ? false : true;
+    return ($return === false) ? "" : $file;
 }
 
 
-function XML取得($xml, $options = array()) {
+function XML取得(string $xml, array $options = []) :array{
     if(!is_object($xml)){
         $xml = ltrim($xml);
         if(!preg_match("/^</", $input)){
@@ -750,7 +790,7 @@ function XML取得($xml, $options = array()) {
         }
         $xmlstr = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$xmlstr);
         $xml = simplexml_load_string($xmlstr);
-        if(!$xml){ return false; }
+        if(!$xml){ return []; }
     }
     //xmlToArray Tamlyn Rhodes <http://tamlyn.org> Public Domain
     $defaults = array(
@@ -810,8 +850,7 @@ function fromphp($data){
 }
 
 
-function 当たり($確率){
-    $確率 = str_replace("%", "", $確率);
+function 当たり(float $確率) :bool{
     if($確率 <= 0){ return false; }
     if($確率 >= 100){ return true; }
 
@@ -820,14 +859,14 @@ function 当たり($確率){
 }
 
 
-function uuid($hyphen = false) { //uuid v4
+function uuid(bool $hyphen=false) :string{ //uuid v4
     $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
     mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0x0fff)|0x4000,mt_rand(0,0x3fff)|0x8000,mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff));
     return ($hyphen) ? $uuid : str_replace("-", "", $uuid);
 }
 
 
-function パスワード発行($length = 8, $userfriendly = false){
+function パスワード発行(int $length=8, bool $userfriendly=false) :string{
     $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
     if($userfriendly){ $str = "ABDEFGHJLMNQRTYabdefghmnrty23456789"; }
     $str = str_repeat($str, floor($length/2));
@@ -835,29 +874,29 @@ function パスワード発行($length = 8, $userfriendly = false){
 }
 
 
-function パスワードハッシュ($password){
+function パスワードハッシュ(string $password) :string{
     return password_hash($password, PASSWORD_DEFAULT);
 }
 
 
-function パスワード認証($password, $hash){
+function パスワード認証(string $password, string $hash) :bool{
     return password_verify($password, $hash);
 }
 
 
-function 暗号化($str, $key){
+function 暗号化(string $str, string $key) :string{
     $iv = openssl_random_pseudo_bytes(16); // openssl_cipher_iv_length('aes-128-cbc') == 16
     return bin2hex($iv) . openssl_encrypt($str, 'aes-128-cbc', $key, 0, $iv); //先頭32バイトがiv
 }
 
 
-function 復号化($str, $key){
+function 復号化(string $str, string $key){
     $iv = substr($str, 0, 32);
     return openssl_decrypt(substr($str, 32), 'aes-128-cbc', $key, 0, hex2bin($iv));
 }
 
 
-function jwt発行($data, $key){
+function jwt発行(array $data, string $key) :string{
     $header     = ['typ'=>'jwt', 'alg'=>'HS256'];
     $segments   = [];
     $segments[] = base64_encode_urlsafe(json_encode($header), JSON_PARTIAL_OUTPUT_ON_ERROR);
@@ -870,7 +909,7 @@ function jwt発行($data, $key){
 }
 
 
-function jwt認証($jwt, $key){
+function jwt認証(string $jwt, string $key){
     if(substr_count($jwt, ".") !== 2) { return false; }
 
     list($headb64, $datab64, $cryptob64) = explode('.', $jwt);
@@ -886,12 +925,12 @@ function jwt認証($jwt, $key){
 }
 
 
-function base64_encode_urlsafe($input){
+function base64_encode_urlsafe(string $input) :string{
     return str_replace('=', '', strtr(base64_encode($input), '+/', '-_'));
 }
 
 
-function base64_decode_urlsafe($input){
+function base64_decode_urlsafe(string $input) :string{
     $remainder = strlen($input) % 4;
     if($remainder){
         $padlen = 4 - $remainder;
@@ -901,7 +940,7 @@ function base64_decode_urlsafe($input){
 }
 
 
-function ベーシック認証($認証関数, $realm="member only"){
+function ベーシック認証(callable $認証関数, string $realm="member only"){
     if(isset($_SERVER['PHP_AUTH_USER']) and isset($_SERVER['PHP_AUTH_PW'])){
         if(call_user_func($認証関数, $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) === true){
             return $_SERVER['PHP_AUTH_USER'];
@@ -913,12 +952,12 @@ function ベーシック認証($認証関数, $realm="member only"){
 }
 
 
-function 連想配列ソート(array &$array){
+function 連想配列ソート(array &$array) :void{
     array_multisort(array_values($array), SORT_DESC, SORT_NATURAL, array_keys($array), SORT_ASC, SORT_NATURAL, $array);
 }
 
 
-function MIMEタイプ($path){ // http://www.iana.org/assignments/media-types/media-types.xhtml
+function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments/media-types/media-types.xhtml
     $list = [
         'jpg'  => 'image/jpeg',
         'jpeg' => 'image/jpeg',
@@ -957,7 +996,7 @@ function MIMEタイプ($path){ // http://www.iana.org/assignments/media-types/me
 }
 
 
-$_ENV['定数'] = function ($v){ return $v; };
+$_ENV['定数'] = function(string $v){ return constant($v); };
 
 
 function データベース($table, $driver = null, $user = null, $pass = null){
@@ -2199,7 +2238,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 }
 
 
-function functionphpエラー($str, $type = E_USER_WARNING){
+function functionphpエラー(string $str, int $type = E_USER_ERROR) :void{
     //$typeは次の4つ: E_USER_ERROR / E_USER_WARNING / E_USER_NOTICE / E_USER_DEPRECATED
     //E_USER_ERRORは停止する
     //1つ目のエラーはdisplay_errors(ini)でSTDOUT、2つ目のエラーはlog_errors(ini)でSTDERR
@@ -2209,7 +2248,7 @@ function functionphpエラー($str, $type = E_USER_WARNING){
     foreach(debug_backtrace() as $trace){
         if(strpos($trace['file'], $除外パス) !== 0){ break; }
     }
-    $message = "[function.phpエラー] $str \n{$trace['file']} {$trace['line']}行目\n\n";
+    $message = "[" . __FUNCTION__ . "] $str \n{$trace['file']} {$trace['line']}行目\n\n";
 
     if(PHP_SAPI !== "cli"){
         $message = htmlspecialchars($message, ENT_QUOTES, "UTF-8", false);
