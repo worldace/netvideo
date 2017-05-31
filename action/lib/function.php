@@ -2256,12 +2256,11 @@ function functionphpエラー(string $str, string $type = "エラー") :void{
         $type   = "エラー";
         $e_user = E_USER_ERROR;
     }
-    
-    $backtrace = debug_backtrace();
-    foreach($backtrace as $trace){
+
+    foreach(debug_backtrace() as $trace){
         if(strpos($trace['file'], $設定["除外パス"]) !== 0){ break; }
     }
-    $message = "【{$設定['タイトル']}{$type}】[{$backtrace[1]['function']}()関数] $str\n{$trace['file']}: {$trace['line']}行目\n\n";
+    $message = "【{$設定['タイトル']}{$type}】[{$trace['function']}()関数] $str\n{$trace['file']}: {$trace['line']}行目\n\n";
 
     if(PHP_SAPI !== "cli"){
         $message = nl2br(htmlspecialchars($message, ENT_QUOTES, "UTF-8", false));
