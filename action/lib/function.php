@@ -120,7 +120,7 @@ function 検査(string $type, string $name, $func) :bool{
         $value = $_COOKIE[$name];
     }
     else{
-        functionphpエラー("検査関数の第1引数には'GET'か'POST'か'COOKIE'のいずれかを渡してください");
+        functionphpエラー("第1引数には'GET'か'POST'か'COOKIE'のいずれかを渡してください");
     }
 
     if(is_callable($func)){
@@ -136,7 +136,7 @@ function 検査(string $type, string $name, $func) :bool{
         else if(preg_match("/^(-?[0-9\.]+)より大きい$/u", $func, $m)){ $result = 検査::より大きい($value, (int)$m[1]); }
         else if(preg_match("/^(-?[0-9\.]+)より小さい$/u", $func, $m)){ $result = 検査::より小さい($value, (int)$m[1]); }
         else if(preg_match("/^(-?[0-9\.]+)と同じ$/u", $func, $m))    { $result = 検査::と同じ($value, (int)$m[1]); }
-        else                                                         { functionphpエラー("検査関数の第3引数の特別関数名が間違っています"); }
+        else                                                         { functionphpエラー("第3引数の特別関数名が間違っています"); }
     }
     
     if(検査::$例外 === true and $result === false){
@@ -145,7 +145,7 @@ function 検査(string $type, string $name, $func) :bool{
     
     if($result === true){ return true; }
     elseif($result === false){ return false; }
-    else{ functionphpエラー("検査関数の第3引数の無名関数はtrueまたはfalseを返してください"); }
+    else{ functionphpエラー("第3引数の無名関数はtrueまたはfalseを返してください"); }
 }
 
 
@@ -220,7 +220,7 @@ function 整形(string $type, string $name, callable $func){
         $result = $_COOKIE[$name] = $func($_COOKIE[$name]);
     }
     else{
-        functionphpエラー("整形関数の第1引数には'GET'か'POST'か'COOKIE'のいずれかを渡してください");
+        functionphpエラー("第1引数には'GET'か'POST'か'COOKIE'のいずれかを渡してください");
     }
 
     return $result;
@@ -237,12 +237,12 @@ function 設定(string $name, $value="\0\rヌル\0\r"){
             return $記憶[$name];
         }
         else{
-            functionphpエラー("設定関数の $name は未設定です。取得できません", E_USER_WARNING);
+            functionphpエラー("$name は未設定です。取得できません", "警告");
         }
     }
     else{ //設定動作
         if(array_key_exists($name, $記憶)){
-            functionphpエラー("設定関数の $name は設定済みです。再代入はできません", E_USER_WARNING);
+            functionphpエラー("$name は設定済みです。再代入はできません", "警告");
             return $value;
         }
         else{
@@ -283,7 +283,7 @@ function テンプレート(string $_file_, array $_data_=null, bool $エスケ�
 
 function ファイルダウンロード(string $file, string $filename=null, int $timeout=60*60*12) :void{
     if(!file_exists($file)){
-        functionphpエラー("ダウンロードさせるファイル $file は存在しません", E_USER_WARNING);
+        functionphpエラー("ダウンロードさせるファイル $file は存在しません", "警告");
         return;
     }
     ini_set("max_execution_time", $timeout);
@@ -468,7 +468,7 @@ function 現在のURL(bool $no_query=false) :string{
 function ホームURL(string $url) :string{
     $parsed = explode("/", $url);
     if(!isset($parsed[2])){
-        functionphpエラー("$url はURL文字列ではありません", E_USER_WARNING);
+        functionphpエラー("$url はURL文字列ではありません", "警告");
         return $url;
     }
     return $parsed[0] . "//" . $parsed[2] . "/";
@@ -586,7 +586,7 @@ function タグ(string $tag, array $attr=[]) :string{
         $tag = ltrim($tag, "!");
     }
     if(preg_match("/[^a-zA-Z0-9\-]/", $tag)){ 
-        functionphpエラー("タグ名に $tag は使用できません", E_USER_WARNING);
+        functionphpエラー("タグ名に $tag は使用できません", "警告");
         return "";
     }
     if(in_array($tag, ["br","wbr","hr","img","col","base","link","meta","input","keygen","area","param","embed","source","track","command"], true)){
@@ -611,7 +611,7 @@ function 属性文字列(array $attr=[]) :string{
     foreach($attr as $key => $val){
         if($key === "本文"){ continue; }
         if(preg_match("/[^a-zA-Z\-]/", $key)){
-            functionphpエラー("属性名に $key は使用できません", E_USER_WARNING);
+            functionphpエラー("属性名に $key は使用できません", "警告");
             continue;
         }
         if(in_array($key, ["src", "href", "action", "formaction", "poster"], true)){ //cite, srcset
@@ -647,7 +647,7 @@ function 自動リンク($arg, array $attr=[], bool $dont_escape=false){
 
 function パーミッション(string $path, string $permission=null) :string{
     if(!file_exists($path)){
-        functionphpエラー("パス $path は存在しません", E_USER_WARNING);
+        functionphpエラー("パス $path は存在しません", "警告");
         return "";
     }
     if(!preg_match("/^0/", $permission) and $permission >= 100 and $permission <= 777){
@@ -659,7 +659,7 @@ function パーミッション(string $path, string $permission=null) :string{
 
 function ファイル一覧(string $dir=".", string $pattern="/./") :iterable{
     if(!is_dir($dir)){
-        functionphpエラー("ディレクトリ $dir は存在しません", E_USER_WARNING);
+        functionphpエラー("ディレクトリ $dir は存在しません", "警告");
         return;
     }
     $dir = realpath($dir);
@@ -681,7 +681,7 @@ function ファイル一覧(string $dir=".", string $pattern="/./") :iterable{
 
 function ディレクトリ一覧(string $dir=".", string $pattern="/./") :iterable{
     if(!is_dir($dir)){
-        functionphpエラー("ディレクトリ $dir は存在しません", E_USER_WARNING);
+        functionphpエラー("ディレクトリ $dir は存在しません", "警告");
         return;
     }
     $dir = realpath($dir);
@@ -701,7 +701,7 @@ function ディレクトリ一覧(string $dir=".", string $pattern="/./") :itera
 
 function ディレクトリ作成(string $dir, string $permission="707") :string{
     if(is_dir($dir)){
-        functionphpエラー("ディレクトリ $dir は既に存在します", E_USER_NOTICE);
+        functionphpエラー("ディレクトリ $dir は既に存在します", "注意");
         パーミッション($dir, $permission);
         return $dir;
     }
@@ -715,7 +715,7 @@ function ディレクトリ作成(string $dir, string $permission="707") :string
 
 function ディレクトリ削除(string $dir) :string{
     if(!is_dir($dir)){
-        functionphpエラー("ディレクトリ $dir は存在しません", E_USER_WARNING);
+        functionphpエラー("ディレクトリ $dir は存在しません", "警告");
         return "";
     }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
@@ -2239,21 +2239,32 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 }
 
 
-function functionphpエラー(string $str, int $type = E_USER_ERROR) :void{
-    //$typeは次の4つ: E_USER_ERROR / E_USER_WARNING / E_USER_NOTICE / E_USER_DEPRECATED
-    //E_USER_ERRORは停止する
-    //1つ目のエラーはdisplay_errors(ini)でSTDOUT、2つ目のエラーはlog_errors(ini)でSTDERR
-    //set_error_handler() で捕捉してね
-
-    $除外パス = __FILE__;
-    foreach(debug_backtrace() as $trace){
-        if(strpos($trace['file'], $除外パス) !== 0){ break; }
+function functionphpエラー(string $str, string $type = "エラー") :void{
+    //1つ目のエラーはdisplay_errors(ini)でSTDOUT、2つ目のエラーはlog_errors(ini)でSTDERR、エラーは set_error_handler() で捕捉できる
+    $設定 = [
+        "タイトル" => "function.php",
+        "除外パス" => __FILE__,
+    ];
+    
+    if($type === "警告"){
+        $e_user = E_USER_WARNING;
     }
-    $message = "[" . __FUNCTION__ . "] $str \n{$trace['file']} {$trace['line']}行目\n\n";
+    else if($type === "注意"){
+        $e_user = E_USER_NOTICE;
+    }
+    else{
+        $type   = "エラー";
+        $e_user = E_USER_ERROR;
+    }
+    
+    $backtrace = debug_backtrace();
+    foreach($backtrace as $trace){
+        if(strpos($trace['file'], $設定["除外パス"]) !== 0){ break; }
+    }
+    $message = "【{$設定['タイトル']}{$type}】[{$backtrace[1]['function']}()関数] $str\n{$trace['file']}: {$trace['line']}行目\n\n";
 
     if(PHP_SAPI !== "cli"){
-        $message = htmlspecialchars($message, ENT_QUOTES, "UTF-8", false);
-        $message = nl2br($message);
+        $message = nl2br(htmlspecialchars($message, ENT_QUOTES, "UTF-8", false));
     }
-    trigger_error($message, $type);
+    trigger_error($message, $e_user);
 } 
