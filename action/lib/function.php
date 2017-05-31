@@ -713,15 +713,15 @@ function ディレクトリ作成(string $dir, string $permission="707") :string
 }
 
 
-function ディレクトリ削除(string $dir) :bool{
+function ディレクトリ削除(string $dir) :string{
     if(!is_dir($dir)){
         functionphpエラー("ディレクトリ $dir は存在しません", E_USER_WARNING);
-        return false;
+        return "";
     }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         (is_dir("$dir/$file")) ? ディレクトリ削除("$dir/$file") : unlink("$dir/$file");
     }
-    return rmdir($dir);
+    return rmdir($dir) ? $dir : "";
 }
 
 
