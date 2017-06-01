@@ -745,10 +745,10 @@ function zip解凍(string $zipfile, string $where = "") :bool{
 
 
 
-function 一時保存(string $name, $data) :string{
+function 一時保存(string $name, $data){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
     $result = file_put_contents($tempfile, json_encode($data, JSON_PARTIAL_OUTPUT_ON_ERROR), LOCK_EX);
-    return ($result === false) ? "" : $name;
+    return ($result === false) ? false : $name;
 }
 
 
