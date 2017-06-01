@@ -166,7 +166,7 @@ class 検査{
     public static function 自然数($v){
         return preg_match("/^[1-9][0-9]*$/", $v) > 0;
     }
-    public static function 自然数と0($v){
+    public static function 整数($v){
         return preg_match("/^(0|[1-9]\d*)$/", $v) > 0;
     }
     public static function 数字($v){
