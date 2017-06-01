@@ -131,14 +131,16 @@ function 検査(string $var, $func) :bool{
             functionphpエラー("第2引数の特別関数名が間違っています");
         }
     }
-    if(検査::$例外 === true and $result === false){
-        throw new Exception("検査エラー");
+    if($result === false){
+        検査::$失敗 = true;
+        if(検査::$例外 === true){ throw new Exception("検査エラー"); }
     }
     return $result;
 }
 
 
 class 検査{
+    public static $失敗 = false;
     public static $例外 = false;
 
     public static function 必須($v) :bool{
