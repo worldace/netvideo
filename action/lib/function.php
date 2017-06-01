@@ -111,13 +111,13 @@ function オブジェクト(string $file, ...$args){
 
 function 検査(string $type, string $name, $func) :bool{
     if(preg_match("/^get$/i", $type)){
-        $value = $_GET[$name];
+        $value = (string)$_GET[$name];
     }
     elseif(preg_match("/^post$/i", $type)){
-        $value = $_POST[$name];
+        $value = (string)$_POST[$name];
     }
     elseif(preg_match("/^cookie$/i", $type)){
-        $value = $_COOKIE[$name];
+        $value = (string)$_COOKIE[$name];
     }
     else{
         functionphpエラー("第1引数には'GET'か'POST'か'COOKIE'のいずれかを渡してください");
@@ -127,22 +127,27 @@ function 検査(string $type, string $name, $func) :bool{
         $result = $func($value);
     }
     else{
-        if     (is_callable("検査::$func"))                          { $result = 検査::$func($value); }
-        else if(preg_match("/^([0-9]+)文字$/u", $func, $m))          { $result = 検査::文字($value, (int)$m[1]); }
-        else if(preg_match("/^([0-9]+)文字以上$/u", $func, $m))      { $result = 検査::文字以上($value, (int)$m[1]); }
-        else if(preg_match("/^([0-9]+)文字以下$/u", $func, $m))      { $result = 検査::文字以下($value, (int)$m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)以上$/u", $func, $m))      { $result = 検査::以上($value, (int)$m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)以下$/u", $func, $m))      { $result = 検査::以下($value, (int)$m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)より大きい$/u", $func, $m)){ $result = 検査::より大きい($value, (int)$m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)より小さい$/u", $func, $m)){ $result = 検査::より小さい($value, (int)$m[1]); }
-        else if(preg_match("/^(-?[0-9\.]+)と同じ$/u", $func, $m))    { $result = 検査::と同じ($value, (int)$m[1]); }
-        else                                                         { functionphpエラー("第3引数の特別関数名が間違っています"); }
+        if(is_callable("検査::$func")){
+            $result = 検査::$func($value);
+        }
+        else if(preg_match("/^(\d+)(文字|字|バイト)(以上|以下|以内|未満|より大きい|より小さい|と同じ)*$/u", $func, $match)){
+            if(!isset($match[3])){ $match[3] = "と同じ"; }
+            if($match[2] === "文字" or $match[2] === "字"){
+                $result = 検査::文字数($value, (int)$match[1], $match[3]);
+            }
+            else{
+                $result = 検査::バイト数($value, (int)$match[1], $match[3]);
+            }
+        }
+        else{
+            functionphpエラー("第3引数の特別関数名が間違っています");
+        }
     }
-    
+
     if(検査::$例外 === true and $result === false){
         throw new Exception("{$name}の値が間違っています", 400);
     }
-    
+
     if($result === true){ return true; }
     elseif($result === false){ return false; }
     else{ functionphpエラー("第3引数の無名関数はtrueまたはfalseを返してください"); }
@@ -182,29 +187,34 @@ class 検査{
     public static function UTF8($v){
         return preg_match('//u', $v); //mb_check_encoding($v, 'UTF-8')
     }
-    public static function と同じ($v, $num){
-        return $v == $num;
+    public static function 文字数(string $v, int $num, string $compare) :bool{
+        $func = "検査::$compare";
+        return $func(mb_strlen($v,"UTF-8"), $num);
     }
-    public static function 以上($v, $num){
-        return (is_numeric($v) and ($v >= $num));
+    public static function バイト数(string $v, int $num, string $compare) :bool{
+        $func = "検査::$compare";
+        return $func(strlen($v), $num);
     }
-    public static function 以下($v, $num){
-        return (is_numeric($v) and ($v <= $num));
+    private static function 以上(int $a, int $b) :bool{
+        return $a >= $b;
     }
-    public static function より大きい($v, $num){
-        return (is_numeric($v) and ($v > $num));
+    private static function 以下(int $a, int $b) :bool{
+        return $a <= $b;
     }
-    public static function より小さい($v, $num){
-        return (is_numeric($v) and ($v < $num));
+    private static function 以内(int $a, int $b) :bool{
+        return $a <= $b;
     }
-    public static function 文字($v, $num){
-        return mb_strlen($v,"UTF-8") == $num;
+    private static function より大きい(int $a, int $b) :bool{
+        return $a > $b;
     }
-    public static function 文字以上($v, $num){
-        return mb_strlen($v,"UTF-8") >= $num;
+    private static function より小さい(int $a, int $b) :bool{
+        return $a < $b;
     }
-    public static function 文字以下($v, $num){
-        return mb_strlen($v,"UTF-8") <= $num;
+    private static function 未満(int $a, int $b) :bool{
+        return $a < $b;
+    }
+    private static function と同じ(int $a, int $b) :bool{
+        return $a === $b;
     }
 }
 
