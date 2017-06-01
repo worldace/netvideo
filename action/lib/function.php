@@ -131,11 +131,16 @@ function 検査(string $var, $func) :bool{
             functionphpエラー("第2引数の特別関数名が間違っています");
         }
     }
+    if(検査::$例外 === true and $result === false){
+        throw new Exception("検査エラー");
+    }
     return $result;
 }
 
 
 class 検査{
+    public static $例外 = false;
+
     public static function 必須($v) :bool{
         return strlen($v) > 0;
     }
@@ -174,22 +179,22 @@ class 検査{
         $func = "検査::$compare";
         return $func(strlen($v), $num);
     }
-    private static function 以上(int $a, int $b) :bool{
+    public static function 以上(int $a, int $b) :bool{
         return $a >= $b;
     }
-    private static function 以下(int $a, int $b) :bool{
+    public static function 以下(int $a, int $b) :bool{
         return $a <= $b;
     }
-    private static function 以内(int $a, int $b) :bool{
+    public static function 以内(int $a, int $b) :bool{
         return $a <= $b;
     }
-    private static function より大きい(int $a, int $b) :bool{
+    public static function より大きい(int $a, int $b) :bool{
         return $a > $b;
     }
-    private static function より小さい(int $a, int $b) :bool{
+    public static function より小さい(int $a, int $b) :bool{
         return $a < $b;
     }
-    private static function 未満(int $a, int $b) :bool{
+    public static function 未満(int $a, int $b) :bool{
         return $a < $b;
     }
     private static function と同じ(int $a, int $b) :bool{
