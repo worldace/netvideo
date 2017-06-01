@@ -699,7 +699,7 @@ function ディレクトリ一覧(string $dir=".", string $pattern="/./") :itera
 }
 
 
-function ディレクトリ作成(string $dir, string $permission="707") :string{
+function ディレクトリ作成(string $dir, string $permission="707"){
     if(is_dir($dir)){
         functionphpエラー("ディレクトリ $dir は既に存在します", "注意");
         パーミッション($dir, $permission);
@@ -709,25 +709,25 @@ function ディレクトリ作成(string $dir, string $permission="707") :string
     umask(0);
     $result = mkdir($dir, octdec($permission), true);
     umask($mask);
-    return ($result) ? $dir : "";
+    return ($result) ? $dir : false;
 }
 
 
-function ディレクトリ削除(string $dir) :string{
+function ディレクトリ削除(string $dir){
     if(!is_dir($dir)){
         functionphpエラー("ディレクトリ $dir は存在しません", "警告");
-        return "";
+        return false;
     }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         (is_dir("$dir/$file")) ? ディレクトリ削除("$dir/$file") : unlink("$dir/$file");
     }
-    return rmdir($dir) ? $dir : "";
+    return rmdir($dir) ? $dir : false;
 }
 
 
-function zip圧縮(string $zipfile, array $filemap) :string{
+function zip圧縮(string $zipfile, array $filemap){
     $zip = new ZipArchive();
-    if(!$zip->open($zipfile, ZipArchive::CREATE)){ return ""; }
+    if(!$zip->open($zipfile, ZipArchive::CREATE)){ return false; }
     foreach($filemap as $name => $value){ $zip->addFromString($name, $value); } //$nameに/を含めるとディレクトリになる
     $zip->close();
     return $zipfile;
