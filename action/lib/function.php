@@ -109,82 +109,61 @@ function オブジェクト(string $file, ...$args){
 }
 
 
-function 検査(string $type, string $name, $func) :bool{
-    if(preg_match("/^get$/i", $type)){
-        $value = (string)$_GET[$name];
-    }
-    elseif(preg_match("/^post$/i", $type)){
-        $value = (string)$_POST[$name];
-    }
-    elseif(preg_match("/^cookie$/i", $type)){
-        $value = (string)$_COOKIE[$name];
-    }
-    else{
-        functionphpエラー("第1引数には'GET'か'POST'か'COOKIE'のいずれかを渡してください");
-    }
-
+function 検査(string $var, $func) :bool{
     if(is_callable($func)){
-        $result = $func($value);
+        $result = $func($var);
+        if(!is_bool($result)){ functionphpエラー("第2引数の無名関数はtrueまたはfalseを返してください"); }
     }
     else{
         if(is_callable("検査::$func")){
-            $result = 検査::$func($value);
+            $result = 検査::$func($var);
         }
         else if(preg_match("/^(\d+)(文字|字|バイト)(以上|以下|以内|未満|より大きい|より小さい|と同じ)*$/u", $func, $match)){
             if(!isset($match[3])){ $match[3] = "と同じ"; }
             if($match[2] === "文字" or $match[2] === "字"){
-                $result = 検査::文字数($value, (int)$match[1], $match[3]);
+                $result = 検査::文字数($var, (int)$match[1], $match[3]);
             }
             else{
-                $result = 検査::バイト数($value, (int)$match[1], $match[3]);
+                $result = 検査::バイト数($var, (int)$match[1], $match[3]);
             }
         }
         else{
-            functionphpエラー("第3引数の特別関数名が間違っています");
+            functionphpエラー("第2引数の特別関数名が間違っています");
         }
     }
-
-    if(検査::$例外 === true and $result === false){
-        throw new Exception("{$name}の値が間違っています", 400);
-    }
-
-    if($result === true){ return true; }
-    elseif($result === false){ return false; }
-    else{ functionphpエラー("第3引数の無名関数はtrueまたはfalseを返してください"); }
+    return $result;
 }
 
 
 class 検査{
-    public static $例外 = false;
-
-    public static function 必須($v){
-        return (is_string($v) and strlen($v) > 0);
+    public static function 必須($v) :bool{
+        return strlen($v) > 0;
     }
-    public static function 数($v){
+    public static function 数($v) :bool{
         return (is_numeric($v) and !preg_match("/^-?0+\d/", $v));
     }
-    public static function 自然数($v){
+    public static function 自然数($v) :bool{
         return preg_match("/^[1-9][0-9]*$/", $v) > 0;
     }
-    public static function 整数($v){
+    public static function 整数($v) :bool{
         return preg_match("/^(0|[1-9]\d*)$/", $v) > 0;
     }
-    public static function 数字($v){
+    public static function 数字($v) :bool{
         return preg_match("/^[0-9]+$/", $v) > 0;
     }
-    public static function 英字($v){
+    public static function 英字($v) :bool{
         return preg_match("/^[A-Za-z]+$/", $v) > 0;
     }
-    public static function 英数字($v){
+    public static function 英数字($v) :bool{
         return preg_match("/^[A-Za-z0-9]+$/", $v) > 0;
     }
-    public static function URL($v){
+    public static function URL($v) :bool{
         return preg_match("|^https?://.{4,}|i", $v) > 0;
     }
-    public static function 画像データ($v){
+    public static function 画像データ($v) :bool{
         return getimagesizefromstring($v)[0] > 0; //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
     }
-    public static function UTF8($v){
+    public static function UTF8($v) :bool{
         return preg_match('//u', $v); //mb_check_encoding($v, 'UTF-8')
     }
     public static function 文字数(string $v, int $num, string $compare) :bool{
@@ -219,21 +198,9 @@ class 検査{
 }
 
 
-function 整形(string $type, string $name, callable $func){
-    if(preg_match("/^get$/i", $type)){
-        $result = $_GET[$name] = $func($_GET[$name]);
-    }
-    elseif(preg_match("/^post$/i", $type)){
-        $result = $_POST[$name] = $func($_POST[$name]);
-    }
-    elseif(preg_match("/^cookie$/i", $type)){
-        $result = $_COOKIE[$name] = $func($_COOKIE[$name]);
-    }
-    else{
-        functionphpエラー("第1引数には'GET'か'POST'か'COOKIE'のいずれかを渡してください");
-    }
-
-    return $result;
+function 整形(string &$var, callable $func){
+    $var = $func($var);
+    return $var;
 }
 
 
