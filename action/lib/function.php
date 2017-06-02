@@ -92,6 +92,7 @@ function 自動読み込み(string $dir=__DIR__) :void{
 function オブジェクト(string $file, ...$args){
     static $記憶 = [];
 
+    $file = realpath($file);
     if(!isset($記憶[$file])){
         $記憶[$file] = require($file);
     }
