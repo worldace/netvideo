@@ -96,7 +96,7 @@ function オブジェクト(string $file, ...$args){
     if(!isset($記憶[$file])){
         $記憶[$file] = require($file);
     }
-    return ($args) ? $記憶[$file]($args) : $記憶[$file];
+    return ($記憶[$file] instanceof Closure) ? $記憶[$file]($args) : $記憶[$file];
 }
 
 
