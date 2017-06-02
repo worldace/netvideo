@@ -9,12 +9,8 @@ declare(strict_types=1);
 
 function route(array $route, $arg=1) :void{
     $_ENV['route.return'] = $arg;
-    $_ENV['route.dir'] = dirname(debug_backtrace()[0]['file']);
 
     foreach((array)$route as $_ENV['route.file']){
-        if(!preg_match("#^(/|\\\\|\w:)#", $_ENV['route.file'])){ //相対パスなら
-            $_ENV['route.file'] = $_ENV['route.dir'] . "/" . $_ENV['route.file'];
-        }
         $func = function (){ return require_once $_ENV['route.file']; };
         $_ENV['route.return'] = $func();
     }
@@ -95,12 +91,6 @@ function 自動読み込み(string $dir=__DIR__) :void{
 
 function オブジェクト(string $file, ...$args){
     static $記憶 = [];
-
-    if(!preg_match("#^(/|\\\\|\w:)#", $file)){ //相対パスなら
-        $dir  = dirname(debug_backtrace()[0]['file']);
-        $file = "$dir/$file";
-    }
-    $file = realpath($file);
 
     if(!isset($記憶[$file])){
         $記憶[$file] = require($file);
@@ -237,9 +227,6 @@ $_ENV['設定'] = function(string $name){ return 設定($name); };
 
 
 function テンプレート(string $_file_, array $_data_=null, bool $エスケープしない=false) :string{
-    if(!preg_match("#^(/|\\\\|\w:)#", $_file_)){ //相対パスなら
-        $_file_ = dirname(debug_backtrace()[0]['file']) . "/$_file_";
-    }
     $_h_ = function($arg) use (&$_h_){
         if(is_array($arg)){ return array_map($_h_, $arg); }
         return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
