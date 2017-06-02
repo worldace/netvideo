@@ -174,12 +174,10 @@ class 検査{
         return preg_match('//u', $v); //mb_check_encoding($v, 'UTF-8')
     }
     public static function 文字数(string $v, int $num, string $compare) :bool{
-        $func = "検査::$compare";
-        return $func(mb_strlen($v,"UTF-8"), $num);
+        return self::{$compare}(mb_strlen($v,"UTF-8"), $num);
     }
     public static function バイト数(string $v, int $num, string $compare) :bool{
-        $func = "検査::$compare";
-        return $func(strlen($v), $num);
+        return self::{$compare}(strlen($v), $num);
     }
     public static function 以上(int $a, int $b) :bool{
         return $a >= $b;
