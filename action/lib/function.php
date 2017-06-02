@@ -219,12 +219,11 @@ function 設定(string $name, $value="\0\rヌル\0\r"){
             return $value;
         }
         else{
-            $記憶[$name] = $value;
+            $記憶[$name] = $_ENV[$name] = $value;
             return $value;
         }
     }
 }
-$_ENV['設定'] = function(string $name){ return 設定($name); };
 
 
 function テンプレート(string $_file_, array $_data_=null, bool $エスケープしない=false) :string{
