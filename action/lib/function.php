@@ -124,7 +124,6 @@ function 検査(string $var, $func) :bool{
     }
     if($result === false){
         検査::$失敗 = true;
-        if(検査::$例外 === true){ throw new Exception("検査エラー"); }
     }
     return $result;
 }
@@ -132,7 +131,6 @@ function 検査(string $var, $func) :bool{
 
 class 検査{
     public static $失敗 = false;
-    public static $例外 = false;
 
     public static function 必須($v) :bool{
         return strlen($v) > 0;
