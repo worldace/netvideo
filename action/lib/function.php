@@ -351,7 +351,7 @@ function GET送信(string $url, array $querymap=null, array $request_header=[]){
 
 function POST送信(string $url, array $querymap=null, array $request_header=[]){
     $content = http_build_query((array)$querymap, "", "&");
-    $request_header = $request_header + [
+    $request_header += [
         "Content-Type" => "application/x-www-form-urlencoded; charset=UTF-8",
         "Content-Length" => strlen($content),
     ];
@@ -390,7 +390,7 @@ function ファイル送信(string $url, array $querymap=null, array $request_he
     }
     $content .= "--$区切り--\r\n";
 
-    $request_header = $request_header + [
+    $request_header += [
         "Content-Type" => "multipart/form-data; boundary=$区切り",
         "Content-Length" => strlen($content),
     ];
