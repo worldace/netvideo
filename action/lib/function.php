@@ -727,10 +727,10 @@ function 一時取得(string $name){
 }
 
 
-function JSON保存(string $file, $data) :string{
+function JSON保存(string $file, $data){
     $prefix = preg_match("/\.php$/i", $file) ? "<?php\n" : "";
     $result = file_put_contents($file, $prefix.json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR), LOCK_EX);
-    return ($result === false) ? "" : $file;
+    return ($result === false) ? false : $file;
 }
 
 
@@ -742,9 +742,9 @@ function JSON取得(string $file){
 }
 
 
-function 配列保存(string $file, array $array) :string{
+function 配列保存(string $file, array $array){
     $return = file_put_contents($file, "<?php\nreturn " . var_export($array,true) . ";", LOCK_EX);
-    return ($return === false) ? "" : $file;
+    return ($return === false) ? false : $file;
 }
 
 
