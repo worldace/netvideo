@@ -334,8 +334,8 @@ function GET送信(string $url, array $querymap=null, array $request_header=[]){
         $url .= preg_match("/\?/", $url) ? "&" : "?";
         $url .= http_build_query($querymap, "", "&", PHP_QUERY_RFC3986);
     }
-    foreach($request_header as $k => $v){
-        $header .= trim($k) . ": " . trim($v) . "\r\n";
+    foreach($request_header as $key => $val){
+        $header .= trim($key) . ": " . trim($val) . "\r\n";
     }
     $context = stream_context_create([
         'http'=>[
@@ -351,12 +351,12 @@ function GET送信(string $url, array $querymap=null, array $request_header=[]){
 
 function POST送信(string $url, array $querymap=null, array $request_header=[]){
     $content = http_build_query((array)$querymap, "", "&");
-    $request_header += [
-        "Content-Type" => "application/x-www-form-urlencoded; charset=UTF-8",
-        "Content-Length" => strlen($content),
+    $request_header = array_change_key_case($request_header) + [
+        "content-type"   => "application/x-www-form-urlencoded; charset=UTF-8",
+        "content-length" => strlen($content),
     ];
-    foreach($request_header as $k => $v){
-        $header .= trim($k) . ": " . trim($v) . "\r\n";
+    foreach($request_header as $key => $val){
+        $header .= trim($key) . ": " . trim($val) . "\r\n";
     }
     $context = stream_context_create([
         'http'=>[
@@ -390,12 +390,12 @@ function ファイル送信(string $url, array $querymap=null, array $request_he
     }
     $content .= "--$区切り--\r\n";
 
-    $request_header += [
-        "Content-Type" => "multipart/form-data; boundary=$区切り",
-        "Content-Length" => strlen($content),
+    $request_header = array_change_key_case($request_header) + [
+        "content-type"   => "multipart/form-data; boundary=$区切り",
+        "content-length" => strlen($content),
     ];
-    foreach($request_header as $k => $v){
-        $header .= trim($k) . ": " . trim($v) . "\r\n";
+    foreach($request_header as $key => $val){
+        $header .= trim($key) . ": " . trim($val) . "\r\n";
     }
 
     $context = stream_context_create([
