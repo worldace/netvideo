@@ -515,6 +515,36 @@ function 経過(int $time) :string{
 }
 
 
+function カレンダー用配列(int $年=null, int $月=null) :array{
+    if(!$年 or !$月){
+        $date = new DateTime('first day of');
+    }
+    else{
+        $date = new DateTime("{$年}-{$月}");
+    }
+
+    $曜日 = $date->format('w');
+    $日数 = $date->format('t');
+    $週   = 0;
+
+    for($i = $曜日; $i > 0; $i--){
+        $return[$週][] = '';
+    }
+    for($i = 1; $i <= $日数; $i++){
+        if($曜日 > 6){
+            $曜日 = 0;
+            $週++;
+        }
+        $曜日++;
+        $return[$週][] = $i;
+    }
+    for($i = $曜日; $i <= 6; $i++){
+        $return[$週][] = '';
+    }
+    return $return;
+}
+
+
 function 日本語設定() :void{
     (preg_match("/^WIN/i", PHP_OS)) ? setlocale(LC_ALL, '') : setlocale(LC_ALL, 'ja_JP.UTF-8');
     ini_set("default_charset", "UTF-8");
