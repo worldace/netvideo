@@ -39,7 +39,7 @@ function JSON表示($data, $allow=null) :void{
     }
     header("Access-Control-Allow-Origin: $allow");
     header("Access-Control-Allow-Credentials: true");
-    if(is_string($_GET['callback'])){ //JSONP
+    if(isset($_GET['callback']) and is_string($_GET['callback'])){ //JSONP
         header("Content-Type: application/javascript; charset=utf-8");
         print $_GET['callback'] . "(" . json_encode($data, JSON_PARTIAL_OUTPUT_ON_ERROR) . ");";
     }
