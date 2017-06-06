@@ -515,7 +515,7 @@ function 経過(int $time) :string{
 }
 
 
-function カレンダー用配列(int $年=null, int $月=null) :array{
+function カレンダー配列(int $年=null, int $月=null) :array{
     if(!$年 or !$月){
         $date = new DateTime('first day of');
     }
