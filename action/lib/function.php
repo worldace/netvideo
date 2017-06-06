@@ -308,7 +308,7 @@ function メール送信($送信先, string $送信元="", string $送信者="",
     if(is_array($add)){ $header .= implode("\r\n", $add) . "\r\n"; }
 
     if(is_array($添付)){
-        $区切り = "__" . uuid() . "__";
+        $区切り = "__" . sha1(uniqid()) . "__";
         $header .= "MIME-Version: 1.0\r\n";
         $header .= "Content-Type: multipart/mixed; boundary=\"{$区切り}\"\r\n";
 
@@ -372,7 +372,7 @@ function POST送信(string $url, array $querymap=null, array $request_header=[])
 
 
 function ファイル送信(string $url, array $querymap=null, array $request_header=[]){
-    $区切り = "__" . uuid() . "__";
+    $区切り = "__" . sha1(uniqid()) . "__";
     foreach((array)$querymap as $name => $value){
         if(is_array($value)){
             foreach($value as $name2 => $value2){
