@@ -1528,6 +1528,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
         $this->文書->formatOutput = true;
         $this->文書->encoding = "utf-8";
+        $this->文書->preserveWhiteSpace = false;
     }
 
     public function 本文($str = null){
@@ -2065,20 +2066,22 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         }
     }
 
-    private function element2array($element) {
-        $return = ["tag"=>$element->tagName];
-        foreach ($element->attributes as $attribute) {
-            $return[$attribute->name] = $attribute->value;
+    private function element2array(DOMElement $node) :array{
+        $array = [];
+
+        foreach($node->attributes as $attr){
+            $array[$attr->name] = $attr->value;
         }
-        foreach ($element->childNodes as $subElement) { // nodeType: http://www.php.net/manual/en/dom.constants.php
-            if ($subElement->nodeType === XML_ELEMENT_NODE) {
-                $return["child"][] = $this->element2array($subElement);
+
+        foreach($node->childNodes as $child){
+            if($child->nodeType === XML_ELEMENT_NODE){ 
+                $array[$child->tagName][] = $this->element2array($child);
             }
-            elseif ($subElement->nodeType === XML_TEXT_NODE){
-                $return["text"] = $subElement->textContent;
+            else if($child->nodeType === XML_TEXT_NODE){
+                $array['text'] = $child->textContent;
             }
         }
-        return $return;
+        return $array;
     }
 
     /**
