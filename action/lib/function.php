@@ -649,8 +649,9 @@ function 連想配列ソート(array &$array) :void{
 }
 
 
-function 配列探索(array $array) :RecursiveIteratorIterator{
-    return new RecursiveIteratorIterator(new RecursiveArrayIterator($array), RecursiveIteratorIterator::SELF_FIRST);
+function 配列探索($array, bool $option = false) :RecursiveIteratorIterator{
+    $option = $option  ?  RecursiveIteratorIterator::LEAVES_ONLY  :  RecursiveIteratorIterator::SELF_FIRST;
+    return new RecursiveIteratorIterator(new RecursiveArrayIterator($array), $option);
 }
 
 
