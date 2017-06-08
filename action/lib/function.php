@@ -649,12 +649,7 @@ function 連想配列ソート(array &$array) :void{
 }
 
 
-function 配列探索($array, bool $leafonly = false) :RecursiveIteratorIterator{
-    $option = $leafonly  ?  RecursiveIteratorIterator::LEAVES_ONLY  :  RecursiveIteratorIterator::SELF_FIRST;
-    return new RecursiveIteratorIterator(new RecursiveArrayIterator($array), $option);
-}
-/* ベンチマークは同じ
-function 配列探索($array, bool $leafonly = false){
+function 配列探索($array, bool $leafonly = false) :Generator{
     foreach($array as $k => $v){
         if(is_iterable($v) or is_object($v)){
             if(!$leafonly){
@@ -667,7 +662,13 @@ function 配列探索($array, bool $leafonly = false){
         }
     }
 }
+/*
+function 配列探索($array, bool $leafonly = false) :RecursiveIteratorIterator{
+    $option = $leafonly  ?  RecursiveIteratorIterator::LEAVES_ONLY  :  RecursiveIteratorIterator::SELF_FIRST;
+    return new RecursiveIteratorIterator(new RecursiveArrayIterator($array), $option);
+}
 */
+
 
 function パーミッション(string $path, string $permission=null) :string{
     if(!file_exists($path)){
@@ -803,10 +804,10 @@ function 配列保存(string $file, array $array){
 }
 
 
-function XML取得(string $xml, array $options = []) :array{
+function XML取得($xml, array $options = []) :array{
     if(!is_object($xml)){
         $xml = ltrim($xml);
-        if(!preg_match("/^</", $input)){
+        if(!preg_match("/^</", $xml)){
             $xmlstr = file_get_contents($xml);
         }
         else{
