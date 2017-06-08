@@ -655,17 +655,15 @@ function 配列探索(iterable $array, bool $leafonly = false) :RecursiveIterato
 }
 /* ベンチマークは同じ
 function 配列探索(iterable $array, bool $leafonly = false){
-    foreach($array as $k1 => $v1){
-        if(is_array($v1) or is_object($v1)){
+    foreach($array as $k => $v){
+        if(is_iterable($v) or is_object($v)){
             if(!$leafonly){
-                yield $k1 => $v1;
+                yield $k => $v;
             }
-            foreach(配列探索($v1, $leafonly) as $k2 => $v2){
-                yield $k2 => $v2;
-            }
+            yield from 配列探索($v, $leafonly);
         }
         else{
-            yield $k1 => $v1;
+            yield $k => $v;
         }
     }
 }
