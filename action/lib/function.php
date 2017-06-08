@@ -649,13 +649,8 @@ function 連想配列ソート(array &$array) :void{
 }
 
 
-function 配列探索(iterable $array, callable $func) :void{
-    foreach($array as $k=>$v){
-        $func($v, $k);
-        if(is_iterable($v)){
-            配列探索($v, $func);
-        }
-    }
+function 配列探索(array $array) :RecursiveIteratorIterator{
+    return new RecursiveIteratorIterator(new RecursiveArrayIterator($array), RecursiveIteratorIterator::SELF_FIRST);
 }
 
 
