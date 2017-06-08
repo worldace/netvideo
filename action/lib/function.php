@@ -649,11 +649,27 @@ function 連想配列ソート(array &$array) :void{
 }
 
 
-function 配列探索($array, bool $option = false) :RecursiveIteratorIterator{
-    $option = $option  ?  RecursiveIteratorIterator::LEAVES_ONLY  :  RecursiveIteratorIterator::SELF_FIRST;
+function 配列探索(iterable $array, bool $leafonly = false) :RecursiveIteratorIterator{
+    $option = $leafonly  ?  RecursiveIteratorIterator::LEAVES_ONLY  :  RecursiveIteratorIterator::SELF_FIRST;
     return new RecursiveIteratorIterator(new RecursiveArrayIterator($array), $option);
 }
-
+/* ベンチマークは同じ
+function 配列探索(iterable $array, bool $leafonly = false){
+    foreach($array as $k1 => $v1){
+        if(is_array($v1) or is_object($v1)){
+            if(!$leafonly){
+                yield $k1 => $v1;
+            }
+            foreach(配列探索($v1, $leafonly) as $k2 => $v2){
+                yield $k2 => $v2;
+            }
+        }
+        else{
+            yield $k1 => $v1;
+        }
+    }
+}
+*/
 
 function パーミッション(string $path, string $permission=null) :string{
     if(!file_exists($path)){
