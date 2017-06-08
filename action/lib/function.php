@@ -651,8 +651,7 @@ function 連想配列ソート(array &$array) :void{
 
 function 配列探索(iterable $array, callable $func) :void{
     foreach($array as $k=>$v){
-        $func_return = $func($k, $v);
-        if($func_return !== null){ $return[] = $func_return; }
+        $func($v, $k);
         if(is_iterable($v)){
             配列探索($v, $func);
         }
