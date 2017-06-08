@@ -649,12 +649,12 @@ function 連想配列ソート(array &$array) :void{
 }
 
 
-function 配列探索(iterable $array, bool $leafonly = false) :RecursiveIteratorIterator{
+function 配列探索($array, bool $leafonly = false) :RecursiveIteratorIterator{
     $option = $leafonly  ?  RecursiveIteratorIterator::LEAVES_ONLY  :  RecursiveIteratorIterator::SELF_FIRST;
     return new RecursiveIteratorIterator(new RecursiveArrayIterator($array), $option);
 }
 /* ベンチマークは同じ
-function 配列探索(iterable $array, bool $leafonly = false){
+function 配列探索($array, bool $leafonly = false){
     foreach($array as $k => $v){
         if(is_iterable($v) or is_object($v)){
             if(!$leafonly){
