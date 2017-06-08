@@ -465,11 +465,6 @@ function POSTなら() :bool{
 }
 
 
-function 連想配列なら($array) :bool{
-    return (is_array($array) and array_values($array) !== $array) ? true : false;
-}
-
-
 function 開発環境なら() :bool{
     return ini_get("display_errors") ? true : false;
 }
@@ -623,6 +618,14 @@ function 属性文字列(array $attr=[]) :string{
 }
 
 
+function 自動リンク($arg, array $attr=[], bool $dont_escape=false){
+    if(is_array($arg)){ return array_map(function($str) use($attr){ return 自動リンク($str, $attr); }, $arg); }
+    $attr_str = 属性文字列($attr);
+    if($dont_escape === false){ $arg = h($arg); }
+    return preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $arg);
+}
+
+
 function 配列→table(array $array, array $attr=[]) :string{
     $firstkey = key($array);
     if(is_array($array[$firstkey])){ $tag = "<tr>\n<th></th>\n<th>" . implode("</th>\n<th>",h(array_keys($array[$firstkey]))) . "</th>\n</tr>\n"; }
@@ -636,11 +639,24 @@ function 配列→table(array $array, array $attr=[]) :string{
 }
 
 
-function 自動リンク($arg, array $attr=[], bool $dont_escape=false){
-    if(is_array($arg)){ return array_map(function($str) use($attr){ return 自動リンク($str, $attr); }, $arg); }
-    $attr_str = 属性文字列($attr);
-    if($dont_escape === false){ $arg = h($arg); }
-    return preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $arg);
+function 連想配列なら($array) :bool{
+    return (is_array($array) and array_values($array) !== $array) ? true : false;
+}
+
+
+function 連想配列ソート(array &$array) :void{
+    array_multisort(array_values($array), SORT_DESC, SORT_NATURAL, array_keys($array), SORT_ASC, SORT_NATURAL, $array);
+}
+
+
+function 配列探索(iterable $array, callable $func) :void{
+    foreach($array as $k=>$v){
+        $func_return = $func($k, $v);
+        if($func_return !== null){ $return[] = $func_return; }
+        if(is_iterable($v)){
+            配列探索($v, $func);
+        }
+    }
 }
 
 
@@ -949,11 +965,6 @@ function ベーシック認証(callable $認証関数, string $realm="member onl
     header("WWW-Authenticate: Basic realm=\"$realm\"");
     header("HTTP/1.0 401 Unauthorized");
     return false;
-}
-
-
-function 連想配列ソート(array &$array) :void{
-    array_multisort(array_values($array), SORT_DESC, SORT_NATURAL, array_keys($array), SORT_ASC, SORT_NATURAL, $array);
 }
 
 
