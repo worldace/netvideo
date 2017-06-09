@@ -821,22 +821,34 @@ function XML取得(string $xml) :array{
 }
 
 
-function XML取得_Array(DOMElement $node) :array{
-    $array = [];
-
-    foreach($node->attributes as $attr){
-        $array[$attr->name] = $attr->value;
-    }
-
-    foreach($node->childNodes as $child){
-        if($child->nodeType === XML_ELEMENT_NODE){ 
-            $array[$child->tagName][] = XML取得_Array($child);
+function XML取得_Array(DOMElement $node){
+    $return = [];
+    if($node->childNodes->length === 1){
+        if($node->firstChild->nodeType === XML_TEXT_NODE){ 
+            $return = $node->firstChild->nodeValue;
         }
-        else if($child->nodeType === XML_TEXT_NODE){
-            $array['text'] = $child->textContent;
+        else{
+            $return[$node->firstChild->tagName] = XML取得_Array($node->firstChild);
         }
     }
-    return $array;
+    else{
+        foreach($node->childNodes as $child){
+            if($child->nodeType !== XML_ELEMENT_NODE){ continue; }
+            $tag[] = $child->tagName;
+        }
+        $onlytag = array_keys(array_count_values($tag), 1); //配列の中で1個しかない要素
+
+        foreach($node->childNodes as $child){
+            if($child->nodeType !== XML_ELEMENT_NODE){ continue; }
+            if(in_array($child->tagName, $onlytag, true)){
+                $return[$child->tagName] = XML取得_Array($child);
+            }
+            else{
+                $return[$child->tagName][] = XML取得_Array($child);
+            }
+        }
+    }
+    return $return;
 }
 
 
