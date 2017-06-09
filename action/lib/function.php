@@ -682,7 +682,7 @@ function パーミッション(string $path, string $permission=null) :string{
 }
 
 
-function ファイル一覧(string $dir=".", string $pattern="/./") :iterable{
+function ファイル一覧(string $dir=".", string $pattern="/./") :Generator{
     if(!is_dir($dir)){
         functionphpエラー("ディレクトリ $dir は存在しません", "警告");
         return;
@@ -702,7 +702,7 @@ function ファイル一覧(string $dir=".", string $pattern="/./") :iterable{
 }
 
 
-function ディレクトリ一覧(string $dir=".", string $pattern="/./") :iterable{
+function ディレクトリ一覧(string $dir=".", string $pattern="/./") :Generator{
     if(!is_dir($dir)){
         functionphpエラー("ディレクトリ $dir は存在しません", "警告");
         return;
@@ -2211,7 +2211,7 @@ function functionphpエラー(string $str, string $type = "エラー") :void{
     foreach(debug_backtrace() as $trace){
         if(strpos($trace['file'], $設定["除外パス"]) !== 0){ break; }
     }
-    $message = "【{$設定['タイトル']}{$type}】{$trace['class']}{$trace['type']}[{$trace['function']}()関数] $str\n{$trace['file']}: {$trace['line']}行目\n\n";
+    $message = "【{$type} {$trace['class']}{$trace['type']}{$trace['function']}()】 $str\n{$trace['file']}: {$trace['line']}行目\n\n";
 
     if(PHP_SAPI !== "cli"){
         $message = nl2br(htmlspecialchars($message, ENT_QUOTES, "UTF-8", false));
