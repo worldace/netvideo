@@ -682,11 +682,13 @@ function パーミッション(string $path, string $permission=null) :string{
 }
 
 
-function ファイル一覧(string $dir=".") :Generator{
-    $dir = realpath($dir);
-    if($dir === false){
-        functionphpエラー("ディレクトリ $dir は存在しません", "警告");
-        return;
+function ファイル一覧(string $dir=".", bool $recursive = false) :Generator{
+    if($recursive === false){
+        $dir = realpath($dir);
+        if($dir === false){
+            functionphpエラー("ディレクトリ $dir は存在しません", "警告");
+            return;
+        }
     }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path = $dir . DIRECTORY_SEPARATOR . $file;
@@ -694,23 +696,25 @@ function ファイル一覧(string $dir=".") :Generator{
             yield $file => $path;
         }
         elseif(is_dir($path)){
-            yield from ファイル一覧($path);
+            yield from ファイル一覧($path, true);
         }
     }
 }
 
 
-function ディレクトリ一覧(string $dir=".") :Generator{
-    $dir = realpath($dir);
-    if($dir === false){
-        functionphpエラー("ディレクトリ $dir は存在しません", "警告");
-        return;
+function ディレクトリ一覧(string $dir=".", bool $recursive = false) :Generator{
+    if($recursive === false){
+        $dir = realpath($dir);
+        if($dir === false){
+            functionphpエラー("ディレクトリ $dir は存在しません", "警告");
+            return;
+        }
     }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path = $dir . DIRECTORY_SEPARATOR . $file;
         if(is_dir($path)) {
             yield $file => $path;
-            yield from ディレクトリ一覧($path);
+            yield from ディレクトリ一覧($path, true);
         }
     }
 }
