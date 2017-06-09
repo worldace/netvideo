@@ -683,11 +683,11 @@ function パーミッション(string $path, string $permission=null) :string{
 
 
 function ファイル一覧(string $dir=".") :Generator{
-    if(!is_dir($dir)){
+    $dir = realpath($dir);
+    if($dir === false){
         functionphpエラー("ディレクトリ $dir は存在しません", "警告");
         return;
     }
-    $dir = realpath($dir);
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path = $dir . DIRECTORY_SEPARATOR . $file;
         if(is_file($path)){
@@ -701,11 +701,11 @@ function ファイル一覧(string $dir=".") :Generator{
 
 
 function ディレクトリ一覧(string $dir=".") :Generator{
-    if(!is_dir($dir)){
+    $dir = realpath($dir);
+    if($dir === false){
         functionphpエラー("ディレクトリ $dir は存在しません", "警告");
         return;
     }
-    $dir = realpath($dir);
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path = $dir . DIRECTORY_SEPARATOR . $file;
         if(is_dir($path)) {
