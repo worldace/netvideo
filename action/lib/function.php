@@ -811,7 +811,7 @@ function XML取得(string $xml) :array{
         if($xml === false){ return []; }
     }
     $xml = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$xml);
-    return json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NONET | LIBXML_COMPACT | LIBXML_PARSEHUGE)), true);
+    return json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOBLANKS | LIBXML_NONET | LIBXML_COMPACT | LIBXML_PARSEHUGE)), true);
 }
 
 
