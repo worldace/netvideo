@@ -808,6 +808,7 @@ function XML取得(string $xml) :array{
     $xml = ltrim($xml);
     if(!preg_match("/^</", $xml)){
         $xml = file_get_contents($xml);
+        if($xml === false){ return []; }
     }
     $xml = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$xml);
 
