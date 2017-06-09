@@ -696,9 +696,7 @@ function ファイル一覧(string $dir=".", string $pattern="/./") :iterable{
             }
         }
         elseif(is_dir($path)){
-            foreach(ファイル一覧($path, $pattern) as $sub){
-                yield $sub;
-            }
+            yield from ファイル一覧($path, $pattern);
         }
     }
 }
@@ -716,9 +714,7 @@ function ディレクトリ一覧(string $dir=".", string $pattern="/./") :itera
             if(preg_match($pattern, $file)){
                 yield $path;
             }
-            foreach(ディレクトリ一覧($path, $pattern) as $sub){
-                yield $sub;
-            }
+            yield from ディレクトリ一覧($path, $pattern);
         }
     }
 }
