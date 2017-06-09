@@ -2013,29 +2013,16 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
     private function xml2array(DOMElement $node){
         $return = [];
 
-        if($node->childNodes->length === 1){
-            if($node->firstChild->nodeType === XML_TEXT_NODE){ 
-                $return = $node->firstChild->nodeValue;
-            }
-            else{
-                $return[$node->firstChild->tagName] = xml2array($node->firstChild);
-            }
+        foreach($node->attributes as $attr){
+            $return['@'.$attr->name] = $attr->value;
         }
-        else{
-            foreach($node->childNodes as $child){
-                if($child->nodeType !== XML_ELEMENT_NODE){ continue; }
-                $tag[] = $child->tagName;
-            }
-            $onlytag = array_keys(array_count_values($tag), 1); //子要素群の中で1個しかない要素
 
-            foreach($node->childNodes as $child){
-                if($child->nodeType !== XML_ELEMENT_NODE){ continue; }
-                if(in_array($child->tagName, $onlytag, true)){
-                    $return[$child->tagName] = xml2array($child);
-                }
-                else{
-                    $return[$child->tagName][] = xml2array($child);
-                }
+        foreach($node->childNodes as $child){
+            if($child->nodeType === XML_ELEMENT_NODE){
+                $return[$child->nodeName][] = $this->xml2array($child);
+            }
+            else if($child->nodeType === XML_TEXT_NODE){
+                $return['#text'] = $child->textContent;
             }
         }
         return $return;
