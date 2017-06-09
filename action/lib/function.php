@@ -250,7 +250,7 @@ function テンプレート(string $_file_, array $_data_=null, bool $エスケ�
 }
 
 
-function ファイルダウンロード(string $file, string $filename=null, int $timeout=60*60*12) :void{
+function ファイルダウンロード(string $file, string $filename=null, int $timeout=60*60*6) :void{
     if(!file_exists($file)){
         functionphpエラー("ダウンロードさせるファイル $file は存在しません", "警告");
         return;
@@ -269,7 +269,7 @@ function ファイルダウンロード(string $file, string $filename=null, int
 }
 
 
-function データダウンロード(string $data, string $filename="data", int $timeout=60*60*12) :void{
+function データダウンロード(string $data, string $filename="data", int $timeout=60*60*6) :void{
     ini_set("max_execution_time", $timeout);
     $filesize = strlen($data);
     $filenameE = rawurlencode($filename);
@@ -712,7 +712,7 @@ function ディレクトリ一覧(string $dir=".", bool $recursive = false) :Gen
     }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path = $dir . DIRECTORY_SEPARATOR . $file;
-        if(is_dir($path)) {
+        if(is_dir($path)){
             yield $file => $path;
             yield from ディレクトリ一覧($path, true);
         }
