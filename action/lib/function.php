@@ -804,69 +804,38 @@ function 配列保存(string $file, array $array){
 }
 
 
-function XML取得($xml, array $options = []) :array{
-    if(!is_object($xml)){
-        $xml = ltrim($xml);
-        if(!preg_match("/^</", $xml)){
-            $xmlstr = file_get_contents($xml);
-        }
-        else{
-            $xmlstr = $xml;
-        }
-        $xmlstr = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$xmlstr);
-        $xml = simplexml_load_string($xmlstr);
-        if(!$xml){ return []; }
+function XML取得(string $xml) :array{
+    $xml = ltrim($xml);
+    if(!preg_match("/^</", $xml)){
+        $xml = file_get_contents($xml);
     }
-    //xmlToArray Tamlyn Rhodes <http://tamlyn.org> Public Domain
-    $defaults = array(
-        'namespaceSeparator' => ':',//you may want this to be something other than a colon
-        'attributePrefix' => '',   //to distinguish between attributes and nodes with the same name
-        'alwaysArray' => array(),   //array of xml tag names which should always become arrays
-        'autoArray' => true,        //only create arrays for tags which appear more than once
-        'textContent' => 'content',       //key used for the text content of elements
-        'autoText' => true,         //skip textContent key if node has no attributes or child nodes
-        'keySearch' => false,       //optional search and replace on tag and attribute names
-        'keyReplace' => false       //replace values for above search values (as passed to str_replace())
-    );
-    $options = array_merge($defaults, $options);
-    $namespaces = $xml->getDocNamespaces();
-    $namespaces[''] = null;
- 
-    $attributesArray = array();
-    foreach ($namespaces as $prefix => $namespace) {
-        foreach ($xml->attributes($namespace) as $attributeName => $attribute) {
-            if ($options['keySearch']) { $attributeName = str_replace($options['keySearch'], $options['keyReplace'], $attributeName); }
-            $attributeKey = $options['attributePrefix'] . ($prefix ? $prefix . $options['namespaceSeparator'] : '') . $attributeName;
-            $attributesArray[$attributeKey] = (string)$attribute;
-        }
+    $xml = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$xml);
+
+    $dom = new DOMDocument();
+    libxml_use_internal_errors(true);
+    libxml_disable_entity_loader(true);
+    $dom->preserveWhiteSpace = false;
+    $dom->loadXML($xml, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT);
+    return [$dom->documentElement->tagName => XML取得_Array($dom->documentElement)];
+}
+
+
+function XML取得_Array(DOMElement $node) :array{
+    $array = [];
+
+    foreach($node->attributes as $attr){
+        $array[$attr->name] = $attr->value;
     }
 
-    $tagsArray = array();
-    foreach ($namespaces as $prefix => $namespace) {
-        foreach ($xml->children($namespace) as $childXml) {
-            $childArray = XML取得($childXml, $options);
-            list($childTagName, $childProperties) = each($childArray);
- 
-            if ($options['keySearch']){ $childTagName = str_replace($options['keySearch'], $options['keyReplace'], $childTagName); }
-            if ($prefix){ $childTagName = $prefix . $options['namespaceSeparator'] . $childTagName; }
- 
-            if (!isset($tagsArray[$childTagName])) {
-                $tagsArray[$childTagName] = in_array($childTagName, $options['alwaysArray']) || !$options['autoArray'] ? array($childProperties) : $childProperties;
-            } elseif (is_array($tagsArray[$childTagName]) && array_keys($tagsArray[$childTagName]) === range(0, count($tagsArray[$childTagName]) - 1)) {
-                $tagsArray[$childTagName][] = $childProperties;
-            } else {
-                $tagsArray[$childTagName] = array($tagsArray[$childTagName], $childProperties);
-            }
+    foreach($node->childNodes as $child){
+        if($child->nodeType === XML_ELEMENT_NODE){ 
+            $array[$child->tagName][] = XML取得_Array($child);
+        }
+        else if($child->nodeType === XML_TEXT_NODE){
+            $array['text'] = $child->textContent;
         }
     }
- 
-    $textContentArray = array();
-    $plainText = trim((string)$xml);
-    if ($plainText !== '') $textContentArray[$options['textContent']] = $plainText;
- 
-    $propertiesArray = !$options['autoText'] || $attributesArray || $tagsArray || ($plainText === '') ? array_merge($attributesArray, $tagsArray, $textContentArray) : $plainText;
- 
-    return array($xml->getName() => $propertiesArray);
+    return $array;
 }
 
 
