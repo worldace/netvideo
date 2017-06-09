@@ -811,7 +811,7 @@ function XML取得(string $xml) :array{
         if($xml === false){ return []; }
     }
     $xml = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$xml);
-    return json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NONET | LIBXML_COMPACT)), true);
+    return json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NONET | LIBXML_COMPACT | LIBXML_PARSEHUGE)), true);
 }
 
 
@@ -1464,10 +1464,10 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
                 $this->種類 = "断片";
             }
             $str = '<?xml encoding="UTF-8">' . $str; //文字化け対策のおまじない。出力時のsaveXML($this->文書->doctype).saveHTML($this->文書->documentElement)とセットで使う
-            $this->文書->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT); // https://php.net/manual/ja/libxml.constants.php
+            $this->文書->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT | LIBXML_PARSEHUGE); // https://php.net/manual/ja/libxml.constants.php
         }
         else{ //XML
-            $this->文書->loadXML($str, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT);
+            $this->文書->loadXML($str, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT | LIBXML_PARSEHUGE);
             $this->種類 = "xml";
         }
 
