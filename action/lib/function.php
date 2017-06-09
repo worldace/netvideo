@@ -1454,7 +1454,6 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
     public function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
         $this->文書 = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
-        libxml_use_internal_errors(true);  // loadHTML() の警告抑制
         libxml_disable_entity_loader(true);
 
         $str = preg_replace("/^[^<]+/", "", $str);
@@ -1464,10 +1463,10 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
                 $this->種類 = "断片";
             }
             $str = '<?xml encoding="UTF-8">' . $str; //文字化け対策のおまじない。出力時のsaveXML($this->文書->doctype).saveHTML($this->文書->documentElement)とセットで使う
-            $this->文書->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT | LIBXML_PARSEHUGE); // https://php.net/manual/ja/libxml.constants.php
+            $this->文書->loadHTML($str, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NONET | LIBXML_COMPACT | LIBXML_PARSEHUGE); // https://php.net/manual/ja/libxml.constants.php
         }
         else{ //XML
-            $this->文書->loadXML($str, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_COMPACT | LIBXML_PARSEHUGE);
+            $this->文書->loadXML($str, LIBXML_NONET | LIBXML_COMPACT | LIBXML_PARSEHUGE);
             $this->種類 = "xml";
         }
 
