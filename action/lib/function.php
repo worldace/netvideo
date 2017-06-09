@@ -550,25 +550,47 @@ function 日本語設定() :void{
 
 
 function h($arg){
-    if(is_string($arg)){ return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false); }
-    else if(is_array($arg)){ return array_map("h", $arg); }
-    else { return $arg; }
+    if(is_string($arg)){
+        $arg = htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
+    }
+    else if(is_array($arg)){
+        array_walk_recursive($arg, function(&$v){
+            $v = htmlspecialchars($v, ENT_QUOTES, "UTF-8", false);
+        });
+    }
+    return $arg;
 }
 
 
 function 改行変換($arg, string $replace=""){
-    if(is_array($arg)){ return array_map(function($str) use($replace){ return 改行変換($str, $replace); }, $arg); }
-    $arg = str_replace("\r", "", $arg);
-    $arg = str_replace("\n", $replace, $arg);
+    if(is_string($arg)){
+        $arg = str_replace("\r", "", $arg);
+        $arg = str_replace("\n", $replace, $arg);
+    }
+    else if(is_array($arg)){
+        array_walk_recursive($arg, function(&$v) use($replace){
+            $v = str_replace("\r", "", $v);
+            $v = str_replace("\n", $replace, $v);
+        });
+    }
     return $arg;
 }
 
 
 function 制御文字削除($arg, bool $LF=false){ // http://blog.sarabande.jp/post/52701231276
-    if(is_array($arg)){ return array_map(function($str) use($LF){ return 制御文字削除($str, $LF); }, $arg); }
-    $arg = preg_replace("/\t/", "    ", $arg);
-    $arg = preg_replace("/\xC2[\x80-\x9F]/", "", $arg); //Unicode制御文字
-    return ($LF) ? preg_replace("/(?!\n)[[:cntrl:]]/u", "", $arg) : preg_replace("/[[:cntrl:]]/u", "", $arg);
+    if(is_string($arg)){
+        $arg = preg_replace("/\t/", "    ", $arg);
+        $arg = preg_replace("/\xC2[\x80-\x9F]/", "", $arg); //Unicode制御文字
+        $arg = ($LF)  ?  preg_replace("/(?!\n)[[:cntrl:]]/u", "", $arg)  :  preg_replace("/[[:cntrl:]]/u", "", $arg);
+    }
+    else if(is_array($arg)){
+        array_walk_recursive($arg, function(&$v) use($LF){
+            $v = preg_replace("/\t/", "    ", $v);
+            $v = preg_replace("/\xC2[\x80-\x9F]/", "", $v); //Unicode制御文字
+            $v = ($LF)  ?  preg_replace("/(?!\n)[[:cntrl:]]/u", "", $v)  :  preg_replace("/[[:cntrl:]]/u", "", $v);
+        });
+    }
+    return $arg;
 }
 
 
