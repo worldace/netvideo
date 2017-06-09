@@ -649,6 +649,7 @@ function 連想配列ソート(array &$array) :void{
 }
 
 
+/*
 function 配列探索($array, bool $leafonly = false) :Generator{
     foreach($array as $k => $v){
         if(is_iterable($v) or is_object($v)){
@@ -662,12 +663,11 @@ function 配列探索($array, bool $leafonly = false) :Generator{
         }
     }
 }
-/*
+*/
 function 配列探索($array, bool $leafonly = false) :RecursiveIteratorIterator{
     $option = $leafonly  ?  RecursiveIteratorIterator::LEAVES_ONLY  :  RecursiveIteratorIterator::SELF_FIRST;
     return new RecursiveIteratorIterator(new RecursiveArrayIterator($array), $option);
 }
-*/
 
 
 function パーミッション(string $path, string $permission=null) :string{
