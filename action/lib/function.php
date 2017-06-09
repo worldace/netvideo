@@ -594,6 +594,20 @@ function 制御文字削除($arg, bool $LF=false){ // http://blog.sarabande.jp/p
 }
 
 
+function 自動リンク($arg, array $attr=[]){
+    $attr_str = 属性文字列($attr);
+    if(is_string($arg)){
+        $arg = preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $arg);
+    }
+    else if(is_array($arg)){
+        array_walk_recursive($arg, function(&$v) use($attr_str){
+            $v = preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $v);
+        });
+    }
+    return $arg;
+}
+
+
 function タグ(string $tag, array $attr=[]) :string{
     $閉じる   = true;
     $単独タグ = false;
@@ -637,14 +651,6 @@ function 属性文字列(array $attr=[]) :string{
         $str .= " $key=\"$val\"";
     }
     return $str;
-}
-
-
-function 自動リンク($arg, array $attr=[], bool $dont_escape=false){
-    if(is_array($arg)){ return array_map(function($str) use($attr){ return 自動リンク($str, $attr); }, $arg); }
-    $attr_str = 属性文字列($attr);
-    if($dont_escape === false){ $arg = h($arg); }
-    return preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $arg);
 }
 
 
