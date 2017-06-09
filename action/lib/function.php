@@ -682,7 +682,7 @@ function パーミッション(string $path, string $permission=null) :string{
 }
 
 
-function ファイル一覧(string $dir=".", string $pattern="/./") :Generator{
+function ファイル一覧(string $dir=".") :Generator{
     if(!is_dir($dir)){
         functionphpエラー("ディレクトリ $dir は存在しません", "警告");
         return;
@@ -691,18 +691,16 @@ function ファイル一覧(string $dir=".", string $pattern="/./") :Generator{
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path = $dir . DIRECTORY_SEPARATOR . $file;
         if(is_file($path)){
-            if(preg_match($pattern, $file)){
-                yield $path;
-            }
+            yield $file => $path;
         }
         elseif(is_dir($path)){
-            yield from ファイル一覧($path, $pattern);
+            yield from ファイル一覧($path);
         }
     }
 }
 
 
-function ディレクトリ一覧(string $dir=".", string $pattern="/./") :Generator{
+function ディレクトリ一覧(string $dir=".") :Generator{
     if(!is_dir($dir)){
         functionphpエラー("ディレクトリ $dir は存在しません", "警告");
         return;
@@ -711,10 +709,8 @@ function ディレクトリ一覧(string $dir=".", string $pattern="/./") :Gener
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path = $dir . DIRECTORY_SEPARATOR . $file;
         if(is_dir($path)) {
-            if(preg_match($pattern, $file)){
-                yield $path;
-            }
-            yield from ディレクトリ一覧($path, $pattern);
+            yield $file => $path;
+            yield from ディレクトリ一覧($path);
         }
     }
 }
