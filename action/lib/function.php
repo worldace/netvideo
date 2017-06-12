@@ -743,8 +743,29 @@ function ディレクトリ一覧(string $dir=".", bool $recursive = false) :Gen
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path = $dir . DIRECTORY_SEPARATOR . $file;
         if(is_dir($path)){
-            yield $file => $path;
+            yield $file => $path . DIRECTORY_SEPARATOR;
             yield from ディレクトリ一覧($path, true);
+        }
+    }
+}
+
+
+function パス一覧(string $dir=".", bool $recursive = false) :Generator{
+    if($recursive === false){
+        $dir = realpath($dir);
+        if($dir === false){
+            functionphpエラー("ディレクトリ $dir は存在しません", "警告");
+            return;
+        }
+    }
+    foreach(array_diff(scandir($dir), ['.','..']) as $file){
+        $path = $dir . DIRECTORY_SEPARATOR . $file;
+        if(is_dir($path)){
+            yield $file => $path . DIRECTORY_SEPARATOR;
+            yield from パス一覧($path, true);
+        }
+        else{
+            yield $file => $path;
         }
     }
 }

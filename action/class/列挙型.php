@@ -1,21 +1,21 @@
 <?php
 
-abstract class 列挙型{
-    private $値;
+abstract class 蛻玲嫌蝙宮
+    private $蛟､;
 
-    public function __construct($引数){
-        $ref = new ReflectionObject($this);
-        if(!in_array($引数, $ref->getConstants(), true)){
-            throw new Exception("[$引数]は" . get_class($this) . "クラスに定義されていません");
+    final function __construct($蠑墓焚){
+        if(!in_array($蠑墓焚, static::蛻玲嫌, true)){
+            throw new Exception("[$蠑墓焚]縺ｯ" . get_class($this) . "繧ｯ繝ｩ繧ｹ縺ｫ螳夂ｾｩ縺輔ｌ縺ｦ縺�縺ｾ縺帙ｓ");
         }
-        $this->値 = $引数;
+        $this->蛟､ = $蠑墓焚;
     }
 
-    final public function __toString(){
-        return (string)$this->値;
+    final function __toString(){
+        return (string)$this->蛟､;
     }
 
-    final public function get(){
-        return $this->値;
+    final function __invoke(){
+        return $this->蛟､;
     }
 }
+
