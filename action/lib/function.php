@@ -252,6 +252,15 @@ function テンプレート(string $_file_, array $_data_=null, bool $エスケ�
 }
 
 
+function 穴埋め(string $str, array $replace) :string{
+    return preg_replace_callback("/□/u", function() use($replace){
+        static $i = -1;
+        $i++;
+        return isset($replace[$i])  ?  "{$replace[$i]}"  :  "";
+    }, $str);
+}
+
+
 function ファイルダウンロード(string $file, string $filename=null, int $timeout=60*60*6) :void{
     if(!file_exists($file)){
         functionphpエラー("ダウンロードさせるファイル $file は存在しません", "警告");
