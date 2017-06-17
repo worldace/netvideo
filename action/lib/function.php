@@ -81,7 +81,6 @@ function リダイレクト(string $url) :void{
 
 
 function 自動読み込み(string $dir=__DIR__) :void{
-    if(!preg_match("#^(/|\\\\|\w:)#", $dir)){ $dir  = dirname(debug_backtrace()[0]['file']) . "/$dir"; }
     spl_autoload_register(function($class) use($dir){
         $class = str_replace(["_","\\"], "/", $class);
         require_once "$dir/$class.php";
