@@ -808,9 +808,18 @@ function ディレクトリ削除(string $dir){
 }
 
 
-function zip圧縮(string $zipfile, array $filemap){
+function zip圧縮(string $zipfile, $filemap){
     $zip = new ZipArchive();
     if(!$zip->open($zipfile, ZipArchive::CREATE)){ return false; }
+    if(is_string($filemap)){
+        $path = realpath($filemap) . DIRECTORY_SEPARATOR;
+        $path_length = strlen($path);
+        $filemap = [];
+        foreach(ファイル一覧($path) as $v){
+            $k = substr($v, $path_length);
+            $filemap[$k] = file_get_contents($v);
+        }
+    }
     foreach($filemap as $name => $value){ $zip->addFromString($name, $value); } //$nameに/を含めるとディレクトリになる
     $zip->close();
     return $zipfile;
@@ -928,10 +937,8 @@ function 復号化(string $str, string $key){
 
 function jwt発行(array $data, string $key) :string{
     $header     = ['typ'=>'jwt', 'alg'=>'HS256'];
-    $segments   = [];
     $segments[] = base64_encode_urlsafe(json_encode($header), JSON_PARTIAL_OUTPUT_ON_ERROR);
     $segments[] = base64_encode_urlsafe(json_encode($data), JSON_PARTIAL_OUTPUT_ON_ERROR);
-
     $sign       = hash_hmac('sha256', implode('.', $segments), $key, true);
     $segments[] = base64_encode_urlsafe($sign);
 
