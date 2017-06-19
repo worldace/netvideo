@@ -843,6 +843,17 @@ function zip解凍(string $zipfile, string $where = "") :bool{
 }
 
 
+function zip追加(string $zipfile, array $filemap){
+    $zip = new ZipArchive();
+    if(!$zip->open($zipfile)){
+        functionphpエラー("ZIPファイルを開けません", "警告");
+        return false;
+    }
+    foreach($filemap as $name => $value){ $zip->addFromString($name, $value); }
+    $zip->close();
+    return $zipfile;
+}
+
 
 function 一時保存(string $name, $data){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
