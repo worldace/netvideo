@@ -810,9 +810,16 @@ function ディレクトリ削除(string $dir){
 
 function zip圧縮(string $zipfile, $filemap){
     $zip = new ZipArchive();
-    if(!$zip->open($zipfile, ZipArchive::CREATE)){ return false; }
+    if(!$zip->open($zipfile, ZipArchive::CREATE)){
+        functionphpエラー("ZIPファイルを作成できません", "警告");
+        return false;
+    }
     if(is_string($filemap)){
         $path = realpath($filemap) . DIRECTORY_SEPARATOR;
+        if($path === false){
+            functionphpエラー("ディレクトリ $filemap は存在しません", "警告");
+            return false;
+        }
         $path_length = strlen($path);
         $filemap = [];
         foreach(ファイル一覧($path) as $v){
