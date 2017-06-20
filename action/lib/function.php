@@ -822,8 +822,12 @@ function zip圧縮(string $zipfile, $filemap){
         }
         $path_length = strlen($path);
         $filemap = [];
+        $windows = preg_match("/^WIN/i", PHP_OS);
         foreach(ファイル一覧($path) as $v){
             $k = substr($v, $path_length);
+            if($windows){
+                $k = str_replace("\\", "/", $k);
+            }
             $filemap[$k] = file_get_contents($v);
         }
     }
