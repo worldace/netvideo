@@ -815,11 +815,12 @@ function zip圧縮(string $zipfile, $filemap){
         return false;
     }
     if(is_string($filemap)){
-        $path = realpath($filemap) . DIRECTORY_SEPARATOR;
+        $path = realpath($filemap);
         if($path === false){
             functionphpエラー("ディレクトリ $filemap は存在しません", "警告");
             return false;
         }
+        $path .= DIRECTORY_SEPARATOR;
         $path_length = strlen($path);
         $filemap = [];
         $windows = preg_match("/^WIN/i", PHP_OS);
@@ -837,7 +838,7 @@ function zip圧縮(string $zipfile, $filemap){
 }
 
 
-function zip追加(string $zipfile, array $filemap){
+function zip追加(string $zipfile, $filemap){
     $zip = new ZipArchive();
     if(!$zip->open($zipfile)){
         functionphpエラー("ZIPファイルを開けません", "警告");
