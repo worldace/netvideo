@@ -230,7 +230,7 @@ function 設定(string $name, $value="\0\rヌル\0\r"){
 }
 
 
-function テンプレート(string $_file_, array $_data_=null, bool $エスケープしない=false) :string{
+function テンプレート(string $_file_, array $_data_, bool $エスケープしない=false) :string{
     $_h_ = function($arg) use (&$_h_){
         if(is_array($arg)){ return array_map($_h_, $arg); }
         return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
@@ -607,20 +607,6 @@ function 制御文字削除($arg, bool $LF=false){ // http://blog.sarabande.jp/p
 }
 
 
-function 自動リンク($arg, array $attr=[]){
-    $attr_str = 属性文字列($attr);
-    if(is_string($arg)){
-        $arg = preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $arg);
-    }
-    else if(is_array($arg)){
-        array_walk_recursive($arg, function(&$v) use($attr_str){
-            $v = preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $v);
-        });
-    }
-    return $arg;
-}
-
-
 function タグ(string $tag, array $attr=[]) :string{
     $閉じる   = true;
     $単独タグ = false;
@@ -664,6 +650,20 @@ function 属性文字列(array $attr=[]) :string{
         $str .= " $key=\"$val\"";
     }
     return $str;
+}
+
+
+function 自動リンク($arg, array $attr=[]){
+    $attr_str = 属性文字列($attr);
+    if(is_string($arg)){
+        $arg = preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $arg);
+    }
+    else if(is_array($arg)){
+        array_walk_recursive($arg, function(&$v) use($attr_str){
+            $v = preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $v);
+        });
+    }
+    return $arg;
 }
 
 
@@ -723,7 +723,7 @@ function パーミッション(string $path, string $permission=null) :string{
 }
 
 
-function ファイル一覧(string $dir=".", bool $recursive = false) :Generator{
+function ファイル一覧(string $dir, bool $recursive = false) :Generator{
     if($recursive === false){
         $dir = realpath($dir);
         if($dir === false){
@@ -743,7 +743,7 @@ function ファイル一覧(string $dir=".", bool $recursive = false) :Generator
 }
 
 
-function ディレクトリ一覧(string $dir=".", bool $recursive = false) :Generator{
+function ディレクトリ一覧(string $dir, bool $recursive = false) :Generator{
     if($recursive === false){
         $dir = realpath($dir);
         if($dir === false){
@@ -761,7 +761,7 @@ function ディレクトリ一覧(string $dir=".", bool $recursive = false) :Gen
 }
 
 
-function パス一覧(string $dir=".", bool $recursive = false) :Generator{
+function パス一覧(string $dir, bool $recursive = false) :Generator{
     if($recursive === false){
         $dir = realpath($dir);
         if($dir === false){
@@ -833,16 +833,6 @@ function zip圧縮(string $zipfile, $filemap){
 }
 
 
-function zip解凍(string $zipfile, string $where = "") :bool{
-    $zip = new ZipArchive();
-    if(!$zip->open($zipfile)){ return false; }
-    if(!$where){ $where = dirname(realpath($zipfile)); }
-    $result = $zip->extractTo($where);
-    $zip->close();
-    return $result;
-}
-
-
 function zip追加(string $zipfile, array $filemap){
     $zip = new ZipArchive();
     if(!$zip->open($zipfile)){
@@ -852,6 +842,16 @@ function zip追加(string $zipfile, array $filemap){
     foreach($filemap as $name => $value){ $zip->addFromString($name, $value); }
     $zip->close();
     return $zipfile;
+}
+
+
+function zip解凍(string $zipfile, string $where = "") :bool{
+    $zip = new ZipArchive();
+    if(!$zip->open($zipfile)){ return false; }
+    if(!$where){ $where = dirname(realpath($zipfile)); }
+    $result = $zip->extractTo($where);
+    $zip->close();
+    return $result;
 }
 
 
