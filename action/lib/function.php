@@ -810,8 +810,8 @@ function ディレクトリ削除(string $dir){
 
 function zip圧縮(string $zipfile, $filemap){
     $zip = new ZipArchive();
-    if(!$zip->open($zipfile, ZipArchive::CREATE)){
-        functionphpエラー("ZIPファイルを作成できません", "警告");
+    if($zip->open($zipfile, ZipArchive::CREATE) !== true){
+        functionphpエラー("ZIPファイル $zipfile を作成できません", "警告");
         return false;
     }
     if(is_string($filemap)){
@@ -840,8 +840,8 @@ function zip圧縮(string $zipfile, $filemap){
 
 function zip追加(string $zipfile, $filemap){
     $zip = new ZipArchive();
-    if(!$zip->open($zipfile)){
-        functionphpエラー("ZIPファイルを開けません", "警告");
+    if($zip->open($zipfile) !== true){
+        functionphpエラー("ZIPファイル $zipfile を開けません", "警告");
         return false;
     }
     foreach($filemap as $name => $value){ $zip->addFromString($name, $value); }
@@ -852,7 +852,10 @@ function zip追加(string $zipfile, $filemap){
 
 function zip解凍(string $zipfile, string $where = "") :bool{
     $zip = new ZipArchive();
-    if(!$zip->open($zipfile)){ return false; }
+    if($zip->open($zipfile) !== true){
+        functionphpエラー("ZIPファイル $zipfile を開けません", "警告");
+        return false;
+    }
     if(!$where){ $where = dirname(realpath($zipfile)); }
     $result = $zip->extractTo($where);
     $zip->close();
@@ -2303,7 +2306,7 @@ function functionphpエラー(string $str, string $type = "エラー") :void{
     foreach(debug_backtrace() as $trace){
         if(strpos($trace['file'], $設定["除外パス"]) !== 0){ break; }
     }
-    $message = "【{$type} {$trace['class']}{$trace['type']}{$trace['function']}()】 $str\n{$trace['file']}: {$trace['line']}行目\n\n";
+    $message = "【{$type}】$str\n{$trace['file']}: {$trace['line']}行目 {$trace['class']}{$trace['type']}{$trace['function']}()\n\n";
 
     if(PHP_SAPI !== "cli"){
         $message = nl2br(htmlspecialchars($message, ENT_QUOTES, "UTF-8", false));
