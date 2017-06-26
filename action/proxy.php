@@ -1,9 +1,13 @@
 <?php
 //ブラウザからの要求をほぼそのまま相手に送り付けて、相手からの応答はそのままブラウザに返す
-//allow_url_fopenが有効であること。参考:http://doremi.s206.xrea.com/php/tips/http.html
+//allow_url_fopenが有効であること。参考: http://doremi.s206.xrea.com/php/tips/http.html
 
 //PHPの実行時間制限(単位は秒、0で無制限)
 ini_set("max_execution_time", 60*60*24);
+
+//バッファ無効化
+while(ob_get_level()){ ob_end_clean(); }
+
 
 if(!isset($_GET['url']) or !preg_match("|^https?://|i", $_GET['url']) or オリジンが同じなら($_GET['url'])){
     proxyエラー();
@@ -39,15 +43,11 @@ foreach(array_reverse(stream_get_meta_data($fp)['wrapper_data']) as $v){
     header($v);
 }
 
-while(ob_get_level()){
-    ob_end_clean();
-}
-
 while(!feof($fp)){
     print fread($fp, 8192);
 }
-
 fclose($fp);
+
 exit;
 
 
