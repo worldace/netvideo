@@ -1054,7 +1054,6 @@ function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments
 }
 
 
-$_ENV['定数'] = "constant";
 
 
 function データベース($table, $driver = null, $user = null, $pass = null){
