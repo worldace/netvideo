@@ -1385,7 +1385,12 @@ class 部品{
             "手動"=>false,
             "nonce"=>null,
         ];
-        self::$設定["ディレクトリ"] = realpath($dir);
+        if(!preg_match('#^(/|[a-zA-Z]:[\\\\/])#', $dir)){ //相対パスの時
+            self::$設定["ディレクトリ"] = realpath($dir);
+        }
+        else{
+            self::$設定["ディレクトリ"] = $dir;
+        }
 
         self::$記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[], 'キャプチャ開始'=>false];
         self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
