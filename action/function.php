@@ -8,7 +8,13 @@ declare(strict_types=1);
 function route(array $route, $arg=1) :void{
     $_ENV['route.return'] = $arg;
 
-    foreach((array)$route as $_ENV['route.file']){
+    if(!function_exists('routed')){
+        function routed(){
+            return $_ENV['route.return'];
+        }
+    }
+
+    foreach($route as $_ENV['route.file']){
         $func = function (){ return require_once $_ENV['route.file']; };
         $_ENV['route.return'] = $func();
     }
@@ -16,9 +22,6 @@ function route(array $route, $arg=1) :void{
 }
 
 
-function routed(){
-    return $_ENV['route.return'];
-}
 
 
 function テキスト表示(string $str) :void{
