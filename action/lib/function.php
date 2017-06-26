@@ -80,6 +80,37 @@ function リダイレクト(string $url) :void{
 }
 
 
+function URL(array $a = null) :string{
+    if(!$a){ return 設定['URL']; }
+    $url = (isset($a[0]) and preg_match("|^https?://|", $a[0]))  ?  array_shift($a)  :  設定['URL'];
+
+    if(isset($a[0], $a[1])){
+        if(設定['URL短縮']){
+            $url .= sprintf("%s/%s", $a[0], $a[1]);
+            $a = array_slice($a, 2);
+        }
+        else{
+            $action = array_shift($a);
+            $id     = array_shift($a);
+            $a = ['action'=>$action, 'id'=>$id] + $a;
+        }
+    }
+    elseif(isset($a[0])){
+        if(設定['URL短縮']){
+            $url .= $a[0];
+            $a = array_slice($a, 1);
+        }
+        else{
+            $action = array_shift($a);
+            $a = ['action'=>$action] + $a;
+        }
+    }
+    if(count($a)){
+        $url .= "?" . http_build_query($a, "", "&");
+    }
+    return $url;
+}
+
 function 自動読み込み(string $dir=__DIR__) :void{
     if(!preg_match('#^(/|[a-zA-Z]:[\\\\/])#', $dir)){ //相対パスの時
         $dir = realpath($dir);
@@ -1062,10 +1093,10 @@ class データベース{
     public function __construct($table, $driver = null, $user = null, $password = null){
         $this->テーブル($table);
         if(!$driver){
-            $driver   = $_ENV['データベース.ドライバー'];
-            $user     = $_ENV['データベース.ユーザー名'];
-            $password = $_ENV['データベース.パスワード'];
-            if(!$driver){ throw new Exception('データベースの設定がありません。$_ENV[\'データベース.ドライバー\']に値を設定してください', 500);}
+            $driver   = 設定['データベースドライバー'];
+            $user     = 設定['データベースユーザー名'];
+            $password = 設定['データベースパスワード'];
+            if(!$driver){ throw new Exception('データベースの設定がありません。設定[\'データベースドライバー\'] に値を設定してください', 500);}
         }
         $this->ドライバー = $driver;
         $this->接続名     = md5($driver.$user.$password);
@@ -1080,7 +1111,7 @@ class データベース{
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ];
-        foreach((array)$_ENV['データベース.詳細設定'] as $name => $value){ $setting[$name] = $value; }
+        foreach((array)設定['データベース詳細'] as $name => $value){ $setting[$name] = $value; }
 
         try{
             $pdo = new PDO($driver, $user, $password, $setting);
@@ -1287,7 +1318,7 @@ class データベース{
         $SQL文 .= " order by $順番列 $順番順 ";
 
         if(!$条件["件数"]){
-            $条件["件数"] = $_ENV['データベース.件数'] ?? 31;
+            $条件["件数"] = 設定['データベース件数'] ?? 31;
         }
         if(!$条件["位置"]){
             $条件["位置"] = 0;
@@ -1310,8 +1341,8 @@ class データベース{
             else { $行タイプ = [PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $条件['行タイプ']]; }
         }
         else{
-            if($_ENV['データベース.詳細設定'][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){
-                $行タイプ = [$_ENV['データベース.詳細設定'][PDO::ATTR_DEFAULT_FETCH_MODE], "{$this->テーブル}定義"];
+            if(設定['データベース詳細'][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){
+                $行タイプ = [設定['データベース詳細'][PDO::ATTR_DEFAULT_FETCH_MODE], "{$this->テーブル}定義"];
             }
         }
 

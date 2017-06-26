@@ -4,7 +4,7 @@
 検査("GET", "登録時間", "自然数");
 
 
-$db = "{$_ENV['ディレクトリ.upload']}/". date('Y/md', $_GET['登録時間']) . "/{$_GET['id']}.db";
+$db = sprintf("%s/upload/%s/%s.db", 設定['公開ディレクトリ'], date('Y/md', $_GET['登録時間']), $_GET['id']);
 if(!is_file($db)){ exit; }
 
 $結果 = データベース("コメント", "sqlite:$db") -> 取得([

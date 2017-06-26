@@ -7,7 +7,7 @@
 検査("POST", "本文", "64文字以下");
 
 
-$db = "{$_ENV['ディレクトリ.upload']}/". date('Y/md', $_GET['登録時間']) . "/{$_GET['id']}.db";
+$db = sprintf("%s/データベース/%s/%s.db", 設定['アプリディレクトリ'], date('Y/md', $_GET['登録時間']), $_GET['id']);
 if(!is_file($db)){ exit; }
 
 
