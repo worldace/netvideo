@@ -1,8 +1,8 @@
 <?php
 
-include './action/lib/function.php';
 include './setting.php';
-include './boot.php';
+include './action/function.php';
+include './action/boot.php';
 
 switch($_GET['action']){
     case ''              : route(['./action/index.php']);
