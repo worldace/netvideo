@@ -223,7 +223,7 @@ function 設定(string $name, $value="\0\rヌル\0\r"){
             return $value;
         }
         else{
-            $記憶[$name] = $_ENV[$name] = $value;
+            $記憶[$name] = $value;
             return $value;
         }
     }
@@ -2306,7 +2306,7 @@ function functionphpエラー(string $str, string $type = "エラー") :void{
     foreach(debug_backtrace() as $trace){
         if(strpos($trace['file'], $設定["除外パス"]) !== 0){ break; }
     }
-    $message = "【{$type}】$str\n{$trace['file']}: {$trace['line']}行目 {$trace['class']}{$trace['type']}{$trace['function']}()\n\n";
+    $message = "【{$type}】$str \n{$trace['file']}: {$trace['line']}行目 {$trace['class']}{$trace['type']}{$trace['function']}()\n\n";
 
     if(PHP_SAPI !== "cli"){
         $message = nl2br(htmlspecialchars($message, ENT_QUOTES, "UTF-8", false));
