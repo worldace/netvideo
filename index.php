@@ -13,5 +13,4 @@ switch($_GET['action']){
     case 'videopostform' : route(['./action/videopostform.php']);
     case 'proxy'         : route(['./action/proxy.php']);
     default              : route(['./action/index.php']);
-
 }
