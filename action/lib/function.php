@@ -1054,7 +1054,6 @@ function データベース($table, $driver = null, $user = null, $pass = null){
 
 class データベース{
     private static $pdo = [];
-    public  static $件数 = 31;
     private $ドライバー;
     private $接続名;
     private $テーブル;
@@ -1287,8 +1286,12 @@ class データベース{
         }
         $SQL文 .= " order by $順番列 $順番順 ";
 
-        if(!$条件["件数"]){ $条件["件数"] = self::$件数; }
-        if(!$条件["位置"]){ $条件["位置"] = 0; }
+        if(!$条件["件数"]){
+            $条件["件数"] = $_ENV['データベース.件数'] ?? 31;
+        }
+        if(!$条件["位置"]){
+            $条件["位置"] = 0;
+        }
         if($条件["件数"] === "∞"){
             $SQL文 .= " offset ? ";
             $割当[] = (int)$条件["位置"];
