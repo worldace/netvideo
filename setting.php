@@ -14,7 +14,7 @@ const 設定 = [
 'アプリディレクトリ' => __DIR__ . "/action",
 
 //動画データベースのドライバー
-'データベースドライバー' => 'sqlite:' . __DIR__ . '/upload/video.db',
+'データベースドライバー' => 'sqlite:' . __DIR__ . '/action/video.db',
 
 //動画データベースのドライバー (標準データベースはSQLiteなので無効になっています)
 //'データベースドライバー' => 'mysql:host=ホストアドレス;dbname=データベース名;charset=utf8',
