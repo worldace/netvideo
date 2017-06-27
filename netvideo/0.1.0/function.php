@@ -466,13 +466,13 @@ function PATH_INFO設定() :string{
         return $_SERVER['PATH_INFO'];
     }
     //サンプル: $_SERVER = ["SCRIPT_FILENAME"=>"/virtual/id/public_html/p/index.php", "DOCUMENT_ROOT"=>"/virtual/id/public_html", "REDIRECT_URL"=>"/p/312/8888"]
-    $dir = preg_replace("|^{$_SERVER['DOCUMENT_ROOT']}|", "", $_SERVER['SCRIPT_FILENAME']);
+    $dir = substr_replace($_SERVER["SCRIPT_FILENAME"], "", 0, strlen($_SERVER["DOCUMENT_ROOT"]));
     $dir = dirname($dir);
     if(strlen($dir) === 1){
         $_SERVER['PATH_INFO'] = $_SERVER['REDIRECT_URL'];
     }
     else{
-        $_SERVER['PATH_INFO'] = preg_replace("|^{$dir}|", "", $_SERVER['REDIRECT_URL']);
+        $_SERVER['PATH_INFO'] = substr_replace($_SERVER['REDIRECT_URL'], "", 0, strlen($dir));
     }
     return $_SERVER['PATH_INFO'];
 }
