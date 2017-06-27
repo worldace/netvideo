@@ -457,6 +457,27 @@ function キャッシュ無効(){
 }
 
 
+function PATH_INFO設定() :string{
+    if(isset($_SERVER['PATH_INFO'])){
+        return $_SERVER['PATH_INFO'];
+    }
+    if(!isset($_SERVER['DOCUMENT_ROOT'], $_SERVER['SCRIPT_FILENAME'], $_SERVER['REDIRECT_URL'])){
+        $_SERVER['PATH_INFO'] = "";
+        return $_SERVER['PATH_INFO'];
+    }
+    //サンプル: $_SERVER = ["SCRIPT_FILENAME"=>"/virtual/id/public_html/p/index.php", "DOCUMENT_ROOT"=>"/virtual/id/public_html", "REDIRECT_URL"=>"/p/312/8888"]
+    $dir = preg_replace("|^{$_SERVER['DOCUMENT_ROOT']}|", "", $_SERVER['SCRIPT_FILENAME']);
+    $dir = dirname($dir);
+    if(strlen($dir) === 1){
+        $_SERVER['PATH_INFO'] = $_SERVER['REDIRECT_URL'];
+    }
+    else{
+        $_SERVER['PATH_INFO'] = preg_replace("|^{$dir}|", "", $_SERVER['REDIRECT_URL']);
+    }
+    return $_SERVER['PATH_INFO'];
+}
+
+
 function 現在のURL(bool $no_query=false) :string{
     if(filter_input(INPUT_SERVER, 'HTTPS', FILTER_VALIDATE_BOOLEAN)){
         $scheme = "https://";
@@ -503,6 +524,7 @@ function POSTなら() :bool{
 
 
 function 開発環境なら() :bool{
+    //display_errorsはstring型で"0","1","stderr"の3パターン
     return ini_get("display_errors") ? true : false;
 }
 
