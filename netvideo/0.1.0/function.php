@@ -117,7 +117,7 @@ function URL($arg = "") :string{
             $query = $query2 + $query1;
         }
         
-        if(isset($query)){
+        if(count($query)){
             $url .= "?" . http_build_query($query, "", "&");
         }
     }
