@@ -916,7 +916,7 @@ function 一時保存(string $name, $data){
 
 function 一時取得(string $name){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
-    return (file_exists($tempfile)) ? json_decode(file_get_contents($tempfile)) : false;
+    return (file_exists($tempfile)) ? json_decode(file_get_contents($tempfile), true) : false;
 }
 
 
