@@ -23,7 +23,7 @@ new class{
         $_GET['action'] = $pathinfo[1] ?? '';
         $_GET['id']     = $pathinfo[2] ?? '';
         
-        if($_GET['id'] === '' and preg_match("/^\d+$/", $_GET['action'])){
+        if(preg_match("/^\d+$/", $_GET['action'])){
             $_GET['id']     = $_GET['action'];
             $_GET['action'] = $default_action;
         }

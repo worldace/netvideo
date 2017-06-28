@@ -99,14 +99,10 @@ function URL($arg = "") :string{
                 $path[] = $v;
                 if(isset(設定['URLキー名'][$k])){
                     $query2[設定['URLキー名'][$k]] = $v;
-                }
-                else{
-                    $query1[$k] = $v;
+                    continue;
                 }
             }
-            else{
-                $query1[$k] = $v;
-            }
+            $query1[$k] = $v;
         }
         
         if(設定['URL短縮']){
