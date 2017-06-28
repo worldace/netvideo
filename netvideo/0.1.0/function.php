@@ -433,22 +433,15 @@ function URL(array $arg = null) :string{
         return $url;
     }
 
-    $path = $query = [];
+    $query = [];
     foreach($arg as $k => $v){
         if(is_numeric($k)){
-            $path[] = rawurlencode($v);
+            $v = rawurlencode($v);
+            $url .= (preg_match("|/$|", $url))  ?  $v  :  "/$v";
         }
         else{
             $query[$k] = $v;
         }
-    }
-
-    $pathinfo = implode("/", $path);
-    if($pathinfo and !preg_match("|/$|", $url)){
-        $url .= "/" . $pathinfo;
-    }
-    else{
-        $url .= $pathinfo;
     }
 
     if($query){
