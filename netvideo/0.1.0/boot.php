@@ -8,8 +8,7 @@ new class{
 
         $_GET += ['action'=>'', 'id'=>''];
         if(設定['URL短縮']){
-            $_SERVER['PATH_INFO'] = $_SERVER['PATH_INFO'] ?? '/';
-            $this->PATH_INFOをGETに代入($_SERVER['PATH_INFO'], 'video');
+            $this->PATH_INFOをGETに代入('video');
         }
 
         自動読み込み(設定['アプリディレクトリ'].'/class/');
@@ -17,8 +16,10 @@ new class{
         検査::$例外 = true;
     }
 
-    function PATH_INFOをGETに代入(string $pathinfo, string $default_action) :void{
-        $pathinfo = explode("/", $pathinfo);
+
+    function PATH_INFOをGETに代入(string $default_action) :void{
+        $_SERVER['PATH_INFO'] = $_SERVER['PATH_INFO'] ?? '/';
+        $pathinfo = explode("/", $_SERVER['PATH_INFO']);
         $_GET['action'] = $pathinfo[1] ?? '';
         $_GET['id']     = $pathinfo[2] ?? '';
         

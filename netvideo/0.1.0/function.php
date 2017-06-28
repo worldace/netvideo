@@ -81,33 +81,45 @@ function リダイレクト(string $url) :void{
 }
 
 
-function URL(array $a = null) :string{
-    if(!$a){ return 設定['URL']; }
-    $url = (isset($a[0]) and preg_match("|^https?://|", $a[0]))  ?  array_shift($a)  :  設定['URL'];
+function URL($arg = "") :string{
+    $url = 設定['URL'];
 
-    if(isset($a[0], $a[1])){
-        if(設定['URL短縮']){
-            $url .= sprintf("%s/%s", $a[0], $a[1]);
-            $a = array_slice($a, 2);
+    if(is_string($arg)){
+        if(preg_match("|^/|", $arg) and preg_match("|/$|", $url)){
+            return $url . substr($arg, 1);
         }
         else{
-            $action = array_shift($a);
-            $id     = array_shift($a);
-            $a = ['action'=>$action, 'id'=>$id] + $a;
+            return $url . $arg;
         }
     }
-    elseif(isset($a[0])){
+    else if(is_array($arg)){
+        $path = $query1 = $query2 = [];
+        foreach($arg as $k => $v){
+            if(is_numeric($k)){
+                $path[] = $v;
+                if(isset(設定['URLキー名'][$k])){
+                    $query2[設定['URLキー名'][$k]] = $v;
+                }
+                else{
+                    $query1[$k] = $v;
+                }
+            }
+            else{
+                $query1[$k] = $v;
+            }
+        }
+        
         if(設定['URL短縮']){
-            $url .= $a[0];
-            $a = array_slice($a, 1);
+            $url .= implode("/", $path);
+            $query = $query1;
         }
         else{
-            $action = array_shift($a);
-            $a = ['action'=>$action] + $a;
+            $query = $query2 + $query1;
         }
-    }
-    if(count($a)){
-        $url .= "?" . http_build_query($a, "", "&");
+        
+        if(isset($query)){
+            $url .= "?" . http_build_query($query, "", "&");
+        }
     }
     return $url;
 }
