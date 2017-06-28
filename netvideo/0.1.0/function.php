@@ -425,41 +425,41 @@ function キャッシュ無効(){
 }
 
 
-function URL($arg = "") :string{
+function URL(array $arg = null) :string{
     $url = 設定['URL'];
 
-    if(is_string($arg)){
-        if(preg_match("|^/|", $arg) and preg_match("|/$|", $url)){
-            return $url . rawurlencode(substr($arg, 1));
-        }
-        else{
-            return $url . rawurlencode($arg);
-        }
+    if($arg === null){
+        return $url;
     }
-    else if(is_array($arg)){
-        $path = $query1 = $query2 = [];
-        $i = 1;
-        foreach($arg as $k => $v){
-            if(is_numeric($k)){
-                $path[] = rawurlencode($v);
-                $query2['key'.$i] = $v;
-                $i++;
-                continue;
-            }
-            $query1[$k] = $v;
+
+    $path = $query1 = $query2 = [];
+    $i = 1;
+    foreach($arg as $k => $v){
+        if(is_numeric($k)){
+            $path[] = rawurlencode($v);
+            $query2['key'.$i] = $v;
+            $i++;
+            continue;
         }
-        
-        if(設定['URL短縮']){
-            $url .= implode("/", $path);
-            $query = $query1;
+        $query1[$k] = $v;
+    }
+    
+    if(設定['URL短縮']){
+        $pathinfo = implode("/", $path);
+        if($pathinfo and !preg_match("|/$|", $url)){
+            $url .= "/$pathinfo";
         }
         else{
-            $query = $query2 + $query1;
+            $url .= $pathinfo;
         }
-        
-        if(count($query)){
-            $url .= "?" . http_build_query($query, "", "&");
-        }
+        $query = $query1;
+    }
+    else{
+        $query = $query2 + $query1;
+    }
+    
+    if(count($query)){
+        $url .= "?" . http_build_query($query, "", "&"); // 設定['URL']に?を含むURLには非対応
     }
     return $url;
 }
