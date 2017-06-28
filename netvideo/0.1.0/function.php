@@ -81,46 +81,6 @@ function リダイレクト(string $url) :void{
 }
 
 
-function URL($arg = "") :string{
-    $url = 設定['URL'];
-
-    if(is_string($arg)){
-        if(preg_match("|^/|", $arg) and preg_match("|/$|", $url)){
-            return $url . substr($arg, 1);
-        }
-        else{
-            return $url . $arg;
-        }
-    }
-    else if(is_array($arg)){
-        $path = $query1 = $query2 = [];
-        foreach($arg as $k => $v){
-            if(is_numeric($k)){
-                $path[] = $v;
-                if(isset(設定['URLキー名'][$k])){
-                    $query2[設定['URLキー名'][$k]] = $v;
-                    continue;
-                }
-            }
-            $query1[$k] = $v;
-        }
-        
-        if(設定['URL短縮']){
-            $url .= implode("/", $path);
-            $query = $query1;
-        }
-        else{
-            $query = $query2 + $query1;
-        }
-        
-        if(count($query)){
-            $url .= "?" . http_build_query($query, "", "&");
-        }
-    }
-    return $url;
-}
-
-
 function 自動読み込み(string $dir=__DIR__) :void{
     if(!preg_match('#^(/|[a-zA-Z]:[\\\\/])#', $dir)){ //相対パスの時
         $dir = realpath($dir);
@@ -465,6 +425,56 @@ function キャッシュ無効(){
 }
 
 
+function URL($arg = "") :string{
+    $url = 設定['URL'];
+
+    if(is_string($arg)){
+        if(preg_match("|^/|", $arg) and preg_match("|/$|", $url)){
+            return $url . rawurlencode(substr($arg, 1));
+        }
+        else{
+            return $url . rawurlencode($arg);
+        }
+    }
+    else if(is_array($arg)){
+        $path = $query1 = $query2 = [];
+        $i = 1;
+        foreach($arg as $k => $v){
+            if(is_numeric($k)){
+                $path[] = rawurlencode($v);
+                $query2['key'.$i] = $v;
+                $i++;
+                continue;
+            }
+            $query1[$k] = $v;
+        }
+        
+        if(設定['URL短縮']){
+            $url .= implode("/", $path);
+            $query = $query1;
+        }
+        else{
+            $query = $query2 + $query1;
+        }
+        
+        if(count($query)){
+            $url .= "?" . http_build_query($query, "", "&");
+        }
+    }
+    return $url;
+}
+
+
+function PATH_INFOをGETに代入() :void{
+    $_SERVER['PATH_INFO'] = $_SERVER['PATH_INFO'] ?? '/';
+    $pathinfo = explode("/", $_SERVER['PATH_INFO']);
+    array_shift($pathinfo);
+
+    for($i = 0; $i < count($pathinfo);  $i++){
+        $_GET['key'.($i+1)] = $pathinfo[$i];
+    }
+}
+
 function PATH_INFO設定() :string{
     if(isset($_SERVER['PATH_INFO'])){
         return $_SERVER['PATH_INFO'];
@@ -473,7 +483,7 @@ function PATH_INFO設定() :string{
         $_SERVER['PATH_INFO'] = "/";
         return $_SERVER['PATH_INFO'];
     }
-    //サンプル: $_SERVER = ["SCRIPT_FILENAME"=>"/virtual/id/public_html/p/index.php", "DOCUMENT_ROOT"=>"/virtual/id/public_html", "REDIRECT_URL"=>"/p/312/8888"]
+    //サンプル: $_SERVER = ["SCRIPT_FILENAME"=>"/virtual/id/public_html/p/index.php", "DOCUMENT_ROOT"=>"/virtual/id/public_html", "REDIRECT_URL"=>"/p/312/8888"]; //※"REDIRECT_URL"の値はURLデコードされている
     $dir = substr_replace($_SERVER["SCRIPT_FILENAME"], "", 0, strlen($_SERVER["DOCUMENT_ROOT"]));
     $dir = dirname($dir);
     $_SERVER['PATH_INFO'] = (strlen($dir) === 1)  ?  $_SERVER['REDIRECT_URL']  :  substr_replace($_SERVER['REDIRECT_URL'], "", 0, strlen($dir));
