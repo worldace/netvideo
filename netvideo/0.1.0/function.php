@@ -32,11 +32,11 @@ function テキスト表示(string $str) :void{
 
 
 function JSON表示($data, $allow=null) :void{
-    if(!$allow){
-        $allow = ($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : "*";
+    if(is_array($allow)){
+        $allow = implode(" ", $allow);
     }
     else{
-        $allow = implode(" ", (array)$allow);
+        $allow = ($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : "*";
     }
     header("Access-Control-Allow-Origin: $allow");
     header("Access-Control-Allow-Credentials: true");
@@ -429,7 +429,7 @@ function URL(array $param = null) :string{
     assert(isset(設定['URL']));
     $url = 設定['URL'];
 
-    if($param === null){
+    if(!$param){
         return $url;
     }
 
