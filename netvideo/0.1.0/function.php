@@ -426,40 +426,33 @@ function キャッシュ無効(){
 
 
 function URL(array $arg = null) :string{
+    assert(isset(設定['URL']));
     $url = 設定['URL'];
 
     if($arg === null){
         return $url;
     }
 
-    $path = $query1 = $query2 = [];
-    $i = 1;
+    $path = $query = [];
     foreach($arg as $k => $v){
         if(is_numeric($k)){
             $path[] = rawurlencode($v);
-            $query2['key'.$i] = $v;
-            $i++;
-            continue;
-        }
-        $query1[$k] = $v;
-    }
-    
-    if(設定['URL短縮']){
-        $pathinfo = implode("/", $path);
-        if($pathinfo and !preg_match("|/$|", $url)){
-            $url .= "/$pathinfo";
         }
         else{
-            $url .= $pathinfo;
+            $query[$k] = $v;
         }
-        $query = $query1;
+    }
+
+    $pathinfo = implode("/", $path);
+    if($pathinfo and !preg_match("|/$|", $url)){
+        $url .= "/" . $pathinfo;
     }
     else{
-        $query = $query2 + $query1;
+        $url .= $pathinfo;
     }
-    
-    if(count($query)){
-        $url .= "?" . http_build_query($query, "", "&"); // 設定['URL']に?を含むURLには非対応
+
+    if($query){
+        $url .= "?" . http_build_query($query, "", "&"); // 設定['URL']で?を含むURLには非対応
     }
     return $url;
 }

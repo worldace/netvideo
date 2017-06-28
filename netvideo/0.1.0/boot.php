@@ -6,9 +6,7 @@ new class{
     function __construct(){
         ini_set('session.cookie_httponly', 1);
 
-        if(設定['URL短縮']){
-            PATH_INFOをGETに代入();
-        }
+        PATH_INFOをGETに代入();
         $_GET['action'] = $_GET['key1'] ?? '';
         $_GET['id']     = $_GET['key2'] ?? '';
         if(preg_match("/^\d+$/", $_GET['action'])){
