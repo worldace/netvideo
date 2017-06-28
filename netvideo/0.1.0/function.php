@@ -425,16 +425,15 @@ function キャッシュ無効(){
 }
 
 
-function URL(array $arg = null) :string{
+function URL(array $param = null) :string{
     assert(isset(設定['URL']));
     $url = 設定['URL'];
 
-    if($arg === null){
+    if($param === null){
         return $url;
     }
 
-    $query = [];
-    foreach($arg as $k => $v){
+    foreach($param as $k => $v){
         if(is_numeric($k)){
             $v = rawurlencode($v);
             $url .= (preg_match("|/$|", $url))  ?  $v  :  "/$v";
@@ -444,7 +443,7 @@ function URL(array $arg = null) :string{
         }
     }
 
-    if($query){
+    if(isset($query)){
         $url .= "?" . http_build_query($query, "", "&"); // 設定['URL']で?を含むURLには非対応
     }
     return $url;
