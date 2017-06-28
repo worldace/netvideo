@@ -32,11 +32,11 @@ function テキスト表示(string $str) :void{
 
 
 function JSON表示($data, $allow=null) :void{
-    if(is_array($allow)){
-        $allow = implode(" ", $allow);
+    if(!$allow){
+        $allow = ($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : "*";
     }
     else{
-        $allow = ($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : "*";
+        $allow = implode(" ", (array)$allow);
     }
     header("Access-Control-Allow-Origin: $allow");
     header("Access-Control-Allow-Credentials: true");
