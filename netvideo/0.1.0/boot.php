@@ -18,14 +18,20 @@ new class{
 
 
     function PATH_INFOをGETに代入(string $default_action) :void{
+        assert(count(設定['URLキー名']) >= 2);
+
         $_SERVER['PATH_INFO'] = $_SERVER['PATH_INFO'] ?? '/';
         $pathinfo = explode("/", $_SERVER['PATH_INFO']);
-        $_GET['action'] = $pathinfo[1] ?? '';
-        $_GET['id']     = $pathinfo[2] ?? '';
-        
-        if(preg_match("/^\d+$/", $_GET['action'])){
-            $_GET['id']     = $_GET['action'];
-            $_GET['action'] = $default_action;
+
+        foreach(設定['URLキー名'] as $k => $v){
+            $_GET[$v] = $pathinfo[$k+1] ?? '';
+        }
+
+        $k0 = 設定['URLキー名'][0];
+        $k1 = 設定['URLキー名'][1];
+        if(preg_match("/^\d+$/", $_GET[$k0])){
+            $_GET[$k1] = $_GET[$k0];
+            $_GET[$k0] = $default_action;
         }
     }
 };
