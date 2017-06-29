@@ -312,13 +312,13 @@ function データダウンロード(string $data, string $filename="data.txt", 
 
 
 function メール送信($送信先, string $送信元="", string $送信者="", string $題名="", string $本文="", array $添付=null, $cc="", $bcc="", array $add=null) :bool{
-    $送信先 = 改行変換($送信先);
-    $送信元 = 改行変換($送信元);
-    $送信者 = 改行変換($送信者);
-    $題名   = 改行変換($題名);
-    $cc     = 改行変換($cc);
-    $bcc    = 改行変換($bcc);
-    $add    = 改行変換($add);
+    $送信先 = str_replace(["\r","\n"," ",","], "", $送信先);
+    $送信元 = str_replace(["\r","\n"," ",","], "", $送信元);
+    $送信者 = str_replace(["\r","\n"], "", $送信者);
+    $題名   = str_replace(["\r","\n"], "", $題名);
+    $cc     = str_replace(["\r","\n"," ",","], "", $cc);
+    $bcc    = str_replace(["\r","\n"," ",","], "", $bcc);
+    $add    = str_replace(["\r","\n"], "", $add);
 
     $送信先 = implode(",", (array)$送信先);
     $題名   = mb_encode_mimeheader($題名, "jis");
