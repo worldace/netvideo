@@ -1068,6 +1068,9 @@ function uuid(bool $hyphen=false) :string{ //uuid v4
 
 
 function パスワード発行(int $length=8, bool $userfriendly=false) :string{
+    if($length < 4){
+        $length = 4;
+    }
     $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
     if($userfriendly){
         $str = "abcdefghijkmnprstwxyz2345678";
