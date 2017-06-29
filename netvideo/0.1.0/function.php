@@ -33,7 +33,7 @@ function テキスト表示(string $str) :void{
 
 function JSON表示($data, $allow=null) :void{
     if(!$allow){
-        $allow = ($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : "*";
+        $allow = $_SERVER['HTTP_ORIGIN'] ?? "*";
     }
     else{
         $allow = implode(" ", (array)$allow);
@@ -57,15 +57,27 @@ function RSS表示(array $channel, array $items) :void{ // http://www.futomi.com
         return "<$name>$value</$name>\n";
     };
     
-    if(isset($channel["title"])){ $rss .= $tag("title", h($channel['title'])); }
-    if(isset($channel["link"])){ $rss .= $tag("link", h($channel['link'])); }
-    if(isset($channel["description"])){ $rss .= $tag("description", h($channel['description'])); }
+    if(isset($channel["title"])){
+        $rss .= $tag("title", h($channel['title']));
+    }
+    if(isset($channel["link"])){
+        $rss .= $tag("link", h($channel['link']));
+    }
+    if(isset($channel["description"])){
+        $rss .= $tag("description", h($channel['description']));
+    }
     
     foreach($items as $item){
         $rss .= "<item>\n";
-        if(isset($item["title"])){ $rss .= $tag("title", h($item['title'])); }
-        if(isset($item["link"])){ $rss .= $tag("link", h($item['link'])); }
-        if(isset($item["pubDate"])){ $rss .= $tag("pubDate", date("r", $item["pubDate"])); }
+        if(isset($item["title"])){
+            $rss .= $tag("title", h($item['title']));
+        }
+        if(isset($item["link"])){
+            $rss .= $tag("link", h($item['link']));
+        }
+        if(isset($item["pubDate"])){
+            $rss .= $tag("pubDate", date("r", $item["pubDate"]));
+        }
         $rss .= "</item>\n";
     }
     
@@ -108,14 +120,18 @@ function オブジェクト(string $file, ...$args){
 function 検査(string $var, $func) :bool{
     if(is_callable($func)){
         $result = $func($var);
-        if(!is_bool($result)){ functionphpエラー("第2引数の無名関数はtrueまたはfalseを返してください"); }
+        if(!is_bool($result)){
+            functionphpエラー("第2引数の無名関数はtrueまたはfalseを返してください");
+        }
     }
     else{
         if(is_callable("検査::$func")){
             $result = 検査::$func($var);
         }
         else if(preg_match("/^(\d+)(文字|字|バイト)(以上|以下|以内|未満|より大きい|より小さい|と同じ)*$/u", $func, $match)){
-            if(!isset($match[3])){ $match[3] = "と同じ"; }
+            if(!isset($match[3])){
+                $match[3] = "と同じ";
+            }
             if($match[2] === "文字" or $match[2] === "字"){
                 $result = 検査::文字数($var, (int)$match[1], $match[3]);
             }
@@ -129,7 +145,9 @@ function 検査(string $var, $func) :bool{
     }
     if($result === false){
         検査::$失敗 = true;
-        if(検査::$例外 === true){ throw new Exception("検査エラー"); }
+        if(検査::$例外 === true){
+            throw new Exception("検査エラー");
+        }
     }
     return $result;
 }
@@ -233,7 +251,9 @@ function 設定(string $name, $value="\0\rヌル\0\r"){
 
 function テンプレート(string $_file_, array $_data_, bool $エスケープしない=false) :string{
     $_h_ = function($arg) use (&$_h_){
-        if(is_array($arg)){ return array_map($_h_, $arg); }
+        if(is_array($arg)){
+            return array_map($_h_, $arg);
+        }
         return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
     };
     
@@ -263,7 +283,9 @@ function ファイルダウンロード(string $file, string $filename=null, int
     ini_set("max_execution_time", $timeout);
 
     $filesize = filesize($file);
-    if(!$filename){ $filename = basename($file); }
+    if(!$filename){
+        $filename = basename($file);
+    }
     $filenameE = rawurlencode($filename);
     header("Content-Type: application/force-download");
     header("Content-Length: $filesize");
@@ -300,17 +322,26 @@ function メール送信($送信先, string $送信元="", string $送信者="",
     $題名   = mb_encode_mimeheader($題名, "jis");
     $body   = mb_convert_encoding($本文, "jis", "UTF-8");
 
-    if($送信元 and $送信者) { $header .= "From: " . mb_encode_mimeheader($送信者,"jis") . " <$送信元>\r\n"; }
-    else if($送信元) { $header .= "From: $送信元\r\n"; }
+    if($送信元 and $送信者){
+        $header .= "From: " . mb_encode_mimeheader($送信者,"jis") . " <$送信元>\r\n";
+    }
+    else if($送信元){
+        $header .= "From: $送信元\r\n";
+    }
+
     if($cc) {
         $cc = implode(",", (array)$cc);
         $header .= "Cc: $cc\r\n";
     }
+
     if($bcc){
         $bcc = implode(",", (array)$bcc);
         $header .= "Bcc: $bcc\r\n";
     }
-    if(is_array($add)){ $header .= implode("\r\n", $add) . "\r\n"; }
+
+    if(is_array($add)){
+        $header .= implode("\r\n", $add) . "\r\n";
+    }
 
     if(is_array($添付)){
         $区切り = "__" . sha1(uniqid()) . "__";
@@ -428,7 +459,9 @@ function ファイル送信(string $url, array $querymap=null, array $request_he
 
 
 function キャッシュ無効(){
-    if(headers_sent()){ return false; }
+    if(headers_sent()){
+        return false;
+    }
     header('Expires: Wed, 11 Jan 1984 05:00:00 GMT');
     header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
     header('Cache-Control: no-cache, must-revalidate, max-age=0');
@@ -490,11 +523,15 @@ function PATH_INFO設定() :string{
 function 現在のURL(bool $no_query=false) :string{
     if(filter_input(INPUT_SERVER, 'HTTPS', FILTER_VALIDATE_BOOLEAN)){
         $scheme = "https://";
-        if($_SERVER['SERVER_PORT'] != 443){ $port = ":" . $_SERVER['SERVER_PORT']; }
+        if($_SERVER['SERVER_PORT'] != 443){
+            $port = ":" . $_SERVER['SERVER_PORT'];
+        }
     }
     else {
         $scheme = "http://";
-        if($_SERVER['SERVER_PORT'] != 80) { $port = ":" . $_SERVER['SERVER_PORT']; }
+        if($_SERVER['SERVER_PORT'] != 80){
+            $port = ":" . $_SERVER['SERVER_PORT'];
+        }
     }
     $url = $scheme . $_SERVER["HTTP_HOST"] . $port . $_SERVER['REQUEST_URI'];
     return ($no_query) ? preg_replace("/\?.*$/","",$url) : $url;
@@ -545,13 +582,17 @@ function PHP≧(string $str) :bool{
 
 function str_replace_once(string $needle, string $replace, string $haystack) :string{
     $pos = strpos($haystack, $needle); 
-    if ($pos === false) { return $haystack; }
+    if($pos === false){
+        return $haystack;
+    }
     return substr_replace($haystack, $replace, $pos, strlen($needle));
 }
 
 
 function 日付(string $str='[年]/[0月]/[0日] [0時]:[0分]', int $time=0) :string{
-    if(!$time){ $time = time(); }
+    if(!$time){
+        $time = time();
+    }
     $week = ['日','月','火','水','木','金','土'][date('w', $time)];
     $from = ['[年]','[月]','[0月]','[日]','[0日]','[時]','[0時]','[0分]','[0秒]','[曜日]'];
     $to   = ['Y'   ,'n'   ,'m'    ,'j'   ,'d'    ,'G'   ,'H'    ,'i'    ,'s'    ,$week];
@@ -563,7 +604,9 @@ function 日付(string $str='[年]/[0月]/[0日] [0時]:[0分]', int $time=0) :s
 
 
 function 経過(int $time) :string{
-    if(!preg_match("/^\d+$/", $time)){ return ""; }
+    if(!preg_match("/^\d+$/", $time)){
+        return "";
+    }
     $時間差 = time() - $time;
     switch($時間差){
         case $時間差 < 0        : return "未来";
@@ -693,13 +736,17 @@ function タグ(string $tag, array $attr=[]) :string{
 function 属性文字列(array $attr=[]) :string{
     $str = "";
     foreach($attr as $key => $val){
-        if($key === "本文"){ continue; }
+        if($key === "本文"){
+            continue;
+        }
         if(preg_match("/[^a-zA-Z\-]/", $key)){
             functionphpエラー("属性名に $key は使用できません", "警告");
             continue;
         }
         if(in_array($key, ["src", "href", "action", "formaction", "poster"], true)){ //cite, srcset
-            if(strlen($val) > 0 and !preg_match("%^(https*://|/|\./|#)%", $val)){ $val = "./" . $val; }
+            if(strlen($val) > 0 and !preg_match("%^(https*://|/|\./|#)%", $val)){
+                $val = "./" . $val;
+            }
         }
         $val = htmlspecialchars($val, ENT_QUOTES, "UTF-8", false);
         $str .= " $key=\"$val\"";
@@ -724,10 +771,16 @@ function 自動リンク($arg, array $attr=[]){
 
 function 配列→table(array $array, array $attr=[]) :string{
     $firstkey = key($array);
-    if(is_array($array[$firstkey])){ $tag = "<tr>\n<th></th>\n<th>" . implode("</th>\n<th>",h(array_keys($array[$firstkey]))) . "</th>\n</tr>\n"; }
+
+    if(is_array($array[$firstkey])){
+        $tag = "<tr>\n<th></th>\n<th>" . implode("</th>\n<th>",h(array_keys($array[$firstkey]))) . "</th>\n</tr>\n";
+    }
+
     foreach($array as $key1 => $value1){
         $tag .= "<tr>\n<th>" . h($key1) . "</th>\n";
-        foreach((array)$value1 as $key2 => $value2){ $tag .= "<td>" . h($value2) . "</td>\n"; }
+        foreach((array)$value1 as $key2 => $value2){
+            $tag .= "<td>" . h($value2) . "</td>\n";
+        }
         $tag .= "</tr>\n";
     }
     $attr_str = 属性文字列($attr);
@@ -887,7 +940,9 @@ function zip圧縮(string $zipfile, $filemap){
             $filemap[$k] = file_get_contents($v);
         }
     }
-    foreach($filemap as $name => $value){ $zip->addFromString($name, $value); } //$nameに/を含めるとディレクトリになる
+    foreach($filemap as $name => $value){  //$nameに/を含めるとディレクトリになる
+        $zip->addFromString($name, $value);
+    }
     $zip->close();
     return $zipfile;
 }
@@ -899,7 +954,9 @@ function zip追加(string $zipfile, $filemap){
         functionphpエラー("ZIPファイル $zipfile を開けません", "警告");
         return false;
     }
-    foreach($filemap as $name => $value){ $zip->addFromString($name, $value); }
+    foreach($filemap as $name => $value){
+        $zip->addFromString($name, $value);
+    }
     $zip->close();
     return $zipfile;
 }
@@ -911,7 +968,9 @@ function zip解凍(string $zipfile, string $where = "") :bool{
         functionphpエラー("ZIPファイル $zipfile を開けません", "警告");
         return false;
     }
-    if(!$where){ $where = dirname(realpath($zipfile)); }
+    if(!$where){
+        $where = dirname(realpath($zipfile));
+    }
     $result = $zip->extractTo($where);
     $zip->close();
     return $result;
@@ -940,7 +999,9 @@ function JSON保存(string $file, $data){
 
 function JSON取得(string $file){
     $json = file_get_contents($file);
-    if($json === false){ return false; }
+    if($json === false){
+        return false;
+    }
     $json = preg_replace("/^<\?php\s*/i", "", $json);
     return json_decode($json, true);
 }
@@ -956,7 +1017,9 @@ function XML取得(string $xml) :array{
     $xml = ltrim($xml);
     if(!preg_match("/^</", $xml)){
         $xml = file_get_contents($xml);
-        if($xml === false){ return []; }
+        if($xml === false){
+            return [];
+        }
     }
     $xml = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$xml);
     $SimpleXML = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOBLANKS | LIBXML_NOCDATA | LIBXML_NONET | LIBXML_COMPACT | LIBXML_PARSEHUGE);
@@ -971,8 +1034,12 @@ function fromphp($data) :string{
 
 
 function 当たり(float $確率) :bool{
-    if($確率 <= 0){ return false; }
-    if($確率 >= 100){ return true; }
+    if($確率 <= 0){
+        return false;
+    }
+    if($確率 >= 100){
+        return true;
+    }
 
     $i = mt_rand(1, round(100/$確率*100000));
     return ($i <= 100000) ? true : false;
@@ -988,7 +1055,9 @@ function uuid(bool $hyphen=false) :string{ //uuid v4
 
 function パスワード発行(int $length=8, bool $userfriendly=false) :string{
     $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
-    if($userfriendly){ $str = "ABDEFGHJLMNQRTYabdefghmnrty23456789"; }
+    if($userfriendly){
+        $str = "ABDEFGHJLMNQRTYabdefghmnrty23456789";
+    }
     $str = str_repeat($str, floor($length/2));
     return substr(str_shuffle($str), 0, $length);
 }
@@ -1035,9 +1104,15 @@ function jwt認証(string $jwt, string $key){
     $data   = json_decode(base64_decode_urlsafe($datab64), true);
     $sign   = base64_decode_urlsafe($cryptob64);
 
-    if(!$header or !$data) { return false; }
-    if($header->alg !== "HS256") { return false; }
-    if($sign !== hash_hmac('sha256', "$headb64.$datab64", $key, true)) { return false; }
+    if(!$header or !$data) {
+        return false;
+    }
+    if($header->alg !== "HS256"){
+        return false;
+    }
+    if($sign !== hash_hmac('sha256', "$headb64.$datab64", $key, true)){
+        return false;
+    }
 
     return $data;
 }
