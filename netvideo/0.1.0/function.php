@@ -382,7 +382,7 @@ function GET送信(string $url, array $querymap=null, array $request_header=[]){
         ]
     ]);
     $return = file_get_contents($url, false, $context);
-    $_ENV['RESPONSE_HEADER'] = ($return !== false) ? $http_response_header : [];
+    $_ENV['RESPONSE_HEADER'] = $http_response_header ?? [];
     return $return;
 }
 
@@ -408,7 +408,7 @@ function POST送信(string $url, array $querymap=null, array $request_header=[])
         ]
     ]);
     $return = file_get_contents($url, false, $context);
-    $_ENV['RESPONSE_HEADER'] = ($return !== false) ? $http_response_header : [];
+    $_ENV['RESPONSE_HEADER'] = $http_response_header ?? [];
     return $return;
 }
 
@@ -453,7 +453,7 @@ function ファイル送信(string $url, array $querymap=null, array $request_he
         ]
     ]);
     $return = file_get_contents($url, false, $context);
-    $_ENV['RESPONSE_HEADER'] = ($return !== false) ? $http_response_header : [];
+    $_ENV['RESPONSE_HEADER'] = $http_response_header ?? [];
     return $return;
 }
 
