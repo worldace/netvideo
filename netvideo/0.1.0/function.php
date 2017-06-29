@@ -286,6 +286,7 @@ function ファイルダウンロード(string $file, string $filename=null, int
     if(!$filename){
         $filename = basename($file);
     }
+    $filename = str_replace(['"',"\r","\n"], "", $filename);
     $filenameE = rawurlencode($filename);
     header("Content-Type: application/force-download");
     header("Content-Length: $filesize");
@@ -296,9 +297,10 @@ function ファイルダウンロード(string $file, string $filename=null, int
 }
 
 
-function データダウンロード(string $data, string $filename="data", int $timeout=60*60*6) :void{
+function データダウンロード(string $data, string $filename="data.txt", int $timeout=60*60*6) :void{
     ini_set("max_execution_time", $timeout);
     $filesize = strlen($data);
+    $filename = str_replace(['"',"\r","\n"], "", $filename);
     $filenameE = rawurlencode($filename);
     header("Content-Type: application/force-download");
     header("Content-Length: $filesize");
