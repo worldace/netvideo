@@ -624,7 +624,6 @@ function 経過(int $time) :string{
     }
     $時間差 = time() - $time;
     switch($時間差){
-        case $時間差 < 0        : return "未来";
         case $時間差 < 1        : return "今";
         case $時間差 < 60       : return "{$時間差}秒前";
         case $時間差 < 3600     : return floor($時間差/60)."分前";
