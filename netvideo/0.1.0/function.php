@@ -460,6 +460,18 @@ function ファイル送信(string $url, array $querymap=null, array $request_he
 }
 
 
+function ホスト確認(string $host) :bool{
+    if(preg_match("|^https?://([^/]+)|i", $host, $m)){ //URLなら
+        $host = $m[1];
+    }
+    else if(filter_var($host, FILTER_VALIDATE_EMAIL)){ //メールアドレスなら
+        $host = array_pop(explode("@", $host));
+        return checkdnsrr($host, 'MX') || checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA');
+    }
+    return checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA');
+}
+
+
 function キャッシュ無効(){
     if(headers_sent()){
         return false;
@@ -572,7 +584,7 @@ function POSTなら() :bool{
 
 
 function 開発環境なら() :bool{
-    $ini = ini_get("display_errors"); //display_errorsはstring型
+    $ini = ini_get("display_errors"); //display_errorsはstring型 "stderr"の扱いが未定。filter_var($bool, FILTER_VALIDATE_BOOLEAN)でも検証できる
     $ini = strtolower($ini);
     return in_array($ini, ["","0","no","off","false"], true) ? false : true;
 }
