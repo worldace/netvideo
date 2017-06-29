@@ -358,10 +358,12 @@ function GET送信(string $url, array $querymap=null, array $request_header=[]){
 
 function POST送信(string $url, array $querymap=null, array $request_header=[]){
     $content = http_build_query((array)$querymap, "", "&");
-    $request_header = array_change_key_case($request_header) + [
+
+    $request_header = [
         "content-type"   => "application/x-www-form-urlencoded; charset=UTF-8",
         "content-length" => strlen($content),
-    ];
+    ] + array_change_key_case($request_header);
+
     foreach($request_header as $k => $v){
         $k = str_replace([":", "\r", "\n"], "", $k);
         $v = str_replace(["\r", "\n"], "", $v);
@@ -405,6 +407,7 @@ function ファイル送信(string $url, array $querymap=null, array $request_he
         "content-type"   => "multipart/form-data; boundary=$区切り",
         "content-length" => strlen($content),
     ] + array_change_key_case($request_header);
+
     foreach($request_header as $k => $v){
         $k = str_replace([":", "\r", "\n"], "", $k);
         $v = str_replace(["\r", "\n"], "", $v);
