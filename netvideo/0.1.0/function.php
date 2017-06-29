@@ -1097,7 +1097,9 @@ function jwt発行(array $data, string $key) :string{
 
 
 function jwt認証(string $jwt, string $key){
-    if(substr_count($jwt, ".") !== 2) { return false; }
+    if(substr_count($jwt, ".") !== 2) {
+        return false;
+    }
 
     list($headb64, $datab64, $cryptob64) = explode('.', $jwt);
     $header = json_decode(base64_decode_urlsafe($headb64));
@@ -1135,7 +1137,7 @@ function base64_decode_urlsafe(string $input) :string{
 
 function ベーシック認証(callable $認証関数, string $realm="member only"){
     if(isset($_SERVER['PHP_AUTH_USER']) and isset($_SERVER['PHP_AUTH_PW'])){
-        if(call_user_func($認証関数, $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) === true){
+        if($認証関数($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) === true){
             return $_SERVER['PHP_AUTH_USER'];
         }
     }
