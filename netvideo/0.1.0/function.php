@@ -572,8 +572,9 @@ function POSTなら() :bool{
 
 
 function 開発環境なら() :bool{
-    //display_errorsはstring型で"0","1","stderr"の3パターン
-    return ini_get("display_errors") ? true : false;
+    $ini = ini_get("display_errors"); //display_errorsはstring型
+    $ini = strtolower($ini);
+    return in_array($ini, ["","0","no","off","false"], true) ? false : true;
 }
 
 
