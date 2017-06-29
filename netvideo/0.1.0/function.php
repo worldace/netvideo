@@ -1070,7 +1070,7 @@ function uuid(bool $hyphen=false) :string{ //uuid v4
 function パスワード発行(int $length=8, bool $userfriendly=false) :string{
     $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
     if($userfriendly){
-        $str = "ABDEFGHJLMNQRTYabdefghmnrty23456789";
+        $str = "abcdefghijkmnprstwxyz2345678";
     }
     $str = str_repeat($str, floor($length/2));
     return substr(str_shuffle($str), 0, $length);
