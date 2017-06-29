@@ -339,8 +339,10 @@ function GET送信(string $url, array $querymap=null, array $request_header=[]){
         $url .= preg_match("/\?/", $url) ? "&" : "?";
         $url .= http_build_query($querymap, "", "&", PHP_QUERY_RFC3986);
     }
-    foreach($request_header as $key => $val){
-        $header .= trim($key) . ": " . trim($val) . "\r\n";
+    foreach($request_header as $k => $v){
+        $k = str_replace([":", "\r", "\n"], "", $k);
+        $v = str_replace(["\r", "\n"], "", $v);
+        $header .= "$k: $v\r\n";
     }
     $context = stream_context_create([
         'http'=>[
@@ -360,8 +362,10 @@ function POST送信(string $url, array $querymap=null, array $request_header=[])
         "content-type"   => "application/x-www-form-urlencoded; charset=UTF-8",
         "content-length" => strlen($content),
     ];
-    foreach($request_header as $key => $val){
-        $header .= trim($key) . ": " . trim($val) . "\r\n";
+    foreach($request_header as $k => $v){
+        $k = str_replace([":", "\r", "\n"], "", $k);
+        $v = str_replace(["\r", "\n"], "", $v);
+        $header .= "$k: $v\r\n";
     }
     $context = stream_context_create([
         'http'=>[
@@ -379,8 +383,10 @@ function POST送信(string $url, array $querymap=null, array $request_header=[])
 function ファイル送信(string $url, array $querymap=null, array $request_header=[]){
     $区切り = "__" . sha1(uniqid()) . "__";
     foreach((array)$querymap as $name => $value){
+        $name = str_replace(['"', "\r", "\n"], "", $name);
         if(is_array($value)){
             foreach($value as $name2 => $value2){
+                $name2 = str_replace(['"', "\r", "\n"], "", $name2);
                 $content .= "--$区切り\r\n";
                 $content .= "Content-Disposition: form-data; name=\"$name\"; filename=\"$name2\"\r\n";
                 $content .= "Content-Type: " . MIMEタイプ($name2) . "\r\n\r\n";
@@ -399,8 +405,10 @@ function ファイル送信(string $url, array $querymap=null, array $request_he
         "content-type"   => "multipart/form-data; boundary=$区切り",
         "content-length" => strlen($content),
     ];
-    foreach($request_header as $key => $val){
-        $header .= trim($key) . ": " . trim($val) . "\r\n";
+    foreach($request_header as $k => $v){
+        $k = str_replace([":", "\r", "\n"], "", $k);
+        $v = str_replace(["\r", "\n"], "", $v);
+        $header .= "$k: $v\r\n";
     }
 
     $context = stream_context_create([
@@ -444,7 +452,7 @@ function URL(array $param = null) :string{
     }
 
     if(isset($query)){
-        $url .= "?" . http_build_query($query, "", "&"); // 設定['URL']で?を含むURLには非対応
+        $url .= "?" . http_build_query($query, "", "&", PHP_QUERY_RFC3986); // 設定['URL']で?を含むURLには非対応
     }
     return $url;
 }
