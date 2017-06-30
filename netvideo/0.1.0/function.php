@@ -515,6 +515,9 @@ function PATH_INFOをGETに代入() :void{
 
     $_GET['PATH_INFO'] = [];
     foreach($pathinfo as $v){
+        if($v === ""){
+            continue;
+        }
         $_GET['PATH_INFO'][] = $v;
     }
 }
