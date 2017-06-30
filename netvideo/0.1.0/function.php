@@ -513,8 +513,9 @@ function PATH_INFOをGETに代入() :void{
     $pathinfo = explode("/", $_SERVER['PATH_INFO']);
     array_shift($pathinfo);
 
-    for($i = 0; $i < count($pathinfo);  $i++){
-        $_GET['PATH_INFO'.($i+1)] = $pathinfo[$i];
+    $_GET['PATH_INFO'] = [];
+    foreach($pathinfo as $v){
+        $_GET['PATH_INFO'][] = $v;
     }
 }
 
