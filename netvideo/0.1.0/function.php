@@ -689,13 +689,11 @@ function h($arg){
 
 function 改行変換($arg, string $replace=""){
     if(is_string($arg)){
-        $arg = str_replace("\r", "", $arg);
-        $arg = str_replace("\n", $replace, $arg);
+        $arg = preg_replace("/\r\n|\n|\r/", $replace, $arg);
     }
     else if(is_array($arg)){
         array_walk_recursive($arg, function(&$v) use($replace){
-            $v = str_replace("\r", "", $v);
-            $v = str_replace("\n", $replace, $v);
+            $v = preg_replace("/\r\n|\n|\r/", $replace, $v);
         });
     }
     return $arg;
