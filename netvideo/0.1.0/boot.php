@@ -7,8 +7,8 @@ new class{
         ini_set('session.cookie_httponly', 1);
 
         PATH_INFOをGETに代入();
-        $_GET['action'] = $_GET['key1'] ?? '';
-        $_GET['id']     = $_GET['key2'] ?? '';
+        $_GET['action'] = $_GET['PATH_INFO1'] ?? '';
+        $_GET['id']     = $_GET['PATH_INFO2'] ?? '';
         if(preg_match("/^\d+$/", $_GET['action'])){
             $_GET['id']     = $_GET['action'];
             $_GET['action'] = 'video';
