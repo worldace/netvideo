@@ -509,16 +509,14 @@ function URL(array $param = null) :string{
 
 
 function PATH_INFOをGETに代入() :void{
-    $_SERVER['PATH_INFO'] = $_SERVER['PATH_INFO'] ?? '/';
-    $pathinfo = explode("/", $_SERVER['PATH_INFO']);
+    $pathinfo = explode("/", $_SERVER['PATH_INFO'] ?? '');
     array_shift($pathinfo);
 
     $_GET['PATH_INFO'] = [];
     foreach($pathinfo as $v){
-        if($v === ""){
-            continue;
+        if($v !== ""){
+            $_GET['PATH_INFO'][] = $v;
         }
-        $_GET['PATH_INFO'][] = $v;
     }
 }
 
@@ -527,7 +525,7 @@ function PATH_INFO設定() :string{
         return $_SERVER['PATH_INFO'];
     }
     if(!isset($_SERVER['DOCUMENT_ROOT'], $_SERVER['SCRIPT_FILENAME'], $_SERVER['REDIRECT_URL'])){
-        $_SERVER['PATH_INFO'] = "/";
+        $_SERVER['PATH_INFO'] = "";
         return $_SERVER['PATH_INFO'];
     }
     //サンプル: $_SERVER = ["SCRIPT_FILENAME"=>"/virtual/id/public_html/p/index.php", "DOCUMENT_ROOT"=>"/virtual/id/public_html", "REDIRECT_URL"=>"/p/312/8888"]; //※"REDIRECT_URL"の値はURLデコードされている
