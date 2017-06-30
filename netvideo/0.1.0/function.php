@@ -602,6 +602,12 @@ function PHP≧(string $str) :bool{
 }
 
 
+function str_match(string $needle, string $haystack, &$match = null){
+    $match = strpos($haystack, $needle);
+    return ($match === false)  ?  false  :  true;
+}
+
+
 function str_replace_once(string $needle, string $replace, string $haystack) :string{
     $pos = strpos($haystack, $needle); 
     if($pos === false){
@@ -610,6 +616,16 @@ function str_replace_once(string $needle, string $replace, string $haystack) :st
     return substr_replace($haystack, $replace, $pos, strlen($needle));
 }
 
+/*
+function preg_match_replace(string $regex, string $replace, string $haystack, &$match = null){
+    if(preg_match($regex, $haystack, $match)){
+        return preg_replace($regex, $replace, $haystack);
+    }
+    else{
+        return $haystack;
+    }
+}
+*/
 
 function 日付(string $str='[年]/[0月]/[0日] [0時]:[0分]', int $time=0) :string{
     if(!$time){
