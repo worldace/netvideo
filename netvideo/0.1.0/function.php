@@ -713,11 +713,12 @@ function 制御文字削除($arg, $LF){ // http://blog.sarabande.jp/post/5270123
             $v = preg_replace("/\t/", "    ", $v);
             $v = preg_replace("/\xC2[\x80-\x9F]/", "", $v); //Unicode制御文字
             if(is_array($LF)){
-                $v = (in_array($k, $LF, true))  ?  preg_replace("/(?!\n)[[:cntrl:]]/u", "", $v)  :  preg_replace("/[[:cntrl:]]/u", "", $v);
+                $bool = in_array($k, $LF, true);
             }
             else{
-                $v = ($LF === true)  ?  preg_replace("/(?!\n)[[:cntrl:]]/u", "", $v)  :  preg_replace("/[[:cntrl:]]/u", "", $v);
+                $bool = ($LF === true);
             }
+            $v = $bool  ?  preg_replace("/(?!\n)[[:cntrl:]]/u", "", $v)  :  preg_replace("/[[:cntrl:]]/u", "", $v);
         });
     }
     return $arg;
