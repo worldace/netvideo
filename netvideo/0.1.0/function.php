@@ -687,7 +687,7 @@ function h($arg){
 }
 
 
-function 改行変換($arg, string $replace=""){
+function 改行置換($arg, string $replace=""){
     if(is_string($arg)){
         $arg = preg_replace("/\r\n|\n|\r/", $replace, $arg);
     }
@@ -698,6 +698,7 @@ function 改行変換($arg, string $replace=""){
     }
     return $arg;
 }
+
 
 
 function 制御文字削除($arg, $LF){ // http://blog.sarabande.jp/post/52701231276
