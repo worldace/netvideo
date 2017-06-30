@@ -788,7 +788,7 @@ function 自動リンク($arg, array $attr=[]){
 }
 
 
-function 配列→table(array $array, array $attr=[]) :string{
+function 配列からtableタグ作成(array $array, array $attr=[]) :string{
     $firstkey = key($array);
 
     if(is_array($array[$firstkey])){
