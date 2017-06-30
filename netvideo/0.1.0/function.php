@@ -702,17 +702,22 @@ function 改行変換($arg, string $replace=""){
 }
 
 
-function 制御文字削除($arg, bool $LF=false){ // http://blog.sarabande.jp/post/52701231276
+function 制御文字削除($arg, $LF){ // http://blog.sarabande.jp/post/52701231276
     if(is_string($arg)){
         $arg = preg_replace("/\t/", "    ", $arg);
         $arg = preg_replace("/\xC2[\x80-\x9F]/", "", $arg); //Unicode制御文字
-        $arg = ($LF)  ?  preg_replace("/(?!\n)[[:cntrl:]]/u", "", $arg)  :  preg_replace("/[[:cntrl:]]/u", "", $arg);
+        $arg = ($LF === true)  ?  preg_replace("/(?!\n)[[:cntrl:]]/u", "", $arg)  :  preg_replace("/[[:cntrl:]]/u", "", $arg);
     }
     else if(is_array($arg)){
-        array_walk_recursive($arg, function(&$v) use($LF){
+        array_walk_recursive($arg, function(&$v, $k) use($LF){
             $v = preg_replace("/\t/", "    ", $v);
             $v = preg_replace("/\xC2[\x80-\x9F]/", "", $v); //Unicode制御文字
-            $v = ($LF)  ?  preg_replace("/(?!\n)[[:cntrl:]]/u", "", $v)  :  preg_replace("/[[:cntrl:]]/u", "", $v);
+            if(is_array($LF)){
+                $v = (in_array($k, $LF, true))  ?  preg_replace("/(?!\n)[[:cntrl:]]/u", "", $v)  :  preg_replace("/[[:cntrl:]]/u", "", $v);
+            }
+            else{
+                $v = ($LF === true)  ?  preg_replace("/(?!\n)[[:cntrl:]]/u", "", $v)  :  preg_replace("/[[:cntrl:]]/u", "", $v);
+            }
         });
     }
     return $arg;
