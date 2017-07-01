@@ -500,6 +500,7 @@ function アップロード受信(string $dir, array $whitelist){
         functionphpエラー("ディレクトリ $dir は存在しません", "警告");
         return false;
     }
+    $dir = realpath($dir);
     foreach($whitelist as $k => $v){
         $v = str_replace(".", "", $v);
         $whitelist[$k] = strtolower($v);
