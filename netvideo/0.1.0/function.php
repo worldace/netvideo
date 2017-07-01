@@ -493,7 +493,11 @@ function FILES詰め直し() :array{
 
 function アップロード受信(string $dir, array $whitelist){
     $files = FILES詰め直し();
-    if(!$files or !is_dir($dir)){
+    if(!$files){
+        return false;
+    }
+    if(!is_dir($dir)){
+        functionphpエラー("ディレクトリ $dir は存在しません", "警告");
         return false;
     }
     foreach($whitelist as $k => $v){
