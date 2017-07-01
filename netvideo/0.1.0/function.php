@@ -465,6 +465,74 @@ function ファイル送信(string $url, array $querymap=null, array $request_he
 }
 
 
+function FILES詰め直し() :array{
+    //['form-name'=>[['name'=>,'type'=>,'tmp_name'=>,'error'=>,'size=>']]]
+    $return = [];
+    if(!isset($_FILES)){
+        return $return;
+    }
+
+    foreach($_FILES as $index => $file) {
+        if(!is_array($file['name'])) {
+            $return[$index][] = $file;
+            continue;
+        }
+        foreach($file['name'] as $idx => $name) {
+            $return[$index][$idx] = [
+                'name' => $name,
+                'type' => $file['type'][$idx],
+                'tmp_name' => $file['tmp_name'][$idx],
+                'error' => $file['error'][$idx],
+                'size' => $file['size'][$idx]
+            ];
+        }
+    }
+    return $return;
+}
+
+
+function アップロード受信(string $dir, array $whitelist){
+    $files = FILES詰め直し();
+    if(!$files or !is_dir($dir)){
+        return false;
+    }
+    foreach($whitelist as $k => $v){
+        $v = str_replace(".", "", $v);
+        $whitelist[$k] = strtolower($v);
+    }
+
+    foreach($files as $k1 => $v1){
+        $k1count++;
+        foreach($v1 as $k2 => $v2){
+            $k2count++;
+            if($v2['error'] !== UPLOAD_ERR_OK){
+                continue;
+            }
+            $ext = pathinfo($v2["name"], PATHINFO_EXTENSION); //拡張子なしは空文字列
+            $ext = strtolower($ext);
+            if(!in_array($ext, $whitelist, true)){
+                continue;
+            }
+            if($ext !== ""){
+                $ext = ".$ext";
+            }
+
+            $savepath = $dir. DIRECTORY_SEPARATOR . uniqid(bin2hex(random_bytes(2))) . $ext;
+            if(!move_uploaded_file($v2["tmp_name"], $savepath)){
+                continue;
+            }
+            $return[$k1][$k2] = $savepath;
+        }
+    }
+    if(isset($return)){
+        return ($k1count === 1 and $k2count === 1)  ?  $savepath  :  $return;
+    }
+    else{
+        return false;
+    }
+}
+
+
 function ホスト確認(string $host) :bool{
     if(preg_match("|^https?://([^/]+)|i", $host, $m)){ //URLなら
         $host = $m[1];
@@ -581,12 +649,14 @@ function Windowsなら() :bool{
 
 
 function GETなら() :bool{
-    return (strtoupper(filter_input(INPUT_SERVER, "REQUEST_METHOD")) === 'GET') ? true : false;
+    $method = filter_input(INPUT_SERVER, "REQUEST_METHOD") ?? '';
+    return (strtoupper($method) === 'GET') ? true : false;
 }
 
 
 function POSTなら() :bool{
-    return (strtoupper(filter_input(INPUT_SERVER, "REQUEST_METHOD")) === 'POST') ? true : false;
+    $method = filter_input(INPUT_SERVER, "REQUEST_METHOD") ?? '';
+    return (strtoupper($method) === 'POST') ? true : false;
 }
 
 
@@ -602,7 +672,7 @@ function PHP≧(string $str) :bool{
 }
 
 
-function str_match(string $needle, string $haystack, &$match = null){
+function str_match(string $needle, string $haystack, &$match = null) :bool{
     $match = strpos($haystack, $needle);
     return ($match === false)  ?  false  :  true;
 }
