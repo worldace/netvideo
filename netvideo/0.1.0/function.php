@@ -474,10 +474,16 @@ function FILES詰め直し() :array{
 
     foreach($_FILES as $index => $file) {
         if(!is_array($file['name'])) {
+            if($file['error'] === UPLOAD_ERR_NO_FILE){
+                continue;
+            }
             $return[$index][] = $file;
             continue;
         }
         foreach($file['name'] as $idx => $name) {
+            if($file['error'][$idx] === UPLOAD_ERR_NO_FILE){
+                continue;
+            }
             $return[$index][$idx] = [
                 'name' => $name,
                 'type' => $file['type'][$idx],
@@ -493,14 +499,15 @@ function FILES詰め直し() :array{
 
 function アップロード受信(string $dir, array $whitelist){
     $files = FILES詰め直し();
+    
     if(!$files){
-        return false;
+        return;
     }
     if(!is_dir($dir)){
         functionphpエラー("ディレクトリ $dir は存在しません", "警告");
         return false;
     }
-    $dir = realpath($dir);
+
     foreach($whitelist as $k => $v){
         $v = str_replace(".", "", $v);
         $whitelist[$k] = strtolower($v);
