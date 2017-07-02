@@ -472,17 +472,18 @@ function FILES詰め直し() :array{
         return $return;
     }
 
+    $uploaded = false;
     foreach($_FILES as $index => $file) {
         if(!is_array($file['name'])) {
-            if($file['error'] === UPLOAD_ERR_NO_FILE){
-                continue;
+            if($file['error'] !== UPLOAD_ERR_NO_FILE){
+                $uploaded = true;
             }
             $return[$index][] = $file;
             continue;
         }
         foreach($file['name'] as $idx => $name) {
             if($file['error'][$idx] === UPLOAD_ERR_NO_FILE){
-                continue;
+                $uploaded = true;
             }
             $return[$index][$idx] = [
                 'name' => $name,
@@ -493,7 +494,7 @@ function FILES詰め直し() :array{
             ];
         }
     }
-    return $return;
+    return $uploaded ? $return : [];
 }
 
 
