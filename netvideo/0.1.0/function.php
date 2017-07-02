@@ -498,7 +498,7 @@ function FILES詰め直し() :array{
 }
 
 
-function アップロード受信(string $dir, array $whitelist){
+function ファイル受信(string $dir, array $whitelist){
     $files = FILES詰め直し();
     
     if(!$files){
