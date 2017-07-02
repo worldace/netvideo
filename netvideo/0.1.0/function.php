@@ -467,11 +467,11 @@ function ファイル送信(string $url, array $querymap=null, array $request_he
 
 function FILES詰め直し() :array{
     //['form-name'=>[['name'=>,'type'=>,'tmp_name'=>,'error'=>,'size=>']]]
-    $return = [];
     if(!isset($_FILES)){
-        return $return;
+        return [];
     }
 
+    $return = [];
     $uploaded = false;
     foreach($_FILES as $index => $file) {
         if(!is_array($file['name'])) {
@@ -482,7 +482,7 @@ function FILES詰め直し() :array{
             continue;
         }
         foreach($file['name'] as $idx => $name) {
-            if($file['error'][$idx] === UPLOAD_ERR_NO_FILE){
+            if($file['error'][$idx] !== UPLOAD_ERR_NO_FILE){
                 $uploaded = true;
             }
             $return[$index][$idx] = [
