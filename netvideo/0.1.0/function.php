@@ -373,6 +373,7 @@ function メール送信($送信先, string $送信元="", string $送信者="",
 
 
 function GET送信(string $url, array $querymap=null, array $request_header=[]){
+    $_ENV['RESPONSE_HEADER'] = [];
     if($querymap){
         $url .= preg_match("/\?/", $url) ? "&" : "?";
         $url .= http_build_query($querymap, "", "&", PHP_QUERY_RFC3986);
@@ -395,6 +396,7 @@ function GET送信(string $url, array $querymap=null, array $request_header=[]){
 
 
 function POST送信(string $url, array $querymap=null, array $request_header=[]){
+    $_ENV['RESPONSE_HEADER'] = [];
     $content = http_build_query((array)$querymap, "", "&");
 
     $request_header = [
@@ -421,6 +423,7 @@ function POST送信(string $url, array $querymap=null, array $request_header=[])
 
 
 function ファイル送信(string $url, array $querymap=null, array $request_header=[]){
+    $_ENV['RESPONSE_HEADER'] = [];
     $区切り = "__" . sha1(uniqid()) . "__";
     foreach((array)$querymap as $name => $value){
         $name = str_replace(['"', "\r", "\n"], "", $name);

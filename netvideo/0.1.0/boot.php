@@ -6,7 +6,7 @@ new class{
     function __construct(){
         ini_set('session.cookie_httponly', 1);
 
-        //PATH_INFOの仕様＝action.id
+        //PATH_INFOの仕様 /action.id
         $_SERVER['PATH_INFO'] = $_SERVER['PATH_INFO'] ?? '/';
         preg_match("|^/?([^\.]*)\.?(.*)$|", $_SERVER['PATH_INFO'], $match);
         $_GET['action'] = $match[1];
