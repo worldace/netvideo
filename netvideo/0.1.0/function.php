@@ -589,7 +589,7 @@ function URL(array $param = null) :string{
         if($url[-1] !== '/'){
             $url .= '/';
         }
-        $url .= implode(設定['URL区切り'] ?? '/', $pathinfo);
+        $url .= implode(設定['PATH_INFO区切り文字'] ?? '/', $pathinfo);
     }
 
     if(isset($query)){
