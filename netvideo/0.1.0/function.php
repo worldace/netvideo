@@ -579,12 +579,17 @@ function URL(array $param = null) :string{
 
     foreach($param as $k => $v){
         if(is_numeric($k)){
-            $v = rawurlencode($v);
-            $url .= (preg_match("|/$|", $url))  ?  $v  :  "/$v";
+            $pathinfo[] = rawurlencode((string)$v);
         }
         else{
             $query[$k] = $v;
         }
+    }
+    if(isset($pathinfo)){
+        if($url[-1] !== '/'){
+            $url .= '/';
+        }
+        $url .= implode(設定['URL区切り'] ?? '/', $pathinfo);
     }
 
     if(isset($query)){
