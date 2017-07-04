@@ -540,8 +540,8 @@ function ファイル受信(string $dir, array $whitelist){
 
 
 function ホスト確認(string $host) :bool{
-    if(preg_match("|^https?://([^/]+)|i", $host, $m)){ //URLなら
-        $host = $m[1];
+    if(preg_match("|^https?://.|i", $host)){ //URLなら
+        $host = parse_url($host, PHP_URL_HOST);
     }
     else if(filter_var($host, FILTER_VALIDATE_EMAIL)){ //メールアドレスなら
         $host = array_pop(explode("@", $host));
