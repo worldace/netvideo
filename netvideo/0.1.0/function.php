@@ -2,26 +2,16 @@
 //======================================================
 // ■function.php http://musou.s38.xrea.com/php/
 //======================================================
-declare(strict_types=1);
 
 
-function route(array $route, $arg=1) :void{
-    $_ENV['route.return'] = $arg;
-
-    if(!function_exists('routed')){
-        function routed(){
-            return $_ENV['route.return'];
-        }
-    }
-
-    foreach($route as $_ENV['route.file']){
-        $func = function (){ return require_once $_ENV['route.file']; };
-        $_ENV['route.return'] = $func();
+function route(array $files, $route=1) :void{
+    foreach($files as $current_route_file){
+        $route = (function() use($route, $current_route_file){
+            return require_once $current_route_file;
+        })();
     }
     exit;
 }
-
-
 
 
 function テキスト表示(string $str) :void{
