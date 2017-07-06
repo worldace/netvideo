@@ -1157,18 +1157,23 @@ function XML取得(string $xml) :array{
 }
 
 
-function CSV読み込み(string $path, string $区切り = ",", string $from = "utf-8", string $囲み = '"', string $退避 = "\\") :Generator{
+function CSV読み込み(string $path, string $区切り = ",", string $from = "auto", string $囲み = '"', string $退避 = "\\") :Generator{
     if(!is_readable($path)){
         functionphpエラー("CSVファイル $path が開けません", "警告");
         return;
     }
+
+    $fp = fopen($path, "rb");
+    if($fp === false){
+        return;
+    }
+
     if(preg_match("/^auto$/i", $from)){
-        $test = fopen($path, "rb");
-        $from = mb_detect_encoding(fread($test, 1024), ["utf-8", "sjis-win", "eucjp-win", "ascii"]);
+        $from = mb_detect_encoding(fread($fp, 1024), ["utf-8", "sjis-win", "eucjp-win", "ascii"]);
         if(!$from){
             $from = "utf-8";
         }
-        fclose($test);
+        rewind($fp);
     }
 
     $is_win = strpos(PHP_OS, "WIN") === 0;
@@ -1187,11 +1192,6 @@ function CSV読み込み(string $path, string $区切り = ",", string $from = "
             $from = false;
         }
         $to = "utf-8";
-    }
-
-    $fp = fopen($path, "rb");
-    if($fp === false){
-        return;
     }
 
     $i = 0;
