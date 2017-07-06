@@ -1169,7 +1169,7 @@ function CSV読み込み(string $path, string $区切り = ",", string $from = "
     }
 
     if(preg_match("/^auto$/i", $from)){
-        $from = mb_detect_encoding(fread($fp, 1024), ["utf-8", "sjis-win", "eucjp-win", "ascii"]);
+        $from = mb_detect_encoding(fread($fp, 2048), ["utf-8", "sjis-win", "eucjp-win", "ascii", "ISO-2022-JP"]);
         if(!$from){
             $from = "utf-8";
         }
