@@ -1159,9 +1159,18 @@ function XML取得(string $xml) :array{
 
 function CSV読み込み(string $path, string $区切り = ",", string $from = "utf-8", string $囲み = '"', string $退避 = "\\") :Generator{
     if(!is_readable($path)){
-        functionphpエラー("CSVファイル $path は開けません", "警告");
+        functionphpエラー("CSVファイル $path が開けません", "警告");
         return;
     }
+    if(preg_match("/^auto$/i", $from)){
+        $test = fopen($path, "rb");
+        $from = mb_detect_encoding(fread($test, 1024), ["utf-8", "sjis-win", "eucjp-win", "ascii"]);
+        if(!$from){
+            $from = "utf-8";
+        }
+        fclose($test);
+    }
+
     $is_win = strpos(PHP_OS, "WIN") === 0;
     $locale = setlocale(LC_ALL, '0'); //現在のロケールを取得
 
@@ -1208,7 +1217,6 @@ function CSV読み込み(string $path, string $区切り = ",", string $from = "
         $i++;
     }
     fclose ($fp);
-
     setlocale(LC_ALL, $locale); //ロケールを戻す
 }
 
