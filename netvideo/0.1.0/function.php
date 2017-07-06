@@ -1157,7 +1157,7 @@ function XML取得(string $xml) :array{
 }
 
 
-function CSV取得(string $path, string $区切り = ",", string $from = "auto", string $囲み = '"', string $退避 = "\\") :Generator{
+function CSV取得(string $path, string $区切り = ",", string $from = "auto", string $囲み = '"', string $退避 = '"') :Generator{
     if(!is_readable($path)){
         functionphpエラー("CSVファイル $path が開けません", "警告");
         return;
@@ -1200,16 +1200,17 @@ function CSV取得_行解析($str, $区切り, $囲み, $退避){ //utf-8 only
     $str = preg_split("//u", $str, null, PREG_SPLIT_NO_EMPTY);
     $return = [];
     $stack  = [];
-    $incell = false;
+    $in_enc = false;
     $count  = count($str);
 
     if(!$count){
         return $return;
     }
+    
 
     for($i = 0;  $i < $count;  $i++){
         if($str[$i] === $区切り){
-            if($incell === false){
+            if($in_enc === false){
                 $return[] = implode("", $stack);
                 $stack = [];
                 continue;
@@ -1220,17 +1221,36 @@ function CSV取得_行解析($str, $区切り, $囲み, $退避){ //utf-8 only
             }
         }
         elseif($str[$i] === $囲み){
-            if($str[$i-1] === $退避){
-                array_pop($stack);
-                $stack[] = $str[$i];
-                continue;
-            }
-            if($incell === true){
-                $incell = false;
-                continue;
+            if($in_enc === true){
+                if($囲み === $退避){
+                   if($str[$i+1] === $区切り and $str[$i+1] !== $退避){
+                        $in_enc = false;
+                        continue;
+                    }
+                    else{
+                        if($str[$i-1] === $退避){
+                            $stack[] = $str[$i];
+                            continue;
+                        }
+                        else{
+                            continue;
+                        }
+                    }
+                }
+                else{
+                    if($str[$i-1] === $退避){
+                        array_pop($stack);
+                        $stack[] = $str[$i];
+                        continue;
+                    }
+                    else{
+                        $in_enc = false;
+                        continue;
+                    }
+                }
             }
             else{
-                $incell = true;
+                $in_enc = true;
                 continue;
             }
         }
