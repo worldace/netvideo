@@ -1169,55 +1169,72 @@ function CSV取得(string $path, string $区切り = ",", string $from = "auto",
     }
 
     if(preg_match("/^auto$/i", $from)){
-        $from = mb_detect_encoding(fgets($fp).fgets($fp).fgets($fp).fgets($fp), ["utf-8", "sjis-win", "eucjp-win", "ascii", "iso-2022-jp"]);
+        $from = mb_detect_encoding(fread($fp, 2048), ["utf-8", "sjis-win", "eucjp-win", "ascii", "ISO-2022-JP"]);
         if(!$from){
             $from = "utf-8";
         }
         rewind($fp);
     }
-
-    $is_win = strpos(PHP_OS, "WIN") === 0;
-    $locale = setlocale(LC_ALL, '0'); //現在のロケールを取得
-
-    if($is_win){
-        setlocale(LC_ALL, "Japanese_Japan.932");
-        if(preg_match("/^(sjis|cp932|shift)/i", $from)){
-            $from = false;
-        }
-        $to = "sjis-win";
-    }
-    else{
-        setlocale(LC_ALL, 'ja_JP.UTF-8');
-        if(preg_match("/^utf-?8$/i", $from)){
-            $from = false;
-        }
-        $to = "utf-8";
+    if(preg_match("/^utf-?8/i", $from)){
+        $from = false;
     }
 
     $i = 0;
     while(($line = fgets($fp)) !== false){
         if($from){
-            $line = mb_convert_encoding($line, $to, $from);
+            $line = mb_convert_encoding($line, "utf-8", $from);
         }
-        $mem = fopen('php://memory', 'w+b');
-        fwrite($mem, $line);
-        rewind($mem);
-        $line = fgetcsv($mem, 0, $区切り, $囲み, $退避);
-        fclose($mem);
-        if($line === false){
-            break;
-        }
-        if($line === [null]){
+        $line = CSV取得_行解析($line, $区切り, $囲み, $退避);
+        if(!$line){
             continue;
-        }
-        if($is_win){
-            mb_convert_variables("utf-8", "sjis-win", $line);
         }
         yield $i => $line;
         $i++;
     }
     fclose($fp);
-    setlocale(LC_ALL, $locale); //ロケールを戻す
+}
+
+
+function CSV取得_行解析($str, $区切り, $囲み, $退避){ //utf-8 only
+    $str = rtrim($str);
+    $str = preg_split("//u", $str, null, PREG_SPLIT_NO_EMPTY);
+    $return = [];
+    $stack  = [];
+    $incell = false;
+    $count  = count($str);
+
+    for($i = 0; $i < $count;  $i++){
+        if($str[$i] === $区切り){
+            if($incell === false){
+                $return[] = implode("", $stack);
+                $stack = [];
+                continue;
+            }
+            else{
+                $stack[] = $str[$i];
+                continue;
+            }
+        }
+        elseif($str[$i] === $囲み){
+            if($str[$i-1] === $退避){
+                array_pop($stack);
+                $stack[] = $str[$i];
+                continue;
+            }
+            if($incell === true){
+                $incell = false;
+                continue;
+            }
+            else{
+                $incell = true;
+                continue;
+            }
+        }
+        else{
+            $stack[] = $str[$i];
+        }
+    }
+    return $return;
 }
 
 
