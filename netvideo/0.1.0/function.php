@@ -540,7 +540,7 @@ function ファイル受信(string $dir, array $whitelist){
 
 
 function ホスト確認(string $host) :bool{
-    if(preg_match("|^https?://.|i", $host)){ //URLなら
+    if(preg_match("|^https?://|i", $host)){ //URLなら
         $host = parse_url($host, PHP_URL_HOST);
     }
     else if(filter_var($host, FILTER_VALIDATE_EMAIL)){ //メールアドレスなら
@@ -1154,6 +1154,61 @@ function XML取得(string $xml) :array{
     $xml = preg_replace("/&(?!([a-zA-Z0-9]{2,8};)|(#[0-9]{2,5};)|(#x[a-fA-F0-9]{2,4};))/", "&amp;" ,$xml);
     $SimpleXML = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOBLANKS | LIBXML_NOCDATA | LIBXML_NONET | LIBXML_COMPACT | LIBXML_PARSEHUGE);
     return json_decode(json_encode([$SimpleXML->getName()=>$SimpleXML]), true);
+}
+
+
+function CSV読み込み(string $path, string $区切り = ",", string $from = "utf-8", string $囲み = '"', string $退避 = "\\") :Generator{
+    if(!is_readable($path)){
+        return;
+    }
+    $is_win = strpos(PHP_OS, "WIN") === 0;
+    $locale = setlocale(LC_ALL, '0'); //現在のロケールを取得
+
+    if($is_win){
+        setlocale(LC_ALL, "Japanese_Japan.932");
+        if(preg_match("/^(sjis|cp932|shift)/i", $from)){
+            $from = false;
+        }
+        $to = "sjis-win";
+    }
+    else{
+        setlocale(LC_ALL, 'ja_JP.UTF-8');
+        if(preg_match("/^utf-?8$/i", $from)){
+            $from = false;
+        }
+        $to = "utf-8";
+    }
+
+    $fp = fopen($path, "rb");
+    if($fp === false){
+        return;
+    }
+
+    $i = 0;
+    while(($line = fgets($fp)) !== false){
+        if($from){
+            $line = mb_convert_encoding($line, $to, $from);
+        }
+        $mem = fopen('php://memory', 'w+b');
+        fwrite($mem, $line);
+        rewind($mem);
+        $line = fgetcsv($mem, 0, $区切り, $囲み, $退避);
+        fclose($mem);
+        if($line === false){
+            break;
+        }
+        if($line === [null]){
+            continue;
+        }
+        if($is_win){
+            mb_convert_variables("utf-8", "sjis-win", $line);
+        }
+        yield $i => $line;
+        $i++;
+    }
+    fclose ($fp);
+
+    setlocale(LC_ALL, $locale); //ロケールを戻す
 }
 
 
