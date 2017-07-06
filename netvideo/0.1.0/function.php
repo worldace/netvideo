@@ -1203,7 +1203,11 @@ function CSV取得_行解析($str, $区切り, $囲み, $退避){ //utf-8 only
     $incell = false;
     $count  = count($str);
 
-    for($i = 0; $i < $count;  $i++){
+    if(!$count){
+        return $return;
+    }
+
+    for($i = 0;  $i < $count;  $i++){
         if($str[$i] === $区切り){
             if($incell === false){
                 $return[] = implode("", $stack);
@@ -1234,6 +1238,7 @@ function CSV取得_行解析($str, $区切り, $囲み, $退避){ //utf-8 only
             $stack[] = $str[$i];
         }
     }
+    $return[] = implode("", $stack);
     return $return;
 }
 
