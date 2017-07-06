@@ -1185,9 +1185,6 @@ function CSV取得(string $path, string $区切り = ",", string $from = "auto",
             $line = mb_convert_encoding($line, "utf-8", $from);
         }
         $line = CSV取得_行解析($line, $区切り, $囲み, $退避);
-        if(!$line){
-            continue;
-        }
         yield $i => $line;
         $i++;
     }
@@ -1201,6 +1198,7 @@ function CSV取得_行解析($str, $区切り, $囲み, $退避){ //utf-8 only
     $return = [];
     $stack  = [];
     $in_enc = false;
+    $ct_enc = 0;
     $count  = count($str);
 
     if(!$count){
@@ -1223,18 +1221,17 @@ function CSV取得_行解析($str, $区切り, $囲み, $退避){ //utf-8 only
         elseif($str[$i] === $囲み){
             if($in_enc === true){
                 if($囲み === $退避){
-                   if($str[$i+1] === $区切り and $str[$i+1] !== $退避){
+                    $ct_enc++;
+                    if($ct_enc % 2 === 1 and $str[$i+1] === $区切り){ //脱出条件
                         $in_enc = false;
+                        $ct_enc = 0;
                         continue;
                     }
                     else{
-                        if($str[$i-1] === $退避){
+                        if($ct_enc % 2 === 0){
                             $stack[] = $str[$i];
-                            continue;
                         }
-                        else{
-                            continue;
-                        }
+                        continue;
                     }
                 }
                 else{
@@ -1251,6 +1248,7 @@ function CSV取得_行解析($str, $区切り, $囲み, $退避){ //utf-8 only
             }
             else{
                 $in_enc = true;
+                $ct_enc = 0;
                 continue;
             }
         }
