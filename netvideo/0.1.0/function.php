@@ -1157,7 +1157,7 @@ function XML取得(string $xml) :array{
 }
 
 
-function CSV読み込み(string $path, string $区切り = ",", string $from = "auto", string $囲み = '"', string $退避 = "\\") :Generator{
+function CSV取得(string $path, string $区切り = ",", string $from = "auto", string $囲み = '"', string $退避 = "\\") :Generator{
     if(!is_readable($path)){
         functionphpエラー("CSVファイル $path が開けません", "警告");
         return;
@@ -1169,7 +1169,7 @@ function CSV読み込み(string $path, string $区切り = ",", string $from = "
     }
 
     if(preg_match("/^auto$/i", $from)){
-        $from = mb_detect_encoding(fgets($fp).fgets($fp).fgets($fp), ["utf-8", "sjis-win", "eucjp-win", "ascii", "iso-2022-jp"]);
+        $from = mb_detect_encoding(fgets($fp).fgets($fp).fgets($fp).fgets($fp), ["utf-8", "sjis-win", "eucjp-win", "ascii", "iso-2022-jp"]);
         if(!$from){
             $from = "utf-8";
         }
@@ -1216,7 +1216,7 @@ function CSV読み込み(string $path, string $区切り = ",", string $from = "
         yield $i => $line;
         $i++;
     }
-    fclose ($fp);
+    fclose($fp);
     setlocale(LC_ALL, $locale); //ロケールを戻す
 }
 
