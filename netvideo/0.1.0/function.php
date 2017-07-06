@@ -1159,6 +1159,7 @@ function XML取得(string $xml) :array{
 
 function CSV読み込み(string $path, string $区切り = ",", string $from = "utf-8", string $囲み = '"', string $退避 = "\\") :Generator{
     if(!is_readable($path)){
+        functionphpエラー("CSVファイル $path は開けません", "警告");
         return;
     }
     $is_win = strpos(PHP_OS, "WIN") === 0;
