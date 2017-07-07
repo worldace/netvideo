@@ -1158,6 +1158,9 @@ function XML取得(string $xml) :array{
 
 
 function CSV取得(string $path, $from = null, string $区切り = null, string $囲い = '"') :Generator{
+    $ini = ini_get("auto_detect_line_endings");
+    ini_set("auto_detect_line_endings", true);
+
     $fp = fopen($path, "rb");
     if($fp === false){
         functionphpエラー("CSVファイル $path が開けません", "警告");
@@ -1165,6 +1168,7 @@ function CSV取得(string $path, $from = null, string $区切り = null, string 
     }
     $sample = fread($fp, 4096);
     rewind($fp);
+
 
     //文字コード検知
     if($from === true){
@@ -1202,6 +1206,7 @@ function CSV取得(string $path, $from = null, string $区切り = null, string 
         $i++;
     }
     fclose($fp);
+    ini_set("auto_detect_line_endings", $ini);
 }
 
 
