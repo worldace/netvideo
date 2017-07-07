@@ -1219,8 +1219,9 @@ function CSV行取得(&$handle, $d = ',', $e = '"'){
 
     preg_match_all(sprintf('/(%s[^%s]*(?:%s%s[^%s]*)*%s|[^%s]*)%s/', $e,$e,$e,$e,$e,$e,$d,$d), preg_replace('/(?:\\r\\n|[\\r\\n])?$/', $d, rtrim($line)), $match);
     $return = isset($match[1]) ? $match[1] : [];
+    $count  = count($return);
 
-    for($i = 0;  $i < count($return);  $i++){
+    for($i = 0;  $i < $count;  $i++){
         $return[$i] = preg_replace(sprintf('/^%s(.*)%s$/s', $e,$e), '$1', $return[$i]);
         $return[$i] = str_replace("$e$e", $e, $return[$i]);
     }
