@@ -1157,7 +1157,7 @@ function XML取得(string $xml) :array{
 }
 
 
-function CSV取得(string $path, string $from = null, string $区切り = null, string $退避 = '"', string $囲み = '"') :Generator{
+function CSV取得(string $path, string $from = null, string $区切り = null, string $退避 = '"', string $囲い = '"') :Generator{
     if(!is_readable($path)){
         functionphpエラー("CSVファイル $path が開けません", "警告");
         return;
@@ -1190,12 +1190,12 @@ function CSV取得(string $path, string $from = null, string $区切り = null, 
     }
 
     foreach($csv as $k => $v){
-        yield $k => CSV取得_行解析($v, $区切り, $退避, $囲み);
+        yield $k => CSV取得_行解析($v, $区切り, $退避, $囲い);
     }
 }
 
 
-function CSV取得_行解析($str, $区切り, $退避, $囲み){ //utf-8 only
+function CSV取得_行解析($str, $区切り, $退避, $囲い){ //utf-8 only
     $str = rtrim($str);
     $str = preg_split("//u", $str, null, PREG_SPLIT_NO_EMPTY);
     $return = [];
@@ -1220,9 +1220,9 @@ function CSV取得_行解析($str, $区切り, $退避, $囲み){ //utf-8 only
                 continue;
             }
         }
-        elseif($str[$i] === $囲み){
+        elseif($str[$i] === $囲い){
             if($in_enc === true){
-                if($囲み === $退避){
+                if($囲い === $退避){
                     $ct_enc++;
                     if($ct_enc % 2 === 1 and $str[$i+1] === $区切り){ //脱出条件
                         $in_enc = false;
