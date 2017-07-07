@@ -1199,6 +1199,9 @@ function CSV取得(string $path, $from = null, string $区切り = null, string 
         if($csv === false){
             break;
         }
+        if($csv === ['']){
+            $csv = [];
+        }
         if($from){
             mb_convert_variables("utf-8", $from, $csv);
         }
@@ -1230,9 +1233,6 @@ function CSV行取得(&$handle, $d = ',', $e = '"'){
         $return[$i] = str_replace("$e$e", $e, $return[$i]);
     }
 
-    if($return === ['']){
-        $return = [];
-    }
     return empty($line) ? false : $return;
 }
 
