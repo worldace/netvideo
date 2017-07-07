@@ -1166,18 +1166,6 @@ function CSV取得(string $path, string $from = null, string $区切り = null, 
     $sample = fread($fp, 4096);
     rewind($fp);
 
-    //区切り検知
-    if(!$区切り){
-        $sample2 = substr($sample, 0, 256);
-        $count_c = preg_match_all("/,/", $sample2);
-        $count_t = preg_match_all("/\t/", $sample2);
-        if(!$count_c and !$count_t){
-            functionphpエラー("CSVファイルの区切り文字を検知できませんでした", "警告");
-            return;
-        }
-        $区切り = ($count_c > $count_t)  ?  ","  :  "\t";
-    }
-
     //改行検知
     preg_match("/(\r\n|\n|\r)/", $sample, $match);
     if(!isset($match[1])){
@@ -1195,6 +1183,18 @@ function CSV取得(string $path, string $from = null, string $区切り = null, 
     }
     if(preg_match("/^utf-?8/i", $from)){
         $from = false;
+    }
+
+    //区切り検知
+    if(!$区切り){
+        $sample  = substr($sample, 0, 256);
+        $count_c = preg_match_all("/,/" , $sample);
+        $count_t = preg_match_all("/\t/", $sample);
+        if(!$count_c and !$count_t){
+            functionphpエラー("CSVファイルの区切り文字を検知できませんでした", "警告");
+            return;
+        }
+        $区切り = ($count_c > $count_t)  ?  ","  :  "\t";
     }
 
     $i = 0;
