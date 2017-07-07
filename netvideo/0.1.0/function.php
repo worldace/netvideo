@@ -1235,13 +1235,15 @@ function CSV取得_行解析($str, $区切り, $囲み, $退避){ //utf-8 only
                     }
                 }
                 else{
-                    if($str[$i-1] === $退避){
-                        array_pop($stack);
-                        $stack[] = $str[$i];
+                    if($str[$i-1] !== $退避 and $str[$i+1] === $区切り){ //脱出条件
+                        $in_enc = false;
                         continue;
                     }
                     else{
-                        $in_enc = false;
+                        if($str[$i-1] === $退避){
+                            array_pop($stack);
+                            $stack[] = $str[$i];
+                        }
                         continue;
                     }
                 }
