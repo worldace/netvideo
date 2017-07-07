@@ -1157,7 +1157,7 @@ function XML取得(string $xml) :array{
 }
 
 
-function CSV取得(string $path, string $区切り = ",", string $from = "auto", string $退避 = '"', string $囲み = '"') :Generator{
+function CSV取得(string $path, string $from = null, string $区切り = null, string $退避 = '"', string $囲み = '"') :Generator{
     if(!is_readable($path)){
         functionphpエラー("CSVファイル $path が開けません", "警告");
         return;
@@ -1173,7 +1173,7 @@ function CSV取得(string $path, string $区切り = ",", string $from = "auto",
     $改行 = $match[1] ?? "\r\n";
 
     //文字コード検知
-    if(preg_match("/^auto$/i", $from)){
+    if(!$from){
         $from = mb_detect_encoding($csv, ["utf-8", "sjis-win", "eucjp-win", "ascii", "ISO-2022-JP"]);
         if(!$from){
             $from = "auto";
@@ -1183,6 +1183,11 @@ function CSV取得(string $path, string $区切り = ",", string $from = "auto",
 
     $csv = explode($改行, $csv);
     array_pop($csv);
+
+    //区切り検知
+    if(!$区切り){
+        $区切り = preg_match("/\t/", $csv[0])  ?  "\t"  :  ",";
+    }
 
     foreach($csv as $k => $v){
         yield $k => CSV取得_行解析($v, $区切り, $退避, $囲み);
