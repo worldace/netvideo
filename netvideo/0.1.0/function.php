@@ -1157,7 +1157,7 @@ function XML取得(string $xml) :array{
 }
 
 
-function CSV取得(string $path, string $from = null, string $区切り = null, string $囲い = '"', string $退避 = '"') :Generator{
+function CSV取得(string $path, $from = null, string $区切り = null, string $囲い = '"') :Generator{
     $fp = fopen($path, "rb");
     if($fp === false){
         functionphpエラー("CSVファイル $path が開けません", "警告");
@@ -1166,23 +1166,15 @@ function CSV取得(string $path, string $from = null, string $区切り = null, 
     $sample = fread($fp, 4096);
     rewind($fp);
 
-    //改行検知
-    preg_match("/(\r\n|\n|\r)/", $sample, $match);
-    if(!isset($match[1])){
-        functionphpエラー("CSVファイルの改行を検知できませんでした", "警告");
-        return;
-    }
-    $改行 = $match[1];
-
     //文字コード検知
-    if(!$from){
+    if($from === true){
         $from = mb_detect_encoding($sample, ["utf-8", "sjis-win", "eucjp-win", "ascii", "ISO-2022-JP"]);
         if(!$from){
             $from = "utf-8";
         }
     }
     if(preg_match("/^utf-?8/i", $from)){
-        $from = false;
+        $from = null;
     }
 
     //区切り検知
@@ -1199,89 +1191,40 @@ function CSV取得(string $path, string $from = null, string $区切り = null, 
 
     $i = 0;
     while(true){
-        $line = stream_get_line($fp, 0, $改行);
-        if($line === false){
+        $csv = CSV行取得($fp, $区切り, $囲い);
+        if($csv === false){
             break;
         }
         if($from){
-            $line = mb_convert_encoding($line, "utf-8", $from);
+            mb_convert_variables("utf-8", $from, $csv);
         }
-        yield $i => CSV行解析($line, $区切り, $囲い, $退避);
+        yield $i => $csv;
         $i++;
     }
     fclose($fp);
 }
 
 
-function CSV行解析($str, $区切り, $囲い, $退避){ //utf-8 only, 文書化していない
-    $str = rtrim($str);
-    $str = preg_split("//u", $str, null, PREG_SPLIT_NO_EMPTY);
-    $return = [];
-    $stack  = [];
-    $in_enc = false;
-    $ct_enc = 0;
-    $count  = count($str);
+function CSV行取得(&$handle, $d = ',', $e = '"'){
+    $d = preg_quote($d);
+    $e = preg_quote($e);
+    $line = "";
 
-    if(!$count){
-        return $return;
+    while(is_resource($handle) and !feof($handle)){
+        $line .= fgets($handle);
+        if(preg_match_all("/$e/", $line) % 2 === 0){
+            break;
+        }
     }
 
-    for($i = 0;  $i < $count;  $i++){
-        if($str[$i] === $区切り){
-            if($in_enc === false){
-                $return[] = implode("", $stack);
-                $stack = [];
-                continue;
-            }
-            else{
-                $stack[] = $str[$i];
-                continue;
-            }
-        }
-        elseif($str[$i] === $囲い){
-            if($in_enc === true){
-                if($囲い === $退避){
-                    $ct_enc++;
-                    if($ct_enc % 2 === 1 and $str[$i+1] === $区切り){ //脱出条件
-                        $in_enc = false;
-                        $ct_enc = 0;
-                        continue;
-                    }
-                    else{
-                        if($ct_enc % 2 === 0){
-                            $stack[] = $str[$i];
-                            continue;
-                        }
-                        continue; //文法ミス
-                    }
-                }
-                else{
-                    if($str[$i-1] !== $退避 and $str[$i+1] === $区切り){ //脱出条件
-                        $in_enc = false;
-                        continue;
-                    }
-                    else{
-                        if($str[$i-1] === $退避){
-                            array_pop($stack);
-                            $stack[] = $str[$i];
-                            continue;
-                        }
-                        continue; //文法ミス
-                    }
-                }
-            }
-            else{
-                $in_enc = true;
-                $ct_enc = 0;
-                continue;
-            }
-        }
-        else{
-            $stack[] = $str[$i];
-        }
+    preg_match_all(sprintf('/(%s[^%s]*(?:%s%s[^%s]*)*%s|[^%s]*)%s/', $e,$e,$e,$e,$e,$e,$d,$d), preg_replace('/(?:\\r\\n|[\\r\\n])?$/', $d, rtrim($line)), $match);
+    $return = isset($match[1]) ? $match[1] : [];
+
+    for($i = 0;  $i < count($return);  $i++){
+        $return[$i] = preg_replace(sprintf('/^%s(.*)%s$/s', $e,$e), '$1', $return[$i]);
+        $return[$i] = str_replace("$e$e", $e, $return[$i]);
     }
-    $return[] = implode("", $stack);
-    return $return;
+    return empty($line) ? false : $return;
 }
 
 
