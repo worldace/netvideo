@@ -1157,7 +1157,7 @@ function XML取得(string $xml) :array{
 }
 
 
-function CSV取得(string $path, string $区切り = ",", string $from = "auto", string $囲み = '"', string $退避 = '"') :Generator{
+function CSV取得(string $path, string $区切り = ",", string $from = "auto", string $退避 = '"', string $囲み = '"') :Generator{
     if(!is_readable($path)){
         functionphpエラー("CSVファイル $path が開けません", "警告");
         return;
@@ -1184,7 +1184,7 @@ function CSV取得(string $path, string $区切り = ",", string $from = "auto",
         if($from){
             $line = mb_convert_encoding($line, "utf-8", $from);
         }
-        $line = CSV取得_行解析($line, $区切り, $囲み, $退避);
+        $line = CSV取得_行解析($line, $区切り, $退避, $囲み);
         yield $i => $line;
         $i++;
     }
@@ -1192,7 +1192,7 @@ function CSV取得(string $path, string $区切り = ",", string $from = "auto",
 }
 
 
-function CSV取得_行解析($str, $区切り, $囲み, $退避){ //utf-8 only
+function CSV取得_行解析($str, $区切り, $退避, $囲み){ //utf-8 only
     $str = rtrim($str);
     $str = preg_split("//u", $str, null, PREG_SPLIT_NO_EMPTY);
     $return = [];
@@ -1230,8 +1230,9 @@ function CSV取得_行解析($str, $区切り, $囲み, $退避){ //utf-8 only
                     else{
                         if($ct_enc % 2 === 0){
                             $stack[] = $str[$i];
+                            continue;
                         }
-                        continue;
+                        continue; //文法ミス
                     }
                 }
                 else{
@@ -1243,8 +1244,9 @@ function CSV取得_行解析($str, $区切り, $囲み, $退避){ //utf-8 only
                         if($str[$i-1] === $退避){
                             array_pop($stack);
                             $stack[] = $str[$i];
+                            continue;
                         }
-                        continue;
+                        continue; //文法ミス
                     }
                 }
             }
