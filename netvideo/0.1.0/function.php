@@ -1204,10 +1204,6 @@ function CSV取得(string $path, string $from = null, string $区切り = null, 
             $line = mb_convert_encoding($line, "utf-8", $from);
         }
         yield $i => CSV行解析($line, $区切り, $退避, $囲い);
-        
-        if(feof($fp) or !$fp){
-            break;
-        }
         $i++;
     }
     fclose($fp);
