@@ -1179,10 +1179,14 @@ function CSV取得(string $path, string $from = null, string $区切り = null, 
             $from = "auto";
         }
     }
-    $csv = mb_convert_encoding($csv, "utf-8", $from);
+    if(!preg_match("/^utf-?8/i", $from)){
+        $csv = mb_convert_encoding($csv, "utf-8", $from);
+    }
 
     $csv = explode($改行, $csv);
-    array_pop($csv);
+    if(!$csv[count($csv)-1]){
+        array_pop($csv);
+    }
 
     //区切り検知
     if(!$区切り){
