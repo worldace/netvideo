@@ -1162,6 +1162,9 @@ function CSV取得(string $path, $from = null, string $区切り = null, string 
     ini_set("auto_detect_line_endings", true);
 
     $fp = fopen($path, "rb");
+
+    ini_set("auto_detect_line_endings", $ini);
+
     if($fp === false){
         functionphpエラー("CSVファイル $path が開けません", "警告");
         return;
@@ -1209,7 +1212,6 @@ function CSV取得(string $path, $from = null, string $区切り = null, string 
         $i++;
     }
     fclose($fp);
-    ini_set("auto_detect_line_endings", $ini);
 }
 
 
