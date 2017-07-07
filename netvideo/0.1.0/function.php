@@ -1194,12 +1194,12 @@ function CSV取得(string $path, string $from = null, string $区切り = null, 
     }
 
     foreach($csv as $k => $v){
-        yield $k => CSV取得_行解析($v, $区切り, $退避, $囲い);
+        yield $k => CSV行解析($v, $区切り, $退避, $囲い);
     }
 }
 
 
-function CSV取得_行解析($str, $区切り, $退避, $囲い){ //utf-8 only
+function CSV行解析($str, $区切り, $退避, $囲い){ //utf-8 only, 文書化していない
     $str = rtrim($str);
     $str = preg_split("//u", $str, null, PREG_SPLIT_NO_EMPTY);
     $return = [];
