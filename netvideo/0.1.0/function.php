@@ -1157,7 +1157,7 @@ function XML取得(string $xml) :array{
 }
 
 
-function CSV取得(string $path, string $from = null, string $区切り = null, string $退避 = '"', string $囲い = '"') :Generator{
+function CSV取得(string $path, string $from = null, string $区切り = null, string $囲い = '"', string $退避 = '"') :Generator{
     if(!is_readable($path)){
         functionphpエラー("CSVファイル $path が開けません", "警告");
         return;
@@ -1203,14 +1203,14 @@ function CSV取得(string $path, string $from = null, string $区切り = null, 
         if($from){
             $line = mb_convert_encoding($line, "utf-8", $from);
         }
-        yield $i => CSV行解析($line, $区切り, $退避, $囲い);
+        yield $i => CSV行解析($line, $区切り, $囲い, $退避);
         $i++;
     }
     fclose($fp);
 }
 
 
-function CSV行解析($str, $区切り, $退避, $囲い){ //utf-8 only, 文書化していない
+function CSV行解析($str, $区切り, $囲い, $退避){ //utf-8 only, 文書化していない
     $str = rtrim($str);
     $str = preg_split("//u", $str, null, PREG_SPLIT_NO_EMPTY);
     $return = [];
