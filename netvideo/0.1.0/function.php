@@ -1167,6 +1167,7 @@ function CSV取得(string $path, string $from = null, string $区切り = null, 
     if($csv === false){
         return;
     }
+    $csv = rtrim($csv);
 
     //改行検知
     preg_match("/(\r\n|\n|\r)/", $csv, $match);
@@ -1184,14 +1185,17 @@ function CSV取得(string $path, string $from = null, string $区切り = null, 
     }
 
     $csv = explode($改行, $csv);
-    if(!$csv[count($csv)-1]){
-        array_pop($csv);
-    }
 
     //区切り検知
     if(!$区切り){
         $区切り = preg_match("/\t/", $csv[0])  ?  "\t"  :  ",";
     }
+
+    /*
+    while($fp and !feof($fp)){ 
+        yield stream_get_line($fp, 0, $改行);
+    }
+    */
 
     foreach($csv as $k => $v){
         yield $k => CSV行解析($v, $区切り, $退避, $囲い);
