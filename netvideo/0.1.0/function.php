@@ -1158,13 +1158,9 @@ function XML取得(string $xml) :array{
 
 
 function CSV取得(string $path, string $from = null, string $区切り = null, string $囲い = '"', string $退避 = '"') :Generator{
-    if(!is_readable($path)){
-        functionphpエラー("CSVファイル $path が開けません", "警告");
-        return;
-    }
-
     $fp = fopen($path, "rb");
     if($fp === false){
+        functionphpエラー("CSVファイル $path が開けません", "警告");
         return;
     }
     $sample = fread($fp, 4096);
