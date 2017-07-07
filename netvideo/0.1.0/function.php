@@ -1163,32 +1163,30 @@ function CSV取得(string $path, string $区切り = ",", string $from = "auto",
         return;
     }
 
-    $fp = fopen($path, "rb");
-    if($fp === false){
+    $csv = file_get_contents($path);
+    if($csv === false){
         return;
     }
 
-    if(preg_match("/^auto$/i", $from)){
-        $from = mb_detect_encoding(fread($fp, 2048), ["utf-8", "sjis-win", "eucjp-win", "ascii", "ISO-2022-JP"]);
-        if(!$from){
-            $from = "utf-8";
-        }
-        rewind($fp);
-    }
-    if(preg_match("/^utf-?8/i", $from)){
-        $from = false;
-    }
+    //改行検知
+    preg_match("/(\r\n|\n|\r)/", $csv, $match);
+    $改行 = $match[1] ?? "\r\n";
 
-    $i = 0;
-    while(($line = fgets($fp)) !== false){
-        if($from){
-            $line = mb_convert_encoding($line, "utf-8", $from);
+    //文字コード検知
+    if(preg_match("/^auto$/i", $from)){
+        $from = mb_detect_encoding($csv, ["utf-8", "sjis-win", "eucjp-win", "ascii", "ISO-2022-JP"]);
+        if(!$from){
+            $from = "auto";
         }
-        $line = CSV取得_行解析($line, $区切り, $退避, $囲み);
-        yield $i => $line;
-        $i++;
     }
-    fclose($fp);
+    $csv = mb_convert_encoding($csv, "utf-8", $from);
+
+    $csv = explode($改行, $csv);
+    array_pop($csv);
+
+    foreach($csv as $k => $v){
+        yield $k => CSV取得_行解析($v, $区切り, $退避, $囲み);
+    }
 }
 
 
@@ -1204,7 +1202,6 @@ function CSV取得_行解析($str, $区切り, $退避, $囲み){ //utf-8 only
     if(!$count){
         return $return;
     }
-    
 
     for($i = 0;  $i < $count;  $i++){
         if($str[$i] === $区切り){
