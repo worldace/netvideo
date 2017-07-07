@@ -1163,43 +1163,54 @@ function CSV取得(string $path, string $from = null, string $区切り = null, 
         return;
     }
 
-    $csv = file_get_contents($path);
-    if($csv === false){
+    $fp = fopen($path, "rb");
+    if($fp === false){
         return;
     }
-    $csv = rtrim($csv);
-
-    //改行検知
-    preg_match("/(\r\n|\n|\r)/", $csv, $match);
-    $改行 = $match[1] ?? "\r\n";
-
-    //文字コード検知
-    if(!$from){
-        $from = mb_detect_encoding($csv, ["utf-8", "sjis-win", "eucjp-win", "ascii", "ISO-2022-JP"]);
-        if(!$from){
-            $from = "auto";
-        }
-    }
-    if(!preg_match("/^utf-?8/i", $from)){
-        $csv = mb_convert_encoding($csv, "utf-8", $from);
-    }
-
-    $csv = explode($改行, $csv);
+    $sample = fread($fp, 4096);
+    rewind($fp);
 
     //区切り検知
     if(!$区切り){
-        $区切り = preg_match("/\t/", $csv[0])  ?  "\t"  :  ",";
+        $区切り = preg_match("/\t/", substr($sample, 0, 100))  ?  "\t"  :  ",";
     }
 
-    /*
-    while($fp and !feof($fp)){ 
-        yield stream_get_line($fp, 0, $改行);
+    //改行検知
+    preg_match("/(\r\n|\n|\r)/", $sample, $match);
+    if(!isset($match[1])){
+        functionphpエラー("CSVファイルの改行を検知できませんでした", "警告");
+        return;
     }
-    */
+    $改行 = $match[1];
 
-    foreach($csv as $k => $v){
-        yield $k => CSV行解析($v, $区切り, $退避, $囲い);
+    //文字コード検知
+    if(!$from){
+        $from = mb_detect_encoding($sample, ["utf-8", "sjis-win", "eucjp-win", "ascii", "ISO-2022-JP"]);
+        if(!$from){
+            $from = "utf-8";
+        }
     }
+    if(preg_match("/^utf-?8/i", $from)){
+        $from = false;
+    }
+
+    $i = 0;
+    while(true){
+        $line = stream_get_line($fp, 0, $改行);
+        if($line === false){
+            break;
+        }
+        if($from){
+            $line = mb_convert_encoding($line, "utf-8", $from);
+        }
+        yield $i => CSV行解析($line, $区切り, $退避, $囲い);
+        
+        if(feof($fp) or !$fp){
+            break;
+        }
+        $i++;
+    }
+    fclose($fp);
 }
 
 
