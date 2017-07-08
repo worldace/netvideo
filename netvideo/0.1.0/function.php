@@ -1197,11 +1197,7 @@ function CSV取得(string $path, $from = null, string $区切り = null, string 
     }
 
     $i = 0;
-    while(true){
-        $csv = CSV行取得($fp, $区切り, $囲い);
-        if($csv === false){
-            break;
-        }
+    while(($csv = CSV行取得($fp, $区切り, $囲い)) !== false){
         if($csv === ['']){
             $csv = [];
         }
