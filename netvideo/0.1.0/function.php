@@ -1235,7 +1235,7 @@ function CSV行取得(&$handle, $d = ',', $e = '"'){
 }
 
 
-function CSV作成($array, bool $常に囲む = null, string $d = ',', string $e = '"') :string{
+function CSV作成($array, $改行変換 = "\n", $常に囲む = null, string $d = ',', string $e = '"') :string{
     $return = "";
     if(!is_iterable($array) and !is_object($array)){
         return $return;
@@ -1248,6 +1248,7 @@ function CSV作成($array, bool $常に囲む = null, string $d = ',', string $e
         $newline = [];
         foreach($line as $cell){
             $cell = (string)$cell;
+            $cell = preg_replace("/\r\n|\n|\r/", $改行変換, $cell);
             if($常に囲む === true or (strlen($cell) and !is_numeric($cell))){
                 $cell = str_replace($e, "$e$e", $cell);
                 $cell = $e . $cell . $e;
@@ -1255,7 +1256,6 @@ function CSV作成($array, bool $常に囲む = null, string $d = ',', string $e
             $newline[] = $cell;
         }
         $newline = implode($d, $newline);
-        $newline = preg_replace("/\r\n|\n|\r/", "\n", $newline); //セル内改行はエクセルの仕様に合わせる
         $return .= $newline . "\r\n";
     }
     return $return;
