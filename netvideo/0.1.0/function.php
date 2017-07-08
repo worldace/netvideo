@@ -1391,7 +1391,7 @@ function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments
         'png'  => 'image/png',
         'gif'  => 'image/gif',
         'bmp'  => 'image/bmp',
-        'svg'  => 'image/image/svg+xml',
+        'svg'  => 'image/svg+xml',
         'ico'  => 'image/x-icon',
         'txt'  => 'text/plain',
         'htm'  => 'text/html',
