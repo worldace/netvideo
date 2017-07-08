@@ -458,6 +458,36 @@ function ファイル送信(string $url, array $querymap=null, array $request_he
 }
 
 
+function HEAD送信(string $url, array $querymap=null, array $request_header=[]){
+    $_ENV['RESPONSE_HEADER'] = [];
+    if($querymap){
+        $url .= preg_match("/\?/", $url) ? "&" : "?";
+        $url .= http_build_query($querymap, "", "&", PHP_QUERY_RFC3986);
+    }
+    foreach($request_header as $k => $v){
+        $k = str_replace([":", "\r", "\n"], "", $k);
+        $v = str_replace(["\r", "\n"], "", $v);
+        $header .= "$k: $v\r\n";
+    }
+    $context = stream_context_create([
+        'http'=>[
+            'method' => 'HEAD',
+            'header' => $header,
+        ]
+    ]);
+    $return = file_get_contents($url, false, $context);
+    $_ENV['RESPONSE_HEADER'] = $http_response_header ?? [];
+
+    foreach(array_reverse($_ENV['RESPONSE_HEADER']) as $v){
+        if(preg_match("|^HTTP/\d+\.\d+\s+(\d+)|i", $v, $match)){
+            $return = (int)$match[1];
+            break;
+        }
+    }
+    return $return;
+}
+
+
 function FILES詰め直し() :array{
     //['form-name'=>[['name'=>,'type'=>,'tmp_name'=>,'error'=>,'size=>']]]
     if(!isset($_FILES)){
