@@ -1157,7 +1157,7 @@ function XML取得(string $xml) :array{
 }
 
 
-function CSV取得(string $path, $from = null, string $区切り = null, string $囲い = '"') :Generator{
+function CSV取得(string $path, $encode = null, string $区切り = null, string $囲い = '"') :Generator{
     $ini = ini_get("auto_detect_line_endings");
     ini_set("auto_detect_line_endings", true);
 
@@ -1174,14 +1174,14 @@ function CSV取得(string $path, $from = null, string $区切り = null, string 
 
 
     //文字コード検知
-    if($from === true){
-        $from = mb_detect_encoding($sample, ["utf-8", "sjis-win", "eucjp-win", "ascii", "ISO-2022-JP"]);
-        if(!$from){
-            $from = "utf-8";
+    if($encode === true){
+        $encode = mb_detect_encoding($sample, ["utf-8", "sjis-win", "eucjp-win", "ascii", "ISO-2022-JP"]);
+        if(!$encode){
+            $encode = "utf-8";
         }
     }
-    if(preg_match("/^utf-?8/i", $from)){
-        $from = null;
+    if(preg_match("/^utf-?8/i", $encode)){
+        $encode = null;
     }
 
     //区切り検知
@@ -1201,8 +1201,8 @@ function CSV取得(string $path, $from = null, string $区切り = null, string 
         if($csv === ['']){
             $csv = [];
         }
-        if($from){
-            mb_convert_variables("utf-8", $from, $csv);
+        if($encode){
+            mb_convert_variables("utf-8", $encode, $csv);
         }
         yield $i => $csv;
         $i++;
@@ -1232,6 +1232,33 @@ function CSV行取得(&$handle, $d = ',', $e = '"'){
     }
 
     return empty($line) ? false : $return;
+}
+
+
+function CSV作成($array, bool $常に囲む = null, string $d = ',', string $e = '"') :string{
+    $return = "";
+    if(!is_iterable($array) and !is_object($array)){
+        return $return;
+    }
+    
+    foreach($array as $line){
+        if(!is_iterable($line) and !is_object($line)){
+            continue;
+        }
+        $newline = [];
+        foreach($line as $cell){
+            $cell = (string)$cell;
+            if($常に囲む === true or (strlen($cell) and !is_numeric($cell))){
+                $cell = str_replace($e, "$e$e", $cell);
+                $cell = $e . $cell . $e;
+            }
+            $newline[] = $cell;
+        }
+        $newline = implode($d, $newline);
+        $newline = preg_replace("/\r\n|\n|\r/", "\n", $newline); //セル内改行はエクセルの仕様に合わせる
+        $return .= $newline . "\r\n";
+    }
+    return $return;
 }
 
 
