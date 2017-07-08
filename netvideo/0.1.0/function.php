@@ -1255,8 +1255,7 @@ function CSV作成($array, $改行変換 = "\n", $常に囲む = null, string $d
             }
             $newline[] = $cell;
         }
-        $newline = implode($d, $newline);
-        $return .= $newline . "\r\n";
+        $return .= implode($d, $newline) . "\r\n";
     }
     return $return;
 }
