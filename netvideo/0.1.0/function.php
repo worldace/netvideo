@@ -1314,7 +1314,7 @@ function uuid(bool $hyphen=false) :string{ //uuid v4
 function ID発行() :string{
     [$micro, $sec] = explode(" ", microtime());
     $micro = substr($micro, 2, 6);
-    $rand  = mt_rand(1000, 3843); //5202までは大丈夫そう
+    $rand  = mt_rand(1000, 5202); //5202までは大丈夫そう
     return base_encode("$rand$micro$sec");
 }
 
