@@ -1315,11 +1315,11 @@ function ID発行() :string{
     [$micro, $sec] = explode(" ", microtime());
     $micro = preg_replace("/^0\.(\d{6})00$/", "$1", $micro); //0.11111100
     $rand  = mt_rand(1000, 3843);
-    return base_encode((int)"$rand$micro$sec", 62);
+    return base_encode("$rand$micro$sec", 62);
 }
 
 
-function base_encode(int $val, int $base) :string{ //未文書化
+function base_encode($val, int $base) :string{ //未文書化
     $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $str = '';
     do {
