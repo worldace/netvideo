@@ -1332,10 +1332,10 @@ function base_encode($val, int $base) :string{ //未文書化
 }
 
 
-function base_decode(string $str, int $base) :int{ //未文書化
+function base_decode(string $str, int $base) :string{ //未文書化
     $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $len = strlen($str);
-    $val = 0;
+    $val = "0";
     $arr = array_flip(str_split($chars));
     for($i = 0;  $i < $len;  $i++){
         $val = bcadd($val, bcmul($arr[$str[$i]], bcpow($base, $len-$i-1)));
