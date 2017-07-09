@@ -1311,6 +1311,26 @@ function uuid(bool $hyphen=false) :string{ //uuid v4
 }
 
 
+function ID発行(){
+    [$micro, $sec] = explode(" ", microtime());
+    $micro = preg_replace("/^0\.(\d{6})00$/", "$1", $micro); //0.11111100
+    $rand  = mt_rand(1000, 3843);
+    return base62_encode($rand . $micro . $sec);
+}
+
+
+function base62_encode($var){ //未文書化
+    $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    $stack = [];
+    while (bccomp($var, 0) != 0){
+        $remainder = bcmod($var, 62);
+        $var = bcdiv(bcsub($var, $remainder), 62);
+        array_push($stack, $chars[$remainder]);
+    }
+    return implode('', array_reverse($stack));
+}
+
+
 function パスワード発行(int $length=8, bool $userfriendly=false) :string{
     if($length < 4){
         $length = 4;
