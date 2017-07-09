@@ -1346,15 +1346,12 @@ function base_decode(string $str, int $base = 62) :string{ //未文書化
 
 
 function パスワード発行(int $length=8, bool $userfriendly=false) :string{
-    if($length < 4){
-        $length = 4;
+    $chars = $userfriendly  ?  'abcdefghijkmnprstwxyz2345678'  :  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $max = strlen($chars) - 1;
+    for($i = 0;  $i < $length;  $i++){
+        $return .= $chars[mt_rand(0, $max)];
     }
-    $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
-    if($userfriendly){
-        $str = "abcdefghijkmnprstwxyz2345678";
-    }
-    $str = str_repeat($str, floor($length/2));
-    return substr(str_shuffle($str), 0, $length);
+    return $return;
 }
 
 
