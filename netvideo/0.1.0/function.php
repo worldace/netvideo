@@ -1311,23 +1311,37 @@ function uuid(bool $hyphen=false) :string{ //uuid v4
 }
 
 
-function ID発行(){
+function ID発行() :string{
     [$micro, $sec] = explode(" ", microtime());
     $micro = preg_replace("/^0\.(\d{6})00$/", "$1", $micro); //0.11111100
     $rand  = mt_rand(1000, 3843);
-    return base62_encode($rand . $micro . $sec);
+    return base_encode((int)"$rand$micro$sec", 62);
 }
 
 
-function base62_encode($var){ //未文書化
-    $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-    $stack = [];
-    while (bccomp($var, 0) != 0){
-        $remainder = bcmod($var, 62);
-        $var = bcdiv(bcsub($var, $remainder), 62);
-        array_push($stack, $chars[$remainder]);
+function base_encode(int $val, int $base) :string{ //未文書化
+    $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $str = '';
+    do {
+        $mem = bcmod($val, $base);
+        $str = $chars[$mem] . $str;
+        $val = bcdiv(bcsub($val, $mem), $base);
+    } while(bccomp($val,0) > 0);
+
+    return $str;
+}
+
+
+function base_decode(string $str, int $base) :int{ //未文書化
+    $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $len = strlen($str);
+    $val = 0;
+    $arr = array_flip(str_split($chars));
+    for($i = 0;  $i < $len;  $i++){
+        $val = bcadd($val, bcmul($arr[$str[$i]], bcpow($base, $len-$i-1)));
     }
-    return implode('', array_reverse($stack));
+
+    return $val;
 }
 
 
