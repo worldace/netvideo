@@ -531,6 +531,7 @@ function ファイル受信(string $dir, array $whitelist){
         functionphpエラー("ディレクトリ $dir は存在しません", "警告");
         return false;
     }
+    $dir = realpath($dir);
 
     foreach($whitelist as $k => $v){
         $v = str_replace(".", "", $v);
@@ -538,9 +539,7 @@ function ファイル受信(string $dir, array $whitelist){
     }
 
     foreach($files as $k1 => $v1){
-        $k1count++;
         foreach($v1 as $k2 => $v2){
-            $k2count++;
             if($v2['error'] !== UPLOAD_ERR_OK){
                 continue;
             }
@@ -560,12 +559,7 @@ function ファイル受信(string $dir, array $whitelist){
             $return[$k1][$k2] = $savepath;
         }
     }
-    if(isset($return)){
-        return ($k1count === 1 and $k2count === 1)  ?  $savepath  :  $return;
-    }
-    else{
-        return false;
-    }
+    return isset($return)  ?  $return  :  false;
 }
 
 
