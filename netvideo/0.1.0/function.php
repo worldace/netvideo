@@ -1313,8 +1313,8 @@ function uuid(bool $hyphen=false) :string{ //uuid v4
 
 function ID発行() :string{
     [$micro, $sec] = explode(" ", microtime());
-    $micro = preg_replace("/^0\.(\d{6})00$/", "$1", $micro); //0.11111100
-    $rand  = mt_rand(1000, 3843);//54-5202までは大丈夫そうだが、先頭に数字がでないようにするには839-5202
+    $micro = substr($micro, 2, 6); //0.11111100
+    $rand  = mt_rand(1000, 3843); //5202までは大丈夫そう
     return base_encode("$rand$micro$sec");
 }
 
