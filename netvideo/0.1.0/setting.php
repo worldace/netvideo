@@ -1,5 +1,5 @@
 <?php
-const 設定 = [
+return [
 
 //ホームページのURL
 'URL' => "http://127.0.0.1/netvideo/",
