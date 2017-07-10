@@ -1304,10 +1304,9 @@ function 当たり(float $確率) :bool{
 }
 
 
-function uuid(bool $hyphen=false) :string{ //uuid v4
-    $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-    mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0x0fff)|0x4000,mt_rand(0,0x3fff)|0x8000,mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff));
-    return ($hyphen) ? $uuid : str_replace("-", "", $uuid);
+function uuid(bool $hyphen=false) :string{ //uuid v4 http://php.net/manual/en/function.uniqid.php#94959
+    $form = $hyphen  ?  '%04x%04x-%04x-%04x-%04x-%04x%04x%04x'  :  '%04x%04x%04x%04x%04x%04x%04x%04x';
+    return sprintf($form, mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0x0fff)|0x4000,mt_rand(0,0x3fff)|0x8000,mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff));
 }
 
 
