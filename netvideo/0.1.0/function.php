@@ -218,7 +218,7 @@ function 整形(string &$var, callable $func){
 }
 
 
-function 二重投稿なら(string $name, $exclude = null) :bool{
+function 二重投稿なら(string $path, $exclude = null) :bool{
     $history_max = 200;
     $return = false;
 
@@ -228,8 +228,11 @@ function 二重投稿なら(string $name, $exclude = null) :bool{
     }
     $id   = $_SERVER['REMOTE_ADDR'];
     $post = $_POST;
-    $name = "double-post-" . $name;
-    $history = 一時取得($name, []);
+    $history = file_get_contents($path);
+    if($history === false){
+        内部エラー("履歴ファイル $path が開けません", "警告");
+        return $return;
+    }
 
     foreach((array)$exclude as $k => $v){
         unset($post[$k]);//存在しなくてもエラーにはならない
@@ -244,7 +247,7 @@ function 二重投稿なら(string $name, $exclude = null) :bool{
     }
     unset($history[$id]);
     $history[$id] = $post;
-    一時保存($name, $history);
+    file_put_contents($path, $history, LOCK_EX);
     return $return;
 }
 
