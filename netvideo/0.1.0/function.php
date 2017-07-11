@@ -2738,10 +2738,14 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 }
 
 
-function 内部エラー(string $str, string $type = "エラー", $除外パス = __FILE__) :void{
-    //1つ目のエラーはdisplay_errors(ini)でSTDOUT、2つ目のエラーはlog_errors(ini)でSTDERR、エラーは set_error_handler() で捕捉できる
-    foreach(debug_backtrace() as $trace){
-        if(strpos($trace['file'], $除外パス) !== 0){ break; }
+function 内部エラー(string $str = "エラーが発生しました", string $type = "エラー", string $除外パス = "") :void{
+    $debug_backtrace = debug_backtrace();
+    $除外パス = $除外パス ?: $debug_backtrace[0]['file'];
+
+    foreach($debug_backtrace as $trace){
+        if(strpos($trace['file'], $除外パス) !== 0){
+            break;
+        }
     }
     $message = sprintf("【%s】%s \n%s: %s行目 %s%s%s()\n\n", $type, $str, $trace['file'], $trace['line'], $trace['class'], $trace['type'], $trace['function']);
 
