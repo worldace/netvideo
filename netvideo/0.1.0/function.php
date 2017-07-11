@@ -218,6 +218,37 @@ function 整形(string &$var, callable $func){
 }
 
 
+function 二重投稿なら(string $name, $exclude = null) :bool{
+    $history_max = 200;
+    $return = false;
+
+    if(!POSTなら()){
+        内部エラー("メソッドがPOSTではありません", "注意");
+        return $return;
+    }
+    $id   = $_SERVER['REMOTE_ADDR'];
+    $post = $_POST;
+    $name = "double-post-" . $name;
+    $history = 一時取得($name, []);
+
+    foreach((array)$exclude as $k => $v){
+        unset($post[$k]);//存在しなくてもエラーにはならない
+    }
+    ksort($post);
+
+    if(isset($history[$id]) and $history[$id] === $post){
+        $return = true;
+    }
+    if(count($history) > $history_max){
+        array_shift($history);
+    }
+    unset($history[$id]);
+    $history[$id] = $post;
+    一時保存($name, $history);
+    return $return;
+}
+
+
 function 設定(string $name, $value="\0\rヌル\0\r"){
     static $記憶 = [];
     if($name === "全て"){
@@ -1148,9 +1179,9 @@ function 一時保存(string $name, $data){
 }
 
 
-function 一時取得(string $name){
+function 一時取得(string $name, $default = false){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
-    return (file_exists($tempfile)) ? unserialize(file_get_contents($tempfile)) : false;
+    return (file_exists($tempfile)) ? unserialize(file_get_contents($tempfile)) : $default;
 }
 
 
