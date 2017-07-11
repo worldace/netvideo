@@ -2738,7 +2738,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 }
 
 
-function 内部エラー(string $str = "エラーが発生しました", string $type = "エラー", string $除外パス = "") :void{
+function 内部エラー(string $str = "エラーが発生しました", string $type = "停止", string $除外パス = "") :void{
     $debug_backtrace = debug_backtrace();
     $除外パス = $除外パス ?: $debug_backtrace[0]['file'];
 
@@ -2753,5 +2753,5 @@ function 内部エラー(string $str = "エラーが発生しました", string 
         $message = nl2br(htmlspecialchars($message, ENT_QUOTES, "UTF-8", false));
     }
 
-    trigger_error($message, ['エラー'=>E_USER_ERROR, '警告'=>E_USER_WARNING, '注意'=>E_USER_NOTICE][$type]);
+    trigger_error($message, ['停止'=>E_USER_ERROR, '警告'=>E_USER_WARNING, '注意'=>E_USER_NOTICE][$type]);
 } 
