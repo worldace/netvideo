@@ -222,10 +222,10 @@ function 二重投稿なら(string $path, $exclude = null) :bool{
     $return  = false;
     $id      = $_SERVER['REMOTE_ADDR'];
     $post    = $_POST;
-    $history = file_get_contents($path);
+    $history = unserialize(file_get_contents($path));
 
     if($history === false){
-        内部エラー("履歴ファイル $path が開けません", "警告");
+        内部エラー("投稿履歴ファイル $path が開けません", "警告");
         return $return;
     }
     if(!POSTなら()){
@@ -246,7 +246,7 @@ function 二重投稿なら(string $path, $exclude = null) :bool{
     }
     unset($history[$id]);
     $history[$id] = $post;
-    file_put_contents($path, $history, LOCK_EX);
+    file_put_contents($path, serialize($history), LOCK_EX);
     return $return;
 }
 
