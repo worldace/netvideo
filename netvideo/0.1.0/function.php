@@ -219,18 +219,17 @@ function 整形(string &$var, callable $func){
 
 
 function 二重投稿なら(string $path, $exclude = null) :bool{
-    $history_max = 200;
-    $return = false;
-
-    if(!POSTなら()){
-        内部エラー("メソッドがPOSTではありません", "注意");
-        return $return;
-    }
-    $id   = $_SERVER['REMOTE_ADDR'];
-    $post = $_POST;
+    $return  = false;
+    $id      = $_SERVER['REMOTE_ADDR'];
+    $post    = $_POST;
     $history = file_get_contents($path);
+
     if($history === false){
         内部エラー("履歴ファイル $path が開けません", "警告");
+        return $return;
+    }
+    if(!POSTなら()){
+        内部エラー("メソッドがPOSTではありません", "注意");
         return $return;
     }
 
@@ -242,7 +241,7 @@ function 二重投稿なら(string $path, $exclude = null) :bool{
     if(isset($history[$id]) and $history[$id] === $post){
         $return = true;
     }
-    if(count($history) > $history_max){
+    if(count($history) > 200){
         array_shift($history);
     }
     unset($history[$id]);
