@@ -111,7 +111,7 @@ function 検査(string $var, $func) :bool{
     if(is_callable($func)){
         $result = $func($var);
         if(!is_bool($result)){
-            functionphpエラー("第2引数の無名関数はtrueまたはfalseを返してください");
+            内部エラー("第2引数の無名関数はtrueまたはfalseを返してください");
         }
     }
     else{
@@ -130,7 +130,7 @@ function 検査(string $var, $func) :bool{
             }
         }
         else{
-            functionphpエラー("第2引数の特別関数名が間違っています");
+            内部エラー("第2引数の特別関数名が間違っています");
         }
     }
     if($result === true){
@@ -228,12 +228,12 @@ function 設定(string $name, $value="\0\rヌル\0\r"){
             return $記憶[$name];
         }
         else{
-            functionphpエラー("$name は未設定です。取得できません", "警告");
+            内部エラー("$name は未設定です。取得できません", "警告");
         }
     }
     else{ //設定動作
         if(array_key_exists($name, $記憶)){
-            functionphpエラー("$name は設定済みです。再代入はできません", "警告");
+            内部エラー("$name は設定済みです。再代入はできません", "警告");
             return $value;
         }
         else{
@@ -272,7 +272,7 @@ function テンプレート(string $_file_, array $_data_, bool $エスケープ
 
 function ファイルダウンロード(string $file, string $filename=null, int $timeout=60*60*6) :void{
     if(!file_exists($file)){
-        functionphpエラー("ダウンロードさせるファイル $file は存在しません", "警告");
+        内部エラー("ダウンロードさせるファイル $file は存在しません", "警告");
         return;
     }
     ini_set("max_execution_time", $timeout);
@@ -528,7 +528,7 @@ function ファイル受信(string $dir, array $whitelist){
         return;
     }
     if(!is_dir($dir)){
-        functionphpエラー("ディレクトリ $dir は存在しません", "警告");
+        内部エラー("ディレクトリ $dir は存在しません", "警告");
         return false;
     }
     $dir = realpath($dir);
@@ -672,7 +672,7 @@ function 現在のURL(bool $no_query=false) :string{
 function ホームURL(string $url) :string{
     $parsed = explode("/", $url);
     if(!isset($parsed[2])){
-        functionphpエラー("$url はURL文字列ではありません", "警告");
+        内部エラー("$url はURL文字列ではありません", "警告");
         return $url;
     }
     return $parsed[0] . "//" . $parsed[2] . "/";
@@ -877,7 +877,7 @@ function タグ(string $tag, array $attr=[]) :string{
         $tag = ltrim($tag, "!");
     }
     if(preg_match("/[^a-zA-Z0-9\-]/", $tag)){ 
-        functionphpエラー("タグ名に $tag は使用できません", "警告");
+        内部エラー("タグ名に $tag は使用できません", "警告");
         return "";
     }
     if(in_array($tag, ["br","wbr","hr","img","col","base","link","meta","input","keygen","area","param","embed","source","track","command"], true)){
@@ -904,7 +904,7 @@ function 属性文字列(array $attr=[]) :string{
             continue;
         }
         if(preg_match("/[^a-zA-Z\-]/", $key)){
-            functionphpエラー("属性名に $key は使用できません", "警告");
+            内部エラー("属性名に $key は使用できません", "警告");
             continue;
         }
         if(in_array($key, ["src", "href", "action", "formaction", "poster"], true)){ //cite, srcset
@@ -985,7 +985,7 @@ function 配列探索($array, bool $leafonly = false) :RecursiveIteratorIterator
 
 function パーミッション(string $path, string $permission=null) :string{
     if(!file_exists($path)){
-        functionphpエラー("パス $path は存在しません", "警告");
+        内部エラー("パス $path は存在しません", "警告");
         return "";
     }
     if(!preg_match("/^0/", $permission) and $permission >= 100 and $permission <= 777){
@@ -999,7 +999,7 @@ function ファイル一覧(string $dir, bool $recursive = false) :Generator{
     if($recursive === false){
         $dir = realpath($dir);
         if($dir === false){
-            functionphpエラー("ディレクトリ $dir は存在しません", "警告");
+            内部エラー("ディレクトリ $dir は存在しません", "警告");
             return;
         }
     }
@@ -1019,7 +1019,7 @@ function ディレクトリ一覧(string $dir, bool $recursive = false) :Generat
     if($recursive === false){
         $dir = realpath($dir);
         if($dir === false){
-            functionphpエラー("ディレクトリ $dir は存在しません", "警告");
+            内部エラー("ディレクトリ $dir は存在しません", "警告");
             return;
         }
     }
@@ -1037,7 +1037,7 @@ function パス一覧(string $dir, bool $recursive = false) :Generator{
     if($recursive === false){
         $dir = realpath($dir);
         if($dir === false){
-            functionphpエラー("ディレクトリ $dir は存在しません", "警告");
+            内部エラー("ディレクトリ $dir は存在しません", "警告");
             return;
         }
     }
@@ -1056,7 +1056,7 @@ function パス一覧(string $dir, bool $recursive = false) :Generator{
 
 function ディレクトリ作成(string $dir, string $permission="707"){
     if(is_dir($dir)){
-        functionphpエラー("ディレクトリ $dir は既に存在します", "注意");
+        内部エラー("ディレクトリ $dir は既に存在します", "注意");
         パーミッション($dir, $permission);
         return $dir;
     }
@@ -1070,7 +1070,7 @@ function ディレクトリ作成(string $dir, string $permission="707"){
 
 function ディレクトリ削除(string $dir){
     if(!is_dir($dir)){
-        functionphpエラー("ディレクトリ $dir は存在しません", "警告");
+        内部エラー("ディレクトリ $dir は存在しません", "警告");
         return false;
     }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
@@ -1083,13 +1083,13 @@ function ディレクトリ削除(string $dir){
 function zip圧縮(string $zipfile, $filemap){
     $zip = new ZipArchive();
     if($zip->open($zipfile, ZipArchive::CREATE) !== true){
-        functionphpエラー("ZIPファイル $zipfile を作成できません", "警告");
+        内部エラー("ZIPファイル $zipfile を作成できません", "警告");
         return false;
     }
     if(is_string($filemap)){
         $path = realpath($filemap);
         if($path === false){
-            functionphpエラー("ディレクトリ $filemap は存在しません", "警告");
+            内部エラー("ディレクトリ $filemap は存在しません", "警告");
             return false;
         }
         $path .= DIRECTORY_SEPARATOR;
@@ -1115,7 +1115,7 @@ function zip圧縮(string $zipfile, $filemap){
 function zip追加(string $zipfile, $filemap){
     $zip = new ZipArchive();
     if($zip->open($zipfile) !== true){
-        functionphpエラー("ZIPファイル $zipfile を開けません", "警告");
+        内部エラー("ZIPファイル $zipfile を開けません", "警告");
         return false;
     }
     foreach($filemap as $name => $value){
@@ -1129,7 +1129,7 @@ function zip追加(string $zipfile, $filemap){
 function zip解凍(string $zipfile, string $where = "") :bool{
     $zip = new ZipArchive();
     if($zip->open($zipfile) !== true){
-        functionphpエラー("ZIPファイル $zipfile を開けません", "警告");
+        内部エラー("ZIPファイル $zipfile を開けません", "警告");
         return false;
     }
     if(!$where){
@@ -1200,7 +1200,7 @@ function CSV取得(string $path, $encode = null, string $区切り = null, strin
     ini_set("auto_detect_line_endings", $ini);
 
     if($fp === false){
-        functionphpエラー("CSVファイル $path が開けません", "警告");
+        内部エラー("CSVファイル $path が開けません", "警告");
         return;
     }
     $sample = fread($fp, 4096);
@@ -1224,7 +1224,7 @@ function CSV取得(string $path, $encode = null, string $区切り = null, strin
         $count_c = preg_match_all("/,/" , $sample);
         $count_t = preg_match_all("/\t/", $sample);
         if(!$count_c and !$count_t){
-            functionphpエラー("CSVファイルの区切り文字を検知できませんでした", "警告");
+            内部エラー("CSVファイルの区切り文字を検知できませんでした", "警告");
             return;
         }
         $区切り = ($count_c > $count_t)  ?  ","  :  "\t";
@@ -2738,13 +2738,10 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 }
 
 
-function functionphpエラー(string $str, string $type = "エラー") :void{
+function 内部エラー(string $str, string $type = "エラー", $除外パス = __FILE__) :void{
     //1つ目のエラーはdisplay_errors(ini)でSTDOUT、2つ目のエラーはlog_errors(ini)でSTDERR、エラーは set_error_handler() で捕捉できる
-    $設定["タイトル"] = "function.php";
-    $設定["除外パス"] = __FILE__;
-
     foreach(debug_backtrace() as $trace){
-        if(strpos($trace['file'], $設定["除外パス"]) !== 0){ break; }
+        if(strpos($trace['file'], $除外パス) !== 0){ break; }
     }
     $message = sprintf("【%s】%s \n%s: %s行目 %s%s%s()\n\n", $type, $str, $trace['file'], $trace['line'], $trace['class'], $trace['type'], $trace['function']);
 
