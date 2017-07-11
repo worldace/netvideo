@@ -1320,11 +1320,16 @@ function uuid(bool $hyphen=false) :string{ //uuid v4 http://php.net/manual/en/fu
 }
 
 
-function ID発行() :string{
+function ID発行(bool $more=false) :string{
     [$micro, $sec] = explode(" ", microtime());
     $micro = substr($micro, 2, 6);
     $rand  = mt_rand(1000, 5202); //5202より大きいと12桁になる
-    return base_encode("$rand$micro$sec");
+    $return = base_encode("$rand$micro$sec");
+    if($more === true){
+        $return = パスワード発行(5) . $return;
+        $return = preg_replace("/^\d/", "a", $return);
+    }
+    return $return;
 }
 
 
@@ -2747,7 +2752,7 @@ function 内部エラー(string $str = "エラーが発生しました", string 
             break;
         }
     }
-    $message = sprintf("【%s】%s \n%s: %s行目 %s%s%s()\n\n", $type, $str, $trace['file'], $trace['line'], $trace['class'], $trace['type'], $trace['function']);
+    $message = sprintf("【%s】%s \n%s :%s行目 %s%s%s()\n\n", $type, $str, $trace['file'], $trace['line'], $trace['class'], $trace['type'], $trace['function']);
 
     if(PHP_SAPI !== "cli"){
         $message = nl2br(htmlspecialchars($message, ENT_QUOTES, "UTF-8", false));
