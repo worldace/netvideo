@@ -690,6 +690,16 @@ function Windowsなら() :bool{
 }
 
 
+function 絶対パスなら(string $path) :bool{
+    if(DIRECTORY_SEPARATOR === '/'){
+        return ($path[0] === '/') ? true : false;
+    }
+    else{
+        return ($path[1] === ':' or $path[0] === '\\' or $path[0] === '/') ? true : false;
+    }
+}
+
+
 function GETなら() :bool{
     $method = filter_input(INPUT_SERVER, "REQUEST_METHOD") ?? '';
     return (strtoupper($method) === 'GET') ? true : false;
@@ -2736,7 +2746,7 @@ function functionphpエラー(string $str, string $type = "エラー") :void{
     foreach(debug_backtrace() as $trace){
         if(strpos($trace['file'], $設定["除外パス"]) !== 0){ break; }
     }
-    $message = "【{$type}】$str \n{$trace['file']}: {$trace['line']}行目 {$trace['class']}{$trace['type']}{$trace['function']}()\n\n";
+    $message = sprintf("【%s】%s \n%s: %s行目 %s%s%s()\n\n", $type, $str, $trace['file'], $trace['line'], $trace['class'], $trace['type'], $trace['function']);
 
     if(PHP_SAPI !== "cli"){
         $message = nl2br(htmlspecialchars($message, ENT_QUOTES, "UTF-8", false));
