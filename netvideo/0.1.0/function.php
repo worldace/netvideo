@@ -1453,6 +1453,19 @@ function ベーシック認証(callable $認証関数, string $realm="member onl
 }
 
 
+function セッション削除() :void{
+    if(session_status() !== PHP_SESSION_ACTIVE){
+        session_start();
+    }
+    $_SESSION = [];
+
+    $param = session_get_cookie_params();
+    setcookie(session_name(), '', 0, $param["path"], $param["domain"], $param["secure"], $param["httponly"]);
+
+    session_destroy();
+}
+
+
 function CSRFタグ() :string{
     $token = uuid();
     setcookie('csrf-token', $token, 0, '/');
