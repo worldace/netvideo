@@ -1453,6 +1453,22 @@ function ベーシック認証(callable $認証関数, string $realm="member onl
 }
 
 
+function CSRFタグ() :string{
+    $id = uuid();
+    setcookie('csrf-token', $id);
+    return sprintf('<input type="hidden" name="csrf-token" value="%s">', $id);
+}
+
+
+function CSRF確認() :bool{
+    if(!empty($_COOKIE['csrf-token']) and !empty($_POST['csrf-token']) and $_COOKIE['csrf-token'] === $_POST['csrf-token']){
+        setcookie('csrf-token');
+        return true;
+    }
+    return false;
+}
+
+
 function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments/media-types/media-types.xhtml
     $list = [
         'jpg'  => 'image/jpeg',

@@ -1,6 +1,6 @@
 <?php
 
-define(設定, include './netvideo/0.1.0/setting.php');
+define("設定", include './netvideo/0.1.0/setting.php');
 include './netvideo/0.1.0/function.php';
 include './netvideo/0.1.0/boot.php';
 
