@@ -218,39 +218,6 @@ function 整形(string &$var, callable $func){
 }
 
 
-function 二重投稿なら(string $path, $exclude = null) :bool{
-    $return  = false;
-    $id      = $_SERVER['REMOTE_ADDR'];
-    $post    = $_POST;
-    $history = unserialize(file_get_contents($path));
-
-    if($history === false){
-        内部エラー("投稿履歴ファイル $path が開けません", "警告");
-        return $return;
-    }
-    if(!POSTなら()){
-        内部エラー("メソッドがPOSTではありません", "注意");
-        return $return;
-    }
-
-    foreach((array)$exclude as $k => $v){
-        unset($post[$k]);//存在しなくてもエラーにはならない
-    }
-    ksort($post);
-
-    if(isset($history[$id]) and $history[$id] === $post){
-        $return = true;
-    }
-    if(count($history) > 200){
-        array_shift($history);
-    }
-    unset($history[$id]);
-    $history[$id] = $post;
-    file_put_contents($path, serialize($history), LOCK_EX);
-    return $return;
-}
-
-
 function 設定(string $name, $value="\0\rヌル\0\r"){
     static $記憶 = [];
     if($name === "全て"){
