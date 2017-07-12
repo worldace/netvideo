@@ -1474,8 +1474,8 @@ function CSRFタグ() :string{
 
 
 function CSRF確認() :bool{
+    setcookie('csrf-token', '', 0, '/');
     if(!empty($_COOKIE['csrf-token']) and !empty($_POST['csrf-token']) and $_COOKIE['csrf-token'] === $_POST['csrf-token']){
-        setcookie('csrf-token', '', 0, '/');
         return true;
     }
     return false;
