@@ -1466,12 +1466,15 @@ function セッション削除() :void{
 }
 
 
-function CSRFタグ() :string{
+/*
+CSRF攻撃パターンが偽フォームの場合、$tokenの値を当てなければいけない(かつ被害者がCookieを有していること)
+CSRF攻撃パターンが偽Ajaxの場合、Cookieが送信できない(ただしサーバーがAccess-Control-Allow-Originで攻撃サイトを指定していて、Access-Control-Allow-Credentialsがtrueだと送信できる)
+*/
+function CSRFタグ() :string{ // ajax: http://d.hatena.ne.jp/hasegawayosuke/20130302/p1
     $token = uuid();
     setcookie('csrf-token', $token, 0, '/');
     return sprintf('<input type="hidden" name="csrf-token" value="%s">', $token) . "\n";
 }
-
 
 function CSRF確認() :bool{
     setcookie('csrf-token', '', 0, '/');
