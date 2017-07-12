@@ -1454,15 +1454,15 @@ function ベーシック認証(callable $認証関数, string $realm="member onl
 
 
 function CSRFタグ() :string{
-    $id = uuid();
-    setcookie('csrf-token', $id);
-    return sprintf('<input type="hidden" name="csrf-token" value="%s">', $id);
+    $token = uuid();
+    setcookie('csrf-token', $token, 0, '/');
+    return sprintf('<input type="hidden" name="csrf-token" value="%s">', $token) . "\n";
 }
 
 
 function CSRF確認() :bool{
     if(!empty($_COOKIE['csrf-token']) and !empty($_POST['csrf-token']) and $_COOKIE['csrf-token'] === $_POST['csrf-token']){
-        setcookie('csrf-token');
+        setcookie('csrf-token', '', 0, '/');
         return true;
     }
     return false;
