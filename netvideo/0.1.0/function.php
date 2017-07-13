@@ -89,16 +89,22 @@ function 自動読み込み(string $dir=__DIR__) :void{
 }
 
 
-function オブジェクト(string $file){
+function require_cache(string $file){
     static $記憶 = [];
 
-    if(!preg_match('#^(/|[a-zA-Z]:[\\\\/])#', $file)){ //相対パスの時
+    if(!絶対パスなら($file)){
         $file = realpath($file);
     }
     if(!isset($記憶[$file])){
         $記憶[$file] = require($file);
     }
-    return clone $記憶[$file];
+    
+    if(is_object($記憶[$file])){
+        return clone $記憶[$file];
+    }
+    else{
+        return $記憶[$file];
+    }
 }
 
 
