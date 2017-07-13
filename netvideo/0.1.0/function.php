@@ -1410,7 +1410,11 @@ function base64_decode_urlsafe(string $input) :string{
 }
 
 
-function base_encode($val, int $base = 62) :string{ //未文書化
+function base_encode($val, int $base = 62) :string{
+    if($base < 2 or $base > 62){
+        内部エラー("進数は2～62の間で指定してください");
+        return "";
+    }
     $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $str = '';
     do {
@@ -1423,7 +1427,11 @@ function base_encode($val, int $base = 62) :string{ //未文書化
 }
 
 
-function base_decode(string $str, int $base = 62) :string{ //未文書化
+function base_decode(string $str, int $base = 62) :string{
+    if($base < 2 or $base > 62){
+        内部エラー("進数は2～62の間で指定してください");
+        return "";
+    }
     $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $len = strlen($str);
     $val = "0";
