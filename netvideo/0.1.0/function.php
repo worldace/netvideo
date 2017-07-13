@@ -1556,6 +1556,29 @@ function ベンチマーク(int $times, callable ...$func) :void{
 }
 
 
+function 関数文字列化(string $name) :string{
+    $ref = new ReflectionFunction($name);
+    return implode("",
+        array_slice(
+            file($ref->getFileName()),
+            $ref->getStartLine() - 1,
+            $ref->getEndLine() - $ref->getStartLine() + 1
+        )
+    );
+}
+
+
+function クラス文字列化(string $name) :string{
+    $ref = new ReflectionClass($name);
+    return implode("",
+        array_slice(
+            file($ref->getFileName()),
+            $ref->getStartLine() - 1,
+            $ref->getEndLine() - $ref->getStartLine() + 1
+        )
+    );
+}
+
 
 
 function データベース($table, $driver = null, $user = null, $pass = null){
