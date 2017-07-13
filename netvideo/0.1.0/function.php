@@ -22,12 +22,7 @@ function テキスト表示(string $str) :void{
 
 
 function JSON表示($data, $allow=null) :void{
-    if(!$allow){
-        $allow = $_SERVER['HTTP_ORIGIN'] ?? "*";
-    }
-    else{
-        $allow = implode(" ", (array)$allow);
-    }
+    $allow = ($allow)  ?  implode(" ", (array)$allow)  :  "*";
     header("Access-Control-Allow-Origin: $allow");
     header("Access-Control-Allow-Credentials: true");
     if(isset($_GET['callback']) and is_string($_GET['callback'])){ //JSONP
