@@ -1328,32 +1328,6 @@ function ID発行(bool $more=false) :string{
 }
 
 
-function base_encode($val, int $base = 62) :string{ //未文書化
-    $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    $str = '';
-    do {
-        $mem = bcmod($val, $base);
-        $str = $chars[$mem] . $str;
-        $val = bcdiv(bcsub($val, $mem), $base);
-    } while(bccomp($val,0) > 0);
-
-    return $str;
-}
-
-
-function base_decode(string $str, int $base = 62) :string{ //未文書化
-    $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    $len = strlen($str);
-    $val = "0";
-    $arr = array_flip(str_split($chars));
-    for($i = 0;  $i < $len;  $i++){
-        $val = bcadd($val, bcmul($arr[$str[$i]], bcpow($base, $len-$i-1)));
-    }
-
-    return $val;
-}
-
-
 function パスワード発行(int $length=8, bool $userfriendly=false) :string{
     $chars = $userfriendly  ?  'abcdefghijkmnprstwxyz2345678'  :  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $max = strlen($chars) - 1;
@@ -1436,6 +1410,32 @@ function base64_decode_urlsafe(string $input) :string{
 }
 
 
+function base_encode($val, int $base = 62) :string{ //未文書化
+    $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $str = '';
+    do {
+        $mem = bcmod($val, $base);
+        $str = $chars[$mem] . $str;
+        $val = bcdiv(bcsub($val, $mem), $base);
+    } while(bccomp($val,0) > 0);
+
+    return $str;
+}
+
+
+function base_decode(string $str, int $base = 62) :string{ //未文書化
+    $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $len = strlen($str);
+    $val = "0";
+    $arr = array_flip(str_split($chars));
+    for($i = 0;  $i < $len;  $i++){
+        $val = bcadd($val, bcmul($arr[$str[$i]], bcpow($base, $len-$i-1)));
+    }
+
+    return $val;
+}
+
+
 function ベーシック認証(callable $認証関数, string $realm="member only"){
     if(isset($_SERVER['PHP_AUTH_USER']) and isset($_SERVER['PHP_AUTH_PW'])){
         if($認証関数($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) === true){
@@ -1462,8 +1462,8 @@ function セッション削除() :void{
 
 
 /*
-CSRF攻撃パターンが偽フォームの場合、$tokenの値を当てなければいけない(かつ被害者がCookieを有していること)
-CSRF攻撃パターンが偽Ajaxの場合、Cookieが送信できない(ただし被害者サーバーがAccess-Control-Allow-Originで攻撃サイトを指定していて、Access-Control-Allow-Credentialsがtrueだと送信できる)
+攻撃パターンが偽フォームの場合、$tokenの値を当てなければいけない(かつ被害者がCookieを有していること)
+攻撃パターンが偽Ajaxの場合、Cookieが送信できない(ただし被害者サーバーがAccess-Control-Allow-Originで攻撃サイトを指定していて、Access-Control-Allow-Credentialsがtrueだと送信できる)
 */
 function CSRFタグ() :string{ // ajax: http://d.hatena.ne.jp/hasegawayosuke/20130302/p1
     $token = uuid();
