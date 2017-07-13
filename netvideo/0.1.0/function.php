@@ -996,8 +996,9 @@ function パーミッション(string $path, string $permission=null) :string{
 }
 
 
-function ファイル一覧(string $dir, bool $recursive = false) :Generator{
-    if($recursive === false){
+function ファイル一覧(string $dir, $recursive = true) :Generator{
+    $recursive = (int)$recursive;
+    if($recursive < 2){
         $dir = realpath($dir);
         if($dir === false){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
@@ -1009,15 +1010,17 @@ function ファイル一覧(string $dir, bool $recursive = false) :Generator{
         if(is_file($path)){
             yield $file => $path;
         }
-        elseif(is_dir($path)){
-            yield from ファイル一覧($path, true);
+        elseif(is_dir($path) and $recursive){
+            $recursive++;
+            yield from ファイル一覧($path, $recursive);
         }
     }
 }
 
 
-function ディレクトリ一覧(string $dir, bool $recursive = false) :Generator{
-    if($recursive === false){
+function ディレクトリ一覧(string $dir, $recursive = true) :Generator{
+    $recursive = (int)$recursive;
+    if($recursive < 2){
         $dir = realpath($dir);
         if($dir === false){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
@@ -1028,14 +1031,18 @@ function ディレクトリ一覧(string $dir, bool $recursive = false) :Generat
         $path = $dir . DIRECTORY_SEPARATOR . $file;
         if(is_dir($path)){
             yield $file => $path . DIRECTORY_SEPARATOR;
-            yield from ディレクトリ一覧($path, true);
+            if($recursive){
+                $recursive++;
+                yield from ディレクトリ一覧($path, $recursive);
+            }
         }
     }
 }
 
 
-function パス一覧(string $dir, bool $recursive = false) :Generator{
-    if($recursive === false){
+function パス一覧(string $dir, $recursive = true) :Generator{
+    $recursive = (int)$recursive;
+    if($recursive < 2){
         $dir = realpath($dir);
         if($dir === false){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
@@ -1046,7 +1053,10 @@ function パス一覧(string $dir, bool $recursive = false) :Generator{
         $path = $dir . DIRECTORY_SEPARATOR . $file;
         if(is_dir($path)){
             yield $file => $path . DIRECTORY_SEPARATOR;
-            yield from パス一覧($path, true);
+            if($recursive){
+                $recursive++;
+                yield from パス一覧($path, $recursive);
+            }
         }
         else{
             yield $file => $path;
