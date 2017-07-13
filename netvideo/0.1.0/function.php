@@ -1543,6 +1543,19 @@ function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments
 }
 
 
+function ベンチマーク(int $times, callable ...$func) :void{
+    for($i = 0;  $i < count($func);  $i++){
+        $start = microtime(true);
+        for($t = 0;  $t < $times;  $t++){
+            $func[$i]();
+        }
+        $end = microtime(true);
+        $total = number_format($end - $start, 3);
+        printf("case%s: %ssec\n", $i+1, $total);
+    }
+}
+
+
 
 
 function データベース($table, $driver = null, $user = null, $pass = null){
