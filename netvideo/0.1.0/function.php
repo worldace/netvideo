@@ -1582,7 +1582,7 @@ function 関数文字列化($name){
         }
         $ref = new ReflectionFunction($name);
     }
-    if($ref->isInternal()){
+    if(!$ref->isUserDefined()){
         return false;
     }
     return implode("",
@@ -1600,7 +1600,7 @@ function クラス文字列化($name){
         return false;
     }
     $ref = new ReflectionClass($name);
-    if($ref->isInternal()){
+    if(!$ref->isUserDefined()){
         return false;
     }
     return implode("",
