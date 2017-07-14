@@ -1559,15 +1559,15 @@ function ベンチマーク(int $times, callable ...$func) :void{
 }
 
 
-function 関数文字列化(string $name){
-    if(preg_match("/::/", $name)){
+function 関数文字列化($name){
+    if(is_string($name) and preg_match("/::/", $name)){
         if(!method_exists(...explode('::', $name))){
             return false;
         }
         $ref = new ReflectionMethod($name);
     }
     else{
-        if(!function_exists($name)){
+        if(!is_callable($name)){
             return false;
         }
         $ref = new ReflectionFunction($name);
@@ -1585,8 +1585,8 @@ function 関数文字列化(string $name){
 }
 
 
-function クラス文字列化(string $name){
-    if(!class_exists($name) and !interface_exists($name) and !trait_exists($name)){
+function クラス文字列化($name){
+    if(!is_object($name) and !class_exists($name) and !interface_exists($name) and !trait_exists($name)){
         return false;
     }
     $ref = new ReflectionClass($name);
