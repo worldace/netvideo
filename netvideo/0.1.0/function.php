@@ -1314,7 +1314,8 @@ function fromphp($data) :string{
 }
 
 
-function 当たり(float $確率) :bool{
+function 当たり($確率) :bool{
+    $確率 = (float)$確率;
     if($確率 <= 0){
         return false;
     }

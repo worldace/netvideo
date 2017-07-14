@@ -29,4 +29,6 @@ return [
 'ini' => [
     'session.cookie_httponly' => 1,
 ],
+
+
 ];
