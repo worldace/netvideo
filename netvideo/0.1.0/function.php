@@ -1546,16 +1546,22 @@ function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments
 }
 
 
-function ベンチマーク(int $times, callable ...$func) :void{
-    for($i = 0;  $i < count($func);  $i++){
-        $start = microtime(true);
-        for($t = 0;  $t < $times;  $t++){
-            $func[$i]();
+function ベンチマーク(callable $func, ...$arg){
+    $start = microtime(true);
+    $end   = $start + 1;
+    if($arg){
+        for($t = -1;  microtime(true) <= $end;  $t++){
+            $func(...$arg);
         }
-        $end = microtime(true);
-        $total = number_format($end - $start, 3);
-        printf("case%s: %ssec\n", $i+1, $total);
     }
+    else{
+        for($t = -1;  microtime(true) <= $end;  $t++){
+            $func();
+        }
+    }
+    $finish = microtime(true);
+    $t = ($t > 0)  ?  number_format($t)  :  number_format(1/($finish-$start), 3);
+    printf("case: %s回\n", $t);
 }
 
 
