@@ -1558,10 +1558,13 @@ function ベンチマーク(int $times, callable ...$func) :void{
 }
 
 
-function 関数文字列化(string $name) :string{
+function 関数文字列化(string $name){
+    if(!function_exists($name)){
+        return false;
+    }
     $ref = new ReflectionFunction($name);
     if($ref->isInternal()){
-        return "";
+        return false;
     }
     return implode("",
         array_slice(
@@ -1573,10 +1576,13 @@ function 関数文字列化(string $name) :string{
 }
 
 
-function クラス文字列化(string $name) :string{
+function クラス文字列化(string $name){
+    if(!class_exists($name) and !interface_exists($name) and !trait_exists($name)){
+        return false;
+    }
     $ref = new ReflectionClass($name);
     if($ref->isInternal()){
-        return "";
+        return false;
     }
     return implode("",
         array_slice(
