@@ -1564,7 +1564,7 @@ function ベンチマーク(callable $func, ...$arg){
     }
     $finish = microtime(true);
 
-    $t = ($t > 1)  ?  number_format($t)  :  number_format(1/($finish-$start), 3);
+    $t = ($t > 0)  ?  number_format($t)  :  number_format(1/($finish-$start), 3);
     printf("case%s: %s回\n", $i, $t);
 }
 
