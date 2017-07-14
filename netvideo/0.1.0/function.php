@@ -1560,10 +1560,18 @@ function ベンチマーク(int $times, callable ...$func) :void{
 
 
 function 関数文字列化(string $name){
-    if(!function_exists($name)){
-        return false;
+    if(preg_match("/::/", $name)){
+        if(!method_exists(...explode('::', $name))){
+            return false;
+        }
+        $ref = new ReflectionMethod($name);
     }
-    $ref = new ReflectionFunction($name);
+    else{
+        if(!function_exists($name)){
+            return false;
+        }
+        $ref = new ReflectionFunction($name);
+    }
     if($ref->isInternal()){
         return false;
     }
