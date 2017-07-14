@@ -1547,6 +1547,9 @@ function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments
 
 
 function ベンチマーク(callable $func, ...$arg){
+    static $i = 0;
+    $i++;
+
     $start = microtime(true);
     $end   = $start + 1;
     if($arg){
@@ -1560,8 +1563,9 @@ function ベンチマーク(callable $func, ...$arg){
         }
     }
     $finish = microtime(true);
-    $t = ($t > 0)  ?  number_format($t)  :  number_format(1/($finish-$start), 3);
-    printf("case: %s回\n", $t);
+
+    $t = ($t > 1)  ?  number_format($t)  :  number_format(1/($finish-$start), 3);
+    printf("case%s: %s回\n", $i, $t);
 }
 
 
