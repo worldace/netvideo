@@ -3,7 +3,9 @@
 // ■起動処理
 //======================================================
 (function (){
-    ini_set('session.cookie_httponly', 1);
+    foreach(設定['ini'] as $k => $v){
+        ini_set($k, $v);
+    }
 
     //PATH_INFOの仕様 /action.id
     $_SERVER['PATH_INFO'] = $_SERVER['PATH_INFO'] ?? '/';
