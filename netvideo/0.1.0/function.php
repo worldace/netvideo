@@ -1560,6 +1560,9 @@ function ベンチマーク(int $times, callable ...$func) :void{
 
 function 関数文字列化(string $name) :string{
     $ref = new ReflectionFunction($name);
+    if($ref->isInternal()){
+        return "";
+    }
     return implode("",
         array_slice(
             file($ref->getFileName()),
@@ -1572,6 +1575,9 @@ function 関数文字列化(string $name) :string{
 
 function クラス文字列化(string $name) :string{
     $ref = new ReflectionClass($name);
+    if($ref->isInternal()){
+        return "";
+    }
     return implode("",
         array_slice(
             file($ref->getFileName()),
