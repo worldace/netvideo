@@ -1601,7 +1601,7 @@ function 関数文字列化($func){
 
 function クラス文字列化($class){
     if(is_object($class) or class_exists($class)){
-        $regex = "class";
+        $regex = "class[\s|\(|\{]";
     }
     elseif(interface_exists($class)){
         $regex = "interface ";
@@ -1623,7 +1623,7 @@ function クラス文字列化($class){
             $ref->getEndLine() - $ref->getStartLine() + 1
         )
     );
-    $return = preg_replace("/^.*$regex/i", $regex, $return);
+    $return = preg_replace("/^.*($regex)/i", '$1', $return);
     $return = preg_replace("/}.*$/", "}", $return);
     return $return;
 }
