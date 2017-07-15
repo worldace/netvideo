@@ -1570,7 +1570,7 @@ function ベンチマーク(callable $func, ...$arg){
 }
 
 
-function 関数文字列化($func){
+function 関数文字列化($func, bool $replace=true){
     if(is_string($func) and preg_match("/::/", $func)){
         if(!method_exists(...explode('::', $func))){
             return false;
@@ -1586,31 +1586,50 @@ function 関数文字列化($func){
     if(!$ref->isUserDefined()){
         return false;
     }
-    return implode("",
+    $return = implode("",
         array_slice(
             file($ref->getFileName()),
             $ref->getStartLine() - 1,
             $ref->getEndLine() - $ref->getStartLine() + 1
         )
     );
+    if($replace){
+        $return = preg_replace("/^.*function/", "function", $return);
+        $return = preg_replace("/}.*$/", "}", $return);
+    }
+    return $return;
 }
 
 
-function クラス文字列化($class){
-    if(!is_object($class) and !class_exists($class) and !interface_exists($class) and !trait_exists($class)){
+function クラス文字列化($class, bool $replace=true){
+    if(is_object($class) or class_exists($class)){
+        $regex = "class";
+    }
+    elseif(interface_exists($class)){
+        $regex = "interface";
+    }
+    elseif(trait_exists($class)){
+        $regex = "trait";
+    }
+    else{
         return false;
     }
     $ref = new ReflectionClass($class);
     if(!$ref->isUserDefined()){
         return false;
     }
-    return implode("",
+    $return = implode("",
         array_slice(
             file($ref->getFileName()),
             $ref->getStartLine() - 1,
             $ref->getEndLine() - $ref->getStartLine() + 1
         )
     );
+    if($replace){
+        $return = preg_replace("/^.*$regex/", $regex, $return);
+        $return = preg_replace("/}.*$/", "}", $return);
+    }
+    return $return;
 }
 
 
