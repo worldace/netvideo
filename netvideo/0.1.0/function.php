@@ -654,7 +654,8 @@ function PATH_INFO設定() :string{
 }
 
 
-function 現在のURL(bool $no_query=false) :string{
+function 現在のURL(bool $cut_query=false) :string{
+    $port   = "";
     if(filter_input(INPUT_SERVER, 'HTTPS', FILTER_VALIDATE_BOOLEAN)){
         $scheme = "https://";
         if($_SERVER['SERVER_PORT'] != 443){
@@ -668,7 +669,7 @@ function 現在のURL(bool $no_query=false) :string{
         }
     }
     $url = $scheme . $_SERVER["HTTP_HOST"] . $port . $_SERVER['REQUEST_URI'];
-    return ($no_query) ? preg_replace("/\?.*$/","",$url) : $url;
+    return $cut_query ? preg_replace("/\?.*$/","",$url) : $url;
 }
 
 
@@ -1569,18 +1570,18 @@ function ベンチマーク(callable $func, ...$arg){
 }
 
 
-function 関数文字列化($name){
-    if(is_string($name) and preg_match("/::/", $name)){
-        if(!method_exists(...explode('::', $name))){
+function 関数文字列化($func){
+    if(is_string($func) and preg_match("/::/", $func)){
+        if(!method_exists(...explode('::', $func))){
             return false;
         }
-        $ref = new ReflectionMethod($name);
+        $ref = new ReflectionMethod($func);
     }
     else{
-        if(!is_callable($name)){
+        if(!is_callable($func) or is_array($func)){
             return false;
         }
-        $ref = new ReflectionFunction($name);
+        $ref = new ReflectionFunction($func);
     }
     if(!$ref->isUserDefined()){
         return false;
@@ -1595,11 +1596,11 @@ function 関数文字列化($name){
 }
 
 
-function クラス文字列化($name){
-    if(!is_object($name) and !class_exists($name) and !interface_exists($name) and !trait_exists($name)){
+function クラス文字列化($class){
+    if(!is_object($class) and !class_exists($class) and !interface_exists($class) and !trait_exists($class)){
         return false;
     }
-    $ref = new ReflectionClass($name);
+    $ref = new ReflectionClass($class);
     if(!$ref->isUserDefined()){
         return false;
     }
@@ -1611,7 +1612,6 @@ function クラス文字列化($name){
         )
     );
 }
-
 
 
 function データベース($table, $driver = null, $user = null, $pass = null){
