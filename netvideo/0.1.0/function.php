@@ -1570,7 +1570,7 @@ function ベンチマーク(callable $func, ...$arg){
 }
 
 
-function 関数文字列化($func, bool $replace=true){
+function 関数文字列化($func){
     if(is_string($func) and preg_match("/::/", $func)){
         if(!method_exists(...explode('::', $func))){
             return false;
@@ -1593,23 +1593,21 @@ function 関数文字列化($func, bool $replace=true){
             $ref->getEndLine() - $ref->getStartLine() + 1
         )
     );
-    if($replace){
-        $return = preg_replace("/^.*function/", "function", $return);
-        $return = preg_replace("/}.*$/", "}", $return);
-    }
+    $return = preg_replace("/^.*(function[\s|\(])/i", '$1', $return);
+    $return = preg_replace("/}.*$/", "}", $return);
     return $return;
 }
 
 
-function クラス文字列化($class, bool $replace=true){
+function クラス文字列化($class){
     if(is_object($class) or class_exists($class)){
         $regex = "class";
     }
     elseif(interface_exists($class)){
-        $regex = "interface";
+        $regex = "interface ";
     }
     elseif(trait_exists($class)){
-        $regex = "trait";
+        $regex = "trait ";
     }
     else{
         return false;
@@ -1625,10 +1623,8 @@ function クラス文字列化($class, bool $replace=true){
             $ref->getEndLine() - $ref->getStartLine() + 1
         )
     );
-    if($replace){
-        $return = preg_replace("/^.*$regex/", $regex, $return);
-        $return = preg_replace("/}.*$/", "}", $return);
-    }
+    $return = preg_replace("/^.*$regex/i", $regex, $return);
+    $return = preg_replace("/}.*$/", "}", $return);
     return $return;
 }
 
