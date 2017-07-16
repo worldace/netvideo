@@ -1984,7 +1984,12 @@ class 部品{
         if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品名]:ループ数が上限に達しました", 500); }
 
         if(is_callable(self::$記憶['部品コード'][$部品名])){
-            $html = self::$記憶['部品コード'][$部品名](...$引数);
+            try{
+                $html = self::$記憶['部品コード'][$部品名](...$引数);
+            }
+            catch(Throwable $t){
+                throw new Exception(sprintf("部品ファイル %s の 部品コード %s 行目で「%s」エラーが発生しました", $部品名, $t->getLine(), $t->getMessage()), 500, $t);
+            }
         }
         else{
             $html = self::$記憶['部品コード'][$部品名];
