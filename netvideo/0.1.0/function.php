@@ -1593,7 +1593,7 @@ function 関数文字列化($func){
             $ref->getEndLine() - $ref->getStartLine() + 1
         )
     );
-    $return = preg_replace("/^.*(function[\s|\(])/i", '$1', $return);
+    $return = preg_replace("/^.*(function[\s|\(])/i", '$1', $return); //token_get_all()でやるべきだが https://spelunker2.wordpress.com/2017/07/16/php%e3%81%ae%e3%83%88%e3%83%bc%e3%82%af%e3%83%b3%e3%83%a1%e3%83%a2/
     $return = preg_replace("/}.*$/", "}", $return);
     return $return;
 }
@@ -2880,14 +2880,14 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
 function 内部エラー(string $str = "エラーが発生しました", string $type = "停止", string $除外パス = "") :void{
     $debug_backtrace = debug_backtrace();
-    $除外パス = $除外パス ?: $debug_backtrace[0]['file'];
+    $除外パス = $除外パス ?: preg_replace("/\.php$/i", "", $debug_backtrace[0]['file']);
 
     foreach($debug_backtrace as $trace){
         if(strpos($trace['file'], $除外パス) !== 0){
             break;
         }
     }
-    $message = sprintf("【%s】%s \n%s :%s行目 %s%s%s()\n\n", $type, $str, $trace['file'], $trace['line'], $trace['class'], $trace['type'], $trace['function']);
+    $message = sprintf("【%s】%s \n%s :%s行目 %s%s%s()\n\n", $type, $str, $trace['file'], $trace['line'], @$trace['class'], @$trace['type'], $trace['function']);
 
     if(PHP_SAPI !== "cli"){
         $message = nl2br(htmlspecialchars($message, ENT_QUOTES, "UTF-8", false));
