@@ -1964,7 +1964,12 @@ class 部品{
             if(!isset(self::$解析[$部品名])){ self::$解析[$部品名] = self::ファイル解析($部品名); }
 
             if(preg_match("/^function/", self::$解析[$部品名]['php'])){
-                self::$記憶['部品コード'][$部品名] = eval("return " . self::$解析[$部品名]['php'] . ";");
+                try{
+                    self::$記憶['部品コード'][$部品名] = eval("return " . self::$解析[$部品名]['php'] . ";");
+                }
+                catch(Throwable $t){
+                    throw new Exception(sprintf("部品ファイル %s の 部品コード %s 行目で「%s」エラーが発生しました", $部品名, $t->getLine(), $t->getMessage()), 500, $t);
+                }
             }
             else{
                 self::$記憶['部品コード'][$部品名] = self::$解析[$部品名]['php'];
