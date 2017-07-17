@@ -1968,7 +1968,7 @@ class 部品{
                     self::$記憶['部品コード'][$部品名] = eval("return " . self::$解析[$部品名]['php'] . ";");
                 }
                 catch(Error $e){
-                    throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で「%s」エラーが発生しました", $部品名, $e->getLine(), $e->getMessage()), 500, $e);
+                    throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で文法エラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), 500, $e);
                 }
             }
             else{
@@ -1988,7 +1988,7 @@ class 部品{
                 $html = self::$記憶['部品コード'][$部品名](...$引数);
             }
             catch(Error $e){
-                throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で「%s」エラーが発生しました", $部品名, $e->getLine(), $e->getMessage()), 500, $e);
+                throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で実行エラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), 500, $e);
             }
         }
         else{
@@ -2890,7 +2890,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
 function 内部エラー(string $str = "エラーが発生しました", string $type = "停止", string $除外パス = "") :void{
     $debug_backtrace = debug_backtrace();
-    $除外パス = $除外パス ?: preg_replace("/\.php$/i", "", $debug_backtrace[0]['file']);
+    $除外パス = $除外パス ?: $debug_backtrace[0]['file'];
 
     foreach($debug_backtrace as $trace){
         if(strpos($trace['file'], $除外パス) !== 0){
