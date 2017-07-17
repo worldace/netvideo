@@ -1967,8 +1967,8 @@ class 部品{
                 try{
                     self::$記憶['部品コード'][$部品名] = eval("return " . self::$解析[$部品名]['php'] . ";");
                 }
-                catch(Throwable $t){
-                    throw new Exception(sprintf("部品ファイル %s の 部品コード %s 行目で「%s」エラーが発生しました", $部品名, $t->getLine(), $t->getMessage()), 500, $t);
+                catch(Error $e){
+                    throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で「%s」エラーが発生しました", $部品名, $e->getLine(), $e->getMessage()), 500, $e);
                 }
             }
             else{
@@ -1981,14 +1981,14 @@ class 部品{
         }
 
         self::$記憶['stack'][] = $部品名;
-        if(count(self::$記憶['stack']) > 250){ throw new Exception("[$部品名]:ループ数が上限に達しました", 500); }
+        if(count(self::$記憶['stack']) > 250){ throw new Error("[$部品名]:ループ数が上限に達しました", 500); }
 
         if(is_callable(self::$記憶['部品コード'][$部品名])){
             try{
                 $html = self::$記憶['部品コード'][$部品名](...$引数);
             }
-            catch(Throwable $t){
-                throw new Exception(sprintf("部品ファイル %s の 部品コード %s 行目で「%s」エラーが発生しました", $部品名, $t->getLine(), $t->getMessage()), 500, $t);
+            catch(Error $e){
+                throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で「%s」エラーが発生しました", $部品名, $e->getLine(), $e->getMessage()), 500, $e);
             }
         }
         else{
@@ -2043,8 +2043,8 @@ class 部品{
     }
 
     private static function ファイル取得($部品名){
-        if(!self::$設定['ディレクトリ']){ throw new Exception("部品::開始() を行ってください", 500); }
-        if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){ throw new Exception("部品名はPHPの変数の命名規則に沿ってください", 500); }
+        if(!self::$設定['ディレクトリ']){ throw new Error("部品::開始() を行ってください", 500); }
+        if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){ throw new Error("部品名はPHPの変数の命名規則に沿ってください", 500); }
 
         $path = self::$設定['ディレクトリ'] . "/" . str_replace("_", "/", $部品名) . ".html";
         $return = file_get_contents($path);
