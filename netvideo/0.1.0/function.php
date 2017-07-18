@@ -725,6 +725,24 @@ function PHP≧(string $str) :bool{
 }
 
 
+function 自然数なら($num, bool $zero = false) :bool{
+    $return = false;
+    if(is_int($num)){
+        $return = $num > 0;
+        if($zero and $num === 0){
+            $return = true;
+        }
+    }
+    elseif(is_string($num)){
+        $return = preg_match("/^[1-9][0-9]*$/", $num) > 0;
+        if($zero and $num === '0'){
+            $return = true;
+        }
+    }
+    return $return;
+}
+
+
 function str_match(string $needle, string $haystack, &$match = null) :bool{
     $match = strpos($haystack, $needle);
     return ($match === false)  ?  false  :  true;
