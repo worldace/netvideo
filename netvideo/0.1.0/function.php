@@ -619,7 +619,7 @@ function URL(array $param = null) :string{
 }
 
 
-function PATH_INFOをGETに代入() :void{
+function PATH_INFO分解() :array{
     $区切り = 設定['PATH_INFO区切り文字'] ?? '/';
     if($区切り === '/'){
         $pathinfo = explode("/", $_SERVER['PATH_INFO'] ?? '');
@@ -630,13 +630,15 @@ function PATH_INFOをGETに代入() :void{
         $pathinfo[0] = preg_replace("|^/|", "", $pathinfo[0]);
     }
 
-    $_GET['PATH_INFO'] = [];
+    $return = [];
     foreach($pathinfo as $v){
         if($v !== ""){
-            $_GET['PATH_INFO'][] = $v;
+            $return[] = $v;
         }
     }
+    return $return;
 }
+
 
 function PATH_INFO設定() :string{
     if(isset($_SERVER['PATH_INFO'])){
