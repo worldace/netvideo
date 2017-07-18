@@ -620,10 +620,10 @@ function URL(array $param = null) :string{
 
 
 function PATH_INFO分解() :array{
-    $区切り   = 設定['PATH_INFO区切り文字'] ?? '/';
+    $区切り文字 = defined("設定['PATH_INFO区切り文字']")  ?  設定['PATH_INFO区切り文字']  :  '/';
     $pathinfo = $_SERVER['PATH_INFO'] ?? '';
     $pathinfo = ltrim($pathinfo, '/');
-    $pathinfo = explode($区切り, $pathinfo);
+    $pathinfo = explode($区切り文字, $pathinfo);
     $return   = [];
 
     foreach($pathinfo as $v){
