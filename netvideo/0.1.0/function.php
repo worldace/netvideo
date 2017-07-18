@@ -620,17 +620,12 @@ function URL(array $param = null) :string{
 
 
 function PATH_INFO分解() :array{
-    $区切り = 設定['PATH_INFO区切り文字'] ?? '/';
-    if($区切り === '/'){
-        $pathinfo = explode("/", $_SERVER['PATH_INFO'] ?? '');
-        array_shift($pathinfo);
-    }
-    else{
-        $pathinfo = explode($区切り, $_SERVER['PATH_INFO'] ?? '');
-        $pathinfo[0] = preg_replace("|^/|", "", $pathinfo[0]);
-    }
+    $区切り   = 設定['PATH_INFO区切り文字'] ?? '/';
+    $pathinfo = $_SERVER['PATH_INFO'] ?? '';
+    $pathinfo = ltrim($pathinfo, '/');
+    $pathinfo = explode($区切り, $pathinfo);
+    $return   = [];
 
-    $return = [];
     foreach($pathinfo as $v){
         if($v !== ""){
             $return[] = $v;
