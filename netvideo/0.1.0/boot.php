@@ -12,7 +12,7 @@
     preg_match("|^/?([^\.]*)\.?(.*)$|", $_SERVER['PATH_INFO'], $match);
     $_GET['action'] = $match[1];
     $_GET['id']     = $match[2];
-    if(preg_match("/^\d+$/", $_GET['action'])){
+    if(自然数なら($_GET['action'])){
         $_GET['id']     = $_GET['action'];
         $_GET['action'] = 'video';
     }

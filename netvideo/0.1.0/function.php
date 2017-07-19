@@ -1275,7 +1275,11 @@ function CSV行取得(&$handle, $d = ',', $e = '"'){
     $e = preg_quote($e);
     $line = "";
 
-    while(is_resource($handle) and !feof($handle)){
+    if(!is_resource($handle)){
+        return false;
+    }
+
+    while(!feof($handle)){
         $line .= fgets($handle);
         if(preg_match_all("/$e/", $line) % 2 === 0){
             break;

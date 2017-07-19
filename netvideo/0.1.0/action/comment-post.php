@@ -9,8 +9,10 @@ $_POST += ['id'=>'', '登録時間'=>'', '位置'=>'', '本文'=>''];
 検査($_POST['本文'], "64文字以下");
 
 
-$db = sprintf("%s/upload/%s/%s.db", 設定['公開ディレクトリ'], date('Y/md', $_GET['登録時間']), $_GET['id']);
-if(!is_file($db)){ exit; }
+$db = sprintf("%s/upload/%s/%s.db", 設定['公開ディレクトリ'], date('Y/md', $_POST['登録時間']), $_POST['id']);
+if(!is_file($db)){
+    exit;
+}
 
 
 データベース("動画") -> 更新($_POST['id'], [

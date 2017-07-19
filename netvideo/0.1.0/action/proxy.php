@@ -43,10 +43,9 @@ foreach(array_reverse(stream_get_meta_data($fp)['wrapper_data']) as $v){
     header($v);
 }
 
-while(!feof($fp)){
-    print fread($fp, 8192);
+while(($read = fread($fp, 8192)) !== false){
+    print $read;
 }
-fclose($fp);
 
 exit;
 
