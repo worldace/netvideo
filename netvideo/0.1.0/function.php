@@ -2187,7 +2187,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
     private $選択記憶 = [];
     private $種類 = "html";
 
-    public function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
+    function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
         $this->文書 = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
         libxml_disable_entity_loader(true);
 
@@ -2210,7 +2210,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         $this->文書->preserveWhiteSpace = false;
     }
 
-    public function 本文($str = null){
+    function 本文($str = null){
         if($str === null){
             if(isset($this->選択[0])){
                 $return = $this->選択[0]->textContent;
@@ -2226,7 +2226,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
     }
 
 
-    public function html($str = null){
+    function html($str = null){
         if($str === null){ //innerHTML
             if(isset($this->選択[0])){
                 foreach($this->選択[0]->childNodes as $child){
@@ -2245,21 +2245,23 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
             $add = $this->文字列DOM化($str);
             foreach($this->選択 as $where){
                 $where->textContent = "";
-                if($str !== ""){ $where->appendChild($add->cloneNode(true)); }
+                if($str !== ""){
+                    $where->appendChild($add->cloneNode(true));
+                }
             }
             return $this;
         }
     }
 
 
-    public function タグ名(){
+    function タグ名(){
         if(isset($this->選択[0])){
             $return = strtolower($this->選択[0]->tagName);
         }
         return (string)$return;
     }
 
-    public function 属性($name = null, $value = null){
+    function 属性($name = null, $value = null){
         if(is_string($name) and $value === null){ //属性値を1つ取得
             if(isset($this->選択[0])){
                 $return = $this->選択[0]->getAttribute($name);
@@ -2283,7 +2285,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         else if($name === null){ //全属性取得
             if(isset($this->選択[0])){
                 $attrs = $this->選択[0]->attributes;
-                for($i = 0; $i < $attrs->length; $i++){
+                for($i = 0;  $i < $attrs->length;  $i++){
                     $return[$attrs->item($i)->name] = $attrs->item($i)->value;
                 }
             }
@@ -2292,7 +2294,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         return $this;
     }
 
-    public function 属性削除($name = null){
+    function 属性削除($name = null){
         if(is_string($name)){
             foreach($this->選択 as $where){
                 $where->removeAttribute($name);
@@ -2301,7 +2303,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         else{
             foreach($this->選択 as $where){
                 $attrs = $where->attributes;
-                for($i = $attrs->length - 1; $i >= 0; $i--){
+                for($i = $attrs->length - 1;  $i >= 0;  $i--){
                     $where->removeAttribute($attrs->item($i)->name);
                 }
             }
@@ -2309,7 +2311,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         return $this;
     }
 
-    public function dom($tag = null, $attr = null, $content = null){
+    function dom($tag = null, $attr = null, $content = null){
         if(is_string($tag)){
             $dom = $this->文書->createElement($tag);
             if(is_array($attr)){
@@ -2330,20 +2332,20 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         }
     }
 
-    public function 追加($add, $relation){
+    function 追加($add, $relation){
         return $this->DOM操作($this->DOM箱作成($add), $relation);
     }
 
-    public function 貼り付け($selector, $relation){
+    function 貼り付け($selector, $relation){
         $this($selector);
         return $this->DOM操作($this->選択記憶, $relation);
     }
 
-    public function 削除(){
+    function 削除(){
         return $this->DOM操作([], "削除");
     }
 
-    public function 検索($selector){
+    function 検索($selector){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->セレクタ検索($selector, false, $where));
@@ -2351,46 +2353,52 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 最初(){
+    function 最初(){
         return $this->選択保存(array_slice($this->選択, 0, 1));
     }
 
-    public function 最後(){
+    function 最後(){
         return $this->選択保存(array_slice($this->選択, -1, 1));
     }
     
-    public function n($n, $m = 1){
+    function n($n, $m = 1){
         return $this->選択保存(array_slice($this->選択, $n, $m));
     }
 
-    public function 親($selector = null){
+    function 親($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->家族探索($where, "parentNode", true));
         }
-        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
+        if($selector){
+            $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false));
+        }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 兄($selector = null){
+    function 兄($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling", true));
         }
-        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
+        if($selector){
+            $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false));
+        }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 弟($selector = null){
+    function 弟($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->家族探索($where, "nextSibling", true));
         }
-        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
+        if($selector){
+            $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false));
+        }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 子持ち($selector = null){
+    function 子持ち($selector = null){
         $新選択 = [];
         if(!$selector){ $selector = "*"; }
         foreach($this->選択 as $where){
@@ -2401,43 +2409,51 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         return $this->選択保存($新選択);
     }
 
-    public function 親全て($selector = null){
+    function 親全て($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->家族探索($where, "parentNode", false));
         }
-        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
+        if($selector){
+            $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false));
+        }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 兄全て($selector = null){
+    function 兄全て($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling", false));
         }
-        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
+        if($selector){
+            $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false));
+        }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 弟全て($selector = null){
+    function 弟全て($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->家族探索($where, "nextSibling", false));
         }
-        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
+        if($selector){
+            $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false));
+        }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 兄弟全て($selector = null){
+    function 兄弟全て($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             $新選択 = array_merge($新選択, $this->家族探索($where, "previousSibling", false), $this->家族探索($where, "nextSibling", false));
         }
-        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
+        if($selector){
+            $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false));
+        }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 子($selector = null){
+    function 子($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             foreach($where->childNodes as $child){
@@ -2447,60 +2463,68 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
                 }
             }
         }
-        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
+        if($selector){
+            $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false));
+        }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 子全て($selector = null){
+    function 子全て($selector = null){
         $新選択 = [];
         foreach($this->選択 as $where){
             foreach($where->childNodes as $child){
-                if($child->nodeType === XML_ELEMENT_NODE){ $新選択[] = $child; }
+                if($child->nodeType === XML_ELEMENT_NODE){
+                    $新選択[] = $child;
+                }
             }
         }
-        if($selector){ $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false)); }
+        if($selector){
+            $新選択 = $this->積集合($新選択, $this->セレクタ検索($selector, false));
+        }
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function かつ($selector){
+    function かつ($selector){
         $新選択 = $this->積集合($this->選択, $this->セレクタ検索($selector, false));
         return $this->選択保存($新選択);
     }
 
-    public function 足す($selector){
+    function 足す($selector){
         $新選択 = array_merge($this->選択, $this->セレクタ検索($selector, false));
         return $this->選択保存($this->重複ノード解消($新選択));
     }
 
-    public function 引く($selector){
+    function 引く($selector){
         $新選択 = $this->差集合($this->選択, $this->セレクタ検索($selector, false));
         return $this->選択保存($新選択);
     }
 
-    public function なら($selector){
+    function なら($selector){
         foreach($this->セレクタ検索($selector, false) as $val){
             foreach($this->選択 as $where){
-                if($where->isSameNode($val)){ return true; }
+                if($where->isSameNode($val)){
+                    return true;
+                }
             }
         }
         return false;
     }
 
-    public function 逆順(){
+    function 逆順(){
         return $this->選択保存(array_reverse($this->選択));
     }
 
-    public function 前の選択(){
+    function 前の選択(){
         list($this->選択記憶, $this->選択) = [$this->選択, $this->選択記憶];
         return $this;
     }
 
-    public function d(){
+    function d(){
         $print = "■現在選択中の要素 (" . count($this->選択) . ")\n\n";
         foreach($this->選択 as $key => $dom){
             $print .= "[$key]: {$this->文書->saveHTML($dom)}\n";
         }
-        
+
         $print .= "\n\n■エラー情報\n\n";
         foreach(libxml_get_errors() as $error){
             switch ($error->level) {
@@ -2519,11 +2543,11 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
     }
 
     //■マジックメソッドの実装
-    public function __toString(){
+    function __toString(){
         return $this->HTML全体文字列();
     }
 
-    public function __invoke($selector = null){
+    function __invoke($selector = null){
         if(is_string($selector)){
             if(!preg_match("/^</", $selector)){
                 $this->セレクタ検索($selector);
@@ -2548,9 +2572,9 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
     }
 
     //■IteratorAggregateインターフェースの実装
-    public function getIterator(){
+    function getIterator(){
         $clone = [];
-        for($i = 0; $i < count($this->選択); $i++){
+        for($i = 0;  $i < count($this->選択);  $i++){
             $clone[] = clone $this;
             $clone[$i]->選択 = [$this->選択[$i]];
             $clone[$i]->選択記憶 = [];
@@ -2559,17 +2583,18 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
     }
 
     //■Countableインターフェースの実装
-    public function count() { 
+    function count() { 
         return count($this->選択);
     }
 
     //■ArrayAccessインターフェースの実装
-    public function offsetGet($offset){
+    function offsetGet($offset){
         return $this->選択保存(array_slice($this->選択, $offset, 1));
     }
-    public function offsetSet($offset, $value){}
-    public function offsetExists($offset){}
-    public function offsetUnset($offset) {}
+    function offsetSet($offset, $value){}
+    function offsetExists($offset){}
+    function offsetUnset($offset) {}
+
 
 
     //■以下プライベートメソッド
@@ -2589,11 +2614,15 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
             $input = new self($input);
         }
         if($input instanceof self){ //文書オブジェクトの場合
-            if($input === $this){ return $dom箱; }
+            if($input === $this){
+                return $dom箱;
+            }
             $root = $input->文書->documentElement;
             $input = [];
             while($root){
-                if($root->nodeType === XML_ELEMENT_NODE){ $input[] = $root; }
+                if($root->nodeType === XML_ELEMENT_NODE){
+                    $input[] = $root;
+                }
                 $root = $root->nextSibling;
             }
         }
@@ -2602,8 +2631,12 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         }
         if(is_array($input) or ($input instanceof DOMNodeList)){ //配列の場合
             foreach($input as $node){
-                if(!($node instanceof DOMElement)){ continue; }
-                if($node->ownerDocument !== $this->文書){ $node = $this->文書->importNode($node, true); }
+                if(!($node instanceof DOMElement)){
+                    continue;
+                }
+                if($node->ownerDocument !== $this->文書){
+                    $node = $this->文書->importNode($node, true);
+                }
                 $dom箱[] = $node->cloneNode(true);
             }
         }
@@ -2660,15 +2693,20 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
     private function セレクタ検索($selector = null, $記録する = true, DOMNode $context = null){
         $return = [];
-        if(!$selector){ return $return; }
+        if(!$selector){
+            return $return;
+        }
 
         $expression = $this->selector2XPath($selector);
-        if($context){ $expression = preg_replace("|^//|", ".//", $expression); } //相対パスにする
-
+        if($context){
+            $expression = preg_replace("|^//|", ".//", $expression); //相対パスにする
+        }
         foreach((new DOMXPath($this->文書))->query($expression, $context) as $node){ //DOMNodeList(複数形)が返る https://secure.php.net/manual/ja/class.domxpath.php
             $return[] = $node;
         }
-        if($記録する){ $this->選択保存($return); }
+        if($記録する){
+            $this->選択保存($return);
+        }
         return $return;
     }
 
@@ -2684,7 +2722,9 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         while($node){
             if($node->nodeType === XML_ELEMENT_NODE){
                 $return[] = $node;
-                if($一人だけ){ break; }
+                if($一人だけ){
+                    break;
+                }
             }
             $node = $node->$続柄;
         }
@@ -2694,9 +2734,13 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
     private function 重複ノード解消(array $array){
         $return = [];
         foreach($array as $v1){
-            if(!($v1 instanceof DOMNode)){ continue; }
+            if(!($v1 instanceof DOMNode)){
+                continue;
+            }
             foreach($return as $v2){
-                if($v1->isSameNode($v2)){ continue 2; }
+                if($v1->isSameNode($v2)){
+                    continue 2;
+                }
             }
             $return[] = $v1;
         }
@@ -2720,7 +2764,9 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         $return = [];
         foreach($a as $v1){
             foreach($b as $v2){
-                if($v1->isSameNode($v2)){ continue 2; }
+                if($v1->isSameNode($v2)){
+                    continue 2;
+                }
             }
             $return[] = $v1;
         }
@@ -2738,7 +2784,9 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
                 return $this->文書->saveXML($type) . "\n" . $this->文書->saveXML($node);
             case "断片":
                 while($node){
-                    if($node->nodeType === XML_ELEMENT_NODE){ $return .= $this->文書->saveHTML($node) . "\n"; }
+                    if($node->nodeType === XML_ELEMENT_NODE){
+                        $return .= $this->文書->saveHTML($node) . "\n";
+                    }
                     $node = $node->nextSibling;
                 }
                 return (string)$return;
