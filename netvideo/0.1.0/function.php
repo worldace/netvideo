@@ -1940,7 +1940,6 @@ class 部品{
     private static $設定;
     private static $記憶;
     private static $タグ;
-    private static $解析;
 
 
     static function 開始($dir = __DIR__."/部品", array $option = []){
@@ -1964,7 +1963,6 @@ class 部品{
 
         self::$記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[], 'キャプチャ開始'=>false];
         self::$タグ = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
-        self::$解析 = [];
         self::関数登録();
 
         if(!self::$設定['手動']){
@@ -1976,32 +1974,30 @@ class 部品{
 
     static function 終了(){
         $return = (self::$記憶['キャプチャ開始'] === true)  ?  self::差し込む(ob_get_clean())  :  "";
-        self::$設定 = self::$記憶 = self::$タグ = self::$解析 = null;
+        self::$設定 = self::$記憶 = self::$タグ = null;
         return $return;
     }
 
 
     static function 作成($部品名, $引数){
         if(!isset(self::$記憶['部品コード'][$部品名])){
-            if(!isset(self::$解析[$部品名])){
-                self::$解析[$部品名] = self::ファイル解析($部品名);
-            }
+            $解析 = self::ファイル解析($部品名);
 
-            if(preg_match("/^function/", self::$解析[$部品名]['php'])){
+            if(preg_match("/^function/i", $解析['php'])){
                 try{
-                    self::$記憶['部品コード'][$部品名] = eval("return " . self::$解析[$部品名]['php'] . ";");
+                    self::$記憶['部品コード'][$部品名] = eval("return " . $解析['php'] . ";");
                 }
                 catch(Error $e){
                     throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で文法エラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), 0, $e);
                 }
             }
             else{
-                self::$記憶['部品コード'][$部品名] = self::$解析[$部品名]['php'];
+                self::$記憶['部品コード'][$部品名] = $解析['php'];
             }
 
-            self::$タグ['css'] .= self::タグ作成(self::$解析[$部品名]['css'], "href", $部品名);
-            self::$タグ['jsinhead'] .= self::タグ作成(self::$解析[$部品名]['jsh'], "src", $部品名);
-            self::$タグ['jsinbody'] .= self::タグ作成(self::$解析[$部品名]['jsb'], "src", $部品名);
+            self::$タグ['css'] .= self::タグ作成($解析['css'], "href", $部品名);
+            self::$タグ['jsinhead'] .= self::タグ作成($解析['jsh'], "src", $部品名);
+            self::$タグ['jsinbody'] .= self::タグ作成($解析['jsb'], "src", $部品名);
         }
 
         self::$記憶['stack'][] = $部品名;
@@ -2118,7 +2114,7 @@ class 部品{
         preg_match_all("|<script([^>]*>)([\s\S]*?)</script>|i", $html, $script, PREG_OFFSET_CAPTURE);
         for($i = 0;  $i < count($script[0]);  $i++){
             if(preg_match("/\stype=[\"']部品[\"']/ui", $script[1][$i][0])){
-                $return["php"] = preg_replace("/^function[^\(]*/", "function", ltrim($script[2][$i][0]));
+                $return["php"] = preg_replace("/^function[^\(]*/i", "function", ltrim($script[2][$i][0]));
             }
             elseif($script[0][$i][1] < $pos){
                 $return["jsh"][] = $script[0][$i][0];
