@@ -1943,13 +1943,18 @@ class 部品{
     private static $解析;
 
 
-    public static function 開始($dir = __DIR__."/部品", array $option = []){
-        if(self::$設定){ return; }
-        if(!is_dir($dir)){ throw new Exception("部品ディレクトリが存在しません", 500); }
+    static function 開始($dir = __DIR__."/部品", array $option = []){
+        if(self::$設定){
+            return;
+        }
+        if(!is_dir($dir)){
+            throw new Exception("部品ディレクトリが存在しません");
+        }
         self::$設定 = $option + [
-            "手動"=>false,
-            "nonce"=>null,
+            "手動"  => false,
+            "nonce" => null,
         ];
+        
         if(!preg_match('#^(/|[a-zA-Z]:[\\\\/])#', $dir)){ //相対パスの時
             self::$設定["ディレクトリ"] = realpath($dir);
         }
@@ -1968,13 +1973,15 @@ class 部品{
         }
     }
 
-    public static function 終了(){
+
+    static function 終了(){
         $return = (self::$記憶['キャプチャ開始'] === true)  ?  self::差し込む(ob_get_clean())  :  "";
         self::$設定 = self::$記憶 = self::$結果 = self::$解析 = null;
         return $return;
     }
 
-    public static function 作成($部品名, $引数){
+
+    static function 作成($部品名, $引数){
         if(!isset(self::$記憶['部品コード'][$部品名])){
             if(!isset(self::$解析[$部品名])){ self::$解析[$部品名] = self::ファイル解析($部品名); }
 
@@ -1983,7 +1990,7 @@ class 部品{
                     self::$記憶['部品コード'][$部品名] = eval("return " . self::$解析[$部品名]['php'] . ";");
                 }
                 catch(Error $e){
-                    throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で文法エラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), 500, $e);
+                    throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で文法エラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), 0, $e);
                 }
             }
             else{
@@ -1996,14 +2003,16 @@ class 部品{
         }
 
         self::$記憶['stack'][] = $部品名;
-        if(count(self::$記憶['stack']) > 250){ throw new Error("[$部品名]:ループ数が上限に達しました", 500); }
+        if(count(self::$記憶['stack']) > 100){
+            throw new Error("部品ファイル読み込みのループ数が100回を超えました\n" . implode("\n", self::$記憶['stack']));
+        }
 
         if(is_callable(self::$記憶['部品コード'][$部品名])){
             try{
                 $html = self::$記憶['部品コード'][$部品名](...$引数);
             }
             catch(Error $e){
-                throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で実行エラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), 500, $e);
+                throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で実行エラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), 0, $e);
             }
         }
         else{
@@ -2014,7 +2023,8 @@ class 部品{
         return $html;
     }
 
-    public static function 差し込む($buf){
+
+    static function 差し込む($buf){
         self::$結果['fromphp'] = self::fromphpタグ完成();
 
         if(self::$結果['jsinbody']){
@@ -2035,12 +2045,14 @@ class 部品{
         return $buf;
     }
 
-    public static function タグ取得(){
+
+    static function タグ取得(){
         self::$結果['fromphp'] = self::fromphpタグ完成();
         return self::$結果;
     }
 
-    public static function fromphp($data){
+
+    static function fromphp($data){
         $部品名 = end(self::$記憶['stack']);
         if($部品名){
             self::$記憶['fromphp'][$部品名] = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
@@ -2051,21 +2063,31 @@ class 部品{
 
 
     private static function 関数登録(){
-        if(function_exists("部品")){ return; }
+        if(function_exists("部品")){
+            return;
+        }
         function 部品($部品名, ...$引数){
             return 部品::作成($部品名, $引数);
         }
     }
 
-    private static function ファイル取得($部品名){
-        if(!self::$設定['ディレクトリ']){ throw new Error("部品::開始() を行ってください", 500); }
-        if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){ throw new Error("部品名はPHPの変数の命名規則に沿ってください", 500); }
 
-        $path = self::$設定['ディレクトリ'] . "/" . str_replace("_", "/", $部品名) . ".html";
+    private static function ファイル取得($部品名){
+        if(!self::$設定['ディレクトリ']){
+            throw new Error("部品::開始() を行ってください");
+        }
+        if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){
+            throw new Error("部品名はPHPの変数の命名規則に沿ってください");
+        }
+
+        $path = sprintf("%s/%s.html", self::$設定['ディレクトリ'], str_replace("_", "/", $部品名));
         $return = file_get_contents($path);
-        if(!$return){ throw new Exception("部品ファイルが見つかりません: $path", 500); }
+        if(!$return){
+            throw new Exception("部品ファイルが見つかりません: $path");
+        }
         return $return;
     }
+
 
     private static function ファイル解析($部品名){
         $return = ["css"=>[], "jsh"=>[], "jsb"=>[], "php"=>""];
@@ -2092,7 +2114,7 @@ class 部品{
 
         //JS処理
         preg_match_all("|<script([^>]*>)([\s\S]*?)</script>|i", $html, $script, PREG_OFFSET_CAPTURE);
-        for($i=0; $i<count($script[0]); $i++){
+        for($i = 0;  $i < count($script[0]);  $i++){
             if(preg_match("/\stype=[\"']部品[\"']/ui", $script[1][$i][0])){
                 $return["php"] = preg_replace("/^function[^\(]*/", "function", ltrim($script[2][$i][0]));
             }
@@ -2106,39 +2128,55 @@ class 部品{
         return $return;
     }
 
+
     private static function タグ完成(array $array, $link, $部品名){
         $return = "";
+        $部品ファイルの位置 = self::$設定['ディレクトリ'] . "/" . dirname(str_replace("_", "/", $部品名));
+
         foreach($array as $v){
             preg_match("|^([^>]+)|", $v, $attr);
-            if(preg_match("|\s$link=[\"\']([\s\S]*?)[\"\']|i", $attr[0], $match)){
-                $url = $match[1];
+            if(preg_match("|\s$link=[\"\']([\s\S]*?)[\"\']|i", $attr[0], $url)){
+                $url = $url[1];
                 if(!preg_match("#^(/|https?://)#", $url)){ //相対パスなら
-                    $url = realpath(self::$設定['ディレクトリ'] . "/" . dirname(str_replace("_", "/", $部品名)) . "/" . $url);
-                    if(in_array($url, self::$記憶['読み込み済みURL'])){ continue; }
-                    $content = file_get_contents($url);
-                    $v = ($link === "href")  ?  "<style>\n$content</style>"  :  "<script>\n$content</script>";
+                    $url = realpath("$部品ファイルの位置/$url");
+                    if(in_array($url, self::$記憶['読み込み済みURL'])){
+                        continue;
+                    }
+                    $contents = file_get_contents($url);
+                    $v = ($link === "href")  ?  "<style>\n$contents</style>"  :  "<script>\n$contents</script>";
                 }
                 else{
-                    if(in_array($url, self::$記憶['読み込み済みURL'])){ continue; }
+                    if(in_array($url, self::$記憶['読み込み済みURL'])){
+                        continue;
+                    }
                 }
                 self::$記憶['読み込み済みURL'][] = $url;
             }
-            if(isset(self::$設定['nonce'])){ $v = preg_replace("/^<(\w+)/", '<$1 nonce="'.self::$設定['nonce'].'" ', $v); }
-            $return .= $v . "\n";
+            if(isset(self::$設定['nonce'])){
+                $v = preg_replace("/^<(\w+)/", sprintf('<$1 nonce="%s" ', self::$設定['nonce']), $v);
+            }
+            $return .= "$v\n";
         }
+
         return $return;
     }
 
+
     private static function fromphpタグ完成(){
-        if(!self::$記憶['fromphp']){ return ""; }
-
-        $return  = isset(self::$設定['nonce'])  ?  '<script nonce="'.self::$設定['nonce'].'">'  :  '<script>';
-        $return .= "\nvar fromphp = {};\n";
-
-        foreach(self::$記憶['fromphp'] as $key => $val){
-            $return .= "fromphp['$key'] = $val;\n";
+        if(!self::$記憶['fromphp']){
+            return "";
         }
-        return $return."</script>\n";
+
+        $return  = isset(self::$設定['nonce'])  ?  sprintf('<script nonce="%s">', self::$設定['nonce'])  :  '<script>';
+        $return .= "\n";
+        $return .= "var fromphp = {};\n";
+
+        foreach(self::$記憶['fromphp'] as $k => $v){
+            $return .= sprintf("fromphp['%s'] = %s;\n", $k, $v);
+        }
+        $return .= "</script>\n";
+
+        return $return;
     }
 }
 
