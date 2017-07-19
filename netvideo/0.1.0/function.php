@@ -1972,6 +1972,9 @@ class 部品{
 
 
     static function 終了(){
+        if(!self::$設定){
+            return;
+        }
         $return = (!self::$設定['手動'])  ?  self::差し込む(ob_get_clean())  :  "";
         self::$設定 = self::$記憶 = self::$タグ = null;
         return $return;
@@ -1994,7 +1997,7 @@ class 部品{
                 self::$記憶['部品コード'][$部品名] = $解析['php'];
             }
 
-            self::$タグ['css'] .= self::タグ作成($解析['css'], "href", $部品名);
+            self::$タグ['css']      .= self::タグ作成($解析['css'], "href", $部品名);
             self::$タグ['jsinhead'] .= self::タグ作成($解析['jsh'], "src", $部品名);
             self::$タグ['jsinbody'] .= self::タグ作成($解析['jsb'], "src", $部品名);
         }
@@ -2026,8 +2029,8 @@ class 部品{
 
         if(self::$タグ['jsinbody']){
             $pos = strripos($buf, "</body>");
-            if($pos !== false){
-                $buf = substr_replace($buf, self::$タグ['jsinbody'], $pos, 0); //最後に出現する</body>の前にJSを挿入する
+            if($pos !== false){ //最後に出現する</body>の前にJSを挿入する
+                $buf = substr_replace($buf, self::$タグ['jsinbody'], $pos, 0);
             }
             else{
                 $buf = $buf . self::$タグ['jsinbody'];
@@ -2035,8 +2038,8 @@ class 部品{
         }
         if(self::$タグ['css'] || self::$タグ['jsinhead'] || self::$タグ['fromphp']){
             $pos = stripos($buf, "</title>");
-            if($pos !== false){
-                $buf = substr_replace($buf, "\n".self::$タグ['css'].self::$タグ['fromphp'].self::$タグ['jsinhead'], $pos+8, 0); //最初に出現する</title>の前に挿入する
+            if($pos !== false){ //最初に出現する</title>の前に挿入する
+                $buf = substr_replace($buf, "\n".self::$タグ['css'].self::$タグ['fromphp'].self::$タグ['jsinhead'], $pos+8, 0);
             }
         }
         return $buf;
