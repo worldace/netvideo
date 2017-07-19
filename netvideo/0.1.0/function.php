@@ -155,61 +155,61 @@ class 検査{
     public static $例外 = false;
     public static $結果 = [];
 
-    public static function 必須($v) :bool{
+    static function 必須($v) :bool{
         return strlen($v) > 0;
     }
-    public static function 数($v) :bool{
+    static function 数($v) :bool{
         return (is_numeric($v) and !preg_match("/^-?0+\d/", $v));
     }
-    public static function 自然数($v) :bool{
+    static function 自然数($v) :bool{
         return preg_match("/^[1-9][0-9]*$/", $v) > 0;
     }
-    public static function 整数($v) :bool{
+    static function 整数($v) :bool{
         return preg_match("/^(0|[1-9]\d*)$/", $v) > 0;
     }
-    public static function 数字($v) :bool{
+    static function 数字($v) :bool{
         return preg_match("/^[0-9]+$/", $v) > 0;
     }
-    public static function 英字($v) :bool{
+    static function 英字($v) :bool{
         return preg_match("/^[A-Za-z]+$/", $v) > 0;
     }
-    public static function 英数字($v) :bool{
+    static function 英数字($v) :bool{
         return preg_match("/^[A-Za-z0-9]+$/", $v) > 0;
     }
-    public static function URL($v) :bool{
+    static function URL($v) :bool{
         return preg_match("|^https?://.{4,}|i", $v) > 0;
     }
-    public static function 画像データ($v) :bool{
+    static function 画像データ($v) :bool{
         return getimagesizefromstring($v)[0] > 0; //getimagesize()[0]:横サイズ [1]:縦サイズ [2]:GIFは1、JPEGは2、PNGは3
     }
-    public static function UTF8($v) :bool{
+    static function UTF8($v) :bool{
         return preg_match('//u', $v); //mb_check_encoding($v, 'UTF-8')
     }
-    public static function 文字数(string $v, int $num, string $compare) :bool{
+    static function 文字数(string $v, int $num, string $compare) :bool{
         return self::{$compare}(mb_strlen($v,"UTF-8"), $num);
     }
-    public static function バイト数(string $v, int $num, string $compare) :bool{
+    static function バイト数(string $v, int $num, string $compare) :bool{
         return self::{$compare}(strlen($v), $num);
     }
-    public static function 以上(int $a, int $b) :bool{
+    static function 以上(int $a, int $b) :bool{
         return $a >= $b;
     }
-    public static function 以下(int $a, int $b) :bool{
+    static function 以下(int $a, int $b) :bool{
         return $a <= $b;
     }
-    public static function 以内(int $a, int $b) :bool{
+    static function 以内(int $a, int $b) :bool{
         return $a <= $b;
     }
-    public static function より大きい(int $a, int $b) :bool{
+    static function より大きい(int $a, int $b) :bool{
         return $a > $b;
     }
-    public static function より小さい(int $a, int $b) :bool{
+    static function より小さい(int $a, int $b) :bool{
         return $a < $b;
     }
-    public static function 未満(int $a, int $b) :bool{
+    static function 未満(int $a, int $b) :bool{
         return $a < $b;
     }
-    private static function と同じ(int $a, int $b) :bool{
+    static function と同じ(int $a, int $b) :bool{
         return $a === $b;
     }
 }
