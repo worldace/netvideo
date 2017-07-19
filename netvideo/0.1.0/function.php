@@ -2083,7 +2083,7 @@ class 部品{
         $path = sprintf("%s/%s.html", self::$設定['ディレクトリ'], str_replace("_", "/", $部品名));
         $return = file_get_contents($path);
         if(!$return){
-            throw new Exception("部品ファイルが見つかりません: $path");
+            throw new Exception("部品ファイルが見つかりません: $部品名");
         }
         return $return;
     }
