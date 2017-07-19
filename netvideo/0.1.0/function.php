@@ -1939,7 +1939,7 @@ class データベース{
 class 部品{
     private static $設定;
     private static $記憶;
-    private static $結果;
+    private static $タグ;
     private static $解析;
 
 
@@ -1963,7 +1963,7 @@ class 部品{
         }
 
         self::$記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[], 'キャプチャ開始'=>false];
-        self::$結果 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
+        self::$タグ = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
         self::$解析 = [];
         self::関数登録();
 
@@ -1976,14 +1976,16 @@ class 部品{
 
     static function 終了(){
         $return = (self::$記憶['キャプチャ開始'] === true)  ?  self::差し込む(ob_get_clean())  :  "";
-        self::$設定 = self::$記憶 = self::$結果 = self::$解析 = null;
+        self::$設定 = self::$記憶 = self::$タグ = self::$解析 = null;
         return $return;
     }
 
 
     static function 作成($部品名, $引数){
         if(!isset(self::$記憶['部品コード'][$部品名])){
-            if(!isset(self::$解析[$部品名])){ self::$解析[$部品名] = self::ファイル解析($部品名); }
+            if(!isset(self::$解析[$部品名])){
+                self::$解析[$部品名] = self::ファイル解析($部品名);
+            }
 
             if(preg_match("/^function/", self::$解析[$部品名]['php'])){
                 try{
@@ -1997,9 +1999,9 @@ class 部品{
                 self::$記憶['部品コード'][$部品名] = self::$解析[$部品名]['php'];
             }
 
-            self::$結果['css'] .= self::タグ完成(self::$解析[$部品名]['css'], "href", $部品名);
-            self::$結果['jsinhead'] .= self::タグ完成(self::$解析[$部品名]['jsh'], "src", $部品名);
-            self::$結果['jsinbody'] .= self::タグ完成(self::$解析[$部品名]['jsb'], "src", $部品名);
+            self::$タグ['css'] .= self::タグ作成(self::$解析[$部品名]['css'], "href", $部品名);
+            self::$タグ['jsinhead'] .= self::タグ作成(self::$解析[$部品名]['jsh'], "src", $部品名);
+            self::$タグ['jsinbody'] .= self::タグ作成(self::$解析[$部品名]['jsb'], "src", $部品名);
         }
 
         self::$記憶['stack'][] = $部品名;
@@ -2025,21 +2027,21 @@ class 部品{
 
 
     static function 差し込む($buf){
-        self::$結果['fromphp'] = self::fromphpタグ完成();
+        self::$タグ['fromphp'] = self::fromphpタグ作成();
 
-        if(self::$結果['jsinbody']){
+        if(self::$タグ['jsinbody']){
             $pos = strripos($buf, "</body>");
             if($pos !== false){
-                $buf = substr_replace($buf, self::$結果['jsinbody'], $pos, 0); //最後に出現する</body>の前にJSを挿入する
+                $buf = substr_replace($buf, self::$タグ['jsinbody'], $pos, 0); //最後に出現する</body>の前にJSを挿入する
             }
             else{
-                $buf = $buf . self::$結果['jsinbody'];
+                $buf = $buf . self::$タグ['jsinbody'];
             }
         }
-        if(self::$結果['css'] || self::$結果['jsinhead'] || self::$結果['fromphp']){
+        if(self::$タグ['css'] || self::$タグ['jsinhead'] || self::$タグ['fromphp']){
             $pos = stripos($buf, "</title>");
             if($pos !== false){
-                $buf = substr_replace($buf, "\n".self::$結果['css'].self::$結果['fromphp'].self::$結果['jsinhead'], $pos+8, 0); //最初に出現する</title>の前に挿入する
+                $buf = substr_replace($buf, "\n".self::$タグ['css'].self::$タグ['fromphp'].self::$タグ['jsinhead'], $pos+8, 0); //最初に出現する</title>の前に挿入する
             }
         }
         return $buf;
@@ -2047,8 +2049,8 @@ class 部品{
 
 
     static function タグ取得(){
-        self::$結果['fromphp'] = self::fromphpタグ完成();
-        return self::$結果;
+        self::$タグ['fromphp'] = self::fromphpタグ作成();
+        return self::$タグ;
     }
 
 
@@ -2082,7 +2084,7 @@ class 部品{
 
         $path = sprintf("%s/%s.html", self::$設定['ディレクトリ'], str_replace("_", "/", $部品名));
         $return = file_get_contents($path);
-        if(!$return){
+        if($return === false){
             throw new Exception("部品ファイルが見つかりません: $部品名");
         }
         return $return;
@@ -2129,7 +2131,7 @@ class 部品{
     }
 
 
-    private static function タグ完成(array $array, $link, $部品名){
+    private static function タグ作成(array $array, $link, $部品名){
         $return = "";
         $部品ファイルの位置 = self::$設定['ディレクトリ'] . "/" . dirname(str_replace("_", "/", $部品名));
 
@@ -2162,7 +2164,7 @@ class 部品{
     }
 
 
-    private static function fromphpタグ完成(){
+    private static function fromphpタグ作成(){
         if(!self::$記憶['fromphp']){
             return "";
         }
