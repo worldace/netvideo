@@ -2990,15 +2990,15 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
 
 function 内部エラー(string $str = "エラーが発生しました", string $type = "停止", string $除外パス = "") :void{
-    $debug_backtrace = debug_backtrace();
-    $除外パス = $除外パス ?: $debug_backtrace[0]['file'];
+    $backtrace = debug_backtrace();
+    $除外パス  = $除外パス ?: $backtrace[0]['file'];
 
-    foreach($debug_backtrace as $trace){
+    foreach($backtrace as $trace){
         if(strpos($trace['file'], $除外パス) !== 0){
             break;
         }
     }
-    $message = sprintf("【%s】%s \n%s :%s行目 %s%s%s()\n\n", $type, $str, $trace['file'], $trace['line'], @$trace['class'], @$trace['type'], $trace['function']);
+    $message = sprintf("【%s】%s \n%s :%s行目 %s%s%s()\n\n", $type, $str, $trace['file'], $trace['line'], @$trace['class'], @$trace['type'], @$trace['function']);
 
     if(PHP_SAPI !== "cli"){
         $message = nl2br(htmlspecialchars($message, ENT_QUOTES, "UTF-8", false));
