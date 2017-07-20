@@ -1723,7 +1723,7 @@ class データベース{
     }
 
 
-    function 列取得($列, ?array $条件){
+    function 列取得(string $列, ?array $条件){
         $this->文字列検証($列);
         [$追加文, $割当] = $this->追加SQL文($条件, "where");
         $SQL文 = "select {$列} from {$this->テーブル} $追加文 ";
@@ -1731,7 +1731,7 @@ class データベース{
     }
 
 
-    function セル取得(int $id, $列){
+    function セル取得(int $id, string $列){
         $this->文字列検証($列);
         $SQL文 = "select {$列} from {$this->テーブル} where {$this->主キー} = ?";
         return $this->実行($SQL文, [$id])->fetchColumn();
@@ -1785,7 +1785,7 @@ class データベース{
         $into文2 = rtrim($into文2, ',');
 
         $SQL文 = "insert into {$this->テーブル} ($into文1) values ($into文2)";
-        $this -> 実行($SQL文, $割当);
+        $this->実行($SQL文, $割当);
         return self::$pdo[$this->接続名]->lastInsertId();
     }
 
