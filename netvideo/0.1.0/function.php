@@ -1832,7 +1832,7 @@ class データベース{
         }
         else { //MySQL用
             $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
-            $追加文 = ($追加文) ?: "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci";
+            $追加文 = ($追加文) ?: "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci";
         }
         $result = $this->実行($SQL文.$追加文);
         return $result ? true : false;
