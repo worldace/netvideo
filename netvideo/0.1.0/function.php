@@ -1904,7 +1904,7 @@ class データベース{
             return $this;
         }
         else{
-            return $this->id;
+            return $this->主キー;
         }
     }
 
