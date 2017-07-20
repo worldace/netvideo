@@ -1653,7 +1653,6 @@ class データベース{
 
 
     function __construct($table, $driver = null, $user = null, $password = null){
-        assert(設定['データベースドライバー']);
         $this->テーブル($table);
         if(!$driver){
             $driver   = 設定['データベースドライバー'];
@@ -1672,7 +1671,6 @@ class データベース{
 
 
     private function 接続($driver, $user = null, $password = null){
-        assert(設定['データベース詳細']);
         $setting = 設定['データベース詳細'] + [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
@@ -1765,7 +1763,6 @@ class データベース{
         else{
             $concat文字列 = sprintf('concat(%s)', implode(',',$列));
         }
-        $concat文字列 = preg_match("/sqlite/i", $this->ドライバー)  ?  sprintf('(%s)', implode('||',$列))  :  sprintf('concat(%s)');
         $検索SQL = implode(' and ', array_fill(0,count($割当1),"$concat文字列 like ?"));
 
         [$追加文, $割当2, $行タイプ] = $this->追加SQL文($条件, "and");
