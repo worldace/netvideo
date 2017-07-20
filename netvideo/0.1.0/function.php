@@ -1776,16 +1776,16 @@ class データベース{
     function 追加(array $data){
         $data = $this->型変換($data);
 
-        $into文1 = $into文2 = "";
+        $追加文1 = $追加文2 = "";
         foreach($data as $k => $v){
-            $into文1 .= "{$k},";
-            $into文2 .= "?,";
+            $追加文1 .= "{$k},";
+            $追加文2 .= "?,";
             $割当[] = $v;
         }
-        $into文1 = rtrim($into文1, ',');
-        $into文2 = rtrim($into文2, ',');
+        $追加文1 = rtrim($追加文1, ',');
+        $追加文2 = rtrim($追加文2, ',');
 
-        $SQL文 = "insert into {$this->テーブル} ($into文1) values ($into文2)";
+        $SQL文 = "insert into {$this->テーブル} ($追加文1) values ($追加文2)";
         $this->実行($SQL文, $割当);
         return self::$pdo[$this->接続名]->lastInsertId();
     }
@@ -1794,20 +1794,20 @@ class データベース{
     function 更新(int $id, array $data){
         $data = $this->型変換($data);
 
-        $set文 = '';
+        $更新文 = '';
         foreach($data as $k => $v){
             if(is_array($v)){
-                $set文 .= "{$k}={$v[0]},";
+                $更新文 .= "{$k}={$v[0]},";
             }
             else{
-                $set文 .= "{$k}=?,";
+                $更新文 .= "{$k}=?,";
                 $割当[] = $v;
             }
         }
-        $set文 = rtrim($set文, ',');
+        $更新文 = rtrim($更新文, ',');
         $割当[] = $id;
 
-        $SQL文 = "update {$this->テーブル} set {$set文} where {$this->主キー} = ?";
+        $SQL文 = "update {$this->テーブル} set {$更新文} where {$this->主キー} = ?";
         return $this->実行($SQL文, $割当)->rowCount();
     }
 
@@ -1819,12 +1819,12 @@ class データベース{
 
 
     function 作成() :bool{
-        $列情報 = "";
+        $作成文 = "";
         foreach(constant("□{$this->テーブル}::定義") as $k => $v){
-            $列情報 .= "$k $v,";
+            $作成文 .= "$k $v,";
         }
-        $列情報 = rtrim($列情報, ',');
-        $SQL文 = "create table IF NOT EXISTS {$this->テーブル} ($列情報) ";
+        $作成文 = rtrim($作成文, ',');
+        $SQL文 = "create table IF NOT EXISTS {$this->テーブル} ($作成文) ";
 
         if(preg_match('/^sqlite/i', $this->ドライバー)){ //SQLite用
             $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
