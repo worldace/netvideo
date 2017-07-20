@@ -1924,10 +1924,10 @@ class データベース{
         }
         $SQL文 .= " order by $順番列 $順番順 ";
 
-        if(!$条件["件数"]){
+        if(!isset($条件["件数"])){
             $条件["件数"] = 設定['データベース件数'] ?? 31;
         }
-        if(!$条件["位置"]){
+        if(!isset($条件["位置"])){
             $条件["位置"] = 0;
         }
         if($条件["件数"] === "∞"){
@@ -1941,7 +1941,7 @@ class データベース{
         }
 
         $行タイプ = [];
-        if($条件['行タイプ']){
+        if(isset($条件['行タイプ'])){
             if($条件['行タイプ'] === "オブジェクト"){
                 $行タイプ[0] = PDO::FETCH_OBJ;
             }
@@ -1952,12 +1952,14 @@ class データベース{
                 $行タイプ[0] = PDO::FETCH_NUM;
             }
             else{
-                $行タイプ = [PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $条件['行タイプ']];
+                $行タイプ[0] = PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE;
+                $行タイプ[1] = $条件['行タイプ'];
             }
         }
         else{
             if(設定['データベース詳細'][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){
-                $行タイプ = [設定['データベース詳細'][PDO::ATTR_DEFAULT_FETCH_MODE], "{$this->テーブル}定義"];
+                $行タイプ[0] = 設定['データベース詳細'][PDO::ATTR_DEFAULT_FETCH_MODE];
+                $行タイプ[1] = "{$this->テーブル}定義";
             }
         }
 
