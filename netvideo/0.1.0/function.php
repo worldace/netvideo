@@ -1646,11 +1646,12 @@ function データベース(string $table, string $driver=null, string $user=nul
 
 class データベース{
     private static $pdo = [];
-    private $ドライバー;
-    private $接続名;
-    private $テーブル;
-    private $列一覧;
+    private $ドライバー = "";
+    private $接続名 = "";
+    private $テーブル = "";
+    private $列一覧 = [];
     private $主キー = "id";
+    private $主キーの型 = "int";
     public static $取得件数 = 31;
 
 
@@ -1671,7 +1672,7 @@ class データベース{
 
 
     private function 接続(string $driver, string $user=null, string $password=null) :PDO{
-        $setting = (設定['データベース詳細']  ?? [])  + [
+        $setting = (設定['データベースPDO設定']  ?? [])  + [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -1718,9 +1719,9 @@ class データベース{
     }
 
 
-    function 行取得(int $id){
+    function 行取得($id){
         $SQL文 = "select * from {$this->テーブル} where {$this->主キー} = ?";
-        return $this->実行($SQL文, [$id])->fetchAll()[0];
+        return $this->実行($SQL文, [$this->id型変換($id)])->fetchAll()[0];
     }
 
 
@@ -1735,12 +1736,12 @@ class データベース{
     }
 
 
-    function セル取得(int $id, string $列){
+    function セル取得($id, string $列){
         if(!in_array($列, $this->列一覧, true)){
             return false;
         }
         $SQL文 = "select {$列} from {$this->テーブル} where {$this->主キー} = ?";
-        return $this->実行($SQL文, [$id])->fetchColumn();
+        return $this->実行($SQL文, [$this->id型変換($id)])->fetchColumn();
     }
 
 
@@ -1800,7 +1801,7 @@ class データベース{
     }
 
 
-    function 更新(int $id, array $data) :bool{
+    function 更新($id, array $data) :bool{
         $data = $this->型変換($data);
         if(!$data){
             return false;
@@ -1817,16 +1818,16 @@ class データベース{
             }
         }
         $更新文 = rtrim($更新文, ',');
-        $割当[] = $id;
+        $割当[] = $this->id型変換($id);
 
         $SQL文 = "update {$this->テーブル} set {$更新文} where {$this->主キー} = ?";
         return (bool)$this->実行($SQL文, $割当)->rowCount();
     }
 
 
-    function 削除(int $id) :bool{
+    function 削除($id) :bool{
         $SQL文 = "delete from {$this->テーブル} where {$this->主キー} = ?";
-        return (bool)$this->実行($SQL文, [$id])->rowCount();
+        return (bool)$this->実行($SQL文, [$this->id型変換($id)])->rowCount();
     }
 
 
@@ -1879,33 +1880,23 @@ class データベース{
 
 
     function 切断() :void{
-        self::$pdo[$this->接続名] = null; //staticはGCの対象にならなくて切断できないかも(不明)
+        self::$pdo[$this->接続名] = null; //staticはGCの対象になるのか？(不明)
     }
 
 
     function テーブル(string $table=null){
-        if($table){
-            $this->列一覧 = array_keys(constant("□$table::定義"));
-            $this->テーブル = $table;
-            return $this;
-        }
-        else{
+        if(!$table){
             return $this->テーブル;
         }
-    }
+        $this->テーブル = $table;
+        $定義 = constant("□$table::定義");
+        $this->列一覧 = array_keys($定義);
+        $this->主キー = defined("□$table::主キー")  ?  constant("□$table::主キー")  :  "id";
 
+        $型情報 = explode(" ", $定義[$this->主キー])[0];
+        $this->主キーの型 = preg_match("/int/i", $型情報)  ?  "int"  :  "string";
 
-    function 主キー(string $id=null){
-        if($id){
-            if(!in_array($id, $this->列一覧, true)){
-                return $this;
-            }
-            $this->主キー = $id;
-            return $this;
-        }
-        else{
-            return $this->主キー;
-        }
+        return $this;
     }
 
 
@@ -1949,6 +1940,11 @@ class データベース{
             }
         }
         return $return;
+    }
+
+
+    private function id型変換($id){
+        return ($this->主キーの型 === "int")  ?  (int)$id  :  (string)$id;
     }
 }
 
