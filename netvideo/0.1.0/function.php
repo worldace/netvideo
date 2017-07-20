@@ -1747,7 +1747,7 @@ class データベース{
     }
 
 
-    function 検索($検索ワード, $列, ?array $条件){
+    function 全文検索($検索ワード, $列, ?array $条件){
         foreach((array)$検索ワード as $v){
             $割当1[] = "%" . addcslashes($v, '_%') . "%";
         }
