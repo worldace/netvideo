@@ -1651,6 +1651,7 @@ class データベース{
     private $テーブル;
     private $列一覧;
     private $主キー = "id";
+    public static $取得件数 = 31;
 
 
     function __construct(string $table, string $driver=null, string $user=null, string $password=null){
@@ -1709,9 +1710,10 @@ class データベース{
     }
 
 
-    function 取得(int $offset = 0, int $limit = 31, array $order = []){
+    function 取得(int $offset=0, int $limit=0, array $order=[]){
+        $limit  = $limit ?: self::$取得件数;
         $順番文 = $this->順番文($order);
-        $SQL文 = "select * from {$this->テーブル} {$順番文} limit ? offset ?";
+        $SQL文  = "select * from {$this->テーブル} {$順番文} limit ? offset ?";
         return $this->実行($SQL文, [$limit, $offset])->fetchAll();
     }
 
@@ -1722,10 +1724,11 @@ class データベース{
     }
 
 
-    function 列取得(string $列, int $offset = 0, int $limit = 31, array $order = []){
+    function 列取得(string $列, int $offset=0, int $limit=0, array $order=[]){
         if(!in_array($列, $this->列一覧, true)){
             return;
         }
+        $limit  = $limit ?: self::$取得件数;
         $順番文 = $this->順番文($order);
         $SQL文  = "select {$列} from {$this->テーブル} {$順番文} limit ? offset ?";
         return $this->実行($SQL文, [$limit, $offset])->fetchAll(PDO::FETCH_COLUMN);
@@ -1747,7 +1750,7 @@ class データベース{
     }
 
 
-    function 全文検索($word, array $列, int $offset = 0, int $limit = 31, array $order = []){
+    function 全文検索($word, array $列, int $offset=0, int $limit=0, array $order=[]){
         $割当 = [];
         foreach((array)$word as $v){
             $割当[] = "%" . addcslashes($v, '_%') . "%";
@@ -1766,7 +1769,7 @@ class データベース{
         $順番文 = $this->順番文($order);
 
         $SQL文 = "select * from {$this->テーブル} where {$検索文} {$順番文} limit ? offset ?";
-        $割当[] = $limit;
+        $割当[] = $limit ?: self::$取得件数;
         $割当[] = $offset;
 
         return $this->実行($SQL文, $割当)->fetchAll();
