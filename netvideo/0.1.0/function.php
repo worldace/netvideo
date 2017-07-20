@@ -1710,11 +1710,11 @@ class データベース{
     }
 
 
-    function 取得(int $offset=0, int $limit=0, array $order=[]){
+    function 取得(?int $offset=0, ?int $limit=0, array $order=[]){
         $limit  = $limit ?: self::$取得件数;
         $順番文 = $this->順番文($order);
         $SQL文  = "select * from {$this->テーブル} {$順番文} limit ? offset ?";
-        return $this->実行($SQL文, [$limit, $offset])->fetchAll();
+        return $this->実行($SQL文, [(int)$limit, (int)$offset])->fetchAll();
     }
 
 
@@ -1724,14 +1724,14 @@ class データベース{
     }
 
 
-    function 列取得(string $列, int $offset=0, int $limit=0, array $order=[]){
+    function 列取得(string $列, ?int $offset=0, ?int $limit=0, array $order=[]){
         if(!in_array($列, $this->列一覧, true)){
             return;
         }
         $limit  = $limit ?: self::$取得件数;
         $順番文 = $this->順番文($order);
         $SQL文  = "select {$列} from {$this->テーブル} {$順番文} limit ? offset ?";
-        return $this->実行($SQL文, [$limit, $offset])->fetchAll(PDO::FETCH_COLUMN);
+        return $this->実行($SQL文, [(int)$limit, (int)$offset])->fetchAll(PDO::FETCH_COLUMN);
     }
 
 
@@ -1750,7 +1750,7 @@ class データベース{
     }
 
 
-    function 全文検索($word, array $列, int $offset=0, int $limit=0, array $order=[]){
+    function 検索($word, array $列, ?int $offset=0, ?int $limit=0, array $order=[]){
         $割当 = [];
         foreach((array)$word as $v){
             $割当[] = "%" . addcslashes($v, '_%') . "%";
@@ -1758,19 +1758,14 @@ class データベース{
 
         $列 = array_intersect($this->列一覧, $列); //共通項
 
-        if(preg_match("/sqlite/i", $this->ドライバー)){
-            $concat文字列 = sprintf('(%s)', implode('||',$列));
-        }
-        else{
-            $concat文字列 = sprintf('concat(%s)', implode(',',$列));
-        }
-        $検索文 = implode(' and ', array_fill(0,count($割当),"$concat文字列 like ?"));
+        $concat文 = preg_match("/sqlite/i", $this->ドライバー)  ?  sprintf('(%s)', implode('||',$列))  :  sprintf('concat(%s)', implode(',',$列));
+        $検索文   = implode(' and ', array_fill(0,count($割当),"$concat文 like ?"));
 
         $順番文 = $this->順番文($order);
 
         $SQL文 = "select * from {$this->テーブル} where {$検索文} {$順番文} limit ? offset ?";
-        $割当[] = $limit ?: self::$取得件数;
-        $割当[] = $offset;
+        $割当[] = (int)($limit ?: self::$取得件数);
+        $割当[] = (int)$offset;
 
         return $this->実行($SQL文, $割当)->fetchAll();
     }
