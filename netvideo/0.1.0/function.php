@@ -1764,6 +1764,7 @@ class データベース{
         $検索文 = implode(' and ', array_fill(0,count($割当),"$concat文字列 like ?"));
 
         $順番文 = $this->順番文($order);
+
         $SQL文 = "select * from {$this->テーブル} where {$検索文} {$順番文} limit ? offset ?";
         $割当[] = $limit;
         $割当[] = $offset;
@@ -1872,7 +1873,7 @@ class データベース{
 
     function テーブル(string $table=null){
         if($table){
-            $this->列一覧 = array_keys(constant("□{$this->テーブル}::定義"));
+            $this->列一覧 = array_keys(constant("□$table::定義"));
             $this->テーブル = $table;
             return $this;
         }
