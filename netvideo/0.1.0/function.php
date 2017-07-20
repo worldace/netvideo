@@ -1657,8 +1657,8 @@ class データベース{
         $this->テーブル($table);
         if(!$driver){
             $driver   = 設定['データベースドライバー'];
-            $user     = 設定['データベースユーザー名'];
-            $password = 設定['データベースパスワード'];
+            $user     = 設定['データベースユーザー名'] ?? '';
+            $password = 設定['データベースパスワード'] ?? '';
         }
         $this->ドライバー = $driver;
         $this->接続名     = md5($driver.$user.$password);
@@ -1687,7 +1687,7 @@ class データベース{
     }
 
 
-    function 実行(string $SQL文, array $割当=null){
+    function 実行(string $SQL文, array $割当=[]){
         $stmt = self::$pdo[$this->接続名]->prepare($SQL文);
         for($i = 0;  $i < count($割当);  $i++){
             $type = gettype($割当[$i]);
@@ -1709,25 +1709,23 @@ class データベース{
     }
 
 
-    function 取得(array $条件=null){
-        [$追加文, $割当, $行タイプ] = $this->追加SQL文($条件, "where");
-        $SQL文 = "select * from {$this->テーブル} $追加文";
-        return $this->実行($SQL文, $割当)->fetchAll(...$行タイプ);
+    function 取得(int $offset = 0, int $num = 31, array $order = []){
+        $順番文 = $this->順番文($order);
+        $SQL文 = "select * from {$this->テーブル} {$順番文} limit ? offset ?";
+        return $this->実行($SQL文, [$num, $offset])->fetchAll();
     }
 
 
-    function 行取得(int $id, array $条件=null){
-        [$追加文, $割当, $行タイプ] = $this->追加SQL文($条件, "where");
+    function 行取得(int $id){
         $SQL文 = "select * from {$this->テーブル} where {$this->主キー} = ?";
-        return $this->実行($SQL文, [$id])->fetchAll(...$行タイプ)[0];
+        return $this->実行($SQL文, [$id])->fetchAll()[0];
     }
 
 
-    function 列取得(string $列, array $条件){
-        $this->文字列検証($列);
-        [$追加文, $割当] = $this->追加SQL文($条件, "where");
-        $SQL文 = "select {$列} from {$this->テーブル} $追加文 ";
-        return $this->実行($SQL文, $割当)->fetchAll(PDO::FETCH_COLUMN);
+    function 列取得(string $列, int $offset = 0, int $num = 31, array $order = []){
+        $順番文 = $this->順番文($order);
+        $SQL文  = "select {$列} from {$this->テーブル} {$順番文} limit ? offset ?";
+        return $this->実行($SQL文, [$num, $offset])->fetchAll(PDO::FETCH_COLUMN);
     }
 
 
@@ -1738,12 +1736,9 @@ class データベース{
     }
 
 
-    function 件数(array $条件=null){
-        if($条件['式']){
-            $追加文 = "where {$条件['式']}";
-        }
-        $SQL文 = "select count(*) from {$this->テーブル} $追加文";
-        return $this->実行($SQL文, $条件['割当'])->fetchColumn();
+    function 件数(){
+        $SQL文 = "select count(*) from {$this->テーブル}";
+        return $this->実行($SQL文)->fetchColumn();
     }
 
 
@@ -1764,19 +1759,18 @@ class データベース{
         }
         $検索SQL = implode(' and ', array_fill(0,count($割当1),"$concat文字列 like ?"));
 
-        [$追加文, $割当2, $行タイプ] = $this->追加SQL文($条件, "and");
+        [$追加文, $割当2] = $this->追加SQL文($条件, "and");
         $SQL文 = "select * from {$this->テーブル} where {$検索SQL} {$追加文} ";
 
-        return $this->実行($SQL文, array_merge($割当1, $割当2))->fetchAll(...$行タイプ);
+        return $this->実行($SQL文, array_merge($割当1, $割当2))->fetchAll();
     }
 
 
-    function 追加($data){
-        if(is_object($data) and get_class($data) === "{$this->テーブル}定義"){
-            $data = $this->型変換($data, "{$this->テーブル}定義");
-        }
+    function 追加(array $data){
+        $data = $this->型変換($data);
+
+        $into文1 = $into文2 = "";
         foreach($data as $k => $v){
-            $this->文字列検証($k);
             $into文1 .= "{$k},";
             $into文2 .= "?,";
             $割当[] = $v;
@@ -1790,14 +1784,13 @@ class データベース{
     }
 
 
-    function 更新(int $id, $data){
-        if(is_object($data) and get_class($data) === "{$this->テーブル}定義"){
-            $data = $this->型変換($data, "{$this->テーブル}定義");
-        }
+    function 更新(int $id, array $data){
+        $data = $this->型変換($data);
+
+        $set文 = '';
         foreach($data as $k => $v){
-            $this->文字列検証($k);
-            if(is_array($v) and array_key_exists('式', $v)){
-                $set文 .= "{$k}={$v['式']},";
+            if(is_array($v)){
+                $set文 .= "{$k}={$v[0]},";
             }
             else{
                 $set文 .= "{$k}=?,";
@@ -1818,8 +1811,9 @@ class データベース{
     }
 
 
-    function 作成(array $テーブル定義, string $追加文=null) :bool{
-        foreach($テーブル定義 as $k => $v){
+    function 作成() :bool{
+        $列情報 = "";
+        foreach(constant("□{$this->テーブル}::定義") as $k => $v){
             $this->文字列検証($k);
             $列情報 .= "$k $v,";
         }
@@ -1831,9 +1825,9 @@ class データベース{
         }
         else { //MySQL用
             $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
-            $追加文 = $追加文 ?: "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci";
+            $SQL文 .= defined("□{$this->テーブル}::追加定義")  ?  constant("□{$this->テーブル}::追加定義")  :  "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci";
         }
-        $result = $this->実行($SQL文.$追加文);
+        $result = $this->実行($SQL文);
         return $result ? true : false;
     }
 
@@ -1893,8 +1887,6 @@ class データベース{
     }
 
 
-
-
     private function 文字列検証(string $str){
         if(preg_match("/[[:cntrl:][:punct:][:space:]]/", $str)){
             throw new Exception("引数に不正な文字列が含まれています");
@@ -1902,89 +1894,41 @@ class データベース{
     }
 
 
-    private function 追加SQL文(array $条件=null, string $WHEREorAND="where"){
-        $SQL文 = '';
-        $割当  = (array)$条件['割当'];
-        if($条件["式"]){
-            $SQL文 = " $WHEREorAND {$条件['式']} ";
-        }
-
-        if(count($条件["順番"]) === 2){
-            $this->文字列検証($条件["順番"][0]);
-            $順番列 = ($条件["順番"][0]) ? $条件["順番"][0] : $this->主キー;
-            $順番順 = ($条件["順番"][1] == "小さい順") ? "asc" : "desc";
+    private function 順番文(array $arg = null) :string{
+        if(is_array($arg) and count($arg) === 2){
+            $column = $arg[0];
+            $order  = ($arg[1] === "大きい順") ? 'desc' : 'asc';
         }
         else{
-            $順番列 = $this->主キー;
-            $順番順 = "desc";
+            $column = $this->主キー;
+            $order  = 'desc';
         }
-        $SQL文 .= " order by $順番列 $順番順 ";
-
-        if(!isset($条件["件数"])){
-            $条件["件数"] = 設定['データベース件数'] ?? 31;
-        }
-        if(!isset($条件["位置"])){
-            $条件["位置"] = 0;
-        }
-        if($条件["件数"] === "∞"){
-            $SQL文 .= " offset ? ";
-            $割当[] = (int)$条件["位置"];
-        }
-        else{
-            $SQL文 .= " limit ? offset ?";
-            $割当[] = (int)$条件["件数"];
-            $割当[] = (int)$条件["位置"];
-        }
-
-        $行タイプ = [];
-        if(isset($条件['行タイプ'])){
-            if($条件['行タイプ'] === "オブジェクト"){
-                $行タイプ[0] = PDO::FETCH_OBJ;
-            }
-            elseif($条件['行タイプ'] === "連想配列"){
-                $行タイプ[0] = PDO::FETCH_ASSOC;
-            }
-            elseif($条件['行タイプ'] === "配列"){
-                $行タイプ[0] = PDO::FETCH_NUM;
-            }
-            else{
-                $行タイプ[0] = PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE;
-                $行タイプ[1] = $条件['行タイプ'];
-            }
-        }
-        else{
-            if(isset(設定['データベース詳細'][PDO::ATTR_DEFAULT_FETCH_MODE]) and 設定['データベース詳細'][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){
-                $行タイプ[0] = 設定['データベース詳細'][PDO::ATTR_DEFAULT_FETCH_MODE];
-                $行タイプ[1] = "{$this->テーブル}定義";
-            }
-        }
-
-        return [$SQL文, $割当, $行タイプ];
+        return " order by $column $order ";
     }
 
 
-    private function 型変換($object, string $table) :array{
+    private function 型変換(array $arg) :array{
         $return = [];
-        foreach(constant("$table::定義") as $k => $v){
-            if(!isset($object->$k)){ //nullどうしようか
+        foreach(constant("□{$this->テーブル}::定義") as $k => $v){
+            if(!isset($arg[$k])){ //nullどうしようか
                 continue;
             }
-            if(isset($object->$k['式'])){
-                $return[$k] = $object->$k;
+            if(is_array($arg[$k])){
+                $return[$k] = $arg[$k];
                 continue;
             }
             $型 = explode(" ", $v)[0];
             if(preg_match("/INT/i", $型)){
-                $return[$k] = (int)$object->$k;
+                $return[$k] = (int)$arg[$k];
             }
             elseif(preg_match("/CHAR|TEXT|CLOB/i", $型)){
-                $return[$k] = (string)$object->$k;
+                $return[$k] = (string)$arg[$k];
             }
             elseif(preg_match("/REAL|FLOA|DOUB/i", $型)){
-                $return[$k] = (float)$object->$k;
+                $return[$k] = (float)$arg[$k];
             }
             else{
-                $return[$k] = $object->$k;
+                $return[$k] = $arg[$k];
             }
         }
         return $return;
