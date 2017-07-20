@@ -1639,7 +1639,7 @@ function クラス文字列化($class){
 }
 
 
-function データベース($table, $driver = null, $user = null, $pass = null){
+function データベース(string $table, string $driver=null, string $user=null, string $pass=null){
     return new データベース($table, $driver, $user, $pass);
 }
 
@@ -1652,7 +1652,7 @@ class データベース{
     private $主キー = "id";
 
 
-    function __construct(string $table, ?string $driver, ?string $user, ?string $password){
+    function __construct(string $table, string $driver=null, string $user=null, string $password=null){
         assert(isset(設定['データベースドライバー']));
         $this->テーブル($table);
         if(!$driver){
@@ -1668,9 +1668,9 @@ class データベース{
     }
 
 
-    private function 接続(string $driver, ?string $user, ?string $password) :PDO{
-        assert(is_array(設定['データベース詳細']));
-        $setting = 設定['データベース詳細'] + [
+    private function 接続(string $driver, string $user=null, string $password=null) :PDO{
+        $setting = 設定['データベース詳細']  ?? [];
+        $setting = $setting + [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -1687,7 +1687,7 @@ class データベース{
     }
 
 
-    function 実行(string $SQL文, ?array $割当){
+    function 実行(string $SQL文, array $割当=null){
         $stmt = self::$pdo[$this->接続名]->prepare($SQL文);
         for($i = 0;  $i < count($割当);  $i++){
             $type = gettype($割当[$i]);
@@ -1709,21 +1709,21 @@ class データベース{
     }
 
 
-    function 取得(?array $条件){
+    function 取得(array $条件=null){
         [$追加文, $割当, $行タイプ] = $this->追加SQL文($条件, "where");
         $SQL文 = "select * from {$this->テーブル} $追加文";
         return $this->実行($SQL文, $割当)->fetchAll(...$行タイプ);
     }
 
 
-    function 行取得(int $id, ?array $条件){
+    function 行取得(int $id, array $条件=null){
         [$追加文, $割当, $行タイプ] = $this->追加SQL文($条件, "where");
         $SQL文 = "select * from {$this->テーブル} where {$this->主キー} = ?";
         return $this->実行($SQL文, [$id])->fetchAll(...$行タイプ)[0];
     }
 
 
-    function 列取得(string $列, ?array $条件){
+    function 列取得(string $列, array $条件){
         $this->文字列検証($列);
         [$追加文, $割当] = $this->追加SQL文($条件, "where");
         $SQL文 = "select {$列} from {$this->テーブル} $追加文 ";
@@ -1738,7 +1738,7 @@ class データベース{
     }
 
 
-    function 件数(?array $条件){
+    function 件数(array $条件=null){
         if($条件['式']){
             $追加文 = "where {$条件['式']}";
         }
@@ -1747,7 +1747,7 @@ class データベース{
     }
 
 
-    function 全文検索($検索ワード, $列, ?array $条件){
+    function 全文検索($検索ワード, $列, array $条件=null){
         foreach((array)$検索ワード as $v){
             $割当1[] = "%" . addcslashes($v, '_%') . "%";
         }
@@ -1818,7 +1818,7 @@ class データベース{
     }
 
 
-    function 作成(array $テーブル定義, ?string $追加文) :bool{
+    function 作成(array $テーブル定義, string $追加文=null) :bool{
         foreach($テーブル定義 as $k => $v){
             $this->文字列検証($k);
             $列情報 .= "$k $v,";
@@ -1869,7 +1869,7 @@ class データベース{
     }
 
 
-    function テーブル(?string $table){
+    function テーブル(string $table=null){
         if($table){
             $this->文字列検証($table);
             $this->テーブル = $table;
@@ -1881,7 +1881,7 @@ class データベース{
     }
 
 
-    function 主キー(?string $id){
+    function 主キー(string $id=null){
         if($id){
             $this->文字列検証($id);
             $this->主キー = $id;
@@ -1902,7 +1902,7 @@ class データベース{
     }
 
 
-    private function 追加SQL文(array $条件 = null, $WHEREorAND = "where"){
+    private function 追加SQL文(array $条件=null, string $WHEREorAND="where"){
         $SQL文 = '';
         $割当  = (array)$条件['割当'];
         if($条件["式"]){
@@ -1953,7 +1953,7 @@ class データベース{
             }
         }
         else{
-            if(設定['データベース詳細'][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){
+            if(isset(設定['データベース詳細'][PDO::ATTR_DEFAULT_FETCH_MODE]) and 設定['データベース詳細'][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){
                 $行タイプ[0] = 設定['データベース詳細'][PDO::ATTR_DEFAULT_FETCH_MODE];
                 $行タイプ[1] = "{$this->テーブル}定義";
             }
