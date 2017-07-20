@@ -1726,7 +1726,7 @@ class データベース{
 
     function 列取得(string $列, ?int $offset=0, ?int $limit=0, array $order=[]){
         if(!in_array($列, $this->列一覧, true)){
-            return false;
+            return [];
         }
         $limit  = $limit ?: self::$取得件数;
         $順番文 = $this->順番文($order);
@@ -1751,8 +1751,13 @@ class データベース{
 
 
     function 検索($word, array $列, ?int $offset=0, ?int $limit=0, array $order=[]){
+        if(is_string($word)){
+            $word = preg_replace("/[[:space:]　]+/u", " ", $word);
+            $word = explode(" ", trim($word));
+        }
+
         $割当 = [];
-        foreach((array)$word as $v){
+        foreach($word as $v){
             $割当[] = "%" . addcslashes($v, '_%') . "%";
         }
 
