@@ -1649,12 +1649,12 @@ class データベース{
     private $ドライバー;
     private $接続名;
     private $テーブル;
+    private $列一覧;
     private $主キー = "id";
 
 
     function __construct(string $table, string $driver=null, string $user=null, string $password=null){
         assert(isset(設定['データベースドライバー']));
-        $this->テーブル($table);
         if(!$driver){
             $driver   = 設定['データベースドライバー'];
             $user     = 設定['データベースユーザー名'] ?? '';
@@ -1665,12 +1665,12 @@ class データベース{
         if(!isset(self::$pdo[$this->接続名])){
             self::$pdo[$this->接続名] = $this->接続($driver, $user, $password);
         }
+        $this->テーブル($table);
     }
 
 
     private function 接続(string $driver, string $user=null, string $password=null) :PDO{
-        $setting = 設定['データベース詳細']  ?? [];
-        $setting = $setting + [
+        $setting = (設定['データベース詳細']  ?? [])  + [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -1709,10 +1709,10 @@ class データベース{
     }
 
 
-    function 取得(int $offset = 0, int $num = 31, array $order = []){
+    function 取得(int $offset = 0, int $limit = 31, array $order = []){
         $順番文 = $this->順番文($order);
         $SQL文 = "select * from {$this->テーブル} {$順番文} limit ? offset ?";
-        return $this->実行($SQL文, [$num, $offset])->fetchAll();
+        return $this->実行($SQL文, [$limit, $offset])->fetchAll();
     }
 
 
@@ -1722,15 +1722,20 @@ class データベース{
     }
 
 
-    function 列取得(string $列, int $offset = 0, int $num = 31, array $order = []){
+    function 列取得(string $列, int $offset = 0, int $limit = 31, array $order = []){
+        if(!in_array($列, $this->列一覧, true)){
+            return;
+        }
         $順番文 = $this->順番文($order);
         $SQL文  = "select {$列} from {$this->テーブル} {$順番文} limit ? offset ?";
-        return $this->実行($SQL文, [$num, $offset])->fetchAll(PDO::FETCH_COLUMN);
+        return $this->実行($SQL文, [$limit, $offset])->fetchAll(PDO::FETCH_COLUMN);
     }
 
 
     function セル取得(int $id, string $列){
-        $this->文字列検証($列);
+        if(!in_array($列, $this->列一覧, true)){
+            return;
+        }
         $SQL文 = "select {$列} from {$this->テーブル} where {$this->主キー} = ?";
         return $this->実行($SQL文, [$id])->fetchColumn();
     }
@@ -1742,27 +1747,28 @@ class データベース{
     }
 
 
-    function 全文検索($検索ワード, $列, array $条件=null){
-        foreach((array)$検索ワード as $v){
-            $割当1[] = "%" . addcslashes($v, '_%') . "%";
+    function 全文検索($word, array $列, int $offset = 0, int $limit = 31, array $order = []){
+        $割当 = [];
+        foreach((array)$word as $v){
+            $割当[] = "%" . addcslashes($v, '_%') . "%";
         }
 
-        $列 = (array)$列;
-        foreach($列 as $v){
-            $this->文字列検証($v);
-        }
+        $列 = array_intersect($this->列一覧, $列); //共通項
+
         if(preg_match("/sqlite/i", $this->ドライバー)){
             $concat文字列 = sprintf('(%s)', implode('||',$列));
         }
         else{
             $concat文字列 = sprintf('concat(%s)', implode(',',$列));
         }
-        $検索SQL = implode(' and ', array_fill(0,count($割当1),"$concat文字列 like ?"));
+        $検索文 = implode(' and ', array_fill(0,count($割当),"$concat文字列 like ?"));
 
-        [$追加文, $割当2] = $this->追加SQL文($条件, "and");
-        $SQL文 = "select * from {$this->テーブル} where {$検索SQL} {$追加文} ";
+        $順番文 = $this->順番文($order);
+        $SQL文 = "select * from {$this->テーブル} where {$検索文} {$順番文} limit ? offset ?";
+        $割当[] = $limit;
+        $割当[] = $offset;
 
-        return $this->実行($SQL文, array_merge($割当1, $割当2))->fetchAll();
+        return $this->実行($SQL文, $割当)->fetchAll();
     }
 
 
@@ -1814,7 +1820,6 @@ class データベース{
     function 作成() :bool{
         $列情報 = "";
         foreach(constant("□{$this->テーブル}::定義") as $k => $v){
-            $this->文字列検証($k);
             $列情報 .= "$k $v,";
         }
         $列情報 = rtrim($列情報, ',');
@@ -1832,8 +1837,10 @@ class データベース{
     }
 
 
-    function インデックス作成($列) :bool{
-        $this->文字列検証($列);
+    function インデックス作成(string $列) :bool{
+        if(!in_array($列, $this->列一覧, true)){
+            return false;
+        }
         $SQL文  = "create index {$列}インデックス on {$this->テーブル} ($列)";
         $result = $this->実行($SQL文);
         return $result ? true : false;
@@ -1865,7 +1872,7 @@ class データベース{
 
     function テーブル(string $table=null){
         if($table){
-            $this->文字列検証($table);
+            $this->列一覧 = array_keys(constant("□{$this->テーブル}::定義"));
             $this->テーブル = $table;
             return $this;
         }
@@ -1877,7 +1884,9 @@ class データベース{
 
     function 主キー(string $id=null){
         if($id){
-            $this->文字列検証($id);
+            if(!in_array($id, $this->列一覧, true)){
+                return $this;
+            }
             $this->主キー = $id;
             return $this;
         }
@@ -1887,11 +1896,6 @@ class データベース{
     }
 
 
-    private function 文字列検証(string $str){
-        if(preg_match("/[[:cntrl:][:punct:][:space:]]/", $str)){
-            throw new Exception("引数に不正な文字列が含まれています");
-        }
-    }
 
 
     private function 順番文(array $arg = null) :string{
