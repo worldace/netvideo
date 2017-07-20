@@ -1726,7 +1726,7 @@ class データベース{
 
     function 列取得(string $列, ?int $offset=0, ?int $limit=0, array $order=[]){
         if(!in_array($列, $this->列一覧, true)){
-            return;
+            return false;
         }
         $limit  = $limit ?: self::$取得件数;
         $順番文 = $this->順番文($order);
@@ -1737,7 +1737,7 @@ class データベース{
 
     function セル取得(int $id, string $列){
         if(!in_array($列, $this->列一覧, true)){
-            return;
+            return false;
         }
         $SQL文 = "select {$列} from {$this->テーブル} where {$this->主キー} = ?";
         return $this->実行($SQL文, [$id])->fetchColumn();
@@ -1758,10 +1758,13 @@ class データベース{
 
         $列 = array_intersect($this->列一覧, $列); //共通項
 
+        if(!$割当 or !$列){
+            return false;
+        }
+
         $concat文 = preg_match("/sqlite/i", $this->ドライバー)  ?  sprintf('(%s)', implode('||',$列))  :  sprintf('concat(%s)', implode(',',$列));
         $検索文   = implode(' and ', array_fill(0,count($割当),"$concat文 like ?"));
-
-        $順番文 = $this->順番文($order);
+        $順番文   = $this->順番文($order);
 
         $SQL文 = "select * from {$this->テーブル} where {$検索文} {$順番文} limit ? offset ?";
         $割当[] = (int)($limit ?: self::$取得件数);
@@ -1773,6 +1776,9 @@ class データベース{
 
     function 追加(array $data){
         $data = $this->型変換($data);
+        if(!$data){
+            return false;
+        }
 
         $追加文1 = $追加文2 = "";
         foreach($data as $k => $v){
@@ -1789,8 +1795,11 @@ class データベース{
     }
 
 
-    function 更新(int $id, array $data){
+    function 更新(int $id, array $data) :bool{
         $data = $this->型変換($data);
+        if(!$data){
+            return false;
+        }
 
         $更新文 = '';
         foreach($data as $k => $v){
@@ -1806,13 +1815,13 @@ class データベース{
         $割当[] = $id;
 
         $SQL文 = "update {$this->テーブル} set {$更新文} where {$this->主キー} = ?";
-        return $this->実行($SQL文, $割当)->rowCount();
+        return (bool)$this->実行($SQL文, $割当)->rowCount();
     }
 
 
-    function 削除(int $id){
+    function 削除(int $id) :bool{
         $SQL文 = "delete from {$this->テーブル} where {$this->主キー} = ?";
-        return $this->実行($SQL文, [$id])->rowCount();
+        return (bool)$this->実行($SQL文, [$id])->rowCount();
     }
 
 
@@ -1898,15 +1907,15 @@ class データベース{
 
 
     private function 順番文(array $arg = null) :string{
-        if(is_array($arg) and count($arg) === 2){
-            $column = $arg[0];
-            $order  = ($arg[1] === "大きい順") ? 'desc' : 'asc';
+        if(is_array($arg) and count($arg) === 2 and in_array($arg[0], $this->列一覧, true)){
+            $列名 = $arg[0];
+            $順番 = ($arg[1] === "大きい順") ? 'desc' : 'asc';
         }
         else{
-            $column = $this->主キー;
-            $order  = 'desc';
+            $列名 = $this->主キー;
+            $順番 = 'desc';
         }
-        return " order by $column $order ";
+        return " order by $列名 $順番 ";
     }
 
 
