@@ -1832,8 +1832,13 @@ class データベース{
 
 
     function 作成() :bool{
+        $定義 = constant("□{$this->テーブル}::定義");
+        if(!is_array($定義) or !$定義){
+            return false;
+        }
+
         $作成文 = "";
-        foreach(constant("□{$this->テーブル}::定義") as $k => $v){
+        foreach($定義 as $k => $v){
             $作成文 .= "$k $v,";
         }
         $作成文 = rtrim($作成文, ',');
