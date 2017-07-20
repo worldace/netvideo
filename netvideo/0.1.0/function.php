@@ -1670,15 +1670,12 @@ class データベース{
 
 
     private function 接続($driver, $user = null, $password = null){
-        $setting = [
+        $setting = 設定['データベース詳細'] + [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ];
-        foreach((array)設定['データベース詳細'] as $k => $v){
-            $setting[$k] = $v;
-        }
 
         try{
             $pdo = new PDO($driver, $user, $password, $setting);
