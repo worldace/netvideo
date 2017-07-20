@@ -972,11 +972,6 @@ function 連想配列なら($array) :bool{
 }
 
 
-function 連想配列ソート(array &$array) :void{
-    array_multisort(array_values($array), SORT_DESC, SORT_NATURAL, array_keys($array), SORT_ASC, SORT_NATURAL, $array);
-}
-
-
 /*
 function 配列探索($array, bool $leafonly = false) :Generator{
     foreach($array as $k => $v){
