@@ -1652,15 +1652,13 @@ class データベース{
     private $主キー = "id";
 
 
-    function __construct($table, $driver = null, $user = null, $password = null){
+    function __construct(string $table, ?string $driver, ?string $user, ?string $password){
+        assert(isset(設定['データベースドライバー']));
         $this->テーブル($table);
         if(!$driver){
             $driver   = 設定['データベースドライバー'];
             $user     = 設定['データベースユーザー名'];
             $password = 設定['データベースパスワード'];
-            if(!$driver){
-                throw new Exception("データベースの設定がありません。設定['データベースドライバー'] に値を設定してください");
-            }
         }
         $this->ドライバー = $driver;
         $this->接続名     = md5($driver.$user.$password);
@@ -1670,7 +1668,8 @@ class データベース{
     }
 
 
-    private function 接続($driver, $user = null, $password = null){
+    private function 接続(string $driver, ?string $user, ?string $password) :PDO{
+        assert(is_array(設定['データベース詳細']));
         $setting = 設定['データベース詳細'] + [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
@@ -1682,49 +1681,49 @@ class データベース{
             $pdo = new PDO($driver, $user, $password, $setting);
         }
         catch(PDOException $e){
-            throw new Exception("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください", 500, $e);
+            throw new Exception("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください");
         }
         return $pdo;
     }
 
 
-    function 実行($SQL文, array $割当 = null){
+    function 実行(string $SQL文, ?array $割当){
         $stmt = self::$pdo[$this->接続名]->prepare($SQL文);
-        for($i = 1;  $i <= count($割当);  $i++){
-            $type = gettype($割当[$i-1]);
+        for($i = 0;  $i < count($割当);  $i++){
+            $type = gettype($割当[$i]);
             if($type === "integer" or $type === "boolean"){
-                $stmt->bindValue($i, $割当[$i-1], PDO::PARAM_INT);
+                $stmt->bindValue($i+1, $割当[$i], PDO::PARAM_INT);
             }
             elseif($type === "resource"){
-                $stmt->bindValue($i, $割当[$i-1], PDO::PARAM_LOB);
+                $stmt->bindValue($i+1, $割当[$i], PDO::PARAM_LOB);
             }
             elseif($type === "NULL"){
-                $stmt->bindValue($i, $割当[$i-1], PDO::PARAM_NULL);
+                $stmt->bindValue($i+1, $割当[$i], PDO::PARAM_NULL);
             }
             else{
-                $stmt->bindValue($i, $割当[$i-1], PDO::PARAM_STR);
+                $stmt->bindValue($i+1, $割当[$i], PDO::PARAM_STR);
             }
         }
         $result = $stmt->execute();
-        return ($result) ? $stmt : false;
+        return $result ? $stmt : false;
     }
 
 
-    function 取得(array $条件 = null){
+    function 取得(?array $条件){
         [$追加文, $割当, $行タイプ] = $this->追加SQL文($条件, "where");
         $SQL文 = "select * from {$this->テーブル} $追加文";
         return $this->実行($SQL文, $割当)->fetchAll(...$行タイプ);
     }
 
 
-    function 行取得($id, array $条件 = null){
+    function 行取得(int $id, ?array $条件){
         [$追加文, $割当, $行タイプ] = $this->追加SQL文($条件, "where");
         $SQL文 = "select * from {$this->テーブル} where {$this->主キー} = ?";
-        return $this->実行($SQL文, [(int)$id])->fetchAll(...$行タイプ)[0];
+        return $this->実行($SQL文, [$id])->fetchAll(...$行タイプ)[0];
     }
 
 
-    function 列取得($列, array $条件 = null){
+    function 列取得($列, ?array $条件){
         $this->文字列検証($列);
         [$追加文, $割当] = $this->追加SQL文($条件, "where");
         $SQL文 = "select {$列} from {$this->テーブル} $追加文 ";
@@ -1732,14 +1731,14 @@ class データベース{
     }
 
 
-    function セル取得($id, $列){
+    function セル取得(int $id, $列){
         $this->文字列検証($列);
         $SQL文 = "select {$列} from {$this->テーブル} where {$this->主キー} = ?";
-        return $this->実行($SQL文, [(int)$id])->fetchColumn();
+        return $this->実行($SQL文, [$id])->fetchColumn();
     }
 
 
-    function 件数(array $条件 = null){
+    function 件数(?array $条件){
         if($条件['式']){
             $追加文 = "where {$条件['式']}";
         }
@@ -1748,7 +1747,7 @@ class データベース{
     }
 
 
-    function 検索($検索ワード, $列, array $条件 = null){
+    function 検索($検索ワード, $列, ?array $条件){
         foreach((array)$検索ワード as $v){
             $割当1[] = "%" . addcslashes($v, '_%') . "%";
         }
@@ -1766,10 +1765,9 @@ class データベース{
         $検索SQL = implode(' and ', array_fill(0,count($割当1),"$concat文字列 like ?"));
 
         [$追加文, $割当2, $行タイプ] = $this->追加SQL文($条件, "and");
-        $割当 = array_merge($割当1, $割当2);
         $SQL文 = "select * from {$this->テーブル} where {$検索SQL} {$追加文} ";
 
-        return $this->実行($SQL文, $割当)->fetchAll(...$行タイプ);
+        return $this->実行($SQL文, array_merge($割当1, $割当2))->fetchAll(...$行タイプ);
     }
 
 
@@ -1792,7 +1790,7 @@ class データベース{
     }
 
 
-    function 更新($id, $data){
+    function 更新(int $id, $data){
         if(is_object($data) and get_class($data) === "{$this->テーブル}定義"){
             $data = $this->型変換($data, "{$this->テーブル}定義");
         }
@@ -1807,20 +1805,20 @@ class データベース{
             }
         }
         $set文 = rtrim($set文, ',');
-        $割当[] = (int)$id;
+        $割当[] = $id;
 
         $SQL文 = "update {$this->テーブル} set {$set文} where {$this->主キー} = ?";
         return $this->実行($SQL文, $割当)->rowCount();
     }
 
 
-    function 削除($id){
+    function 削除(int $id){
         $SQL文 = "delete from {$this->テーブル} where {$this->主キー} = ?";
-        return $this->実行($SQL文, [(int)$id])->rowCount();
+        return $this->実行($SQL文, [$id])->rowCount();
     }
 
 
-    function 作成(array $テーブル定義, $追加文 = ""){
+    function 作成(array $テーブル定義, ?string $追加文) :bool{
         foreach($テーブル定義 as $k => $v){
             $this->文字列検証($k);
             $列情報 .= "$k $v,";
@@ -1833,14 +1831,14 @@ class データベース{
         }
         else { //MySQL用
             $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
-            $追加文 = ($追加文) ?: "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci";
+            $追加文 = $追加文 ?: "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci";
         }
         $result = $this->実行($SQL文.$追加文);
         return $result ? true : false;
     }
 
 
-    function インデックス作成($列){
+    function インデックス作成($列) :bool{
         $this->文字列検証($列);
         $SQL文  = "create index {$列}インデックス on {$this->テーブル} ($列)";
         $result = $this->実行($SQL文);
@@ -1848,33 +1846,33 @@ class データベース{
     }
 
 
-    function トランザクション開始(){
+    function トランザクション開始() :データベース{
         self::$pdo[$this->接続名]->beginTransaction();
         return $this;
     }
 
 
-    function トランザクション終了(){
+    function トランザクション終了() :データベース{
         self::$pdo[$this->接続名]->commit();
         return $this;
     }
 
 
-    function トランザクション失敗(){
+    function トランザクション失敗() :データベース{
         self::$pdo[$this->接続名]->rollBack();
         return $this;
     }
 
 
-    function 切断(){
+    function 切断() :void{
         self::$pdo[$this->接続名] = null; //staticはGCの対象にならなくて切断できないかも(不明)
     }
 
 
-    function テーブル($arg = null){
-        if($arg){
-            $this->文字列検証($arg);
-            $this->テーブル = $arg;
+    function テーブル(?string $table){
+        if($table){
+            $this->文字列検証($table);
+            $this->テーブル = $table;
             return $this;
         }
         else{
@@ -1883,10 +1881,10 @@ class データベース{
     }
 
 
-    function 主キー($arg = null){
-        if($arg){
-            $this->文字列検証($arg);
-            $this->主キー = $arg;
+    function 主キー(?string $id){
+        if($id){
+            $this->文字列検証($id);
+            $this->主キー = $id;
             return $this;
         }
         else{
@@ -1897,7 +1895,7 @@ class データベース{
 
 
 
-    private function 文字列検証($str){
+    private function 文字列検証(string $str){
         if(preg_match("/[[:cntrl:][:punct:][:space:]]/", $str)){
             throw new Exception("引数に不正な文字列が含まれています");
         }
@@ -1965,32 +1963,31 @@ class データベース{
     }
 
 
-    private function 型変換($object, $table){
-        $定義 = constant("$table::定義");
-        $data = [];
-        foreach($定義 as $k => $v){
+    private function 型変換($object, string $table) :array{
+        $return = [];
+        foreach(constant("$table::定義") as $k => $v){
             if(!isset($object->$k)){ //nullどうしようか
                 continue;
             }
             if(isset($object->$k['式'])){
-                $data[$k] = $object->$k;
+                $return[$k] = $object->$k;
                 continue;
             }
             $型 = explode(" ", $v)[0];
             if(preg_match("/INT/i", $型)){
-                $data[$k] = (int)$object->$k;
+                $return[$k] = (int)$object->$k;
             }
             elseif(preg_match("/CHAR|TEXT|CLOB/i", $型)){
-                $data[$k] = (string)$object->$k;
+                $return[$k] = (string)$object->$k;
             }
             elseif(preg_match("/REAL|FLOA|DOUB/i", $型)){
-                $data[$k] = (float)$object->$k;
+                $return[$k] = (float)$object->$k;
             }
             else{
-                $data[$k] = $object->$k;
+                $return[$k] = $object->$k;
             }
         }
-        return $data;
+        return $return;
     }
 }
 
