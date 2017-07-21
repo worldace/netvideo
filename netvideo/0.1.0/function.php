@@ -1648,29 +1648,29 @@ class データベース{
     private static $pdo = [];
     private $接続名 = "";
     private $テーブル = "";
-    private $isMySQL = true;
     private $定義 = [];
     private $主キー = "id";
-    private $PDO設定 = [];
+    private $接続設定 = [];
     public static $取得件数 = 31;
 
 
     function __construct(string $table, array $setting=[]){
         assert(isset(設定['データベース接続設定']));
+        assert(class_exists("□$table"));
+
         $setting[0] = $setting[0] ?? 設定['データベース接続設定'][0];
         $setting[1] = $setting[1] ?? 設定['データベース接続設定'][1] ?? '';
         $setting[2] = $setting[2] ?? 設定['データベース接続設定'][2] ?? '';
 
-        $this->接続名  = md5(implode('', $setting));
-        $this->isMySQL = (bool)preg_match("/^mysql/i", $setting[0]);
-
         $setting[3] = (設定['データベース接続設定'][3]  ?? [])  + [
+
             PDO::ATTR_DEFAULT_FETCH_MODE       => PDO::FETCH_ASSOC,
             PDO::ATTR_ERRMODE                  => PDO::ERRMODE_WARNING,
             PDO::ATTR_EMULATE_PREPARES         => true,
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ];
-        $this->PDO設定 = $setting[3];
+
+        $this->接続名  = md5($setting[0].$setting[1].$setting[2]);
 
         if(!isset(self::$pdo[$this->接続名])){
             try{ //パスワードが漏れる可能性があるので例外を握りつぶす＋パスワードは配列に入れておく
@@ -1685,7 +1685,20 @@ class データベース{
                 }
             }
         }
+        $this->接続設定 = $setting;
         $this->テーブル($table);
+    }
+
+
+    function テーブル(string $table=null){
+        if(!$table){
+            return $this->テーブル;
+        }
+        $this->テーブル = $table;
+        $this->定義     = constant("□$table::定義");
+        $this->主キー   = defined("□$table::主キー")  ?  constant("□$table::主キー")  :  "id";
+
+        return $this;
     }
 
 
@@ -1706,7 +1719,7 @@ class データベース{
                 $stmt->bindValue($i+1, $割当[$i], PDO::PARAM_STR);
             }
         }
-        if($this->PDO設定[PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){ //&は「含めば」
+        if($this->接続設定[3][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){ //&は「含めば」
             $stmt->setFetchMode(PDO::FETCH_CLASS, "□{$this->テーブル}"); // http://php.net/manual/ja/pdostatement.setfetchmode.php
         }
         $result = $stmt->execute();
@@ -1771,7 +1784,7 @@ class データベース{
             return false;
         }
 
-        $concat文 = $this->isMySQL  ?  sprintf('concat(%s)', implode(',',$列))  :  sprintf('(%s)', implode('||',$列));
+        $concat文 = $this->MySQLなら()  ?  sprintf('concat(%s)', implode(',',$列))  :  sprintf('(%s)', implode('||',$列));
         $検索文   = implode(' and ', array_fill(0,count($割当),"$concat文 like ?"));
         $順番文   = $this->順番文($order);
 
@@ -1846,7 +1859,7 @@ class データベース{
         $作成文 = rtrim($作成文, ',');
         $SQL文 = "create table IF NOT EXISTS {$this->テーブル} ($作成文) ";
 
-        if($this->isMySQL){
+        if($this->MySQLなら()){
             $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
             $SQL文 .= defined("□{$this->テーブル}::追加定義")  ?  constant("□{$this->テーブル}::追加定義")  :  "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci";
         }
@@ -1891,22 +1904,17 @@ class データベース{
     }
 
 
-    function テーブル(string $table=null){
-        if(!$table){
-            return $this->テーブル;
-        }
-        $this->テーブル = $table;
-        $this->定義     = constant("□$table::定義");
-        $this->主キー   = defined("□$table::主キー")  ?  constant("□$table::主キー")  :  "id";
 
-        return $this;
+
+    private function MySQLなら(){
+        (bool)preg_match("/^mysql/i", $this->接続設定[0]);
     }
 
 
     private function 列なら($arg) :bool{
         return in_array($arg, array_keys($this->定義), true);
     }
-    
+
 
     private function 順番文(array $arg = null) :string{
         if(is_array($arg) and count($arg) === 2 and $this->列なら($arg[0])){
