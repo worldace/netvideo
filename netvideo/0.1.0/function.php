@@ -1647,10 +1647,10 @@ function データベース(string $table, array $setting=[]){
 class データベース{
     private static $pdo = [];
     private $接続名 = "";
-    private $テーブル = "";
-    private $定義 = [];
-    private $主キー = "id";
     private $接続設定 = [];
+    private $テーブル = "";
+    private $主キー = "id";
+    private $定義 = [];
     public static $取得件数 = 31;
 
 
@@ -1662,7 +1662,6 @@ class データベース{
         $setting[2] = $setting[2] ?? 設定['データベース接続設定'][2] ?? '';
 
         $setting[3] = (設定['データベース接続設定'][3]  ?? [])  + [
-
             PDO::ATTR_DEFAULT_FETCH_MODE       => PDO::FETCH_ASSOC,
             PDO::ATTR_ERRMODE                  => PDO::ERRMODE_WARNING,
             PDO::ATTR_EMULATE_PREPARES         => true,
