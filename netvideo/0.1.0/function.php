@@ -1702,6 +1702,9 @@ class データベース{
 
 
     function 実行(string $SQL文, array $割当=[]){
+        if(!isset(self::$pdo[$this->接続名])){
+            return false;
+        }
         $state = self::$pdo[$this->接続名]->prepare($SQL文);
         if($state === false){
             return false;
