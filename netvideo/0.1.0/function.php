@@ -1646,12 +1646,11 @@ function データベース(string $table, array $setting=[]){
 
 class データベース{
     private static $pdo = [];
-    private $isMySQL = true;
     private $接続名 = "";
     private $テーブル = "";
-    private $列一覧 = [];
+    private $isMySQL = true;
+    private $定義 = [];
     private $主キー = "id";
-    private $主キーの型 = "int";
     private $PDO設定 = [];
     public static $取得件数 = 31;
 
@@ -1725,7 +1724,7 @@ class データベース{
 
 
     function 列取得(string $列, ?int $offset=0, ?int $limit=0, array $order=[]){
-        if(!in_array($列, $this->列一覧, true)){
+        if(!$this->列なら($列)){
             return [];
         }
         $limit  = $limit ?: self::$取得件数;
@@ -1736,7 +1735,7 @@ class データベース{
 
 
     function セル取得($id, string $列){
-        if(!in_array($列, $this->列一覧, true)){
+        if(!$this->列なら($列)){
             return false;
         }
         $SQL文 = "select {$列} from {$this->テーブル} where {$this->主キー} = ?";
@@ -1761,7 +1760,7 @@ class データベース{
             $割当[] = "%" . addcslashes($v, '_%') . "%";
         }
 
-        $列 = array_intersect($this->列一覧, $列); //共通項
+        $列 = array_intersect(array_keys($this->定義), $列); //共通項
 
         if(!$割当 or !$列){
             return false;
@@ -1831,13 +1830,12 @@ class データベース{
 
 
     function 作成() :bool{
-        $定義 = constant("□{$this->テーブル}::定義");
-        if(!is_array($定義) or !$定義){
+        if(!is_array($this->定義) or !$this->定義){
             return false;
         }
 
         $作成文 = "";
-        foreach($定義 as $k => $v){
+        foreach($this->定義 as $k => $v){
             $作成文 .= "$k $v,";
         }
         $作成文 = rtrim($作成文, ',');
@@ -1856,7 +1854,7 @@ class データベース{
 
 
     function インデックス作成(string $列) :bool{
-        if(!in_array($列, $this->列一覧, true)){
+        if(!$this->列なら($列)){
             return false;
         }
         $SQL文  = "create index {$列}インデックス on {$this->テーブル} ($列)";
@@ -1893,21 +1891,20 @@ class データベース{
             return $this->テーブル;
         }
         $this->テーブル = $table;
-        $定義 = constant("□$table::定義");
-        $this->列一覧 = array_keys($定義);
-        $this->主キー = defined("□$table::主キー")  ?  constant("□$table::主キー")  :  "id";
-
-        $型情報 = explode(" ", $定義[$this->主キー])[0];
-        $this->主キーの型 = preg_match("/int/i", $型情報)  ?  "int"  :  "string";
+        $this->定義     = constant("□$table::定義");
+        $this->主キー   = defined("□$table::主キー")  ?  constant("□$table::主キー")  :  "id";
 
         return $this;
     }
 
 
-
+    private function 列なら($arg) :bool{
+        return in_array($arg, array_keys($this->定義), true);
+    }
+    
 
     private function 順番文(array $arg = null) :string{
-        if(is_array($arg) and count($arg) === 2 and in_array($arg[0], $this->列一覧, true)){
+        if(is_array($arg) and count($arg) === 2 and $this->列なら($arg[0])){
             $列名 = $arg[0];
             $順番 = ($arg[1] === "大きい順") ? 'desc' : 'asc';
         }
@@ -1920,17 +1917,16 @@ class データベース{
 
 
     private function 型変換(array $arg) :array{
-        $定義 = constant("□{$this->テーブル}::定義");
         $return = [];
         foreach($arg as $k => $v){
-            if(!isset($定義[$k])){
+            if(!isset($this->定義[$k])){
                 continue;
             }
             if(is_array($v)){
                 $return[$k] = $v;
                 continue;
             }
-            $型 = explode(" ", ltrim($定義[$k]))[0];
+            $型 = strstr(ltrim($this->定義[$k], ' ', true);
             if(preg_match("/INT/i", $型)){
                 $return[$k] = (int)$v;
             }
@@ -1949,7 +1945,8 @@ class データベース{
 
 
     private function id型変換($id){
-        return ($this->主キーの型 === "int")  ?  (int)$id  :  (string)$id;
+        $型 = strstr(ltrim($定義[$this->主キー]), ' ', true);
+        return preg_match("/int/i", $型)  ?  (int)$id  :  (string)$id;
     }
 }
 
