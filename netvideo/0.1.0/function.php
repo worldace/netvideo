@@ -1656,7 +1656,6 @@ class データベース{
 
     function __construct(string $table, array $setting=[]){
         assert(isset(設定['データベース接続設定']));
-        assert(class_exists("□$table"));
 
         $setting[0] = $setting[0] ?? 設定['データベース接続設定'][0];
         $setting[1] = $setting[1] ?? 設定['データベース接続設定'][1] ?? '';
@@ -1691,6 +1690,7 @@ class データベース{
 
 
     function テーブル(string $table=null){
+        assert(class_exists("□$table"));
         if(!$table){
             return $this->テーブル;
         }
