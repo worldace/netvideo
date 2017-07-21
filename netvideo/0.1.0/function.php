@@ -1759,7 +1759,7 @@ class データベース{
 
 
     function 列取得($列, ?int $offset=0, ?int $limit=0, array $order=[]){
-        if(!$this->列なら($v)){
+        if(!$this->列なら($列)){
             return false;
         }
 
@@ -1799,7 +1799,7 @@ class データベース{
         if(!$列){
             return false;
         }
-        if(!$this->列なら($v)){
+        if(!$this->列なら($列)){
             return false;
         }
 
