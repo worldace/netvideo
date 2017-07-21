@@ -1926,7 +1926,7 @@ class データベース{
                 $return[$k] = $v;
                 continue;
             }
-            $型 = strstr(ltrim($this->定義[$k], ' ', true);
+            $型 = strstr(ltrim($this->定義[$k]), ' ', true);
             if(preg_match("/INT/i", $型)){
                 $return[$k] = (int)$v;
             }
