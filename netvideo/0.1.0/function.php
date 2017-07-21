@@ -1759,10 +1759,8 @@ class データベース{
 
 
     function 列取得($列, ?int $offset=0, ?int $limit=0, array $order=[]){
-        foreach((array)$列 as $v){
-            if(!$this->列なら($v)){
-                return false;
-            }
+        if(!$this->列なら($v)){
+            return false;
         }
 
         $limit  = $limit ?: self::$取得件数;
@@ -1801,10 +1799,8 @@ class データベース{
         if(!$列){
             return false;
         }
-        foreach($列 as $v){
-            if(!$this->列なら($v)){
-                return false;
-            }
+        if(!$this->列なら($v)){
+            return false;
         }
 
         if(is_string($word)){
@@ -1959,9 +1955,18 @@ class データベース{
         return (bool)preg_match("/^mysql/i", $this->接続設定[0]);
     }
 
-
     private function 列なら($arg) :bool{
-        return in_array($arg, array_keys($this->定義), true);
+        if(!is_string($arg) and !is_array($arg)){
+            return false;
+        }
+
+        $列一覧 = array_keys($this->定義);
+        foreach((array)$arg as $v){
+            if(!in_array($v, $列一覧, true)){
+                return false;
+            }
+        }
+        return true;
     }
 
 
