@@ -1664,7 +1664,7 @@ class データベース{
         $this->接続名  = md5(implode('', $setting));
         $this->isMySQL = (bool)preg_match("/^mysql/i", $setting[0]);
 
-        $setting[3] = (設定['データベースPDO設定']  ?? [])  + [
+        $setting[3] = (設定['データベース接続設定'][3]  ?? [])  + [
             PDO::ATTR_DEFAULT_FETCH_MODE       => PDO::FETCH_ASSOC,
             PDO::ATTR_ERRMODE                  => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_EMULATE_PREPARES         => true,
