@@ -1703,32 +1703,32 @@ class データベース{
 
 
     function 実行(string $SQL文, array $割当=[]){
-        $stmt = self::$pdo[$this->接続名]->prepare($SQL文);
-        if($stmt === false){
+        $state = self::$pdo[$this->接続名]->prepare($SQL文);
+        if($state === false){
             return false;
         }
 
         for($i = 0;  $i < count($割当);  $i++){
             $type = gettype($割当[$i]);
             if($type === "integer" or $type === "boolean"){
-                $stmt->bindValue($i+1, $割当[$i], PDO::PARAM_INT);
+                $state->bindValue($i+1, $割当[$i], PDO::PARAM_INT);
             }
             elseif($type === "resource"){
-                $stmt->bindValue($i+1, $割当[$i], PDO::PARAM_LOB);
+                $state->bindValue($i+1, $割当[$i], PDO::PARAM_LOB);
             }
             elseif($type === "NULL"){
-                $stmt->bindValue($i+1, $割当[$i], PDO::PARAM_NULL);
+                $state->bindValue($i+1, $割当[$i], PDO::PARAM_NULL);
             }
             else{
-                $stmt->bindValue($i+1, $割当[$i], PDO::PARAM_STR);
+                $state->bindValue($i+1, $割当[$i], PDO::PARAM_STR);
             }
         }
 
         if($this->接続設定[3][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){ //&は「含めば」
-            $stmt->setFetchMode(PDO::FETCH_CLASS, "□{$this->テーブル}"); // http://php.net/manual/ja/pdostatement.setfetchmode.php
+            $state->setFetchMode(PDO::FETCH_CLASS, "□{$this->テーブル}"); // http://php.net/manual/ja/pdostatement.setfetchmode.php
         }
 
-        return $stmt->execute() ? $stmt : false;
+        return $state->execute() ? $state : false;
     }
 
 
@@ -1736,30 +1736,42 @@ class データベース{
         $limit  = $limit ?: self::$取得件数;
         $順番文 = $this->順番文($order);
         $SQL文  = "select * from {$this->テーブル} {$順番文} limit ? offset ?";
-        $result = $this->実行($SQL文, [(int)$limit, (int)$offset]);
 
-        return $result ? $result->fetchAll() : false;
+        $state = $this->実行($SQL文, [(int)$limit, (int)$offset]);
+
+        return $state ? $state->fetchAll() : false;
     }
 
 
     function 行取得($id){
         $SQL文  = "select * from {$this->テーブル} where {$this->主キー} = ?";
-        $result = $this->実行($SQL文, [$this->id型変換($id)]);
 
-        return $result ? $result->fetchAll()[0] : false;
+        $state  = $this->実行($SQL文, [$this->id型変換($id)]);
+        if($state === false){
+            return false;
+        }
+
+        $data = $result->fetchAll();
+        return $data ? $data[0] : $data;
     }
 
 
-    function 列取得(string $列, ?int $offset=0, ?int $limit=0, array $order=[]){
-        if(!$this->列なら($列)){
-            return [];
+    function 列取得($列, ?int $offset=0, ?int $limit=0, array $order=[]){
+        foreach((array)$列 as $v){
+            if(!$this->列なら($v)){
+                return false;
+            }
         }
+
         $limit  = $limit ?: self::$取得件数;
         $順番文 = $this->順番文($order);
-        $SQL文  = "select {$列} from {$this->テーブル} {$順番文} limit ? offset ?";
-        $result = $this->実行($SQL文, [(int)$limit, (int)$offset]);
+        $列文   = implode(",", (array)$列);
+        $SQL文  = "select {$列文} from {$this->テーブル} {$順番文} limit ? offset ?";
 
-        return $result ? $result->fetchAll(PDO::FETCH_COLUMN) : false;
+        $mode  = is_string($列) ? PDO::FETCH_COLUMN : null;
+        $state = $this->実行($SQL文, [(int)$limit, (int)$offset]);
+
+        return $state ? $state->fetchAll($mode) : false;
     }
 
 
@@ -1768,24 +1780,37 @@ class データベース{
             return false;
         }
         $SQL文  = "select {$列} from {$this->テーブル} where {$this->主キー} = ?";
-        $result = $this->実行($SQL文, [$this->id型変換($id)]);
 
-        return $result ? $result->fetchColumn() : false;
+        $state = $this->実行($SQL文, [$this->id型変換($id)]);
+
+        return $state ? $state->fetchColumn() : false;
     }
 
 
     function 件数(){
-        $SQL文  = "select count(*) from {$this->テーブル}";
-        $result = $this->実行($SQL文);
+        $SQL文 = "select count(*) from {$this->テーブル}";
+        $state = $this->実行($SQL文);
 
-        return $result ? $result->fetchColumn() : false;
+        return $state ? $state->fetchColumn() : false;
     }
 
 
     function 検索($word, array $列, ?int $offset=0, ?int $limit=0, array $order=[]){
+        if(!$列){
+            return false;
+        }
+        foreach($列 as $v){
+            if(!$this->列なら($v)){
+                return false;
+            }
+        }
+
         if(is_string($word)){
             $word = preg_replace("/[[:space:]　]+/u", " ", $word);
             $word = explode(" ", trim($word));
+        }
+        if(!$word){
+            return false;
         }
 
         $割当 = [];
@@ -1793,23 +1818,17 @@ class データベース{
             $割当[] = "%" . addcslashes($v, '_%') . "%";
         }
 
-        $列 = array_intersect(array_keys($this->定義), $列); //共通項
-
-        if(!$割当 or !$列){
-            return false;
-        }
-
         $concat文 = $this->MySQLなら()  ?  sprintf('concat(%s)', implode(',',$列))  :  sprintf('(%s)', implode('||',$列));
         $検索文   = implode(' and ', array_fill(0,count($割当),"$concat文 like ?"));
         $順番文   = $this->順番文($order);
 
-        $SQL文 = "select * from {$this->テーブル} where {$検索文} {$順番文} limit ? offset ?";
+        $SQL文  = "select * from {$this->テーブル} where {$検索文} {$順番文} limit ? offset ?";
         $割当[] = (int)($limit ?: self::$取得件数);
         $割当[] = (int)$offset;
 
-        $result = $this->実行($SQL文, $割当);
+        $state = $this->実行($SQL文, $割当);
 
-        return $result ? $result->fetchAll() : false;
+        return $state ? $result->fetchAll() : false;
     }
 
 
@@ -1980,7 +1999,7 @@ class データベース{
 
 
     private function id型変換($id){
-        $型 = strstr(ltrim($定義[$this->主キー]), ' ', true);
+        $型 = strstr(ltrim($this->定義[$this->主キー]), ' ', true);
         return preg_match("/int/i", $型)  ?  (int)$id  :  (string)$id;
     }
 }
