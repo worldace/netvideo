@@ -1683,7 +1683,7 @@ class データベース{
             $pdo = new PDO($driver, $user, $password, $setting);
         }
         catch(PDOException $e){
-            throw new Exception("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください");
+            throw new PDOException("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください");
         }
         return $pdo;
     }
@@ -1922,8 +1922,8 @@ class データベース{
 
     private function 型変換(array $arg) :array{
         $return = [];
-        foreach(constant("□{$this->テーブル}::定義") as $k => $v){
-            if(!isset($arg[$k])){ //nullどうしようか
+        foreach(constant("□{$this->テーブル}::定義") as $k => $v){ //これ$argを回すべきだと思うが
+            if(!isset($arg[$k])){ //nullどうしようか→ array_key_exists を使う
                 continue;
             }
             if(is_array($arg[$k])){
