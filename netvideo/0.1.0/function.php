@@ -1707,6 +1707,7 @@ class データベース{
         if($stmt === false){
             return false;
         }
+
         for($i = 0;  $i < count($割当);  $i++){
             $type = gettype($割当[$i]);
             if($type === "integer" or $type === "boolean"){
@@ -1722,6 +1723,7 @@ class データベース{
                 $stmt->bindValue($i+1, $割当[$i], PDO::PARAM_STR);
             }
         }
+
         if($this->接続設定[3][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){ //&は「含めば」
             $stmt->setFetchMode(PDO::FETCH_CLASS, "□{$this->テーブル}"); // http://php.net/manual/ja/pdostatement.setfetchmode.php
         }
@@ -1734,13 +1736,17 @@ class データベース{
         $limit  = $limit ?: self::$取得件数;
         $順番文 = $this->順番文($order);
         $SQL文  = "select * from {$this->テーブル} {$順番文} limit ? offset ?";
-        return $this->実行($SQL文, [(int)$limit, (int)$offset])->fetchAll();
+        $result = $this->実行($SQL文, [(int)$limit, (int)$offset]);
+
+        return $result ? $result->fetchAll() : false;
     }
 
 
     function 行取得($id){
-        $SQL文 = "select * from {$this->テーブル} where {$this->主キー} = ?";
-        return $this->実行($SQL文, [$this->id型変換($id)])->fetchAll()[0];
+        $SQL文  = "select * from {$this->テーブル} where {$this->主キー} = ?";
+        $result = $this->実行($SQL文, [$this->id型変換($id)]);
+
+        return $result ? $result->fetchAll()[0] : false;
     }
 
 
@@ -1751,7 +1757,9 @@ class データベース{
         $limit  = $limit ?: self::$取得件数;
         $順番文 = $this->順番文($order);
         $SQL文  = "select {$列} from {$this->テーブル} {$順番文} limit ? offset ?";
-        return $this->実行($SQL文, [(int)$limit, (int)$offset])->fetchAll(PDO::FETCH_COLUMN);
+        $result = $this->実行($SQL文, [(int)$limit, (int)$offset]);
+
+        return $result ? $result->fetchAll(PDO::FETCH_COLUMN) : false;
     }
 
 
@@ -1759,14 +1767,18 @@ class データベース{
         if(!$this->列なら($列)){
             return false;
         }
-        $SQL文 = "select {$列} from {$this->テーブル} where {$this->主キー} = ?";
-        return $this->実行($SQL文, [$this->id型変換($id)])->fetchColumn();
+        $SQL文  = "select {$列} from {$this->テーブル} where {$this->主キー} = ?";
+        $result = $this->実行($SQL文, [$this->id型変換($id)]);
+
+        return $result ? $result->fetchColumn() : false;
     }
 
 
     function 件数(){
-        $SQL文 = "select count(*) from {$this->テーブル}";
-        return $this->実行($SQL文)->fetchColumn();
+        $SQL文  = "select count(*) from {$this->テーブル}";
+        $result = $this->実行($SQL文);
+
+        return $result ? $result->fetchColumn() : false;
     }
 
 
@@ -1795,7 +1807,9 @@ class データベース{
         $割当[] = (int)($limit ?: self::$取得件数);
         $割当[] = (int)$offset;
 
-        return $this->実行($SQL文, $割当)->fetchAll();
+        $result = $this->実行($SQL文, $割当);
+
+        return $result ? $result->fetchAll() : false;
     }
 
 
@@ -1814,9 +1828,10 @@ class データベース{
         $追加文1 = rtrim($追加文1, ',');
         $追加文2 = rtrim($追加文2, ',');
 
-        $SQL文 = "insert into {$this->テーブル} ($追加文1) values ($追加文2)";
-        $this->実行($SQL文, $割当);
-        return self::$pdo[$this->接続名]->lastInsertId();
+        $SQL文  = "insert into {$this->テーブル} ($追加文1) values ($追加文2)";
+        $result = $this->実行($SQL文, $割当);
+
+        return $result ? self::$pdo[$this->接続名]->lastInsertId() : false;
     }
 
 
@@ -1839,14 +1854,18 @@ class データベース{
         $更新文 = rtrim($更新文, ',');
         $割当[] = $this->id型変換($id);
 
-        $SQL文 = "update {$this->テーブル} set {$更新文} where {$this->主キー} = ?";
-        return (bool)$this->実行($SQL文, $割当)->rowCount();
+        $SQL文  = "update {$this->テーブル} set {$更新文} where {$this->主キー} = ?";
+        $result = $this->実行($SQL文, $割当);
+
+        return $result ? (bool)$result->rowCount() : false;
     }
 
 
     function 削除($id) :bool{
-        $SQL文 = "delete from {$this->テーブル} where {$this->主キー} = ?";
-        return (bool)$this->実行($SQL文, [$this->id型変換($id)])->rowCount();
+        $SQL文  = "delete from {$this->テーブル} where {$this->主キー} = ?";
+        $result = $this->実行($SQL文, [$this->id型変換($id)]);
+
+        return $result ? (bool)$result->rowCount() : false;
     }
 
 
@@ -1910,7 +1929,7 @@ class データベース{
 
 
     private function MySQLなら(){
-        (bool)preg_match("/^mysql/i", $this->接続設定[0]);
+        return (bool)preg_match("/^mysql/i", $this->接続設定[0]);
     }
 
 
