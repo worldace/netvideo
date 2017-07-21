@@ -1639,8 +1639,8 @@ function クラス文字列化($class){
 }
 
 
-function データベース(string $table, string $driver=null, string $user=null, string $pass=null){
-    return new データベース($table, $driver, $user, $pass);
+function データベース(string $table, array $setting=[]){
+    return new データベース($table, $setting);
 }
 
 
@@ -1655,23 +1655,23 @@ class データベース{
     public static $取得件数 = 31;
 
 
-    function __construct(string $table, string $driver=null, string $user=null, string $password=null){
+    function __construct(string $table, array $setting=[]){
         assert(isset(設定['データベースドライバー']));
-        if(!$driver){
-            $driver   = 設定['データベースドライバー'];
-            $user     = 設定['データベースユーザー名'] ?? '';
-            $password = 設定['データベースパスワード'] ?? '';
+        if(!$setting){
+            $setting[] = 設定['データベースドライバー'];
+            $setting[] = 設定['データベースユーザー名'] ?? '';
+            $setting[] = 設定['データベースパスワード'] ?? '';
         }
-        $this->ドライバー = $driver;
-        $this->接続名     = md5($driver.$user.$password);
+        $this->ドライバー = $setting[0];
+        $this->接続名     = md5(implode('', $setting));
         if(!isset(self::$pdo[$this->接続名])){
-            self::$pdo[$this->接続名] = $this->接続($driver, $user, $password);
+            self::$pdo[$this->接続名] = $this->接続($setting);
         }
         $this->テーブル($table);
     }
 
 
-    private function 接続(string $driver, string $user=null, string $password=null) :PDO{
+    private function 接続(array $setting) :PDO{
         $pdo_setting = (設定['データベースPDO設定']  ?? [])  + [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
@@ -1679,8 +1679,8 @@ class データベース{
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ];
 
-        try{
-            $pdo = new PDO($driver, $user, $password, $pdo_setting);
+        try{ //パスワードが漏れる可能性があるので例外を握りつぶす＋パスワードは配列に入れておく
+            $pdo = new PDO($setting[0], $setting[1] ?? '', $setting[2] ?? '', $pdo_setting);
         }
         catch(PDOException $e){
             throw new PDOException("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください");
