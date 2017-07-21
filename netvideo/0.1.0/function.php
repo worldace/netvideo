@@ -1652,14 +1652,15 @@ class データベース{
     private $列一覧 = [];
     private $主キー = "id";
     private $主キーの型 = "int";
+    private $PDO設定 = [];
     public static $取得件数 = 31;
 
 
     function __construct(string $table, array $setting=[]){
-        assert(isset(設定['データベースドライバー']));
-        $setting[0] = $setting[0] ?? 設定['データベースドライバー'];
-        $setting[1] = $setting[1] ?? 設定['データベースユーザー名'] ?? '';
-        $setting[2] = $setting[2] ?? 設定['データベースパスワード'] ?? '';
+        assert(isset(設定['データベース接続設定']));
+        $setting[0] = $setting[0] ?? 設定['データベース接続設定'][0];
+        $setting[1] = $setting[1] ?? 設定['データベース接続設定'][1] ?? '';
+        $setting[2] = $setting[2] ?? 設定['データベース接続設定'][2] ?? '';
 
         $this->接続名  = md5(implode('', $setting));
         $this->isMySQL = (bool)preg_match("/^mysql/i", $setting[0]);
@@ -1670,6 +1671,7 @@ class データベース{
             PDO::ATTR_EMULATE_PREPARES         => true,
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ];
+        $this->PDO設定 = $setting[3];
 
         if(!isset(self::$pdo[$this->接続名])){
             try{ //パスワードが漏れる可能性があるので例外を握りつぶす＋パスワードは配列に入れておく
@@ -1699,6 +1701,9 @@ class データベース{
             else{
                 $stmt->bindValue($i+1, $割当[$i], PDO::PARAM_STR);
             }
+        }
+        if($this->PDO設定[PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){ //&は「含めば」
+            $stmt->setFetchMode(PDO::FETCH_CLASS, "□{$this->テーブル}"); // http://php.net/manual/ja/pdostatement.setfetchmode.php
         }
         $result = $stmt->execute();
         return $result ? $stmt : false;
