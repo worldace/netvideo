@@ -1646,7 +1646,7 @@ function データベース(string $table, array $setting=[]){
 
 class データベース{
     private static $pdo = [];
-    private $ドライバー = "";
+    private $isSQLite = false;
     private $接続名 = "";
     private $テーブル = "";
     private $列一覧 = [];
@@ -1657,35 +1657,29 @@ class データベース{
 
     function __construct(string $table, array $setting=[]){
         assert(isset(設定['データベースドライバー']));
-        if(!$setting){
-            $setting[] = 設定['データベースドライバー'];
-            $setting[] = 設定['データベースユーザー名'] ?? '';
-            $setting[] = 設定['データベースパスワード'] ?? '';
-        }
-        $this->ドライバー = $setting[0];
-        $this->接続名     = md5(implode('', $setting));
-        if(!isset(self::$pdo[$this->接続名])){
-            self::$pdo[$this->接続名] = $this->接続($setting);
-        }
-        $this->テーブル($table);
-    }
+        $setting[0] = $setting[0] ?? 設定['データベースドライバー'];
+        $setting[1] = $setting[1] ?? 設定['データベースユーザー名'] ?? '';
+        $setting[2] = $setting[2] ?? 設定['データベースパスワード'] ?? '';
 
+        $this->isSQLite = (bool)preg_match("/^sqlite/i", $setting[0]);
+        $this->接続名   = md5(implode('', $setting));
 
-    private function 接続(array $setting) :PDO{
-        $pdo_setting = (設定['データベースPDO設定']  ?? [])  + [
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => true,
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        $setting[3] = (設定['データベースPDO設定']  ?? [])  + [
+            PDO::ATTR_DEFAULT_FETCH_MODE       => PDO::FETCH_ASSOC,
+            PDO::ATTR_ERRMODE                  => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_EMULATE_PREPARES         => true,
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ];
 
-        try{ //パスワードが漏れる可能性があるので例外を握りつぶす＋パスワードは配列に入れておく
-            $pdo = new PDO($setting[0], $setting[1] ?? '', $setting[2] ?? '', $pdo_setting);
+        if(!isset(self::$pdo[$this->接続名])){
+            try{ //パスワードが漏れる可能性があるので例外を握りつぶす＋パスワードは配列に入れておく
+                self::$pdo[$this->接続名] = new PDO(...$setting);
+            }
+            catch(PDOException $e){
+                throw new PDOException("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください");
+            }
         }
-        catch(PDOException $e){
-            throw new PDOException("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください");
-        }
-        return $pdo;
+        $this->テーブル($table);
     }
 
 
@@ -1768,7 +1762,7 @@ class データベース{
             return false;
         }
 
-        $concat文 = preg_match("/sqlite/i", $this->ドライバー)  ?  sprintf('(%s)', implode('||',$列))  :  sprintf('concat(%s)', implode(',',$列));
+        $concat文 = $this->isSQLite  ?  sprintf('(%s)', implode('||',$列))  :  sprintf('concat(%s)', implode(',',$列));
         $検索文   = implode(' and ', array_fill(0,count($割当),"$concat文 like ?"));
         $順番文   = $this->順番文($order);
 
@@ -1844,10 +1838,10 @@ class データベース{
         $作成文 = rtrim($作成文, ',');
         $SQL文 = "create table IF NOT EXISTS {$this->テーブル} ($作成文) ";
 
-        if(preg_match('/^sqlite/i', $this->ドライバー)){ //SQLite用
+        if($this->isSQLite){
             $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
         }
-        else { //MySQL用
+        else {
             $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
             $SQL文 .= defined("□{$this->テーブル}::追加定義")  ?  constant("□{$this->テーブル}::追加定義")  :  "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci";
         }
