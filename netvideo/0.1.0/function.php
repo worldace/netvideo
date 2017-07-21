@@ -1661,8 +1661,8 @@ class データベース{
         $setting[1] = $setting[1] ?? 設定['データベースユーザー名'] ?? '';
         $setting[2] = $setting[2] ?? 設定['データベースパスワード'] ?? '';
 
-        $this->isMySQL = (bool)preg_match("/^mysql/i", $setting[0]);
         $this->接続名  = md5(implode('', $setting));
+        $this->isMySQL = (bool)preg_match("/^mysql/i", $setting[0]);
 
         $setting[3] = (設定['データベースPDO設定']  ?? [])  + [
             PDO::ATTR_DEFAULT_FETCH_MODE       => PDO::FETCH_ASSOC,
