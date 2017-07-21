@@ -1655,7 +1655,7 @@ class データベース{
 
 
     function __construct(string $table, array $setting=[]){
-        assert(isset(設定['データベース接続設定']));
+        assert(isset(設定['データベース接続設定'][0]));
 
         $setting[0] = $setting[0] ?? 設定['データベース接続設定'][0];
         $setting[1] = $setting[1] ?? 設定['データベース接続設定'][1] ?? '';
@@ -1704,6 +1704,9 @@ class データベース{
 
     function 実行(string $SQL文, array $割当=[]){
         $stmt = self::$pdo[$this->接続名]->prepare($SQL文);
+        if($stmt === false){
+            return false;
+        }
         for($i = 0;  $i < count($割当);  $i++){
             $type = gettype($割当[$i]);
             if($type === "integer" or $type === "boolean"){
@@ -1722,8 +1725,8 @@ class データベース{
         if($this->接続設定[3][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){ //&は「含めば」
             $stmt->setFetchMode(PDO::FETCH_CLASS, "□{$this->テーブル}"); // http://php.net/manual/ja/pdostatement.setfetchmode.php
         }
-        $result = $stmt->execute();
-        return $result ? $stmt : false;
+
+        return $stmt->execute() ? $stmt : false;
     }
 
 
@@ -1866,8 +1869,8 @@ class データベース{
         else {
             $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
         }
-        $result = $this->実行($SQL文);
-        return $result ? true : false;
+
+        return $this->実行($SQL文) ? true : false;
     }
 
 
@@ -1876,8 +1879,8 @@ class データベース{
             return false;
         }
         $SQL文  = "create index {$列}インデックス on {$this->テーブル} ($列)";
-        $result = $this->実行($SQL文);
-        return $result ? true : false;
+
+        return $this->実行($SQL文) ? true : false;
     }
 
 
