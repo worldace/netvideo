@@ -1925,19 +1925,25 @@ class データベース{
 
 
     function トランザクション開始() :データベース{
-        self::$pdo[$this->接続名]->beginTransaction();
+        if(isset(self::$pdo[$this->接続名])){
+            self::$pdo[$this->接続名]->beginTransaction();
+        }
         return $this;
     }
 
 
     function トランザクション終了() :データベース{
-        self::$pdo[$this->接続名]->commit();
+        if(isset(self::$pdo[$this->接続名])){
+            self::$pdo[$this->接続名]->commit();
+        }
         return $this;
     }
 
 
     function トランザクション失敗() :データベース{
-        self::$pdo[$this->接続名]->rollBack();
+        if(isset(self::$pdo[$this->接続名])){
+            self::$pdo[$this->接続名]->rollBack();
+        }
         return $this;
     }
 
