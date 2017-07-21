@@ -1666,7 +1666,7 @@ class データベース{
 
         $setting[3] = (設定['データベース接続設定'][3]  ?? [])  + [
             PDO::ATTR_DEFAULT_FETCH_MODE       => PDO::FETCH_ASSOC,
-            PDO::ATTR_ERRMODE                  => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE                  => PDO::ERRMODE_WARNING,
             PDO::ATTR_EMULATE_PREPARES         => true,
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ];
@@ -1677,7 +1677,12 @@ class データベース{
                 self::$pdo[$this->接続名] = new PDO(...$setting);
             }
             catch(PDOException $e){
-                throw new PDOException("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください");
+                if($setting[3][PDO::ATTR_ERRMODE] === PDO::ERRMODE_EXCEPTION){
+                    throw new PDOException("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください");
+                }
+                else{
+                    trigger_error("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください", E_USER_WARNING);
+                }
             }
         }
         $this->テーブル($table);
