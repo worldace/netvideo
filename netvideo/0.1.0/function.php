@@ -1672,7 +1672,7 @@ class データベース{
 
 
     private function 接続(string $driver, string $user=null, string $password=null) :PDO{
-        $setting = (設定['データベースPDO設定']  ?? [])  + [
+        $pdo_setting = (設定['データベースPDO設定']  ?? [])  + [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => true,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -1680,7 +1680,7 @@ class データベース{
         ];
 
         try{
-            $pdo = new PDO($driver, $user, $password, $setting);
+            $pdo = new PDO($driver, $user, $password, $pdo_setting);
         }
         catch(PDOException $e){
             throw new PDOException("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください");
@@ -1921,27 +1921,28 @@ class データベース{
 
 
     private function 型変換(array $arg) :array{
+        $定義 = constant("□{$this->テーブル}::定義");
         $return = [];
-        foreach(constant("□{$this->テーブル}::定義") as $k => $v){ //これ$argを回すべきだと思うが
-            if(!isset($arg[$k])){ //nullどうしようか→ array_key_exists を使う
+        foreach($arg as $k => $v){
+            if(!isset($定義[$k])){
                 continue;
             }
-            if(is_array($arg[$k])){
-                $return[$k] = $arg[$k];
+            if(is_array($v)){
+                $return[$k] = $v;
                 continue;
             }
-            $型 = explode(" ", $v)[0];
+            $型 = explode(" ", ltrim($定義[$k]))[0];
             if(preg_match("/INT/i", $型)){
-                $return[$k] = (int)$arg[$k];
+                $return[$k] = (int)$v;
             }
             elseif(preg_match("/CHAR|TEXT|CLOB/i", $型)){
-                $return[$k] = (string)$arg[$k];
+                $return[$k] = (string)$v;
             }
             elseif(preg_match("/REAL|FLOA|DOUB/i", $型)){
-                $return[$k] = (float)$arg[$k];
+                $return[$k] = (float)$v;
             }
             else{
-                $return[$k] = $arg[$k];
+                $return[$k] = $v;
             }
         }
         return $return;
