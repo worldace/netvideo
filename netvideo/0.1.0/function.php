@@ -1947,7 +1947,9 @@ class データベース{
 
 
     function 切断() :void{
-        self::$pdo[$this->接続名] = null; //staticはGCの対象になるのか？(不明)
+        if(isset(self::$pdo[$this->接続名])){
+            self::$pdo[$this->接続名] = null; //staticはGCの対象になるのか？(不明)
+        }
     }
 
 
