@@ -1703,7 +1703,7 @@ class データベース{
     }
 
 
-    function 実行(string $SQL文, array $割当=[]){
+    function 実行(string $SQL文, array $プレースホルダ=[]){
         $this->where = [];
 
         if(!isset(self::$pdo[$this->接続名])){
@@ -1711,7 +1711,7 @@ class データベース{
         }
 
         if(isset(self::$ログ)){
-            (self::$ログ)($SQL文, $割当);
+            (self::$ログ)($SQL文, $プレースホルダ);
         }
 
         $state = self::$pdo[$this->接続名]->prepare($SQL文);
@@ -1723,19 +1723,19 @@ class データベース{
             $state->setFetchMode(PDO::FETCH_CLASS, "□{$this->テーブル}"); // http://php.net/manual/ja/pdostatement.setfetchmode.php
         }
 
-        for($i = 0;  $i < count($割当);  $i++){
-            $type = gettype($割当[$i]);
+        for($i = 0;  $i < count($プレースホルダ);  $i++){
+            $type = gettype($プレースホルダ[$i]);
             if($type === "integer" or $type === "boolean"){
-                $state->bindValue($i+1, $割当[$i], PDO::PARAM_INT);
+                $state->bindValue($i+1, $プレースホルダ[$i], PDO::PARAM_INT);
             }
             elseif($type === "resource"){
-                $state->bindValue($i+1, $割当[$i], PDO::PARAM_LOB);
+                $state->bindValue($i+1, $プレースホルダ[$i], PDO::PARAM_LOB);
             }
             elseif($type === "NULL"){
-                $state->bindValue($i+1, $割当[$i], PDO::PARAM_NULL);
+                $state->bindValue($i+1, $プレースホルダ[$i], PDO::PARAM_NULL);
             }
             else{
-                $state->bindValue($i+1, $割当[$i], PDO::PARAM_STR);
+                $state->bindValue($i+1, $プレースホルダ[$i], PDO::PARAM_STR);
             }
         }
 
@@ -1744,14 +1744,14 @@ class データベース{
 
 
     function 取得(?int $offset=0, ?int $limit=0, array $order=[]){
-        [$where文, $割当] = $this->where文('where');
+        [$where文, $プレースホルダ] = $this->where文('where');
 
-        $割当[] = (int)($limit ?: self::$取得件数);
-        $割当[] = (int)$offset;
+        $プレースホルダ[] = (int)($limit ?: self::$取得件数);
+        $プレースホルダ[] = (int)$offset;
         $順番文 = $this->順番文($order);
 
         $SQL文 = "select * from {$this->テーブル} {$where文} {$順番文} limit ? offset ?";
-        $state = $this->実行($SQL文, $割当);
+        $state = $this->実行($SQL文, $プレースホルダ);
 
         return $state ? $state->fetchAll() : false;
     }
@@ -1762,15 +1762,15 @@ class データベース{
             return false;
         }
 
-        [$where文, $割当] = $this->where文('where');
+        [$where文, $プレースホルダ] = $this->where文('where');
 
-        $割当[] = (int)($limit ?: self::$取得件数);
-        $割当[] = (int)$offset;
+        $プレースホルダ[] = (int)($limit ?: self::$取得件数);
+        $プレースホルダ[] = (int)$offset;
         $順番文 = $this->順番文($order);
         $列文   = implode(",", (array)$列);
 
         $SQL文  = "select {$列文} from {$this->テーブル} {$where文} {$順番文} limit ? offset ?";
-        $state = $this->実行($SQL文, $割当);
+        $state = $this->実行($SQL文, $プレースホルダ);
         $mode  = is_string($列) ? PDO::FETCH_COLUMN : null;
 
         return $state ? $state->fetchAll($mode) : false;
@@ -1778,11 +1778,11 @@ class データベース{
 
 
     function 行取得($id){
-        [$where文, $割当] = $this->where文('and');
-        array_unshift($割当, $this->id型変換($id));
+        [$where文, $プレースホルダ] = $this->where文('and');
+        array_unshift($プレースホルダ, $this->id型変換($id));
 
         $SQL文  = "select * from {$this->テーブル} where {$this->主キー} = ? {$where文}";
-        $state  = $this->実行($SQL文, $割当);
+        $state  = $this->実行($SQL文, $プレースホルダ);
         if($state === false){
             return false;
         }
@@ -1797,21 +1797,21 @@ class データベース{
             return false;
         }
 
-        [$where文, $割当] = $this->where文('and');
-        array_unshift($割当, $this->id型変換($id));
+        [$where文, $プレースホルダ] = $this->where文('and');
+        array_unshift($プレースホルダ, $this->id型変換($id));
 
         $SQL文  = "select {$列} from {$this->テーブル} where {$this->主キー} = ? {$where文}";
-        $state = $this->実行($SQL文, $割当);
+        $state = $this->実行($SQL文, $プレースホルダ);
 
         return $state ? $state->fetchColumn() : false;
     }
 
 
     function 件数(){
-        [$where文, $割当] = $this->where文('where');
+        [$where文, $プレースホルダ] = $this->where文('where');
 
         $SQL文 = "select count(*) from {$this->テーブル} {$where文}";
-        $state = $this->実行($SQL文, $割当);
+        $state = $this->実行($SQL文, $プレースホルダ);
 
         return $state ? $state->fetchColumn() : false;
     }
@@ -1831,21 +1831,21 @@ class データベース{
             return false;
         }
 
-        [$where文, $割当] = $this->where文('and');
+        [$where文, $プレースホルダ] = $this->where文('and');
 
         foreach($word as $v){
-            array_unshift($割当, "%" . addcslashes($v, '_%') . "%");
+            array_unshift($プレースホルダ, "%" . addcslashes($v, '_%') . "%");
         }
 
         $concat文 = $this->MySQLなら()  ?  sprintf('concat(%s)', implode(',',$列))  :  sprintf('(%s)', implode('||',$列));
-        $検索文   = implode(' and ', array_fill(0,count($割当),"$concat文 like ?"));
+        $検索文   = implode(' and ', array_fill(0,count($プレースホルダ),"$concat文 like ?"));
         $順番文   = $this->順番文($order);
 
-        $割当[] = (int)($limit ?: self::$取得件数);
-        $割当[] = (int)$offset;
+        $プレースホルダ[] = (int)($limit ?: self::$取得件数);
+        $プレースホルダ[] = (int)$offset;
 
         $SQL文  = "select * from {$this->テーブル} where {$検索文} {$where文} {$順番文} limit ? offset ?";
-        $state  = $this->実行($SQL文, $割当);
+        $state  = $this->実行($SQL文, $プレースホルダ);
 
         return $state ? $state->fetchAll() : false;
     }
@@ -1857,7 +1857,7 @@ class データベース{
             return false;
         }
 
-        $割当 = [];
+        $プレースホルダ = [];
         $追加文1 = $追加文2 = "";
         foreach($data as $k => $v){
             $追加文1 .= "{$k},";
@@ -1866,14 +1866,14 @@ class データベース{
             }
             else{
                 $追加文2 .= "?,";
-                $割当[] = $v;
+                $プレースホルダ[] = $v;
             }
         }
         $追加文1 = rtrim($追加文1, ',');
         $追加文2 = rtrim($追加文2, ',');
 
         $SQL文  = "insert into {$this->テーブル} ($追加文1) values ($追加文2)";
-        $state  = $this->実行($SQL文, $割当);
+        $state  = $this->実行($SQL文, $プレースホルダ);
 
         return $state ? self::$pdo[$this->接続名]->lastInsertId() : false;
     }
@@ -1885,7 +1885,7 @@ class データベース{
             return false;
         }
 
-        $割当 = [];
+        $プレースホルダ = [];
         $更新文 = '';
         foreach($data as $k => $v){
             if(is_array($v)){
@@ -1893,27 +1893,27 @@ class データベース{
             }
             else{
                 $更新文 .= "{$k}=?,";
-                $割当[] = $v;
+                $プレースホルダ[] = $v;
             }
         }
         $更新文 = rtrim($更新文, ',');
-        $割当[] = $this->id型変換($id);
+        $プレースホルダ[] = $this->id型変換($id);
 
-        [$where文, $割当2] = $this->where文('and');
+        [$where文, $プレースホルダ2] = $this->where文('and');
 
         $SQL文  = "update {$this->テーブル} set {$更新文} where {$this->主キー} = ? {$where文}";
-        $state  = $this->実行($SQL文, array_merge($割当, $割当2));
+        $state  = $this->実行($SQL文, array_merge($プレースホルダ, $プレースホルダ2));
 
         return $state ? (bool)$state->rowCount() : false;
     }
 
 
     function 削除($id) :bool{
-        [$where文, $割当] = $this->where文('and');
-        array_unshift($割当, $this->id型変換($id));
+        [$where文, $プレースホルダ] = $this->where文('and');
+        array_unshift($プレースホルダ, $this->id型変換($id));
 
         $SQL文  = "delete from {$this->テーブル} where {$this->主キー} = ? {$where文}";
-        $state  = $this->実行($SQL文, $割当);
+        $state  = $this->実行($SQL文, $プレースホルダ);
 
         return $state ? (bool)$state->rowCount() : false;
     }
@@ -1943,8 +1943,8 @@ class データベース{
     }
 
 
-    function where(string $where文, array $割当=[]){
-        $this->where = [$where文, $割当];
+    function where(string $where文, array $プレースホルダ=[]){
+        $this->where = [$where文, $プレースホルダ];
         return $this;
     }
     
@@ -2015,14 +2015,14 @@ class データベース{
     private function where文(string $prefix = ''){
         if($this->where){
             $this->where[0] = preg_replace("/^where/i", "", ltrim($this->where[0]));
-            $where文 = sprintf("%s %s", $prefix, $this->where[0]);
-            $割当    = $this->where[1];
+            $where文        = sprintf("%s %s", $prefix, $this->where[0]);
+            $プレースホルダ = $this->where[1];
         }
         else{
-            $where文 = "";
-            $割当    = [];
+            $where文        = "";
+            $プレースホルダ = [];
         }
-        return [$where文, $割当];
+        return [$where文, $プレースホルダ];
     }
 
 
