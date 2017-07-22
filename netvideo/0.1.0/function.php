@@ -1795,7 +1795,7 @@ class データベース{
         [$where文, $割当] = $this->where文('and');
         array_unshift($割当, $this->id型変換($id));
 
-        $SQL文  = "select {$列} from {$this->テーブル} where {$this->主キー} = ? $where文";
+        $SQL文  = "select {$列} from {$this->テーブル} where {$this->主キー} = ? {$where文}";
         $state = $this->実行($SQL文, $割当);
 
         return $state ? $state->fetchColumn() : false;
@@ -1825,20 +1825,21 @@ class データベース{
             return false;
         }
 
-        $割当 = [];
+        [$where文, $割当] = $this->where文('and');
+
         foreach($word as $v){
-            $割当[] = "%" . addcslashes($v, '_%') . "%";
+            array_unshift($割当, "%" . addcslashes($v, '_%') . "%");
         }
 
         $concat文 = $this->MySQLなら()  ?  sprintf('concat(%s)', implode(',',$列))  :  sprintf('(%s)', implode('||',$列));
         $検索文   = implode(' and ', array_fill(0,count($割当),"$concat文 like ?"));
         $順番文   = $this->順番文($order);
 
-        $SQL文  = "select * from {$this->テーブル} where {$検索文} {$順番文} limit ? offset ?";
         $割当[] = (int)($limit ?: self::$取得件数);
         $割当[] = (int)$offset;
 
-        $state = $this->実行($SQL文, $割当);
+        $SQL文  = "select * from {$this->テーブル} where {$検索文} {$where文} {$順番文} limit ? offset ?";
+        $state  = $this->実行($SQL文, $割当);
 
         return $state ? $result->fetchAll() : false;
     }
@@ -1887,16 +1888,21 @@ class データベース{
         $更新文 = rtrim($更新文, ',');
         $割当[] = $this->id型変換($id);
 
-        $SQL文  = "update {$this->テーブル} set {$更新文} where {$this->主キー} = ?";
-        $state  = $this->実行($SQL文, $割当);
+        [$where文, $割当2] = $this->where文('and');
+
+        $SQL文  = "update {$this->テーブル} set {$更新文} where {$this->主キー} = ? {$where文}";
+        $state  = $this->実行($SQL文, array_merge($割当, $割当2));
 
         return $state ? (bool)$state->rowCount() : false;
     }
 
 
     function 削除($id) :bool{
-        $SQL文  = "delete from {$this->テーブル} where {$this->主キー} = ?";
-        $state  = $this->実行($SQL文, [$this->id型変換($id)]);
+        [$where文, $割当] = $this->where文('and');
+        array_unshift($割当, $this->id型変換($id));
+
+        $SQL文  = "delete from {$this->テーブル} where {$this->主キー} = ? {$where文}";
+        $state  = $this->実行($SQL文, $割当);
 
         return $state ? (bool)$state->rowCount() : false;
     }
