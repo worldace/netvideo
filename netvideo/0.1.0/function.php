@@ -1651,6 +1651,7 @@ class データベース{
     private $テーブル = "";
     private $主キー = "id";
     private $定義 = [];
+    private $where = [];
     public static $取得件数 = 31;
 
 
@@ -1702,9 +1703,12 @@ class データベース{
 
 
     function 実行(string $SQL文, array $割当=[]){
+        $this->where = [];
+
         if(!isset(self::$pdo[$this->接続名])){
             return false;
         }
+
         $state = self::$pdo[$this->接続名]->prepare($SQL文);
         if($state === false){
             return false;
@@ -1735,20 +1739,45 @@ class データベース{
 
 
     function 取得(?int $offset=0, ?int $limit=0, array $order=[]){
-        $limit  = $limit ?: self::$取得件数;
-        $順番文 = $this->順番文($order);
-        $SQL文  = "select * from {$this->テーブル} {$順番文} limit ? offset ?";
+        [$where文, $割当] = $this->where文('where');
 
-        $state = $this->実行($SQL文, [(int)$limit, (int)$offset]);
+        $割当[] = (int)($limit ?: self::$取得件数);
+        $割当[] = (int)$offset;
+        $順番文 = $this->順番文($order);
+
+        $SQL文 = "select * from {$this->テーブル} {$where文} {$順番文} limit ? offset ?";
+        $state = $this->実行($SQL文, $割当);
 
         return $state ? $state->fetchAll() : false;
     }
 
 
-    function 行取得($id){
-        $SQL文  = "select * from {$this->テーブル} where {$this->主キー} = ?";
+    function 列取得($列, ?int $offset=0, ?int $limit=0, array $order=[]){
+        if(!$this->列なら($列)){
+            return false;
+        }
 
-        $state  = $this->実行($SQL文, [$this->id型変換($id)]);
+        [$where文, $割当] = $this->where文('where');
+
+        $割当[] = (int)($limit ?: self::$取得件数);
+        $割当[] = (int)$offset;
+        $順番文 = $this->順番文($order);
+        $列文   = implode(",", (array)$列);
+
+        $SQL文  = "select {$列文} from {$this->テーブル} {$where文} {$順番文} limit ? offset ?";
+        $state = $this->実行($SQL文, $割当);
+        $mode  = is_string($列) ? PDO::FETCH_COLUMN : null;
+
+        return $state ? $state->fetchAll($mode) : false;
+    }
+
+
+    function 行取得($id){
+        [$where文, $割当] = $this->where文('and');
+        array_unshift($割当, $this->id型変換($id));
+
+        $SQL文  = "select * from {$this->テーブル} where {$this->主キー} = ? {$where文}";
+        $state  = $this->実行($SQL文, $割当);
         if($state === false){
             return false;
         }
@@ -1758,38 +1787,26 @@ class データベース{
     }
 
 
-    function 列取得($列, ?int $offset=0, ?int $limit=0, array $order=[]){
-        if(!$this->列なら($列)){
-            return false;
-        }
-
-        $limit  = $limit ?: self::$取得件数;
-        $順番文 = $this->順番文($order);
-        $列文   = implode(",", (array)$列);
-        $SQL文  = "select {$列文} from {$this->テーブル} {$順番文} limit ? offset ?";
-
-        $mode  = is_string($列) ? PDO::FETCH_COLUMN : null;
-        $state = $this->実行($SQL文, [(int)$limit, (int)$offset]);
-
-        return $state ? $state->fetchAll($mode) : false;
-    }
-
-
     function セル取得($id, string $列){
         if(!$this->列なら($列)){
             return false;
         }
-        $SQL文  = "select {$列} from {$this->テーブル} where {$this->主キー} = ?";
 
-        $state = $this->実行($SQL文, [$this->id型変換($id)]);
+        [$where文, $割当] = $this->where文('and');
+        array_unshift($割当, $this->id型変換($id));
+
+        $SQL文  = "select {$列} from {$this->テーブル} where {$this->主キー} = ? $where文";
+        $state = $this->実行($SQL文, $割当);
 
         return $state ? $state->fetchColumn() : false;
     }
 
 
     function 件数(){
-        $SQL文 = "select count(*) from {$this->テーブル}";
-        $state = $this->実行($SQL文);
+        [$where文, $割当] = $this->where文('where');
+
+        $SQL文 = "select count(*) from {$this->テーブル} {$where文}";
+        $state = $this->実行($SQL文, $割当);
 
         return $state ? $state->fetchColumn() : false;
     }
@@ -1909,6 +1926,13 @@ class データベース{
     }
 
 
+    function where(string $where文, array $割当=[]){
+        $this->where = [$where文, $割当];
+        return $this;
+    }
+    
+
+
     function インデックス作成(string $列) :bool{
         if(!$this->列なら($列)){
             return false;
@@ -1968,6 +1992,19 @@ class データベース{
             }
         }
         return true;
+    }
+
+
+    private function where文(string $prefix = ''){
+        if($this->where){
+            $where文 = sprintf("%s %s", $prefix, $this->where[0]);
+            $割当    = $this->where[1];
+        }
+        else{
+            $where文 = "";
+            $割当    = [];
+        }
+        return [$where文, $割当];
     }
 
 
