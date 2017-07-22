@@ -1753,7 +1753,7 @@ class データベース{
             return false;
         }
 
-        $data = $result->fetchAll();
+        $data = $state->fetchAll();
         return $data ? $data[0] : $data;
     }
 
@@ -1836,6 +1836,7 @@ class データベース{
             return false;
         }
 
+        $割当 = [];
         $追加文1 = $追加文2 = "";
         foreach($data as $k => $v){
             $追加文1 .= "{$k},";
@@ -1858,6 +1859,7 @@ class データベース{
             return false;
         }
 
+        $割当 = [];
         $更新文 = '';
         foreach($data as $k => $v){
             if(is_array($v)){
