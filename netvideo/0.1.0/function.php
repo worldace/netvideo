@@ -1993,14 +1993,14 @@ class データベース{
                 $return[$k] = $v;
                 continue;
             }
-            $型 = strstr(ltrim($this->定義[$k]), ' ', true);
-            if(preg_match("/INT/i", $型)){
+            preg_match("/^(\S+)/", ltrim($this->定義[$k]), $型);
+            if(preg_match("/INT/i", $型[1])){
                 $return[$k] = (int)$v;
             }
-            elseif(preg_match("/CHAR|TEXT|CLOB/i", $型)){
+            elseif(preg_match("/CHAR|TEXT|CLOB/i", $型[1])){
                 $return[$k] = (string)$v;
             }
-            elseif(preg_match("/REAL|FLOA|DOUB/i", $型)){
+            elseif(preg_match("/REAL|FLOA|DOUB/i", $型[1])){
                 $return[$k] = (float)$v;
             }
             else{
@@ -2012,8 +2012,8 @@ class データベース{
 
 
     private function id型変換($id){
-        $型 = strstr(ltrim($this->定義[$this->主キー]), ' ', true);
-        return preg_match("/int/i", $型)  ?  (int)$id  :  (string)$id;
+        preg_match("/^(\S+)/", ltrim($this->定義[$this->主キー]), $型);
+        return preg_match("/int/i", $型[1])  ?  (int)$id  :  (string)$id;
     }
 }
 
