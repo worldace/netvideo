@@ -1846,9 +1846,9 @@ class データベース{
         $追加文2 = rtrim($追加文2, ',');
 
         $SQL文  = "insert into {$this->テーブル} ($追加文1) values ($追加文2)";
-        $result = $this->実行($SQL文, $割当);
+        $state  = $this->実行($SQL文, $割当);
 
-        return $result ? self::$pdo[$this->接続名]->lastInsertId() : false;
+        return $state ? self::$pdo[$this->接続名]->lastInsertId() : false;
     }
 
 
@@ -1872,22 +1872,22 @@ class データベース{
         $割当[] = $this->id型変換($id);
 
         $SQL文  = "update {$this->テーブル} set {$更新文} where {$this->主キー} = ?";
-        $result = $this->実行($SQL文, $割当);
+        $state  = $this->実行($SQL文, $割当);
 
-        return $result ? (bool)$result->rowCount() : false;
+        return $state ? (bool)$state->rowCount() : false;
     }
 
 
     function 削除($id) :bool{
         $SQL文  = "delete from {$this->テーブル} where {$this->主キー} = ?";
-        $result = $this->実行($SQL文, [$this->id型変換($id)]);
+        $state  = $this->実行($SQL文, [$this->id型変換($id)]);
 
-        return $result ? (bool)$result->rowCount() : false;
+        return $state ? (bool)$state->rowCount() : false;
     }
 
 
     function 作成() :bool{
-        if(!is_array($this->定義) or !$this->定義){
+        if(!$this->定義){
             return false;
         }
 
