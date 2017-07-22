@@ -1936,7 +1936,7 @@ class データベース{
     }
 
 
-    function トランザクション失敗() :データベース{
+    function トランザクション復帰() :データベース{
         if(isset(self::$pdo[$this->接続名])){
             self::$pdo[$this->接続名]->rollBack();
         }
@@ -1971,9 +1971,9 @@ class データベース{
 
 
     private function 順番文(array $arg = null) :string{
-        if(is_array($arg) and count($arg) === 2 and $this->列なら($arg[0])){
-            $列名 = $arg[0];
-            $順番 = ($arg[1] === "大きい順") ? 'desc' : 'asc';
+        if(is_array($arg) and $this->列なら(key($arg))){
+            $列名 = key($arg);
+            $順番 = ($arg[$列名] === "大きい順") ? 'desc' : 'asc';
         }
         else{
             $列名 = $this->主キー;
