@@ -1653,6 +1653,7 @@ class データベース{
     private $定義 = [];
     private $where = [];
     public static $取得件数 = 31;
+    public static $ログ;
 
 
     function __construct(string $table, array $setting=[]){
@@ -1709,9 +1710,17 @@ class データベース{
             return false;
         }
 
+        if(isset(self::$ログ)){
+            (self::$ログ)($SQL文, $割当);
+        }
+
         $state = self::$pdo[$this->接続名]->prepare($SQL文);
         if($state === false){
             return false;
+        }
+
+        if($this->接続設定[3][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){ //&は「含めば」
+            $state->setFetchMode(PDO::FETCH_CLASS, "□{$this->テーブル}"); // http://php.net/manual/ja/pdostatement.setfetchmode.php
         }
 
         for($i = 0;  $i < count($割当);  $i++){
@@ -1728,10 +1737,6 @@ class データベース{
             else{
                 $state->bindValue($i+1, $割当[$i], PDO::PARAM_STR);
             }
-        }
-
-        if($this->接続設定[3][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){ //&は「含めば」
-            $state->setFetchMode(PDO::FETCH_CLASS, "□{$this->テーブル}"); // http://php.net/manual/ja/pdostatement.setfetchmode.php
         }
 
         return $state->execute() ? $state : false;
