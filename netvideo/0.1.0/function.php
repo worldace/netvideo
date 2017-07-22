@@ -1812,7 +1812,8 @@ class データベース{
     }
 
 
-    function 検索($word, array $列, ?int $offset=0, ?int $limit=0, array $order=[]){
+    function 検索($word, $列, ?int $offset=0, ?int $limit=0, array $order=[]){
+        $列 = (array)$列;
         if(!$this->列なら($列)){
             return false;
         }
@@ -1841,7 +1842,7 @@ class データベース{
         $SQL文  = "select * from {$this->テーブル} where {$検索文} {$where文} {$順番文} limit ? offset ?";
         $state  = $this->実行($SQL文, $割当);
 
-        return $state ? $result->fetchAll() : false;
+        return $state ? $state->fetchAll() : false;
     }
 
 
@@ -2003,6 +2004,7 @@ class データベース{
 
     private function where文(string $prefix = ''){
         if($this->where){
+            $this->where[0] = preg_replace("/^where/i", "", ltrim($this->where[0]));
             $where文 = sprintf("%s %s", $prefix, $this->where[0]);
             $割当    = $this->where[1];
         }
