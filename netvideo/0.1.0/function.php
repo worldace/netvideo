@@ -1796,9 +1796,6 @@ class データベース{
 
 
     function 検索($word, array $列, ?int $offset=0, ?int $limit=0, array $order=[]){
-        if(!$列){
-            return false;
-        }
         if(!$this->列なら($列)){
             return false;
         }
@@ -1960,7 +1957,7 @@ class データベース{
     }
 
     private function 列なら($arg) :bool{
-        if(!is_string($arg) and !is_array($arg)){
+        if(empty($arg)){
             return false;
         }
 
