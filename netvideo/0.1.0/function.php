@@ -1648,7 +1648,6 @@ class データベース{
     private static $pdo = [];
     private $接続名 = "";
     private $テーブル = "";
-    private $テーブルクラス = "";
     private $主キー = "id";
     private $where = [];
     private $設定  = [];
@@ -1700,12 +1699,13 @@ class データベース{
         if(!$table){
             return $this->テーブル;
         }
-        assert(class_exists($this->設定['クラス修飾'] . $table));
+        
+        $class = $this->設定['クラス修飾'] . $table;
+        assert(class_exists($class));
 
-        $this->テーブル       = $table;
-        $this->テーブルクラス = $this->設定['クラス修飾'] . $table;
-        $this->定義           = constant("{$this->テーブルクラス}::定義");
-        $this->主キー         = defined ("{$this->テーブルクラス}::主キー")  ?  constant("{$this->テーブルクラス}::主キー")  :  "id";
+        $this->テーブル = $table;
+        $this->定義     = constant("$class::定義");
+        $this->主キー   = defined ("$class::主キー")  ?  constant("$class::主キー")  :  "id";
 
         return $this;
     }
@@ -1942,8 +1942,9 @@ class データベース{
         $SQL文 = "create table IF NOT EXISTS {$this->テーブル} ($作成文) ";
 
         if($this->MySQLなら()){
-            $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
-            $SQL文 .= defined("{$this->テーブルクラス}::追加定義")  ?  constant("$this->テーブルクラス}::追加定義")  :  "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci";
+            $追加定義 = $this->設定['クラス修飾'] . $this->テーブル . "::追加定義";
+            $SQL文    = str_replace('autoincrement', 'auto_increment', $SQL文);
+            $SQL文   .= defined($追加定義)  ?  constant($追加定義)  :  "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci";
         }
         else {
             $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
