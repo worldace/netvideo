@@ -1647,37 +1647,39 @@ function データベース(string $table, array $setting=[]){
 class データベース{
     private static $pdo = [];
     private $接続名 = "";
-    private $接続設定 = [];
     private $テーブル = "";
+    private $テーブルクラス = "";
     private $主キー = "id";
-    private $定義 = [];
     private $where = [];
-    public static $取得件数 = 31;
-    public static $ログ;
-    public static $テーブルクラス修飾名 = '□';
+    private $設定  = [];
+    private $定義  = [];
+
+
 
     function __construct(string $table, array $setting=[]){
-        assert(isset(設定['データベース接続設定'][0]));
+        global $設定;
+        assert(isset($設定['データベース.接続'][0]));
 
-        $setting[0] = $setting[0] ?? 設定['データベース接続設定'][0];
-        $setting[1] = $setting[1] ?? 設定['データベース接続設定'][1] ?? '';
-        $setting[2] = $setting[2] ?? 設定['データベース接続設定'][2] ?? '';
+        $this->設定['接続'][0] = $setting[0] ?? $設定['データベース.接続'][0];
+        $this->設定['接続'][1] = $setting[1] ?? $設定['データベース.接続'][1] ?? '';
+        $this->設定['接続'][2] = $setting[2] ?? $設定['データベース.接続'][2] ?? '';
+        $this->設定['接続'][3] = $setting[3] ?? $設定['データベース.接続'][3] ?? [];
 
-        $setting[3] = (設定['データベース接続設定'][3]  ?? [])  + [
+        $this->設定['接続'][3] += [
             PDO::ATTR_DEFAULT_FETCH_MODE       => PDO::FETCH_ASSOC,
             PDO::ATTR_ERRMODE                  => PDO::ERRMODE_WARNING,
             PDO::ATTR_EMULATE_PREPARES         => true,
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ];
 
-        $this->接続名  = md5($setting[0].$setting[1].$setting[2]);
+        $this->接続名  = md5($this->設定['接続'][0] . $this->設定['接続'][1] . $this->設定['接続'][2]);
 
         if(!isset(self::$pdo[$this->接続名])){
             try{ //パスワードが漏れる可能性があるので例外を握りつぶす＋パスワードは配列に入れておく
-                self::$pdo[$this->接続名] = new PDO(...$setting);
+                self::$pdo[$this->接続名] = new PDO(...$this->設定['接続']);
             }
             catch(PDOException $e){
-                if($setting[3][PDO::ATTR_ERRMODE] === PDO::ERRMODE_EXCEPTION){
+                if($this->設定['接続'][3][PDO::ATTR_ERRMODE] === PDO::ERRMODE_EXCEPTION){
                     throw new PDOException("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください");
                 }
                 else{
@@ -1685,19 +1687,25 @@ class データベース{
                 }
             }
         }
-        $this->接続設定 = $setting;
+ 
+        $this->設定['取得件数'] = $設定['データベース.取得件数'] ?? 31;
+        $this->設定['修飾名']   = $設定['データベース.修飾名']   ?? '□';
+        $this->設定['ログ']     = $設定['データベース.ログ']     ?? null;
+
         $this->テーブル($table);
     }
 
 
     function テーブル(string $table=null){
-        assert(class_exists(self::$テーブルクラス修飾名.$table));
         if(!$table){
             return $this->テーブル;
         }
-        $this->テーブル = $table;
-        $this->定義     = constant(self::$テーブルクラス修飾名.$table."::定義");
-        $this->主キー   = defined(self::$テーブルクラス修飾名.$table."::主キー")  ?  constant(self::$テーブルクラス修飾名.$table."::主キー")  :  "id";
+        assert(class_exists($this->設定['修飾名'] . $table));
+
+        $this->テーブル       = $table;
+        $this->テーブルクラス = $this->設定['修飾名'] . $table;
+        $this->定義           = constant("{$this->テーブルクラス}::定義");
+        $this->主キー         = defined ("{$this->テーブルクラス}::主キー")  ?  constant("{$this->テーブルクラス}::主キー")  :  "id";
 
         return $this;
     }
@@ -1710,8 +1718,8 @@ class データベース{
             return false;
         }
 
-        if(isset(self::$ログ)){
-            (self::$ログ)($SQL文, $プレースホルダ);
+        if(isset($this->設定['ログ'])){
+            $this->設定['ログ']($SQL文, $プレースホルダ);
         }
 
         $state = self::$pdo[$this->接続名]->prepare($SQL文);
@@ -1719,8 +1727,8 @@ class データベース{
             return false;
         }
 
-        if($this->接続設定[3][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){ //&は「含めば」
-            $state->setFetchMode(PDO::FETCH_CLASS, self::$テーブルクラス修飾名.$this->テーブル); // http://php.net/manual/ja/pdostatement.setfetchmode.php
+        if($this->設定['接続'][3][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){ //&は「含めば」
+            $state->setFetchMode(PDO::FETCH_CLASS, $this->テーブルクラス); // http://php.net/manual/ja/pdostatement.setfetchmode.php
         }
 
         for($i = 0;  $i < count($プレースホルダ);  $i++){
@@ -1746,7 +1754,7 @@ class データベース{
     function 取得(?int $offset=0, ?int $limit=0, array $order=[]){
         [$where文, $プレースホルダ] = $this->where文('where');
 
-        $プレースホルダ[] = (int)($limit ?: self::$取得件数);
+        $プレースホルダ[] = (int)($limit ?: $this->設定['取得件数']);
         $プレースホルダ[] = (int)$offset;
         $順番文 = $this->順番文($order);
 
@@ -1764,7 +1772,7 @@ class データベース{
 
         [$where文, $プレースホルダ] = $this->where文('where');
 
-        $プレースホルダ[] = (int)($limit ?: self::$取得件数);
+        $プレースホルダ[] = (int)($limit ?: $this->設定['取得件数']);
         $プレースホルダ[] = (int)$offset;
         $順番文 = $this->順番文($order);
         $列文   = implode(",", (array)$列);
@@ -1843,7 +1851,7 @@ class データベース{
         [$where文, $プレースホルダ2] = $this->where文('and');
         $プレースホルダ = array_merge($プレースホルダ, $プレースホルダ2);
 
-        $プレースホルダ[] = (int)($limit ?: self::$取得件数);
+        $プレースホルダ[] = (int)($limit ?: $this->設定['取得件数']);
         $プレースホルダ[] = (int)$offset;
 
         $SQL文  = "select * from {$this->テーブル} where {$検索文} {$where文} {$順番文} limit ? offset ?";
@@ -1935,7 +1943,7 @@ class データベース{
 
         if($this->MySQLなら()){
             $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
-            $SQL文 .= defined(self::$テーブルクラス修飾名.$this->テーブル."::追加定義")  ?  constant(self::$テーブルクラス修飾名.$this->テーブル."::追加定義")  :  "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci";
+            $SQL文 .= defined("{$this->テーブルクラス}::追加定義")  ?  constant("$this->テーブルクラス}::追加定義")  :  "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci";
         }
         else {
             $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
@@ -1996,7 +2004,7 @@ class データベース{
 
 
     private function MySQLなら() :bool{
-        return (bool)preg_match("/^mysql/i", $this->接続設定[0]);
+        return (bool)preg_match("/^mysql/i", $this->設定['接続'][0]);
     }
 
     private function 列なら($arg) :bool{
