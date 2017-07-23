@@ -1831,15 +1831,17 @@ class データベース{
             return false;
         }
 
-        [$where文, $プレースホルダ] = $this->where文('and');
-
+        $プレースホルダ = [];
         foreach($word as $v){
-            array_unshift($プレースホルダ, "%" . addcslashes($v, '_%') . "%");
+            $プレースホルダ[] = "%" . addcslashes($v, '_%') . "%";
         }
 
         $concat文 = $this->MySQLなら()  ?  sprintf('concat(%s)', implode(',',$列))  :  sprintf('(%s)', implode('||',$列));
         $検索文   = implode(' and ', array_fill(0,count($プレースホルダ),"$concat文 like ?"));
         $順番文   = $this->順番文($order);
+
+        [$where文, $プレースホルダ2] = $this->where文('and');
+        $プレースホルダ = array_merge($プレースホルダ, $プレースホルダ2);
 
         $プレースホルダ[] = (int)($limit ?: self::$取得件数);
         $プレースホルダ[] = (int)$offset;
@@ -1943,7 +1945,7 @@ class データベース{
     }
 
 
-    function where(string $where文, array $プレースホルダ=[]){
+    function where(string $where文, array $プレースホルダ=[]) :データベース{
         $this->where = [$where文, $プレースホルダ];
         return $this;
     }
@@ -1993,7 +1995,7 @@ class データベース{
 
 
 
-    private function MySQLなら(){
+    private function MySQLなら() :bool{
         return (bool)preg_match("/^mysql/i", $this->接続設定[0]);
     }
 
@@ -2012,7 +2014,7 @@ class データベース{
     }
 
 
-    private function where文(string $prefix = ''){
+    private function where文(string $prefix = '') :array{
         if($this->where){
             $this->where[0] = preg_replace("/^where/i", "", ltrim($this->where[0]));
             $where文        = sprintf("%s %s", $prefix, $this->where[0]);
