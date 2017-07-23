@@ -1729,7 +1729,7 @@ class データベース{
                 $state->bindValue($i+1, $プレースホルダ[$i], PDO::PARAM_INT);
             }
             elseif($type === "resource"){
-                $state->bindValue($i+1, $プレースホルダ[$i], PDO::PARAM_LOB);
+                $state->bindParam($i+1, $プレースホルダ[$i], PDO::PARAM_LOB);
             }
             elseif($type === "NULL"){
                 $state->bindValue($i+1, $プレースホルダ[$i], PDO::PARAM_NULL);
