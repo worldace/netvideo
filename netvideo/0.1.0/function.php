@@ -1654,7 +1654,7 @@ class データベース{
     private $where = [];
     public static $取得件数 = 31;
     public static $ログ;
-    public static $テーブルクラス接頭辞 = '□';
+    public static $テーブルクラス修飾名 = '□';
 
     function __construct(string $table, array $setting=[]){
         assert(isset(設定['データベース接続設定'][0]));
@@ -1691,13 +1691,13 @@ class データベース{
 
 
     function テーブル(string $table=null){
-        assert(class_exists(self::$テーブルクラス接頭辞.$table));
+        assert(class_exists(self::$テーブルクラス修飾名.$table));
         if(!$table){
             return $this->テーブル;
         }
         $this->テーブル = $table;
-        $this->定義     = constant(self::$テーブルクラス接頭辞.$table."::定義");
-        $this->主キー   = defined(self::$テーブルクラス接頭辞.$table."::主キー")  ?  constant(self::$テーブルクラス接頭辞.$table."::主キー")  :  "id";
+        $this->定義     = constant(self::$テーブルクラス修飾名.$table."::定義");
+        $this->主キー   = defined(self::$テーブルクラス修飾名.$table."::主キー")  ?  constant(self::$テーブルクラス修飾名.$table."::主キー")  :  "id";
 
         return $this;
     }
@@ -1720,7 +1720,7 @@ class データベース{
         }
 
         if($this->接続設定[3][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){ //&は「含めば」
-            $state->setFetchMode(PDO::FETCH_CLASS, self::$テーブルクラス接頭辞.$this->テーブル); // http://php.net/manual/ja/pdostatement.setfetchmode.php
+            $state->setFetchMode(PDO::FETCH_CLASS, self::$テーブルクラス修飾名.$this->テーブル); // http://php.net/manual/ja/pdostatement.setfetchmode.php
         }
 
         for($i = 0;  $i < count($プレースホルダ);  $i++){
@@ -1935,7 +1935,7 @@ class データベース{
 
         if($this->MySQLなら()){
             $SQL文  = str_replace('autoincrement', 'auto_increment', $SQL文);
-            $SQL文 .= defined(self::$テーブルクラス接頭辞.$this->テーブル."::追加定義")  ?  constant(self::$テーブルクラス接頭辞.$this->テーブル."::追加定義")  :  "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci";
+            $SQL文 .= defined(self::$テーブルクラス修飾名.$this->テーブル."::追加定義")  ?  constant(self::$テーブルクラス修飾名.$this->テーブル."::追加定義")  :  "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci";
         }
         else {
             $SQL文  = str_replace('auto_increment', 'autoincrement', $SQL文);
