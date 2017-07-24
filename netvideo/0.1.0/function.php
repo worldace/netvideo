@@ -1163,7 +1163,7 @@ function zip解凍(string $zipfile, string $解凍先 = "") :array{
 
     for($i = 0;  $i < $zip->numFiles;  $i++){
         $name   = $zip->getNameIndex($i, ZipArchive::FL_ENC_RAW);
-        $encode = mb_detect_encoding($name, ["utf-8", "sjis-win", "eucjp-win", "ascii"]);
+        $encode = mb_detect_encoding($name, ["utf-8", "sjis-win", "eucjp", "ascii"]);
         if($encode !== 'UTF-8'){
             $name = mb_convert_encoding($name, "utf-8", $encode);
         }
