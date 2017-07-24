@@ -247,7 +247,7 @@ function 設定(string $name, $value="\0\rヌル\0\r"){
 }
 
 
-function テンプレート(string $_file_, array $_data_, bool $エスケープしない=false) :string{
+function テンプレート(string $_file_, array $_data_, bool $エスケープする=true) :string{
     $_h_ = function($arg) use (&$_h_){
         if(is_array($arg)){
             return array_map($_h_, $arg);
@@ -255,7 +255,7 @@ function テンプレート(string $_file_, array $_data_, bool $エスケープ
         return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
     };
     
-    if($エスケープしない){
+    if($エスケープする === false){
         foreach((array)$_data_ as $_key1_ => $_val_){
             $$_key1_ = $_val_;
         }
