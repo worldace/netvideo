@@ -1640,7 +1640,7 @@ function クラス文字列化($class){
 
 
 function データベース(string $table, array $setting=[]){
-    return データベース::接続($table, $setting);
+    return new データベース($table, $setting);
 }
 
 
@@ -1655,32 +1655,30 @@ class データベース{
 
 
 
-    static function 接続(string $table, array $setting=[]){
+    function __construct(string $table, array $setting=[]){
         global $設定;
         assert(isset($設定['データベース.接続'][0]));
 
-        $that = new self;
+        $this->設定['接続'][0] = $setting[0] ?? $設定['データベース.接続'][0];
+        $this->設定['接続'][1] = $setting[1] ?? $設定['データベース.接続'][1] ?? '';
+        $this->設定['接続'][2] = $setting[2] ?? $設定['データベース.接続'][2] ?? '';
+        $this->設定['接続'][3] = $setting[3] ?? $設定['データベース.接続'][3] ?? [];
 
-        $that->設定['接続'][0] = $setting[0] ?? $設定['データベース.接続'][0];
-        $that->設定['接続'][1] = $setting[1] ?? $設定['データベース.接続'][1] ?? '';
-        $that->設定['接続'][2] = $setting[2] ?? $設定['データベース.接続'][2] ?? '';
-        $that->設定['接続'][3] = $setting[3] ?? $設定['データベース.接続'][3] ?? [];
-
-        $that->設定['接続'][3] += [
+        $this->設定['接続'][3] += [
             PDO::ATTR_DEFAULT_FETCH_MODE       => PDO::FETCH_ASSOC,
             PDO::ATTR_ERRMODE                  => PDO::ERRMODE_WARNING,
             PDO::ATTR_EMULATE_PREPARES         => true,
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ];
 
-        $that->接続名  = md5($that->設定['接続'][0] . $that->設定['接続'][1] . $that->設定['接続'][2]);
+        $this->接続名  = md5($this->設定['接続'][0] . $this->設定['接続'][1] . $this->設定['接続'][2]);
 
-        if(!isset(self::$pdo[$that->接続名])){
+        if(!isset(self::$pdo[$this->接続名])){
             try{ //パスワードが漏れる可能性があるので例外を握りつぶす＋パスワードは配列に入れておく
-                self::$pdo[$that->接続名] = new PDO(...$that->設定['接続']);
+                self::$pdo[$this->接続名] = new PDO(...$this->設定['接続']);
             }
             catch(PDOException $e){
-                if($that->設定['接続'][3][PDO::ATTR_ERRMODE] === PDO::ERRMODE_EXCEPTION){
+                if($this->設定['接続'][3][PDO::ATTR_ERRMODE] === PDO::ERRMODE_EXCEPTION){
                     throw new PDOException("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください");
                 }
                 else{
@@ -1689,13 +1687,11 @@ class データベース{
             }
         }
  
-        $that->設定['取得件数']   = $設定['データベース.取得件数']   ?? 31;
-        $that->設定['クラス修飾'] = $設定['データベース.クラス修飾'] ?? '□';
-        $that->設定['ログ']       = $設定['データベース.ログ']       ?? null;
+        $this->設定['取得件数']   = $設定['データベース.取得件数']   ?? 31;
+        $this->設定['クラス修飾'] = $設定['データベース.クラス修飾'] ?? '□';
+        $this->設定['ログ']       = $設定['データベース.ログ']       ?? null;
 
-        $that->テーブル($table);
-
-        return $that;
+        $this->テーブル($table);
     }
 
 
