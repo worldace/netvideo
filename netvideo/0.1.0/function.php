@@ -1728,7 +1728,7 @@ class データベース{
         }
 
         if($this->設定['接続'][3][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){ //&は「含めば」
-            $state->setFetchMode(PDO::FETCH_CLASS, $this->テーブルクラス); // http://php.net/manual/ja/pdostatement.setfetchmode.php
+            $state->setFetchMode(PDO::FETCH_CLASS, $this->設定['クラス修飾'].$this->テーブル); // http://php.net/manual/ja/pdostatement.setfetchmode.php
         }
 
         for($i = 0;  $i < count($プレースホルダ);  $i++){
