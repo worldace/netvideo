@@ -827,7 +827,7 @@ function カレンダー配列(int $年=null, int $月=null) :array{
 
 
 function 日本語設定() :void{
-    (preg_match("/^WIN/i", PHP_OS)) ? setlocale(LC_ALL, '') : setlocale(LC_ALL, 'ja_JP.UTF-8');
+    preg_match("/^WIN/i", PHP_OS) ? setlocale(LC_ALL, 'Japanese_Japan.932') : setlocale(LC_ALL, 'ja_JP.UTF-8');
     ini_set("mbstring.language", "Japanese");
     ini_set("mbstring.detect_order", "UTF-8,SJIS-win,eucJP-win,ASCII");
     ini_set("date.timezone", "Asia/Tokyo");
@@ -1143,8 +1143,8 @@ function zip追加(string $zipfile, $filemap){
         内部エラー("ZIPファイル $zipfile を開けません", "警告");
         return false;
     }
-    foreach($filemap as $name => $value){
-        $zip->addFromString($name, $value);
+    foreach($filemap as $k => $v){
+        $zip->addFromString($k, $v);
     }
     $zip->close();
     return $zipfile;
