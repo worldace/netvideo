@@ -1154,12 +1154,8 @@ function zip解凍(string $zipfile, string $解凍先 = "") :array{
         return $return;
     }
 
-    if(!$解凍先){
-        $解凍先 = dirname(realpath($zipfile)) . DIRECTORY_SEPARATOR;
-    }
-    else{
-        $解凍先 = realpath($解凍先) . DIRECTORY_SEPARATOR;
-    }
+    $解凍先  = $解凍先 ? realpath($解凍先) : dirname(realpath($zipfile));
+    $解凍先 .= DIRECTORY_SEPARATOR;
 
     for($i = 0;  $i < $zip->numFiles;  $i++){
         $name   = $zip->getNameIndex($i, ZipArchive::FL_ENC_RAW);
@@ -1168,7 +1164,7 @@ function zip解凍(string $zipfile, string $解凍先 = "") :array{
             $name = mb_convert_encoding($name, "utf-8", $encode);
         }
         if(strpos($name, "/") !== false){
-            $dir = $解凍先 . dirname($name);
+            $dir = $解凍先.dirname($name);
             if(!is_dir($dir)){
                 mkdir($dir, 0755, true);
             }
