@@ -1158,7 +1158,7 @@ function zip解凍(string $zipfile, string $解凍先 = "") :array{
     $解凍先 .= DIRECTORY_SEPARATOR;
 
     for($i = 0;  $i < $zip->numFiles;  $i++){
-        $name   = $zip->getNameIndex($i, ZipArchive::FL_ENC_RAW);
+        $name = $zip->getNameIndex($i, ZipArchive::FL_ENC_RAW);
         if($name[-1] === '/'){
             continue;
         }
@@ -1173,7 +1173,7 @@ function zip解凍(string $zipfile, string $解凍先 = "") :array{
                 mkdir($dir, 0755, true);
             }
         }
-        if(file_put_contents($解凍先.$name, $zip->getStream($zip->getNameIndex($i))) !== false){ //$zip->getFromIndex($i)
+        if(file_put_contents($解凍先.$name, $zip->getStream($zip->getNameIndex($i))) !== false){ // $zip->getFromIndex($i) という方法もあるけど
             $return[] = $解凍先.$name;
         }
     }
