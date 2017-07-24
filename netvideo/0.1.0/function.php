@@ -1100,7 +1100,7 @@ function ディレクトリ削除(string $dir){
 
 
 function zip圧縮(string $zipfile, $filemap){
-    $zip = new ZipArchive();
+    $zip = new ZipArchive(); // http://php.net/ziparchive
     if($zip->open($zipfile, ZipArchive::CREATE) !== true){
         内部エラー("ZIPファイル $zipfile を作成できません", "警告");
         return false;
@@ -1113,18 +1113,24 @@ function zip圧縮(string $zipfile, $filemap){
         }
         $path .= DIRECTORY_SEPARATOR;
         $path_length = strlen($path);
-        $filemap = [];
         $windows = preg_match("/^WIN/i", PHP_OS);
-        foreach(ファイル一覧($path) as $v){
+        foreach(パス一覧($path) as $v){
             $k = substr($v, $path_length);
             if($windows){
                 $k = str_replace("\\", "/", $k);
             }
-            $filemap[$k] = file_get_contents($v);
+            if(is_dir($v)){
+                $zip->addEmptyDir($k);
+            }
+            else{
+                $zip->addFile($v, $k);
+            }
         }
     }
-    foreach($filemap as $name => $value){  //$nameに/を含めるとディレクトリになる
-        $zip->addFromString($name, $value);
+    else{
+        foreach($filemap as $k => $v){
+            $zip->addFromString($k, $v);
+        }
     }
     $zip->close();
     return $zipfile;
@@ -1132,7 +1138,7 @@ function zip圧縮(string $zipfile, $filemap){
 
 
 function zip追加(string $zipfile, $filemap){
-    $zip = new ZipArchive();
+    $zip = new ZipArchive(); // http://php.net/ziparchive
     if($zip->open($zipfile) !== true){
         内部エラー("ZIPファイル $zipfile を開けません", "警告");
         return false;
@@ -1148,7 +1154,7 @@ function zip追加(string $zipfile, $filemap){
 function zip解凍(string $zipfile, string $解凍先 = "") :array{
     $return= [];
 
-    $zip = new ZipArchive();
+    $zip = new ZipArchive(); // http://php.net/ziparchive
     if($zip->open($zipfile) !== true){
         内部エラー("ZIPファイル $zipfile を開けません", "警告");
         return $return;
