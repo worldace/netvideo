@@ -1,6 +1,6 @@
 <?php
 
-class 動画定義{
+class □動画{
     const 定義 = [
         "id"           => "integer primary key auto_increment",
         "url"          => "varchar(500) not null",
@@ -16,18 +16,4 @@ class 動画定義{
         "本文"         => "text",
         "備考"         => "text",
     ];
-    
-    public $id;
-    public $url;
-    public $横幅;
-    public $縦幅;
-    public $長さ;
-    public $登録時間;
-    public $アクセス数;
-    public $コメント数;
-    public $ユーザid;
-    public $状態;
-    public $タイトル;
-    public $本文;
-    public $備考;
 }

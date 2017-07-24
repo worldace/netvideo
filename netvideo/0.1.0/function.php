@@ -1699,7 +1699,7 @@ class データベース{
         if(!$table){
             return $this->テーブル;
         }
-        
+
         $class = $this->設定['クラス修飾'] . $table;
         assert(class_exists($class));
 
