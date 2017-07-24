@@ -1076,7 +1076,6 @@ function パス一覧(string $dir, $recursive = true) :Generator{
 
 function ディレクトリ作成(string $dir, string $permission="707"){
     if(is_dir($dir)){
-        内部エラー("ディレクトリ $dir は既に存在します", "注意");
         パーミッション($dir, $permission);
         return $dir;
     }
@@ -1146,18 +1145,40 @@ function zip追加(string $zipfile, $filemap){
 }
 
 
-function zip解凍(string $zipfile, string $where = "") :bool{
+function zip解凍(string $zipfile, string $解凍先 = "") :array{
+    $return= [];
+
     $zip = new ZipArchive();
     if($zip->open($zipfile) !== true){
         内部エラー("ZIPファイル $zipfile を開けません", "警告");
-        return false;
+        return $return;
     }
-    if(!$where){
-        $where = dirname(realpath($zipfile));
+
+    if(!$解凍先){
+        $解凍先 = dirname(realpath($zipfile)) . DIRECTORY_SEPARATOR;
     }
-    $result = $zip->extractTo($where);
+    else{
+        $解凍先 = realpath($解凍先) . DIRECTORY_SEPARATOR;
+    }
+
+    for($i = 0;  $i < $zip->numFiles;  $i++){
+        $name   = $zip->getNameIndex($i, ZipArchive::FL_ENC_RAW);
+        $encode = mb_detect_encoding($name, ["utf-8", "sjis-win", "eucjp-win", "ascii"]);
+        if($encode !== 'UTF-8'){
+            $name = mb_convert_encoding($name, "utf-8", $encode);
+        }
+        if(strpos($name, "/") !== false){
+            $dir = $解凍先 . dirname($name);
+            if(!is_dir($dir)){
+                mkdir($dir, 0755, true);
+            }
+        }
+        if(file_put_contents($解凍先.$name, $zip->getFromIndex($i)) !== false){
+            $return[] = $解凍先.$name;
+        }
+    }
     $zip->close();
-    return $result;
+    return $return;
 }
 
 
@@ -1564,19 +1585,19 @@ function ベンチマーク(callable $func, ...$arg){
     $start = microtime(true);
     $end   = $start + 1;
     if($arg){
-        for($t = -1;  microtime(true) <= $end;  $t++){
+        for($count = -1;  microtime(true) <= $end;  $count++){
             $func(...$arg);
         }
     }
     else{
-        for($t = -1;  microtime(true) <= $end;  $t++){
+        for($count = -1;  microtime(true) <= $end;  $count++){
             $func();
         }
     }
     $finish = microtime(true);
 
-    $t = ($t > 0)  ?  number_format($t)  :  number_format(1/($finish-$start), 3);
-    printf("case%s: %s回\n", $i, $t);
+    $count = ($count > 0) ? number_format($count) : number_format(1/($finish-$start), 3);
+    printf("case%s: %s回\n", $i, $count);
 }
 
 
@@ -1670,6 +1691,10 @@ class データベース{
             PDO::ATTR_EMULATE_PREPARES         => true,
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ];
+ 
+        $this->設定['取得件数']   = $設定['データベース.取得件数']   ?? 31;
+        $this->設定['クラス修飾'] = $設定['データベース.クラス修飾'] ?? '□';
+        $this->設定['ログ']       = $設定['データベース.ログ']       ?? null;
 
         $this->接続名  = md5($this->設定['接続'][0] . $this->設定['接続'][1] . $this->設定['接続'][2]);
 
@@ -1686,10 +1711,6 @@ class データベース{
                 }
             }
         }
- 
-        $this->設定['取得件数']   = $設定['データベース.取得件数']   ?? 31;
-        $this->設定['クラス修飾'] = $設定['データベース.クラス修飾'] ?? '□';
-        $this->設定['ログ']       = $設定['データベース.ログ']       ?? null;
 
         $this->テーブル($table);
     }
