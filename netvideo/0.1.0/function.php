@@ -2122,24 +2122,19 @@ class 部品{
     private static $タグ;
 
 
-    static function 開始($dir = __DIR__."/部品", array $option = []){
+    static function 開始($dir = __DIR__."/部品", array $option = []) :bool{
         if(self::$設定){
-            return;
+            return false;
         }
         if(!is_dir($dir)){
-            throw new Exception("部品ディレクトリが存在しません");
+            return false;
         }
+
         self::$設定 = $option + [
             "手動"  => false,
             "nonce" => null,
         ];
-        
-        if(!preg_match('#^(/|[a-zA-Z]:[\\\\/])#', $dir)){ //相対パスの時
-            self::$設定["ディレクトリ"] = realpath($dir);
-        }
-        else{
-            self::$設定["ディレクトリ"] = $dir;
-        }
+        self::$設定["ディレクトリ"] = realpath($dir);
 
         self::$記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[]];
         self::$タグ = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
@@ -2148,29 +2143,30 @@ class 部品{
         if(!self::$設定['手動']){
             ob_start(["部品", "差し込む"]);
         }
+        return true;
     }
 
 
-    static function 終了(){
+    static function 終了() :string{
         if(!self::$設定){
-            return;
+            return "";
         }
-        $return = (!self::$設定['手動'])  ?  self::差し込む(ob_get_clean())  :  "";
+        $return = self::$設定['手動']  ?  ""  :  self::差し込む(ob_get_clean());
         self::$設定 = self::$記憶 = self::$タグ = null;
         return $return;
     }
 
 
-    static function 作成($部品名, $引数){
+    static function 作成($部品名, $引数) :string{
         if(!isset(self::$記憶['部品コード'][$部品名])){
             $解析 = self::ファイル解析($部品名);
 
             if(preg_match("/^function/i", $解析['php'])){
                 try{
-                    self::$記憶['部品コード'][$部品名] = eval("return " . $解析['php'] . ";");
+                    self::$記憶['部品コード'][$部品名] = eval(sprintf("return %s;", $解析['php']));
                 }
                 catch(Error $e){
-                    throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で文法エラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), 0, $e);
+                    throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で文法エラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()));
                 }
             }
             else{
@@ -2183,8 +2179,8 @@ class 部品{
         }
 
         self::$記憶['stack'][] = $部品名;
-        if(count(self::$記憶['stack']) > 100){
-            throw new Error("部品ファイル読み込みのループ数が100回を超えました\n" . implode("\n", self::$記憶['stack']));
+        if(count(self::$記憶['stack']) > 1000){
+            throw new Error("部品ファイル読み込みのループ数が1000回を超えました\n" . implode("→", array_slice(self::$記憶['stack'], -50)));
         }
 
         if(is_callable(self::$記憶['部品コード'][$部品名])){
@@ -2192,7 +2188,7 @@ class 部品{
                 $html = self::$記憶['部品コード'][$部品名](...$引数);
             }
             catch(Error $e){
-                throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で実行エラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), 0, $e);
+                throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で実行エラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()));
             }
         }
         else{
@@ -2200,11 +2196,11 @@ class 部品{
         }
 
         array_pop(self::$記憶['stack']);
-        return $html;
+        return (string)$html;
     }
 
 
-    static function 差し込む($buf){
+    static function 差し込む(string $buf = "") :string{
         self::$タグ['fromphp'] = self::fromphpタグ作成();
 
         if(self::$タグ['jsinbody']){
@@ -2226,13 +2222,13 @@ class 部品{
     }
 
 
-    static function タグ取得(){
+    static function タグ取得() :array{
         self::$タグ['fromphp'] = self::fromphpタグ作成();
         return self::$タグ;
     }
 
 
-    static function fromphp($data){
+    static function fromphp($data) :void{
         $部品名 = end(self::$記憶['stack']);
         if($部品名){
             self::$記憶['fromphp'][$部品名] = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
@@ -2242,17 +2238,7 @@ class 部品{
 
 
 
-    private static function 関数登録(){
-        if(function_exists("部品")){
-            return;
-        }
-        function 部品($部品名, ...$引数){
-            return 部品::作成($部品名, $引数);
-        }
-    }
-
-
-    private static function ファイル取得($部品名){
+    private static function ファイル取得(string $部品名){
         if(!self::$設定['ディレクトリ']){
             throw new Error("部品::開始() を行ってください");
         }
@@ -2269,7 +2255,7 @@ class 部品{
     }
 
 
-    private static function ファイル解析($部品名){
+    private static function ファイル解析(string $部品名) :array{
         $return = ["css"=>[], "jsh"=>[], "jsb"=>[], "php"=>""];
         $html = self::ファイル取得($部品名);
 
@@ -2309,7 +2295,7 @@ class 部品{
     }
 
 
-    private static function タグ作成(array $array, $link, $部品名){
+    private static function タグ作成(array $array, string $link, string $部品名) :string{
         $return = "";
         $部品ファイルの位置 = self::$設定['ディレクトリ'] . "/" . dirname(str_replace("_", "/", $部品名));
 
@@ -2342,7 +2328,7 @@ class 部品{
     }
 
 
-    private static function fromphpタグ作成(){
+    private static function fromphpタグ作成() :string{
         if(!self::$記憶['fromphp']){
             return "";
         }
@@ -2357,6 +2343,15 @@ class 部品{
         $return .= "</script>\n";
 
         return $return;
+    }
+
+
+    private static function 関数登録() :void{
+        if(!function_exists("部品")){
+            function 部品(string $部品名, ...$引数) :string{
+                return 部品::作成($部品名, $引数);
+            }
+        }
     }
 }
 
