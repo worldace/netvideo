@@ -2127,6 +2127,7 @@ class 部品{
             return false;
         }
         if(!is_dir($dir)){
+            trigger_error("部品ディレクトリ: $dir が見つかりません", E_USER_WARNING);
             return false;
         }
 
