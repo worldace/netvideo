@@ -2154,8 +2154,8 @@ class 部品{
         ];
         self::$設定["ディレクトリ"] = realpath($dir);
 
-        self::$記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[]];
-        self::$タグ = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
+        self::$記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromparts'=>[]];
+        self::$タグ = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromparts'=>''];
 
         if(!self::$設定['手動']){
             ob_start(["部品", "差し込む"]);
@@ -2198,7 +2198,7 @@ class 部品{
 
 
     static function 差し込む(string $buf="") :string{
-        self::$タグ['fromphp'] = self::fromphpタグ作成();
+        self::$タグ['fromparts'] = self::frompartsタグ作成();
 
         if(self::$タグ['jsinbody']){
             $pos = strripos($buf, "</body>");
@@ -2209,10 +2209,10 @@ class 部品{
                 $buf = $buf . self::$タグ['jsinbody'];
             }
         }
-        if(self::$タグ['css'] || self::$タグ['jsinhead'] || self::$タグ['fromphp']){
+        if(self::$タグ['css'] || self::$タグ['jsinhead'] || self::$タグ['fromparts']){
             $pos = stripos($buf, "</title>");
             if($pos !== false){ //最初に出現する</title>の前に挿入する
-                $buf = substr_replace($buf, "\n".self::$タグ['css'].self::$タグ['fromphp'].self::$タグ['jsinhead'], $pos+8, 0);
+                $buf = substr_replace($buf, "\n".self::$タグ['css'].self::$タグ['fromparts'].self::$タグ['jsinhead'], $pos+8, 0);
             }
         }
         return $buf;
@@ -2220,15 +2220,15 @@ class 部品{
 
 
     static function タグ取得() :array{
-        self::$タグ['fromphp'] = self::fromphpタグ作成();
+        self::$タグ['fromparts'] = self::frompartsタグ作成();
         return self::$タグ;
     }
 
 
-    static function fromphp($data) :void{
+    static function fromparts($data) :void{
         $部品名 = end(self::$記憶['stack']);
         if($部品名){
-            self::$記憶['fromphp'][$部品名] = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
+            self::$記憶['fromparts'][$部品名] = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
         }
     }
 
@@ -2325,17 +2325,17 @@ class 部品{
     }
 
 
-    private static function fromphpタグ作成() :string{
-        if(!self::$記憶['fromphp']){
+    private static function frompartsタグ作成() :string{
+        if(!self::$記憶['fromparts']){
             return "";
         }
 
         $return  = isset(self::$設定['nonce'])  ?  sprintf('<script nonce="%s">', self::$設定['nonce'])  :  '<script>';
         $return .= "\n";
-        $return .= "var fromphp = {};\n";
+        $return .= "var fromparts = {};\n";
 
-        foreach(self::$記憶['fromphp'] as $k => $v){
-            $return .= sprintf("fromphp['%s'] = %s;\n", $k, $v);
+        foreach(self::$記憶['fromparts'] as $k => $v){
+            $return .= sprintf("fromparts['%s'] = %s;\n", $k, $v);
         }
         $return .= "</script>\n";
 

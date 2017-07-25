@@ -269,7 +269,7 @@
 
 <script type="部品">
 function($動画){
-    部品::fromphp($動画['url']);
+    部品::fromparts($動画['url']);
     return <<<"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 <div class="jsplayer" id="jsplayer"
   ><div class="jsplayer-screen" tabindex="1"
@@ -1186,8 +1186,8 @@ $v.func.type = function(target){
 
 
 //■ entrypoint
-var fromphp = fromphp || {"jsplayer": "http://127.0.0.1/1.mp4"};
-$v.player.entrypoint(fromphp.jsplayer, 640, 360);
+var fromparts = fromparts || {"jsplayer": "http://127.0.0.1/1.mp4"};
+$v.player.entrypoint(fromparts.jsplayer, 640, 360);
 </script>
 </body>
 </html>
