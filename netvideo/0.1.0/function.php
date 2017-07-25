@@ -2116,6 +2116,21 @@ class データベース{
 
 
 
+function 部品(string $部品名, ...$引数) :string{
+    $return = "";
+    try{
+        $return = 部品::作成($部品名, $引数);
+    }
+    catch(Error $e){
+        trigger_error(sprintf("部品ファイル: %s の部品コード%s行目でPHPエラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), E_USER_WARNING);
+    }
+    catch(Exception $e){
+        trigger_error($e->getMessage(), E_USER_WARNING);
+    }
+    return $return;
+}
+
+
 class 部品{
     private static $設定;
     private static $記憶;
@@ -2139,7 +2154,6 @@ class 部品{
 
         self::$記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromphp'=>[]];
         self::$タグ = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromphp'=>''];
-        self::関数登録();
 
         if(!self::$設定['手動']){
             ob_start(["部品", "差し込む"]);
@@ -2324,26 +2338,6 @@ class 部品{
         $return .= "</script>\n";
 
         return $return;
-    }
-
-
-    private static function 関数登録() :void{
-        if(function_exists("部品")){
-            return;
-        }
-        function 部品(string $部品名, ...$引数) :string{
-            $return = "";
-            try{
-                $return = 部品::作成($部品名, $引数);
-            }
-            catch(Error $e){
-                trigger_error(sprintf("部品ファイル: %s の部品コード%s行目でPHPエラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), E_USER_WARNING);
-            }
-            catch(Exception $e){
-                trigger_error($e->getMessage(), E_USER_WARNING);
-            }
-            return $return;
-        }
     }
 }
 
