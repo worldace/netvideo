@@ -2116,11 +2116,12 @@ class データベース{
 
 
 
+
 function 部品(string $部品名, ...$引数) :?string{
     try{
         return 部品::作成($部品名, $引数);
     }
-    catch(Error $e){
+    catch(Error $e){ //部品コードをevalした時と、部品コードを実行した時に飛んでくる例外
         trigger_error(sprintf("部品ファイル: %s の部品コード%s行目でPHPエラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), E_USER_WARNING);
     }
     catch(Exception $e){
@@ -2183,7 +2184,7 @@ class 部品{
 
         self::$記憶['stack'][] = $部品名;
         if(count(self::$記憶['stack']) > 1000){
-            throw new Exception("部品ファイル読み込みのループが1000回を超えました。\n" . implode("→", array_slice(self::$記憶['stack'], -50)));
+            throw new Exception("部品ファイル読み込みのループが1000回を超えました。\n" . implode("→", array_slice(self::$記憶['stack'], -50))); //部品関数でキャッチする
         }
 
         $html = is_callable(self::$記憶['部品コード'][$部品名])  ?  self::$記憶['部品コード'][$部品名](...$引数)  :  self::$記憶['部品コード'][$部品名];
@@ -2233,16 +2234,16 @@ class 部品{
 
     private static function ファイル取得(string $部品名) :string{
         if(!isset(self::$設定['ディレクトリ'])){
-            throw new Exception("部品::開始() を行っていません");
+            throw new Exception("部品::開始() を行っていません"); //部品関数でキャッチする
         }
         if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){
-            throw new Exception("部品名: $部品名 はPHP変数の命名規則に沿っていません");
+            throw new Exception("部品名: $部品名 はPHP変数の命名規則に沿っていません"); //部品関数でキャッチする
         }
 
         $path = sprintf("%s/%s.html", self::$設定['ディレクトリ'], str_replace("_", "/", $部品名));
         $return = file_get_contents($path);
         if($return === false){
-            throw new Exception("部品名: $部品名 の部品ファイル: $path が見つかりません");
+            throw new Exception("部品名: $部品名 の部品ファイル: $path が見つかりません"); //部品関数でキャッチする
         }
         return $return;
     }
