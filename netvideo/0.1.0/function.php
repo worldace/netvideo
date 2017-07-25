@@ -1349,9 +1349,10 @@ function CSV作成($array, $改行変換="\n", $常に囲む=null, string $d=','
 }
 
 
-function fromphp($data) :string{
-    $return = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
-    return ($return !== false) ? $return : "{}";
+function fromphp($data, string $name='fromphp') :string{
+    $json  = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
+    $valid = preg_match("/^[a-zA-Z_\$\x7f-\xff][a-zA-Z0-9_\$\x7f-\xff]*/", $name);
+    return ($json !== false and $valid)  ?  "<script>var $name = $json;</script>\n"  :  "";
 }
 
 
@@ -2125,8 +2126,8 @@ function 部品(string $部品名, ...$引数) :string{
         trigger_error(sprintf("部品ファイル: %s の部品コード%s行目でPHPエラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), E_USER_WARNING);
     }
     catch(Exception $e){
-        $trace = debug_backtrace()[0];
-        trigger_error(sprintf("%s\n%s: %s行目\n\n", $e->getMessage(), $trace['file'], $trace['line']), E_USER_WARNING);
+        $back = debug_backtrace()[0];
+        trigger_error(sprintf("%s\n%s: %s行目\n\n", $e->getMessage(), $back['file'], $back['line']), E_USER_WARNING);
     }
     return "";
 }
