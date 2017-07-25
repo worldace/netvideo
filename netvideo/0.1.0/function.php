@@ -2116,7 +2116,7 @@ class データベース{
 
 
 
-function 部品(string $部品名, ...$引数){
+function 部品(string $部品名, ...$引数) :?string{
     try{
         return 部品::作成($部品名, $引数);
     }
