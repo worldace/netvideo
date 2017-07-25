@@ -2117,7 +2117,7 @@ class データベース{
 
 
 
-function 部品(string $部品名, ...$引数) :?string{
+function 部品(string $部品名, ...$引数) :string{
     try{
         return 部品::作成($部品名, $引数);
     }
@@ -2125,8 +2125,10 @@ function 部品(string $部品名, ...$引数) :?string{
         trigger_error(sprintf("部品ファイル: %s の部品コード%s行目でPHPエラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), E_USER_WARNING);
     }
     catch(Exception $e){
-        trigger_error($e->getMessage(), E_USER_WARNING);
+        $trace = debug_backtrace()[0];
+        trigger_error(sprintf("%s\n%s: %s行目\n\n", $e->getMessage(), $trace['file'], $trace['line']), E_USER_WARNING);
     }
+    return "";
 }
 
 
@@ -2136,7 +2138,7 @@ class 部品{
     private static $タグ;
 
 
-    static function 開始($dir=__DIR__."/部品", array $option=[]) :bool{
+    static function 開始(string $dir, array $option=[]) :bool{
         if(self::$設定){
             return false;
         }
@@ -2234,14 +2236,14 @@ class 部品{
 
     private static function ファイル取得(string $部品名) :string{
         if(!isset(self::$設定['ディレクトリ'])){
-            throw new Exception("部品::開始() を行っていません"); //部品関数でキャッチする
+            throw new Exception("部品::開始() が行われていません"); //部品関数でキャッチする
         }
         if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){
             throw new Exception("部品名: $部品名 はPHP変数の命名規則に沿っていません"); //部品関数でキャッチする
         }
 
         $path = sprintf("%s/%s.html", self::$設定['ディレクトリ'], str_replace("_", "/", $部品名));
-        $return = file_get_contents($path);
+        $return = @file_get_contents($path);
         if($return === false){
             throw new Exception("部品名: $部品名 の部品ファイル: $path が見つかりません"); //部品関数でキャッチする
         }
