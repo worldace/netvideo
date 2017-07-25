@@ -589,7 +589,7 @@ function キャッシュ無効(){
 }
 
 
-function URL(array $param = null) :string{
+function URL(array $param=null) :string{
     assert(isset(設定['URL']));
     $url = 設定['URL'];
 
@@ -740,7 +740,7 @@ function 自然数なら($num, bool $zero = false) :bool{
 }
 
 
-function str_match(string $needle, string $haystack, &$match = null) :bool{
+function str_match(string $needle, string $haystack, &$match=null) :bool{
     $match = strpos($haystack, $needle);
     return ($match === false)  ?  false  :  true;
 }
@@ -990,7 +990,7 @@ function 配列探索($array, bool $leafonly = false) :Generator{
     }
 }
 */
-function 配列探索($array, bool $leafonly = false) :RecursiveIteratorIterator{
+function 配列探索($array, bool $leafonly=false) :RecursiveIteratorIterator{
     $option = $leafonly  ?  RecursiveIteratorIterator::LEAVES_ONLY  :  RecursiveIteratorIterator::SELF_FIRST;
     return new RecursiveIteratorIterator(new RecursiveArrayIterator($array), $option);
 }
@@ -1008,7 +1008,7 @@ function パーミッション(string $path, string $permission=null) :string{
 }
 
 
-function ファイル一覧(string $dir, $recursive = true) :Generator{
+function ファイル一覧(string $dir, $recursive=true) :Generator{
     $recursive = (int)$recursive;
     if($recursive < 2){
         $dir = realpath($dir);
@@ -1030,7 +1030,7 @@ function ファイル一覧(string $dir, $recursive = true) :Generator{
 }
 
 
-function ディレクトリ一覧(string $dir, $recursive = true) :Generator{
+function ディレクトリ一覧(string $dir, $recursive=true) :Generator{
     $recursive = (int)$recursive;
     if($recursive < 2){
         $dir = realpath($dir);
@@ -1052,7 +1052,7 @@ function ディレクトリ一覧(string $dir, $recursive = true) :Generator{
 }
 
 
-function パス一覧(string $dir, $recursive = true) :Generator{
+function パス一覧(string $dir, $recursive=true) :Generator{
     $recursive = (int)$recursive;
     if($recursive < 2){
         $dir = realpath($dir);
@@ -1154,7 +1154,7 @@ function zip追加(string $zipfile, $filemap){
 }
 
 
-function zip解凍(string $zipfile, string $解凍先 = "") :array{
+function zip解凍(string $zipfile, string $解凍先="") :array{
     $return= [];
 
     $zip = new ZipArchive(); // http://php.net/ziparchive
@@ -1241,7 +1241,7 @@ function XML取得(string $xml) :array{
 }
 
 
-function CSV取得(string $path, $encode = null, string $区切り = null, string $囲い = '"') :Generator{
+function CSV取得(string $path, $encode=null, string $区切り=null, string $囲い='"') :Generator{
     $ini = ini_get("auto_detect_line_endings");
     ini_set("auto_detect_line_endings", true);
 
@@ -1295,7 +1295,7 @@ function CSV取得(string $path, $encode = null, string $区切り = null, strin
 }
 
 
-function CSV行取得(&$handle, $d = ',', $e = '"'){
+function CSV行取得(&$handle, $d=',', $e='"'){
     $d = preg_quote($d);
     $e = preg_quote($e);
     $line = "";
@@ -1323,7 +1323,7 @@ function CSV行取得(&$handle, $d = ',', $e = '"'){
 }
 
 
-function CSV作成($array, $改行変換 = "\n", $常に囲む = null, string $d = ',', string $e = '"') :string{
+function CSV作成($array, $改行変換="\n", $常に囲む=null, string $d=',', string $e='"') :string{
     $return = "";
     if(!is_iterable($array) and !is_object($array)){
         return $return;
@@ -1470,7 +1470,7 @@ function base64_decode_urlsafe(string $input) :string{
 }
 
 
-function base_encode($val, int $base = 62) :string{
+function base_encode($val, int $base=62) :string{
     if($base < 2 or $base > 62){
         内部エラー("進数は2～62の間で指定してください");
         return "";
@@ -1487,7 +1487,7 @@ function base_encode($val, int $base = 62) :string{
 }
 
 
-function base_decode(string $str, int $base = 62) :string{
+function base_decode(string $str, int $base=62) :string{
     if($base < 2 or $base > 62){
         内部エラー("進数は2～62の間で指定してください");
         return "";
@@ -2053,7 +2053,7 @@ class データベース{
     }
 
 
-    private function where文(string $prefix = '') :array{
+    private function where文(string $prefix='') :array{
         if($this->where){
             $this->where[0] = preg_replace("/^where/i", "", ltrim($this->where[0]));
             $where文        = sprintf("%s %s", $prefix, $this->where[0]);
@@ -2067,7 +2067,7 @@ class データベース{
     }
 
 
-    private function 順番文(array $arg = null) :string{
+    private function 順番文(array $arg=null) :string{
         if(is_array($arg) and $this->列なら(key($arg))){
             $列名 = key($arg);
             $順番 = ($arg[$列名] === "大きい順") ? 'desc' : 'asc';
@@ -2122,7 +2122,7 @@ class 部品{
     private static $タグ;
 
 
-    static function 開始($dir = __DIR__."/部品", array $option = []) :bool{
+    static function 開始($dir=__DIR__."/部品", array $option=[]) :bool{
         if(self::$設定){
             return false;
         }
@@ -2171,7 +2171,7 @@ class 部品{
 
         self::$記憶['stack'][] = $部品名;
         if(count(self::$記憶['stack']) > 1000){
-            throw new Exception("部品ファイル読み込みのループが1000回を超えました\n" . implode("→", array_slice(self::$記憶['stack'], -50)));
+            throw new Exception("部品ファイル読み込みのループが1000回を超えました。\n" . implode("→", array_slice(self::$記憶['stack'], -50)));
         }
 
         $html = is_callable(self::$記憶['部品コード'][$部品名])  ?  self::$記憶['部品コード'][$部品名](...$引数)  :  self::$記憶['部品コード'][$部品名];
@@ -2181,7 +2181,7 @@ class 部品{
     }
 
 
-    static function 差し込む(string $buf = "") :string{
+    static function 差し込む(string $buf="") :string{
         self::$タグ['fromphp'] = self::fromphpタグ作成();
 
         if(self::$タグ['jsinbody']){
@@ -2337,7 +2337,7 @@ class 部品{
                 $return = 部品::作成($部品名, $引数);
             }
             catch(Error $e){
-                trigger_error(sprintf("部品ファイル: %s の部品コード%s行目でエラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), E_USER_WARNING);
+                trigger_error(sprintf("部品ファイル: %s の部品コード%s行目でPHPエラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), E_USER_WARNING);
             }
             catch(Exception $e){
                 trigger_error($e->getMessage(), E_USER_WARNING);
@@ -2346,6 +2346,8 @@ class 部品{
         }
     }
 }
+
+
 
 
 class 文書 implements Countable, IteratorAggregate, ArrayAccess{
@@ -3201,7 +3203,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 }
 
 
-function 内部エラー(string $str = "エラーが発生しました", string $type = "停止", string $除外パス = "") :void{
+function 内部エラー(string $str="エラーが発生しました", string $type="停止", string $除外パス="") :void{
     $backtrace = debug_backtrace();
     $除外パス  = $除外パス ?: $backtrace[0]['file'];
 
@@ -3217,4 +3219,4 @@ function 内部エラー(string $str = "エラーが発生しました", string 
     }
 
     trigger_error($message, ['停止'=>E_USER_ERROR, '警告'=>E_USER_WARNING, '注意'=>E_USER_NOTICE][$type]);
-} 
+}
