@@ -2161,17 +2161,7 @@ class 部品{
         if(!isset(self::$記憶['部品コード'][$部品名])){
             $解析 = self::ファイル解析($部品名);
 
-            if(preg_match("/^function/i", $解析['php'])){
-                try{
-                    self::$記憶['部品コード'][$部品名] = eval(sprintf("return %s;", $解析['php']));
-                }
-                catch(Error $e){
-                    throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で文法エラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()));
-                }
-            }
-            else{
-                self::$記憶['部品コード'][$部品名] = $解析['php'];
-            }
+            self::$記憶['部品コード'][$部品名] = preg_match("/^function/i", $解析['php'])  ?  eval(sprintf("return %s;", $解析['php']))  :  $解析['php'];
 
             self::$タグ['css']      .= self::タグ作成($解析['css'], "href", $部品名);
             self::$タグ['jsinhead'] .= self::タグ作成($解析['jsh'], "src", $部品名);
@@ -2180,20 +2170,10 @@ class 部品{
 
         self::$記憶['stack'][] = $部品名;
         if(count(self::$記憶['stack']) > 1000){
-            throw new Error("部品ファイル読み込みのループ数が1000回を超えました\n" . implode("→", array_slice(self::$記憶['stack'], -50)));
+            throw new Exception("部品ファイル読み込みのループが1000回を超えました\n" . implode("→", array_slice(self::$記憶['stack'], -50)));
         }
 
-        if(is_callable(self::$記憶['部品コード'][$部品名])){
-            try{
-                $html = self::$記憶['部品コード'][$部品名](...$引数);
-            }
-            catch(Error $e){
-                throw new Error(sprintf("部品ファイル %s の 部品コード %s 行目で実行エラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()));
-            }
-        }
-        else{
-            $html = self::$記憶['部品コード'][$部品名];
-        }
+        $html = is_callable(self::$記憶['部品コード'][$部品名])  ?  self::$記憶['部品コード'][$部品名](...$引数)  :  self::$記憶['部品コード'][$部品名];
 
         array_pop(self::$記憶['stack']);
         return (string)$html;
@@ -2238,18 +2218,18 @@ class 部品{
 
 
 
-    private static function ファイル取得(string $部品名){
-        if(!self::$設定['ディレクトリ']){
-            throw new Error("部品::開始() を行ってください");
+    private static function ファイル取得(string $部品名) :string{
+        if(!isset(self::$設定['ディレクトリ'])){
+            throw new Exception("部品::開始() を行っていません");
         }
         if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){
-            throw new Error("部品名はPHPの変数の命名規則に沿ってください");
+            throw new Exception("部品名: $部品名 はPHP変数の命名規則に沿っていません");
         }
 
         $path = sprintf("%s/%s.html", self::$設定['ディレクトリ'], str_replace("_", "/", $部品名));
         $return = file_get_contents($path);
         if($return === false){
-            throw new Exception("部品ファイルが見つかりません: $部品名");
+            throw new Exception("部品名: $部品名 の部品ファイル: $path が見つかりません");
         }
         return $return;
     }
@@ -2347,10 +2327,21 @@ class 部品{
 
 
     private static function 関数登録() :void{
-        if(!function_exists("部品")){
-            function 部品(string $部品名, ...$引数) :string{
-                return 部品::作成($部品名, $引数);
+        if(function_exists("部品")){
+            return;
+        }
+        function 部品(string $部品名, ...$引数) :string{
+            $return = "";
+            try{
+                $return = 部品::作成($部品名, $引数);
             }
+            catch(Error $e){
+                trigger_error(sprintf("部品ファイル: %s の部品コード%s行目でエラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), E_USER_WARNING);
+            }
+            catch(Exception $e){
+                trigger_error($e->getMessage(), E_USER_WARNING);
+            }
+            return $return;
         }
     }
 }
