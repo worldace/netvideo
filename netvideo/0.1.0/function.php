@@ -2116,10 +2116,9 @@ class データベース{
 
 
 
-function 部品(string $部品名, ...$引数) :string{
-    $return = "";
+function 部品(string $部品名, ...$引数){
     try{
-        $return = 部品::作成($部品名, $引数);
+        return 部品::作成($部品名, $引数);
     }
     catch(Error $e){
         trigger_error(sprintf("部品ファイル: %s の部品コード%s行目でPHPエラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), E_USER_WARNING);
@@ -2127,7 +2126,6 @@ function 部品(string $部品名, ...$引数) :string{
     catch(Exception $e){
         trigger_error($e->getMessage(), E_USER_WARNING);
     }
-    return $return;
 }
 
 
