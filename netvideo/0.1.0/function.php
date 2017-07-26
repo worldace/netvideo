@@ -702,21 +702,18 @@ function 絶対パスなら(string $path) :bool{
 
 
 function GETなら() :bool{
-    $method = filter_input(INPUT_SERVER, "REQUEST_METHOD") ?? '';
-    return (strtoupper($method) === 'GET') ? true : false;
+    return filter_input(INPUT_SERVER, "REQUEST_METHOD") === 'GET';
 }
 
 
 function POSTなら() :bool{
-    $method = filter_input(INPUT_SERVER, "REQUEST_METHOD") ?? '';
-    return (strtoupper($method) === 'POST') ? true : false;
+    return filter_input(INPUT_SERVER, "REQUEST_METHOD") === 'POST';
 }
 
 
 function 開発環境なら() :bool{
-    $ini = ini_get("display_errors"); //display_errorsはstring型 "stderr"の扱いが未定。filter_var($bool, FILTER_VALIDATE_BOOLEAN)でも検証できる
-    $ini = strtolower($ini);
-    return in_array($ini, ["","0","no","off","false"], true) ? false : true;
+    //display_errorsはstring型 "stderr"の扱いが未定。filter_var($bool, FILTER_VALIDATE_BOOLEAN)でも検証できる
+    return !in_array(ini_get("display_errors"), ["","0","no","off","false"], true);
 }
 
 
@@ -742,7 +739,7 @@ function 自然数なら($num, bool $zero = false) :bool{
 
 function str_match(string $needle, string $haystack, &$match=null) :bool{
     $match = strpos($haystack, $needle);
-    return ($match === false)  ?  false  :  true;
+    return $match !== false;
 }
 
 
