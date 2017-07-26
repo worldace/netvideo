@@ -968,7 +968,7 @@ function 配列HTML(array $array, array $attr=[]) :string{
 
 
 function 連想配列なら($array) :bool{
-    return (is_array($array) and array_values($array) !== $array) ? true : false;
+    return (is_array($array) and array_values($array) !== $array);
 }
 
 
@@ -1363,7 +1363,7 @@ function 当たり($確率) :bool{
     }
 
     $i = mt_rand(1, round(100/$確率*100000));
-    return ($i <= 100000) ? true : false;
+    return $i <= 100000;
 }
 
 
