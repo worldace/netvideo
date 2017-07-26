@@ -693,10 +693,10 @@ function Windowsなら() :bool{
 
 function 絶対パスなら(string $path) :bool{
     if(DIRECTORY_SEPARATOR === '/'){
-        return ($path[0] === '/') ? true : false;
+        return $path[0] === '/';
     }
     else{
-        return ($path[1] === ':' or $path[0] === '\\' or $path[0] === '/') ? true : false;
+        return ($path[1] === ':' or $path[0] === '\\' or $path[0] === '/');
     }
 }
 
@@ -722,7 +722,7 @@ function PHP≧(string $str) :bool{
 }
 
 
-function 自然数なら($num, bool $zero = false) :bool{
+function 自然数なら($num, bool $zero=false) :bool{
     if(is_int($num)){
         if(($num > 0) or ($zero and $num === 0)){
             return true;
