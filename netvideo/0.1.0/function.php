@@ -1178,14 +1178,12 @@ function zip解凍(string $zipfile, string $解凍先="") :array{
             $name = mb_convert_encoding($name, "utf-8", $encode);
         }
 
-        if(strpos($name, "/") !== false){
-            $dir = ($name[-1] === '/') ? $解凍先.$name : $解凍先.dirname($name);
-            if(!is_dir($dir)){
-                mkdir($dir, 0755, true);
-            }
-            if($name[-1] === '/'){
-                continue;
-            }
+        $dir = ($name[-1] === '/') ? $解凍先.$name : $解凍先.dirname($name);
+        if(!is_dir($dir)){
+            mkdir($dir, 0755, true);
+        }
+        if($name[-1] === '/'){
+            continue;
         }
         if(file_put_contents($解凍先.$name, $zip->getStream($zip->getNameIndex($i))) !== false){ // $zip->getFromIndex($i) という方法もあるけど
             $return[] = $解凍先.$name;
