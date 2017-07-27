@@ -1168,7 +1168,7 @@ function zip解凍(string $zipfile, string $解凍先="") :array{
         return $return;
     }
 
-    $解凍先  = $解凍先 ?: dirname(realpath($zipfile));
+    $解凍先  = $解凍先 ?: dirname($zipfile);
     $解凍先 .= DIRECTORY_SEPARATOR;
 
     for($i = 0;  $i < $zip->numFiles;  $i++){
