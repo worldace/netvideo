@@ -112,48 +112,50 @@ function require_cache(string $file){
 
 function 検査(string $var, $func) :bool{
     if(is_callable($func)){
-        $result = $func($var);
-        if(!is_bool($result)){
+        $return = $func($var);
+        if(!is_bool($return)){
             内部エラー("第2引数の無名関数はtrueまたはfalseを返してください");
         }
     }
     else{
         if(is_callable("検査::$func")){
-            $result = 検査::$func($var);
+            $return = 検査::$func($var);
         }
         else if(preg_match("/^(\d+)(文字|字|バイト)(以上|以下|以内|未満|より大きい|より小さい|と同じ)*$/u", $func, $match)){
             if(!isset($match[3])){
                 $match[3] = "と同じ";
             }
             if($match[2] === "文字" or $match[2] === "字"){
-                $result = 検査::文字数($var, (int)$match[1], $match[3]);
+                $return = 検査::文字数($var, (int)$match[1], $match[3]);
             }
             else{
-                $result = 検査::バイト数($var, (int)$match[1], $match[3]);
+                $return = 検査::バイト数($var, (int)$match[1], $match[3]);
             }
         }
         else{
             内部エラー("第2引数の特別関数名が間違っています");
         }
     }
-    if($result === true){
-        検査::$結果[] = true;
-    }
-    else{
-        検査::$結果[] = false;
-        検査::$失敗 = true;
-        if(検査::$例外 === true){
-            throw new Exception("検査エラー");
-        }
-    }
-    return $result;
+
+    検査::$結果[] = $return;
+    return $return;
 }
 
 
 class 検査{
-    public static $失敗 = false;
-    public static $例外 = false;
     public static $結果 = [];
+
+
+    static function エラーなら(&$result) :bool{
+        $result     = self::$結果;
+        self::$結果 = [];
+        return in_array(false, $result, true);
+    }
+
+    static function 開始() :void{
+        self::$結果 = [];
+    }
+
 
     static function 必須($v) :bool{
         return strlen($v) > 0;
@@ -247,28 +249,28 @@ function 設定(string $name, $value="\0\rヌル\0\r"){
 }
 
 
-function テンプレート(string $_file_, array $_data_, bool $エスケープする=true) :string{
-    $_h_ = function($arg) use (&$_h_){
+function テンプレート(string $file_, array $data_, bool $エスケープする_=true) :string{
+    $h_ = function($arg) use (&$h_){
         if(is_array($arg)){
-            return array_map($_h_, $arg);
+            return array_map($h_, $arg);
         }
         return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
     };
     
-    if($エスケープする === false){
-        foreach((array)$_data_ as $_key1_ => $_val_){
-            $$_key1_ = $_val_;
+    if($エスケープする_){
+        foreach((array)$data_ as $key1_ => $val_){
+            $$key1_ = $h_($val_);
+            $key2_  = "__" . $key1_;
+            $$key2_ = $val_;
         }
     }
     else{
-        foreach((array)$_data_ as $_key1_ => $_val_){
-            $$_key1_ = $_h_($_val_);
-            $_key2_ = "__" . $_key1_;
-            $$_key2_ = $_val_;
+        foreach((array)$data_ as $key1_ => $val_){
+            $$key1_ = $val_;
         }
     }
     ob_start();
-    require $_file_;
+    require $file_;
     return ob_get_clean();
 }
 
