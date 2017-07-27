@@ -110,11 +110,11 @@ function require_cache(string $file){
 }
 
 
-function 検査(string $var, $func) :bool{
+function 検査(string $var, $func, $message = "") :bool{
     if(is_callable($func)){
         $return = $func($var);
         if(!is_bool($return)){
-            内部エラー("第2引数の無名関数はtrueまたはfalseを返してください");
+            内部エラー("第2引数の関数はtrueかfalseを返してください");
         }
     }
     else{
@@ -137,7 +137,7 @@ function 検査(string $var, $func) :bool{
         }
     }
 
-    検査::$結果[] = $return;
+    検査::$結果[] = ($return === false and $message) ? $message : $return;
     return $return;
 }
 
@@ -146,10 +146,16 @@ class 検査{
     public static $結果 = [];
 
 
-    static function エラーなら(&$result) :bool{
-        $result     = self::$結果;
+    static function 失敗なら(&$result) :bool{
+        $result = self::$結果;
         self::$結果 = [];
-        return in_array(false, $result, true);
+
+        foreach($result as $v){
+            if($v !== true){
+                return true;
+            }
+        }
+        return false;
     }
 
     static function 開始() :void{
