@@ -110,7 +110,7 @@ function require_cache(string $file){
 }
 
 
-function 検査(string $var, $func, $message = "") :bool{
+function 検査($var, $func, $message = "") :bool{
     if(is_callable($func)){
         $return = $func($var);
         if(!is_bool($return)){
