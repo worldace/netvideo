@@ -1145,7 +1145,7 @@ function zip圧縮(string $zipfile, $filemap){
 }
 
 
-function zip追加(string $zipfile, $filemap){
+function zip追加(string $zipfile, array $filemap){
     $zip = new ZipArchive(); // http://php.net/ziparchive
     if($zip->open($zipfile) !== true){
         内部エラー("ZIPファイル $zipfile を開けません", "警告");
@@ -1168,7 +1168,11 @@ function zip解凍(string $zipfile, string $解凍先="") :array{
         return $return;
     }
 
-    $解凍先  = $解凍先 ?: dirname($zipfile);
+    $解凍先  = $解凍先 ? realpath($解凍先) : realpath(dirname($zipfile));
+    if($解凍先 === false){
+        内部エラー("解凍先ディレクトリが存在しません", "警告");
+        return $return;
+    }
     $解凍先 .= DIRECTORY_SEPARATOR;
 
     for($i = 0;  $i < $zip->numFiles;  $i++){
