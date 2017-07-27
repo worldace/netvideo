@@ -803,10 +803,10 @@ function 経過(int $time) :string{
 
 function カレンダー配列(int $年=null, int $月=null) :array{
     if(!$年 or !$月){
-        $date = new DateTime('first day of');
+        $date = new \DateTime('first day of');
     }
     else{
-        $date = new DateTime("{$年}-{$月}");
+        $date = new \DateTime("{$年}-{$月}");
     }
 
     $曜日 = $date->format('w');
@@ -997,7 +997,7 @@ function 配列探索($array, bool $leafonly = false) :Generator{
 */
 function 配列探索($array, bool $leafonly=false) :RecursiveIteratorIterator{
     $option = $leafonly  ?  RecursiveIteratorIterator::LEAVES_ONLY  :  RecursiveIteratorIterator::SELF_FIRST;
-    return new RecursiveIteratorIterator(new RecursiveArrayIterator($array), $option);
+    return new \RecursiveIteratorIterator(new \RecursiveArrayIterator($array), $option);
 }
 
 
@@ -1108,7 +1108,7 @@ function ディレクトリ削除(string $dir){
 
 
 function zip圧縮(string $zipfile, $filemap){
-    $zip = new ZipArchive(); // http://php.net/ziparchive
+    $zip = new \ZipArchive(); // http://php.net/ziparchive
     if($zip->open($zipfile, ZipArchive::CREATE) !== true){
         内部エラー("ZIPファイル $zipfile を作成できません", "警告");
         return false;
@@ -1146,7 +1146,7 @@ function zip圧縮(string $zipfile, $filemap){
 
 
 function zip追加(string $zipfile, array $filemap){
-    $zip = new ZipArchive(); // http://php.net/ziparchive
+    $zip = new \ZipArchive(); // http://php.net/ziparchive
     if($zip->open($zipfile) !== true){
         内部エラー("ZIPファイル $zipfile を開けません", "警告");
         return false;
@@ -1162,7 +1162,7 @@ function zip追加(string $zipfile, array $filemap){
 function zip解凍(string $zipfile, string $解凍先="") :array{
     $return= [];
 
-    $zip = new ZipArchive(); // http://php.net/ziparchive
+    $zip = new \ZipArchive(); // http://php.net/ziparchive
     if($zip->open($zipfile) !== true){
         内部エラー("ZIPファイル $zipfile を開けません", "警告");
         return $return;
@@ -1623,13 +1623,13 @@ function 関数文字列化($func){
         if(!method_exists(...explode('::', $func))){
             return false;
         }
-        $ref = new ReflectionMethod($func);
+        $ref = new \ReflectionMethod($func);
     }
     else{
         if(!is_callable($func) or is_array($func)){
             return false;
         }
-        $ref = new ReflectionFunction($func);
+        $ref = new \ReflectionFunction($func);
     }
     if(!$ref->isUserDefined()){
         return false;
@@ -1660,7 +1660,7 @@ function クラス文字列化($class){
     else{
         return false;
     }
-    $ref = new ReflectionClass($class);
+    $ref = new \ReflectionClass($class);
     if(!$ref->isUserDefined()){
         return false;
     }
@@ -1717,11 +1717,11 @@ class データベース{
 
         if(!isset(self::$pdo[$this->接続名])){
             try{ //パスワードが漏れる可能性があるので例外を握りつぶす＋パスワードは配列に入れておく
-                self::$pdo[$this->接続名] = new PDO(...$this->設定['接続']);
+                self::$pdo[$this->接続名] = new \PDO(...$this->設定['接続']);
             }
-            catch(PDOException $e){
+            catch(\PDOException $e){
                 if($this->設定['接続'][3][PDO::ATTR_ERRMODE] === PDO::ERRMODE_EXCEPTION){
-                    throw new PDOException("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください");
+                    throw new \PDOException("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください");
                 }
                 else{
                     trigger_error("データベースに接続できません。データベースの設定(ドライバー,ユーザー名,パスワード)を再確認してください", E_USER_WARNING);
@@ -2129,10 +2129,10 @@ function 部品(string $部品名, ...$引数) :string{
     try{
         return 部品::作成($部品名, $引数);
     }
-    catch(Error $e){ //部品コードをevalした時と、部品コードを実行した時に飛んでくる例外
+    catch(\Error $e){ //部品コードをevalした時と、部品コードを実行した時に飛んでくる例外
         trigger_error(sprintf("部品ファイル: %s の部品コード%s行目でPHPエラー「%s」が発生しました", $部品名, $e->getLine(), $e->getMessage()), E_USER_WARNING);
     }
-    catch(Exception $e){
+    catch(\Exception $e){
         $back = debug_backtrace()[0];
         trigger_error(sprintf("%s\n%s: %s行目\n\n", $e->getMessage(), $back['file'], $back['line']), E_USER_WARNING);
     }
@@ -2194,7 +2194,7 @@ class 部品{
 
         self::$記憶['stack'][] = $部品名;
         if(count(self::$記憶['stack']) > 1000){
-            throw new Exception("部品ファイル読み込みのループが1000回を超えました。\n" . implode("→", array_slice(self::$記憶['stack'], -50))); //部品関数でキャッチする
+            throw new \Exception("部品ファイル読み込みのループが1000回を超えました。\n" . implode("→", array_slice(self::$記憶['stack'], -50))); //部品関数でキャッチする
         }
 
         $html = is_callable(self::$記憶['部品コード'][$部品名])  ?  self::$記憶['部品コード'][$部品名](...$引数)  :  self::$記憶['部品コード'][$部品名];
@@ -2244,16 +2244,16 @@ class 部品{
 
     private static function ファイル取得(string $部品名) :string{
         if(!isset(self::$設定['ディレクトリ'])){
-            throw new Exception("部品::開始() が行われていません"); //部品関数でキャッチする
+            throw new \Exception("部品::開始() が行われていません"); //部品関数でキャッチする
         }
         if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){
-            throw new Exception("部品名: $部品名 はPHP変数の命名規則に沿っていません"); //部品関数でキャッチする
+            throw new \Exception("部品名: $部品名 はPHP変数の命名規則に沿っていません"); //部品関数でキャッチする
         }
 
         $path = sprintf("%s/%s.html", self::$設定['ディレクトリ'], str_replace("_", "/", $部品名));
         $return = @file_get_contents($path);
         if($return === false){
-            throw new Exception("部品名: $部品名 の部品ファイル: $path が見つかりません"); //部品関数でキャッチする
+            throw new \Exception("部品名: $部品名 の部品ファイル: $path が見つかりません"); //部品関数でキャッチする
         }
         return $return;
     }
@@ -2361,7 +2361,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
 
     function __construct($str = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title></title></head><body></body></html>'){
-        $this->文書 = new DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
+        $this->文書 = new \DOMDocument(); // https://secure.php.net/manual/ja/class.domdocument.php
         libxml_disable_entity_loader(true);
 
         $str = preg_replace("/^[^<]+/", "", $str);
@@ -2763,7 +2763,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         else if($selector instanceof self){
             return clone $this->選択保存($this->DOM箱作成($selector));
         }
-        else if($selector instanceof DOMElement){
+        else if($selector instanceof \DOMElement){
             return clone $this->選択保存($this->DOM箱作成($selector));
         }
         else if(is_array($selector)){
@@ -2783,7 +2783,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
             $clone[$i]->選択 = [$this->選択[$i]];
             $clone[$i]->選択記憶 = [];
         }
-        return new ArrayObject($clone);
+        return new \ArrayObject($clone);
     }
 
 
@@ -2833,12 +2833,12 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
                 $root = $root->nextSibling;
             }
         }
-        if($input instanceof DOMElement){ //DOMの場合
+        if($input instanceof \DOMElement){ //DOMの場合
             $input = [$input];
         }
-        if(is_array($input) or ($input instanceof DOMNodeList)){ //配列の場合
+        if(is_array($input) or ($input instanceof \DOMNodeList)){ //配列の場合
             foreach($input as $node){
-                if(!($node instanceof DOMElement)){
+                if(!($node instanceof \DOMElement)){
                     continue;
                 }
                 if($node->ownerDocument !== $this->文書){
@@ -2910,7 +2910,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         if($context){
             $expression = preg_replace("|^//|", ".//", $expression); //相対パスにする
         }
-        foreach((new DOMXPath($this->文書))->query($expression, $context) as $node){ //DOMNodeList(複数形)が返る https://secure.php.net/manual/ja/class.domxpath.php
+        foreach((new \DOMXPath($this->文書))->query($expression, $context) as $node){ //DOMNodeList(複数形)が返る https://secure.php.net/manual/ja/class.domxpath.php
             $return[] = $node;
         }
         if($記録する){
@@ -2946,7 +2946,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
     private function 重複ノード解消(array $array){
         $return = [];
         foreach($array as $v1){
-            if(!($v1 instanceof DOMNode)){
+            if(!($v1 instanceof \DOMNode)){
                 continue;
             }
             foreach($return as $v2){
