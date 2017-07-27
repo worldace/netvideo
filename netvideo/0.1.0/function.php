@@ -1172,19 +1172,25 @@ function zip解凍(string $zipfile, string $解凍先="") :array{
     $解凍先 .= DIRECTORY_SEPARATOR;
 
     for($i = 0;  $i < $zip->numFiles;  $i++){
-        $name = $zip->getNameIndex($i, ZipArchive::FL_ENC_RAW);
-        if($name[-1] === '/'){
-            continue;
-        }
-
-        $encode = mb_detect_encoding($name, ["utf-8", "sjis-win", "eucjp", "ascii"]);
+        $name   = $zip->getNameIndex($i, ZipArchive::FL_ENC_RAW);
+        $encode = mb_detect_encoding($name, ["utf-8", "sjis-win", "eucjp"]);
         if($encode !== 'UTF-8'){
             $name = mb_convert_encoding($name, "utf-8", $encode);
         }
+
         if(strpos($name, "/") !== false){
-            $dir = $解凍先 . dirname($name);
-            if(!is_dir($dir)){
-                mkdir($dir, 0755, true);
+            if($name[-1] === '/'){
+                $dir = $解凍先.$name;
+                if(!is_dir($dir)){
+                    mkdir($dir, 0755, true);
+                }
+                continue;
+            }
+            else{
+                $dir = $解凍先.dirname($name);
+                if(!is_dir($dir)){
+                    mkdir($dir, 0755, true);
+                }
             }
         }
         if(file_put_contents($解凍先.$name, $zip->getStream($zip->getNameIndex($i))) !== false){ // $zip->getFromIndex($i) という方法もあるけど
