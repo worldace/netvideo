@@ -137,12 +137,7 @@ function 検査($var, $func, $message=null) :bool{
         }
     }
 
-    if($return){
-        検査::$結果[] = true;
-    }
-    else{
-        検査::$結果[] = $message ? $message : $var;
-    }
+    検査::$結果[] = $return ?: $message;
     return $return;
 }
 
