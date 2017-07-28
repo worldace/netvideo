@@ -264,7 +264,7 @@ function 入力取得(string $name, $default=""){
         case "GET"    : $typeid = INPUT_GET; break;
         case "POST"   : $typeid = INPUT_POST; break;
         case "COOKIE" : $typeid = INPUT_COOKIE; break;
-        default       : return $default; //error
+        default       : return 内部エラー("取得できるのはget/post/cookieのみです", "警告");
     }
 
     $v = filter_input($typeid, $name);
