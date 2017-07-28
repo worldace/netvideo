@@ -255,6 +255,28 @@ function 設定(string $name, $value="\0\rヌル\0\r"){
 }
 
 
+function 入力取得(string $name, $default=""){
+    preg_match("/^([^\.]+)\.(.+)$/", $name, $m);
+    $type = $m[1] ?? '';
+    $name = $m[2] ?? '';
+
+    switch(strtoupper($type)){
+        case "GET"    : $typeid = INPUT_GET; break;
+        case "POST"   : $typeid = INPUT_POST; break;
+        case "COOKIE" : $typeid = INPUT_COOKIE; break;
+        default       : //error
+    }
+
+    $v = filter_input($typeid, $name);
+    if($v === false){ //配列の場合
+        return filter_input($typeid, $name, FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
+    }
+    else{
+        return ($v === "" or is_null($v)) ? $default : $v;
+    }
+}
+
+
 function テンプレート(string $file_, array $data_, bool $エスケープする_=true) :string{
     $h_ = function($arg) use (&$h_){
         if(is_array($arg)){
