@@ -3206,7 +3206,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 }
 
 
-function 内部エラー(string $str="エラーが発生しました", string $type="停止", string $除外パス="") :void{
+function 内部エラー(string $str="エラーが発生しました", string $type="停止", string $除外パス="") :bool{
     $backtrace = debug_backtrace();
     $除外パス  = $除外パス ?: $backtrace[0]['file'];
 
@@ -3222,4 +3222,5 @@ function 内部エラー(string $str="エラーが発生しました", string $t
     }
 
     trigger_error($message, ['停止'=>E_USER_ERROR, '警告'=>E_USER_WARNING, '注意'=>E_USER_NOTICE][$type]);
+    return false;
 }
