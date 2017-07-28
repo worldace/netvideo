@@ -264,7 +264,7 @@ function 入力取得(string $name, $default=""){
         case "GET"    : $typeid = INPUT_GET; break;
         case "POST"   : $typeid = INPUT_POST; break;
         case "COOKIE" : $typeid = INPUT_COOKIE; break;
-        default       : //error
+        default       : return $default; //error
     }
 
     $v = filter_input($typeid, $name);
