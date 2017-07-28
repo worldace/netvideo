@@ -256,15 +256,20 @@ function 設定(string $name, $value="\0\rヌル\0\r"){
 
 
 function 入力取得(string $name, $default=""){
-    preg_match("/^([^\.]+)\.(.+)$/", $name, $m);
-    $type = $m[1] ?? '';
-    $name = $m[2] ?? '';
-
-    switch(strtoupper($type)){
-        case "GET"    : $typeid = INPUT_GET; break;
-        case "POST"   : $typeid = INPUT_POST; break;
-        case "COOKIE" : $typeid = INPUT_COOKIE; break;
-        default       : return 内部エラー("取得できるのはget/post/cookieのみです", "警告");
+    if($name === ""){
+        return $default;
+    }
+    preg_match("/^(get|post|cookie)?\.?(.+)$/i", $name, $m);
+    $name = $m[2];
+    if($m[1]){
+        $typeid = constant('INPUT_' . strtoupper($m[1]));
+    }
+    else{
+        foreach([INPUT_GET, INPUT_POST, INPUT_COOKIE] as $typeid){
+            if(filter_has_var($typeid, $name)){
+                break;
+            }
+        }
     }
 
     $v = filter_input($typeid, $name);
