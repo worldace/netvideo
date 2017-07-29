@@ -400,12 +400,50 @@ function メール送信($送信先, string $送信元="", string $送信者="",
 }
 
 
+function 並列GET送信(array $url, int $並列数=5, array $option=[]) :array{
+    $option = $option + [ // http://php.net/manual/ja/function.curl-setopt.php
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 10,
+        CURLOPT_SSL_VERIFYPEER => false,
+    ];
+
+    $mh = curl_multi_init();
+    curl_multi_setopt($mh, CURLMOPT_PIPELINING, 1); // http://php.net/manual/ja/function.curl-multi-setopt.php
+    curl_multi_setopt($mh, CURLMOPT_MAX_TOTAL_CONNECTIONS, $並列数);
+    curl_multi_setopt($mh, CURLMOPT_MAX_HOST_CONNECTIONS, $並列数);
+
+    foreach($url as $k => $v){
+        $ch[$k] = curl_init($v);
+        curl_setopt_array($ch[$k], $option);
+        curl_multi_add_handle($mh, $ch[$k]);
+    }
+
+    do {
+        curl_multi_exec($mh, $running);
+        curl_multi_select($mh);
+    } while ($running > 0);
+
+    $return = [];
+    foreach($ch as $k => $v){
+        //$info = curl_getinfo($ch[$key]); // http://php.net/manual/ja/function.curl-getinfo.php
+        $return[$url[$k]] = curl_multi_getcontent($v);
+        curl_multi_remove_handle($mh, $v);
+    }
+
+    curl_multi_close($mh);
+    return $return;
+}
+
+
 function GET送信(string $url, array $querymap=null, array $request_header=[]){
     $_ENV['RESPONSE_HEADER'] = [];
     if($querymap){
         $url .= preg_match("/\?/", $url) ? "&" : "?";
         $url .= http_build_query($querymap, "", "&", PHP_QUERY_RFC3986);
     }
+    $header = "";
     foreach($request_header as $k => $v){
         $k = str_replace([":", "\r", "\n"], "", $k);
         $v = str_replace(["\r", "\n"], "", $v);
@@ -432,6 +470,7 @@ function POST送信(string $url, array $querymap=null, array $request_header=[])
         "content-length" => strlen($content),
     ] + array_change_key_case($request_header);
 
+    $header = "";
     foreach($request_header as $k => $v){
         $k = str_replace([":", "\r", "\n"], "", $k);
         $v = str_replace(["\r", "\n"], "", $v);
@@ -477,6 +516,7 @@ function ファイル送信(string $url, array $querymap=null, array $request_he
         "content-length" => strlen($content),
     ] + array_change_key_case($request_header);
 
+    $header = "";
     foreach($request_header as $k => $v){
         $k = str_replace([":", "\r", "\n"], "", $k);
         $v = str_replace(["\r", "\n"], "", $v);
@@ -502,6 +542,7 @@ function HEAD送信(string $url, array $querymap=null, array $request_header=[])
         $url .= preg_match("/\?/", $url) ? "&" : "?";
         $url .= http_build_query($querymap, "", "&", PHP_QUERY_RFC3986);
     }
+    $header = "";
     foreach($request_header as $k => $v){
         $k = str_replace([":", "\r", "\n"], "", $k);
         $v = str_replace(["\r", "\n"], "", $v);
