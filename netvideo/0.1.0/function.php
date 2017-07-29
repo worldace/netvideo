@@ -2481,10 +2481,11 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
             return $return;
         }
         if($str === true){ //outerHTML
+            $return = "";
             if(isset($this->選択[0])){
                 $return = $this->文書->saveHTML($this->選択[0]);
             }
-            return (string)$return;
+            return $return;
         }
         else{
             $add = $this->文字列DOM化($str);
@@ -2500,19 +2501,21 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
 
     function タグ名(){
+        $return = "";
         if(isset($this->選択[0])){
             $return = strtolower($this->選択[0]->tagName);
         }
-        return (string)$return;
+        return $return;
     }
 
 
     function 属性($name = null, $value = null){
         if(is_string($name) and $value === null){ //属性値を1つ取得
+            $return = "";
             if(isset($this->選択[0])){
                 $return = $this->選択[0]->getAttribute($name);
             }
-            return (string)$return;
+            return $return;
         }
         else if(is_string($name)){ //属性値を1つ設定
             foreach($this->選択 as $where){
@@ -2529,13 +2532,14 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
             return $this;
         }
         else if($name === null){ //全属性取得
+            $return = [];
             if(isset($this->選択[0])){
                 $attrs = $this->選択[0]->attributes;
                 for($i = 0;  $i < $attrs->length;  $i++){
                     $return[$attrs->item($i)->name] = $attrs->item($i)->value;
                 }
             }
-            return (array)$return;
+            return $return;
         }
         return $this;
     }
@@ -3063,6 +3067,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         $type = $this->文書->doctype;
         $node = $this->文書->documentElement;
 
+        $return = "";
         switch($this->種類){
             case "html":
                 return $this->文書->saveXML($type) . "\n" . $this->文書->saveHTML($node);
@@ -3075,7 +3080,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
                     }
                     $node = $node->nextSibling;
                 }
-                return (string)$return;
+                return $return;
         }
     }
 
