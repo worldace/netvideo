@@ -2035,7 +2035,7 @@ class データベース{
     }
 
 
-    function 作成() :bool{
+    function テーブル作成() :bool{
         if(!$this->定義){
             return false;
         }
