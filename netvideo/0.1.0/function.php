@@ -1063,8 +1063,8 @@ function 配列探索($array, bool $leafonly = false) :Generator{
     }
 }
 */
-function 配列探索($array, bool $leafonly=false) :RecursiveIteratorIterator{
-    $option = $leafonly  ?  RecursiveIteratorIterator::LEAVES_ONLY  :  RecursiveIteratorIterator::SELF_FIRST;
+function 配列探索($array, bool $枝要素を含む=false) :RecursiveIteratorIterator{
+    $option = $枝要素を含む  ?  RecursiveIteratorIterator::SELF_FIRST  :  RecursiveIteratorIterator::LEAVES_ONLY;
     return new \RecursiveIteratorIterator(new \RecursiveArrayIterator($array), $option);
 }
 
