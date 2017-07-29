@@ -2044,7 +2044,7 @@ class データベース{
     }
 
 
-    function トランザクション終了() :データベース{
+    function トランザクション確定() :データベース{
         if(isset(self::$pdo[$this->接続名])){
             self::$pdo[$this->接続名]->commit();
         }
@@ -2052,7 +2052,7 @@ class データベース{
     }
 
 
-    function トランザクション復帰() :データベース{
+    function トランザクション元に戻す() :データベース{
         if(isset(self::$pdo[$this->接続名])){
             self::$pdo[$this->接続名]->rollBack();
         }
