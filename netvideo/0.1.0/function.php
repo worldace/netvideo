@@ -255,7 +255,7 @@ function 設定(string $name, $value="\0\rヌル\0\r"){
 }
 
 
-function 入力取得(string $name, $default=""){
+function 入力(string $name, $default=""){
     if($name === ""){
         return $default;
     }
