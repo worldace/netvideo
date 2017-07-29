@@ -2455,10 +2455,11 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
     function 本文($str = null){
         if($str === null){
+            $return = "";
             if(isset($this->選択[0])){
                 $return = $this->選択[0]->textContent;
             }
-            return (string)$return;
+            return $return;
         }
         else{
             foreach($this->選択 as $where){
@@ -2471,12 +2472,13 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
     function html($str = null){
         if($str === null){ //innerHTML
+            $return = "";
             if(isset($this->選択[0])){
                 foreach($this->選択[0]->childNodes as $child){
                     $return .= $this->文書->saveHTML($child);
                 }
             }
-            return (string)$return;
+            return $return;
         }
         if($str === true){ //outerHTML
             if(isset($this->選択[0])){
