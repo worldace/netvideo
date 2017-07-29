@@ -223,9 +223,9 @@ class 検査{
 }
 
 
-function 整形(string &$var, callable $func){
-    $var = $func($var);
-    return $var;
+function 整形(&$x, callable $func){
+    $x = $func($x);
+    return $x;
 }
 
 

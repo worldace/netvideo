@@ -13,17 +13,17 @@ if(検査::失敗なら()){
 }
 
 
-$db = sprintf("%s/upload/%s/%s.db", 設定['公開ディレクトリ'], date('Y/md', $_POST['登録時間']), $_POST['id']);
-if(!is_file($db)){
+$dbfile = sprintf("%s/upload/%s/%s.db", 設定['公開ディレクトリ'], date('Y/md', $_POST['登録時間']), $_POST['id']);
+if(!is_file($dbfile)){
     exit;
 }
 
 
-データベース("動画") -> 更新($_POST['id'], [
+データベース("動画")->更新($_POST['id'], [
     "コメント数" => ["コメント数+1"],
 ]);
 
-データベース("コメント", "sqlite:$db") -> 追加([
+データベース("コメント", "sqlite:$dbfile")->追加([
     "本文"     => $_POST['本文'],
     "位置"     => $_POST['位置'],
     "登録時間" => $_SERVER['REQUEST_TIME'],
