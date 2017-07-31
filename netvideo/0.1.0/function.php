@@ -1,7 +1,7 @@
 <?php
-//======================================================
 // ■function.php http://musou.s38.xrea.com/php/
-//======================================================
+
+
 
 
 function route(array $files, $route=1) :void{
@@ -1967,7 +1967,7 @@ class データベース{
     }
 
 
-    function 追加(array $data){
+    function 追加($data){
         $data = $this->型変換($data);
         if(!$data){
             return false;
@@ -1995,7 +1995,7 @@ class データベース{
     }
 
 
-    function 更新($id, array $data) :bool{
+    function 更新($id, $data) :bool{
         $data = $this->型変換($data);
         if(!$data){
             return false;
@@ -2156,8 +2156,13 @@ class データベース{
     }
 
 
-    private function 型変換(array $arg) :array{
+    private function 型変換($arg) :array{
         $return = [];
+
+        if(!is_array($arg) or !($arg instanceof $this->設定['クラス修飾'].$this->テーブル)){
+            return $return;
+        }
+
         foreach($arg as $k => $v){
             if(!isset($this->定義[$k])){
                 continue;
