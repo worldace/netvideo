@@ -2159,7 +2159,7 @@ class データベース{
     private function 型変換($arg) :array{
         $return = [];
 
-        if(!is_array($arg) or !($arg instanceof $this->設定['クラス修飾'].$this->テーブル)){
+        if(!is_array($arg) and !($arg instanceof $this->設定['クラス修飾'].$this->テーブル)){
             return $return;
         }
 
