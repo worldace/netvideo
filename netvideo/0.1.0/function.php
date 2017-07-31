@@ -68,13 +68,13 @@ function リダイレクト(string $url) :void{
 }
 
 
-function route(string $method, array $files, $before=1){
+function route(string $method, array $files, $before=1) :void{
     $method = strtoupper($method);
     if(!in_array($method, ['GET', 'POST', 'ANY'])){
-        return 内部エラー("第1引数の指定メソッドは'GET'か'POST'か'ANY'のどれかにしてください");
+        内部エラー("第1引数の指定メソッドは'GET'か'POST'か'ANY'のどれかにしてください");
     }
     if($method !== $_SERVER['REQUEST_METHOD']){
-        return false;
+        return;
     }
     while(count($files)){
         $before = require_once array_shift($files);
