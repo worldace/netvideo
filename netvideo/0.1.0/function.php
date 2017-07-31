@@ -3,17 +3,6 @@
 
 
 
-
-function route(array $files, $route=1) :void{
-    foreach($files as $current_route_file){
-        $route = (function() use($route, $current_route_file){
-            return require_once $current_route_file;
-        })();
-    }
-    exit;
-}
-
-
 function テキスト表示(string $str) :void{
     header("Content-Type: text/plain; charset=utf-8");
     print $str;
@@ -72,8 +61,20 @@ function RSS表示(array $channel, array $items) :void{ // http://www.futomi.com
 }
 
 
+
 function リダイレクト(string $url) :void{
     header("Location: $url");
+    exit;
+}
+
+
+function route(array $files, string $method=null){
+    if($method and strcasecmp($method, @$_SERVER['REQUEST_METHOD']) !== 0){
+        return false;
+    }
+    while(count($files)){
+        $route = require_once array_shift($files);
+    }
     exit;
 }
 

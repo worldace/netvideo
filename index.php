@@ -8,8 +8,8 @@ switch($_GET['action']){
     case ''                : route(['./netvideo/0.1.0/action/index.php']);
     case 'video'           : route(['./netvideo/0.1.0/action/video.php']);
     case 'comment-get'     : route(['./netvideo/0.1.0/action/comment-get.php']);
-    case 'comment-post'    : route(['./netvideo/0.1.0/action/comment-post.php']);
-    case 'video-post'      : route(['./netvideo/0.1.0/action/video-post.php']);
+    case 'comment-post'    : route(['./netvideo/0.1.0/action/comment-post.php'], 'post');
+    case 'video-post'      : route(['./netvideo/0.1.0/action/video-post.php'], 'post');
     case 'video-post-form' : route(['./netvideo/0.1.0/action/video-post-form.php']);
     case 'proxy'           : route(['./netvideo/0.1.0/action/proxy.php']);
     default                : route(['./netvideo/0.1.0/action/index.php']);
