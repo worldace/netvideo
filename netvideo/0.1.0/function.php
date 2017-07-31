@@ -68,8 +68,9 @@ function リダイレクト(string $url) :void{
 }
 
 
-function route(array $files, string $method=null){
-    if($method and strcasecmp($method, @$_SERVER['REQUEST_METHOD']) !== 0){
+function route(array $files, string $method='GET'){
+    $method = strtoupper($method);
+    if(in_array($method, ['GET', 'POST']) and $_SERVER['REQUEST_METHOD'] === $method){
         return false;
     }
     while(count($files)){
