@@ -68,7 +68,7 @@ function リダイレクト(string $url) :void{
 }
 
 
-function route(string $method, array $files){
+function route(string $method, array $files, $before=1){
     $method = strtoupper($method);
     if(!in_array($method, ['GET', 'POST', 'ANY'])){
         return 内部エラー("第1引数の指定メソッドは'GET'か'POST'か'ANY'のどれかにしてください");
@@ -77,7 +77,7 @@ function route(string $method, array $files){
         return false;
     }
     while(count($files)){
-        $route = require_once array_shift($files);
+        $before = require_once array_shift($files);
     }
     exit;
 }
