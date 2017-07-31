@@ -68,9 +68,12 @@ function リダイレクト(string $url) :void{
 }
 
 
-function route(array $files, string $method='GET'){
+function route(string $method, array $files){
     $method = strtoupper($method);
-    if(in_array($method, ['GET', 'POST']) and $_SERVER['REQUEST_METHOD'] === $method){
+    if(!in_array($method, ['GET', 'POST', 'ANY'])){
+        return 内部エラー("第1引数の指定メソッドは'GET'か'POST'か'ANY'のどれかにしてください");
+    }
+    if($method !== $_SERVER['REQUEST_METHOD']){
         return false;
     }
     while(count($files)){
