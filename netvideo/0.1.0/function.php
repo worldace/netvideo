@@ -1668,6 +1668,24 @@ function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments
 }
 
 
+function 非同期処理(string $file, $data=null) :void{
+    if(!is_file($file)){
+        return;
+    }
+    $file = escapeshellarg($file);
+    $data = escapeshellarg(json_encode($data, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_PARTIAL_OUTPUT_ON_ERROR));
+
+    if(preg_match('/WIN/i', PHP_OS)){
+        $command = sprintf('start php -f %s -- %s', $file, $data);
+        pclose(popen($command, 'r'));
+    }
+    else{
+        $command = sprintf('php -f %s -- %s > /dev/null &', $file, $data);
+        exec();
+    }
+}
+
+
 function ベンチマーク(callable $func, ...$arg){
     static $i = 0;
     $i++;
