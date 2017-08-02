@@ -1672,6 +1672,7 @@ function 非同期処理(string $file, $data=null) :void{
     if(!is_file($file)){
         return;
     }
+
     $file = escapeshellarg($file);
     $data = escapeshellarg(json_encode($data, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_PARTIAL_OUTPUT_ON_ERROR));
 
@@ -1681,7 +1682,7 @@ function 非同期処理(string $file, $data=null) :void{
     }
     else{
         $command = sprintf('php -f %s -- %s > /dev/null &', $file, $data);
-        exec();
+        exec($command);
     }
 }
 
