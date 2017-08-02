@@ -1148,14 +1148,17 @@ function ファイル一覧(string $dir, $recursive=true) :array{
     $recursive = (int)$recursive;
     if($recursive < 2){
         $dir = realpath($dir);
-        $strlen = strlen($dir) + 1;
         if($dir === false){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return $return;
         }
+        $strlen = strlen($dir) + 1;
+        if(preg_match("/^WIN/i", PHP_OS)){
+            $dir = str_replace("\\", "/", $dir);
+        }
     }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
-        $path = $dir . DIRECTORY_SEPARATOR . $file;
+        $path = "$dir/$file";
         $relative = substr($path, $strlen);
         if(is_file($path)){
             $return[$relative] = $path;
@@ -1175,17 +1178,20 @@ function ディレクトリ一覧(string $dir, $recursive=true) :array{
     $recursive = (int)$recursive;
     if($recursive < 2){
         $dir = realpath($dir);
-        $strlen = strlen($dir) + 1;
         if($dir === false){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return $return;
         }
+        $strlen = strlen($dir) + 1;
+        if(preg_match("/^WIN/i", PHP_OS)){
+            $dir = str_replace("\\", "/", $dir);
+        }
     }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
-        $path = $dir . DIRECTORY_SEPARATOR . $file;
+        $path = "$dir/$file";
         $relative = substr($path, $strlen);
         if(is_dir($path)){
-            $return[$relative.DIRECTORY_SEPARATOR] = $path;
+            $return[$relative.'/'] = $path;
             if($recursive){
                 $recursive++;
                 $return = array_merge($return, ディレクトリ一覧($path, $recursive));
@@ -1202,17 +1208,20 @@ function パス一覧(string $dir, $recursive=true) :array{
     $recursive = (int)$recursive;
     if($recursive < 2){
         $dir = realpath($dir);
-        $strlen = strlen($dir) + 1;
         if($dir === false){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return $return;
         }
+        $strlen = strlen($dir) + 1;
+        if(preg_match("/^WIN/i", PHP_OS)){
+            $dir = str_replace("\\", "/", $dir);
+        }
     }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
-        $path = $dir . DIRECTORY_SEPARATOR . $file;
+        $path = "$dir/$file";
         $relative = substr($path, $strlen);
         if(is_dir($path)){
-            $return[$relative.DIRECTORY_SEPARATOR] = $path;
+            $return[$relative.'/'] = $path;
             if($recursive){
                 $recursive++;
                 $return = array_merge($return, パス一覧($path, $recursive));
@@ -1263,18 +1272,8 @@ function zip圧縮(string $zipfile, $filemap){
             内部エラー("ディレクトリ $filemap は存在しません", "警告");
             return false;
         }
-        $path .= DIRECTORY_SEPARATOR;
-        $windows = preg_match("/^WIN/i", PHP_OS);
         foreach(パス一覧($path) as $k => $v){
-            if($windows){
-                $k = str_replace("\\", "/", $k);
-            }
-            if(is_dir($v)){
-                $zip->addEmptyDir($k);
-            }
-            else{
-                $zip->addFile($v, $k);
-            }
+            is_dir($v)  ?  $zip->addEmptyDir($k) :  $zip->addFile($v, $k);
         }
     }
     else{
