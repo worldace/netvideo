@@ -664,7 +664,7 @@ function メール送信($送信先, string $送信元="", string $送信者="",
 }
 
 
-function FTPアップロード(array $files, array $option) :array{ // http://php.net/ftp
+function FTPアップロード(array $upload, array $option) :array{ // http://php.net/ftp
     $return = [];
     $option = $option + [
         'ftp.パッシブモード' => true,
@@ -687,13 +687,19 @@ function FTPアップロード(array $files, array $option) :array{ // http://ph
     ftp_pasv($ftp, $option['ftp.パッシブモード']);
     $転送モード = $option['ftp.バイナリモード'] ? FTP_BINARY : FTP_ASCII;
 
-    foreach($files as $k => $v){
-        if($k[-1] === '/' and @ftp_mkdir($ftp, $k)){
-            $return[$k] = $v;
+    $files = [];
+    foreach($upload as $k => $v){
+        if(is_dir($v)){
+            if(@ftp_mkdir($ftp, $k)){
+                $return[$k] = $v;
+            }
+        }
+        else{
+            $files[$k] = $v;
         }
     }
     foreach($files as $k => $v){
-        if($k[-1] !== '/' and ftp_put($ftp, $k, $v, $転送モード)){
+        if(ftp_put($ftp, $k, $v, $転送モード)){
             $return[$k] = $v;
         }
     }
