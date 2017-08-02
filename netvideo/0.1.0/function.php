@@ -676,10 +676,12 @@ function FTPアップロード(array $files, array $option) :array{ // http://ph
     $ftp = ($option['ftp.暗号化'] and function_exists('ftp_ssl_connect')) ? 'ftp_ssl_connect' : 'ftp_connect';
     $ftp = $ftp($option['ftp.ホスト'], $option['ftp.ポート']);
     if(!$ftp){
+        内部エラー("FTPサーバに接続できませんでした", "警告");
         return $return;
     }
 
     if(!ftp_login($ftp, $option['ftp.id'], $option['ftp.パスワード'])){
+        内部エラー("FTPサーバにログインできませんでした", "警告");
         return $return;
     }
     ftp_pasv($ftp, $option['ftp.パッシブモード']);
