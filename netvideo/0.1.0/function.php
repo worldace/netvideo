@@ -688,8 +688,12 @@ function FTPアップロード(array $files, array $option) :array{ // http://ph
     $転送モード = $option['ftp.バイナリモード'] ? FTP_BINARY : FTP_ASCII;
 
     foreach($files as $k => $v){
-        $result = $k[-1] === '/' ? ftp_mkdir($ftp, $k) : ftp_put($ftp, $k, $v, $転送モード);
-        if($result){
+        if($k[-1] === '/' and ftp_mkdir($ftp, $k)){
+            $return[$k] = $v;
+        }
+   }
+    foreach($files as $k => $v){
+        if($k[-1] !== '/' and ftp_put($ftp, $k, $v, $転送モード)){
             $return[$k] = $v;
         }
     }
