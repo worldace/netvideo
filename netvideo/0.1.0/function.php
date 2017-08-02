@@ -26,7 +26,7 @@ function JSON表示($data, $allow=null) :void{
 }
 
 
-function RSS表示(array $channel, array $items) :void{ // http://www.futomi.com/lecture/japanese/rss20.html
+function RSS表示(array $items, array $channel) :void{ // http://www.futomi.com/lecture/japanese/rss20.html
     $tag = function ($name, $value){
         return "<$name>$value</$name>\n";
     };
