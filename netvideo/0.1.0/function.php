@@ -690,9 +690,7 @@ function FTPアップロード(array $upload, array $option) :array{ // http://p
     $files = [];
     foreach($upload as $k => $v){
         if(is_dir($v)){
-            if(@ftp_mkdir($ftp, $k)){
-                $return[$k] = $v;
-            }
+            @ftp_mkdir($ftp, $k);
         }
         else{
             $files[$k] = $v;
