@@ -115,6 +115,23 @@ function require_cache(string $file){
 }
 
 
+function 非同期処理(string $file, $data=null) :void{
+    if(!is_file($file)){
+        return;
+    }
+
+    $file = escapeshellarg($file);
+    $data = escapeshellarg(json_encode($data, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_PARTIAL_OUTPUT_ON_ERROR));
+
+    if(preg_match('/WIN/i', PHP_OS)){
+        pclose(popen(sprintf('start php -f %s -- %s', $file, $data), 'r'));
+    }
+    else{
+        exec(sprintf('php -f %s -- %s > /dev/null &', $file, $data));
+    }
+}
+
+
 function 検査($var, $func, $message=null) :bool{
     if(is_callable($func)){
         $return = $func($var);
@@ -346,62 +363,6 @@ function データダウンロード(string $data, string $filename="data.txt", 
 
     while(ob_get_level()){ ob_end_clean(); }
     print $data;
-}
-
-
-function メール送信($送信先, string $送信元="", string $送信者="", string $題名="", string $本文="", array $添付=null, $cc="", $bcc="", array $add=null) :bool{
-    $送信先 = str_replace(["\r","\n"," ",","], "", $送信先);
-    $送信元 = str_replace(["\r","\n"," ",","], "", $送信元);
-    $送信者 = str_replace(["\r","\n"], "", $送信者);
-    $題名   = str_replace(["\r","\n"], "", $題名);
-    $cc     = str_replace(["\r","\n"," ",","], "", $cc);
-    $bcc    = str_replace(["\r","\n"," ",","], "", $bcc);
-    $add    = str_replace(["\r","\n"], "", $add);
-
-    $送信先 = implode(",", (array)$送信先);
-    $題名   = mb_encode_mimeheader($題名, "jis");
-    $body   = mb_convert_encoding($本文, "jis", "UTF-8");
-
-    if($送信元 and $送信者){
-        $header .= "From: " . mb_encode_mimeheader($送信者,"jis") . " <$送信元>\r\n";
-    }
-    else if($送信元){
-        $header .= "From: $送信元\r\n";
-    }
-
-    if($cc) {
-        $cc = implode(",", (array)$cc);
-        $header .= "Cc: $cc\r\n";
-    }
-
-    if($bcc){
-        $bcc = implode(",", (array)$bcc);
-        $header .= "Bcc: $bcc\r\n";
-    }
-
-    if(is_array($add)){
-        $header .= implode("\r\n", $add) . "\r\n";
-    }
-
-    if(is_array($添付)){
-        $区切り = "__" . sha1(uniqid()) . "__";
-        $header .= "MIME-Version: 1.0\r\n";
-        $header .= "Content-Type: multipart/mixed; boundary=\"{$区切り}\"\r\n";
-
-        $body  = "--{$区切り}\r\n";
-        $body .= "Content-Type: text/plain; charset=\"ISO-2022-JP\"\r\n\r\n";
-        $body .= mb_convert_encoding($本文, "jis", "UTF-8") . "\r\n";
-
-        foreach($添付 as $name => $value){
-            $body .= "--{$区切り}\r\n";
-            $body .= "Content-Type: " . MIMEタイプ($name) . "\r\n";
-            $body .= "Content-Transfer-Encoding: base64\r\n";
-            $body .= "Content-Disposition: attachment; filename=\"" . mb_encode_mimeheader($name, "jis") . "\"\r\n\r\n";
-            $body .= chunk_split(base64_encode($value)) . "\r\n";
-        }
-        $body .= "--{$区切り}--\r\n";
-    }
-    return mail($送信先, $題名, $body, $header);
 }
 
 
@@ -644,6 +605,95 @@ function ファイル受信(string $dir, array $whitelist){
         }
     }
     return isset($return)  ?  $return  :  false;
+}
+
+
+function メール送信($送信先, string $送信元="", string $送信者="", string $題名="", string $本文="", array $添付=null, $cc="", $bcc="", array $add=null) :bool{
+    $送信先 = str_replace(["\r","\n"," ",","], "", $送信先);
+    $送信元 = str_replace(["\r","\n"," ",","], "", $送信元);
+    $送信者 = str_replace(["\r","\n"], "", $送信者);
+    $題名   = str_replace(["\r","\n"], "", $題名);
+    $cc     = str_replace(["\r","\n"," ",","], "", $cc);
+    $bcc    = str_replace(["\r","\n"," ",","], "", $bcc);
+    $add    = str_replace(["\r","\n"], "", $add);
+
+    $送信先 = implode(",", (array)$送信先);
+    $題名   = mb_encode_mimeheader($題名, "jis");
+    $body   = mb_convert_encoding($本文, "jis", "UTF-8");
+
+    if($送信元 and $送信者){
+        $header .= "From: " . mb_encode_mimeheader($送信者,"jis") . " <$送信元>\r\n";
+    }
+    else if($送信元){
+        $header .= "From: $送信元\r\n";
+    }
+
+    if($cc) {
+        $cc = implode(",", (array)$cc);
+        $header .= "Cc: $cc\r\n";
+    }
+
+    if($bcc){
+        $bcc = implode(",", (array)$bcc);
+        $header .= "Bcc: $bcc\r\n";
+    }
+
+    if(is_array($add)){
+        $header .= implode("\r\n", $add) . "\r\n";
+    }
+
+    if(is_array($添付)){
+        $区切り = "__" . sha1(uniqid()) . "__";
+        $header .= "MIME-Version: 1.0\r\n";
+        $header .= "Content-Type: multipart/mixed; boundary=\"{$区切り}\"\r\n";
+
+        $body  = "--{$区切り}\r\n";
+        $body .= "Content-Type: text/plain; charset=\"ISO-2022-JP\"\r\n\r\n";
+        $body .= mb_convert_encoding($本文, "jis", "UTF-8") . "\r\n";
+
+        foreach($添付 as $name => $value){
+            $body .= "--{$区切り}\r\n";
+            $body .= "Content-Type: " . MIMEタイプ($name) . "\r\n";
+            $body .= "Content-Transfer-Encoding: base64\r\n";
+            $body .= "Content-Disposition: attachment; filename=\"" . mb_encode_mimeheader($name, "jis") . "\"\r\n\r\n";
+            $body .= chunk_split(base64_encode($value)) . "\r\n";
+        }
+        $body .= "--{$区切り}--\r\n";
+    }
+    return mail($送信先, $題名, $body, $header);
+}
+
+
+function FTPアップロード(array $files, array $option) :array{ // http://php.net/ftp
+    $return = [];
+    $option = $option + [
+        'ftp.パッシブモード' => true,
+        'ftp.バイナリモード' => true,
+        'ftp.ポート' => 21,
+        'ftp.暗号化' => false,
+    ];
+
+    $ftp = ($option['ftp.暗号化'] and function_exists('ftp_ssl_connect')) ? 'ftp_ssl_connect' : 'ftp_connect';
+    $ftp = $ftp($option['ftp.ホスト'], $option['ftp.ポート']);
+    if(!$ftp){
+        return $return;
+    }
+
+    if(!ftp_login($ftp, $option['ftp.id'], $option['ftp.パスワード'])){
+        return $return;
+    }
+    ftp_pasv($ftp, $option['ftp.パッシブモード']);
+    $転送モード = $option['ftp.バイナリモード'] ? FTP_BINARY : FTP_ASCII;
+
+    foreach($files as $k => $v){
+        $result = $k[-1] === '/' ? ftp_mkdir($ftp, $k) : ftp_put($ftp, $k, $v, $転送モード);
+        if($result){
+            $return[$k] = $v;
+        }
+    }
+
+    ftp_close($ftp);
+    return $return;
 }
 
 
@@ -1665,25 +1715,6 @@ function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments
     ];
     $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
     return $list[$ext] ?: "application/octet-stream";
-}
-
-
-function 非同期処理(string $file, $data=null) :void{
-    if(!is_file($file)){
-        return;
-    }
-
-    $file = escapeshellarg($file);
-    $data = escapeshellarg(json_encode($data, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_PARTIAL_OUTPUT_ON_ERROR));
-
-    if(preg_match('/WIN/i', PHP_OS)){
-        $command = sprintf('start php -f %s -- %s', $file, $data);
-        pclose(popen($command, 'r'));
-    }
-    else{
-        $command = sprintf('php -f %s -- %s > /dev/null &', $file, $data);
-        exec($command);
-    }
 }
 
 
