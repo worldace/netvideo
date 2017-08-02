@@ -1143,9 +1143,11 @@ function パーミッション(string $path, string $permission=null) :string{
 
 
 function ファイル一覧(string $dir, $recursive=true) :Generator{
+    static $strlen = 0;
     $recursive = (int)$recursive;
     if($recursive < 2){
         $dir = realpath($dir);
+        $strlen = strlen($dir) + 1;
         if($dir === false){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return;
@@ -1153,8 +1155,9 @@ function ファイル一覧(string $dir, $recursive=true) :Generator{
     }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path = $dir . DIRECTORY_SEPARATOR . $file;
+        $relative = substr($path, $strlen);
         if(is_file($path)){
-            yield $file => $path;
+            yield $relative => $path;
         }
         elseif(is_dir($path) and $recursive){
             $recursive++;
@@ -1165,9 +1168,11 @@ function ファイル一覧(string $dir, $recursive=true) :Generator{
 
 
 function ディレクトリ一覧(string $dir, $recursive=true) :Generator{
+    static $strlen = 0;
     $recursive = (int)$recursive;
     if($recursive < 2){
         $dir = realpath($dir);
+        $strlen = strlen($dir) + 1;
         if($dir === false){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return;
@@ -1175,8 +1180,9 @@ function ディレクトリ一覧(string $dir, $recursive=true) :Generator{
     }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path = $dir . DIRECTORY_SEPARATOR . $file;
+        $relative = substr($path, $strlen);
         if(is_dir($path)){
-            yield $file => $path . DIRECTORY_SEPARATOR;
+            yield $relative => $path . DIRECTORY_SEPARATOR;
             if($recursive){
                 $recursive++;
                 yield from ディレクトリ一覧($path, $recursive);
@@ -1187,9 +1193,11 @@ function ディレクトリ一覧(string $dir, $recursive=true) :Generator{
 
 
 function パス一覧(string $dir, $recursive=true) :Generator{
+    static $strlen = 0;
     $recursive = (int)$recursive;
     if($recursive < 2){
         $dir = realpath($dir);
+        $strlen = strlen($dir) + 1;
         if($dir === false){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return;
@@ -1197,15 +1205,16 @@ function パス一覧(string $dir, $recursive=true) :Generator{
     }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path = $dir . DIRECTORY_SEPARATOR . $file;
+        $relative = substr($path, $strlen);
         if(is_dir($path)){
-            yield $file => $path . DIRECTORY_SEPARATOR;
+            yield $relative => $path . DIRECTORY_SEPARATOR;
             if($recursive){
                 $recursive++;
                 yield from パス一覧($path, $recursive);
             }
         }
         else{
-            yield $file => $path;
+            yield $relative => $path;
         }
     }
 }
@@ -1724,7 +1733,7 @@ function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments
 }
 
 
-function ベンチマーク(callable $func, ...$arg){
+function ベンチマーク(callable $func, ...$arg) :int{
     static $i = 0;
     $i++;
 
@@ -1744,6 +1753,7 @@ function ベンチマーク(callable $func, ...$arg){
 
     $count = ($count > 0) ? number_format($count) : number_format(1/($finish-$start), 3);
     printf("case%s: %s回\n", $i, $count);
+    return $count;
 }
 
 
