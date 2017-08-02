@@ -1182,7 +1182,7 @@ function ディレクトリ一覧(string $dir, $recursive=true) :Generator{
         $path = $dir . DIRECTORY_SEPARATOR . $file;
         $relative = substr($path, $strlen);
         if(is_dir($path)){
-            yield $relative => $path . DIRECTORY_SEPARATOR;
+            yield $relative . DIRECTORY_SEPARATOR => $path;
             if($recursive){
                 $recursive++;
                 yield from ディレクトリ一覧($path, $recursive);
@@ -1207,7 +1207,7 @@ function パス一覧(string $dir, $recursive=true) :Generator{
         $path = $dir . DIRECTORY_SEPARATOR . $file;
         $relative = substr($path, $strlen);
         if(is_dir($path)){
-            yield $relative => $path . DIRECTORY_SEPARATOR;
+            yield $relative . DIRECTORY_SEPARATOR => $path;
             if($recursive){
                 $recursive++;
                 yield from パス一覧($path, $recursive);
@@ -1258,10 +1258,8 @@ function zip圧縮(string $zipfile, $filemap){
             return false;
         }
         $path .= DIRECTORY_SEPARATOR;
-        $path_length = strlen($path);
         $windows = preg_match("/^WIN/i", PHP_OS);
-        foreach(パス一覧($path) as $v){
-            $k = substr($v, $path_length);
+        foreach(パス一覧($path) as $k => $v){
             if($windows){
                 $k = str_replace("\\", "/", $k);
             }
