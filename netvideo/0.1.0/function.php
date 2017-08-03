@@ -1195,7 +1195,7 @@ function ディレクトリ一覧(string $dir, $recursive=true) :array{
         $path = "$dir/$file";
         $relative = substr($path, $strlen);
         if(is_dir($path)){
-            $return[$relative.'/'] = $path;
+            $return[$relative.'/'] = $path.'/';
             if($recursive){
                 $recursive++;
                 $return = array_merge($return, ディレクトリ一覧($path, $recursive));
@@ -1225,7 +1225,7 @@ function パス一覧(string $dir, $recursive=true) :array{
         $path = "$dir/$file";
         $relative = substr($path, $strlen);
         if(is_dir($path)){
-            $return[$relative.'/'] = $path;
+            $return[$relative.'/'] = $path.'/';
             if($recursive){
                 $recursive++;
                 $return = array_merge($return, パス一覧($path, $recursive));
