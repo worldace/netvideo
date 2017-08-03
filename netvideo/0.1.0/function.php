@@ -1145,30 +1145,30 @@ function パーミッション(string $path, string $permission=null) :string{
 }
 
 
-function ファイル一覧(string $dir, $recursive=true) :array{
-    static $strlen = 0;
+function ファイル一覧(string $dir, $再帰=true) :array{
+    static $length = 0;
     $return = [];
-    $recursive = (int)$recursive;
-    if($recursive < 2){
-        $dir = realpath($dir);
-        if($dir === false){
+    $再帰 = (int)$再帰;
+    if($再帰 < 2){
+        if(!is_dir($dir)){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return $return;
         }
-        $strlen = strlen($dir) + 1;
+        $dir    = realpath($dir);
+        $length = strlen($dir) + 1;
         if(preg_match("/^WIN/i", PHP_OS)){
             $dir = str_replace("\\", "/", $dir);
         }
     }
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
-        $path = "$dir/$file";
-        $relative = substr($path, $strlen);
+        $path     = "$dir/$file";
+        $relative = substr($path, $length);
         if(is_file($path)){
             $return[$relative] = $path;
         }
-        elseif(is_dir($path) and $recursive){
-            $recursive++;
-            $return = array_merge($return, ファイル一覧($path, $recursive));
+        elseif(is_dir($path) and $再帰){
+            $再帰++;
+            $return = array_merge($return, ファイル一覧($path, $再帰));
         }
     }
     return $return;
@@ -1180,11 +1180,11 @@ function ディレクトリ一覧(string $dir, $recursive=true) :array{
     $return = [];
     $recursive = (int)$recursive;
     if($recursive < 2){
-        $dir = realpath($dir);
-        if($dir === false){
+        if(!is_dir($dir)){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return $return;
         }
+        $dir = realpath($dir);
         $strlen = strlen($dir) + 1;
         if(preg_match("/^WIN/i", PHP_OS)){
             $dir = str_replace("\\", "/", $dir);
@@ -1210,11 +1210,11 @@ function パス一覧(string $dir, $recursive=true) :array{
     $return = [];
     $recursive = (int)$recursive;
     if($recursive < 2){
-        $dir = realpath($dir);
-        if($dir === false){
+        if(!is_dir($dir)){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return $return;
         }
+        $dir = realpath($dir);
         $strlen = strlen($dir) + 1;
         if(preg_match("/^WIN/i", PHP_OS)){
             $dir = str_replace("\\", "/", $dir);
