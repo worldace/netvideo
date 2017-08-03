@@ -2250,8 +2250,9 @@ class データベース{
 class 設定 implements ArrayAccess, IteratorAggregate, Countable{
     private $記憶 = [];
 
-    function offsetGet($offset){
-        return $this->記憶[$offset] ?? null;
+
+    function &offsetGet($offset){
+        return $this->記憶[$offset];
     }
 
     function offsetSet($offset, $value){
@@ -2278,7 +2279,6 @@ class 設定 implements ArrayAccess, IteratorAggregate, Countable{
     function __toString(){
         return "設定";
     }
-    
 
     function __set($name, $value){
     }
