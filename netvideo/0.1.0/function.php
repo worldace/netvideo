@@ -1814,12 +1814,12 @@ class データベース{
 
     function __construct(string $table, array $setting=[]){
         global $設定;
-        assert(isset($設定['データベース.接続'][0]));
+        assert(isset($設定['データベース.接続.0']));
 
-        $this->設定['接続'][0] = $setting[0] ?? $設定['データベース.接続'][0];
-        $this->設定['接続'][1] = $setting[1] ?? $設定['データベース.接続'][1] ?? '';
-        $this->設定['接続'][2] = $setting[2] ?? $設定['データベース.接続'][2] ?? '';
-        $this->設定['接続'][3] = $setting[3] ?? $設定['データベース.接続'][3] ?? [];
+        $this->設定['接続'][0] = $setting[0] ?? $設定['データベース.接続.0'];
+        $this->設定['接続'][1] = $setting[1] ?? $設定['データベース.接続.1'] ?? '';
+        $this->設定['接続'][2] = $setting[2] ?? $設定['データベース.接続.2'] ?? '';
+        $this->設定['接続'][3] = $setting[3] ?? $設定['データベース.接続.3'] ?? [];
 
         $this->設定['接続'][3] += [
             PDO::ATTR_DEFAULT_FETCH_MODE       => PDO::FETCH_ASSOC,
@@ -2251,8 +2251,8 @@ class 設定 implements ArrayAccess, IteratorAggregate, Countable{
     private $記憶 = [];
 
 
-    function &offsetGet($offset){
-        return $this->記憶[$offset];
+    function offsetGet($offset){
+        return $this->記憶[$offset] ?? null;
     }
 
     function offsetSet($offset, $value){
