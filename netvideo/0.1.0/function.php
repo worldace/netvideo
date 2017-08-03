@@ -330,39 +330,33 @@ function テンプレート(string $file_, array $data_, bool $エスケープ�
 }
 
 
-function ファイルダウンロード(string $file, string $filename=null, int $timeout=60*60*6) :void{
-    if(!file_exists($file)){
-        内部エラー("ダウンロードさせるファイル $file は存在しません", "警告");
-        return;
+function ダウンロード(string $file, string $filename=null, int $timeout=60*60*6) :void{
+    if(preg_match('/^data:.*,/i', $file, $m)){
+        $filesize = strlen($file) - strlen($m[0]);
+        if(!$filename){
+            $filename = "data.txt";
+        }
+    }
+    else{
+        if(!file_exists($file)){
+            内部エラー("ダウンロードさせるファイル $file は存在しません", "警告");
+            return;
+        }
+        $filesize = filesize($file);
+        if(!$filename){
+            $filename = basename($file);
+        }
     }
     ini_set("max_execution_time", $timeout);
 
-    $filesize = filesize($file);
-    if(!$filename){
-        $filename = basename($file);
-    }
-    $filename = str_replace(['"',"\r","\n"], "", $filename);
+    $filename = str_replace(['"',"'","\r","\n"], "", $filename);
     $filenameE = rawurlencode($filename);
     header("Content-Type: application/force-download");
     header("Content-Length: $filesize");
     header("Content-Disposition: attachment; filename=\"$filename\"; filename*=UTF-8''$filenameE");
 
     while(ob_get_level()){ ob_end_clean(); }
-    readfile($data);
-}
-
-
-function データダウンロード(string $data, string $filename="data.txt", int $timeout=60*60*6) :void{
-    ini_set("max_execution_time", $timeout);
-    $filesize = strlen($data);
-    $filename = str_replace(['"',"\r","\n"], "", $filename);
-    $filenameE = rawurlencode($filename);
-    header("Content-Type: application/force-download");
-    header("Content-Length: $filesize");
-    header("Content-Disposition: attachment; filename=\"$filename\"; filename*=UTF-8''$filenameE");
-
-    while(ob_get_level()){ ob_end_clean(); }
-    print $data;
+    readfile($file);
 }
 
 
@@ -462,7 +456,11 @@ function ファイル送信(string $url, array $querymap=null, array $request_he
         $name = str_replace(['"', "\r", "\n"], "", $name);
         if(is_array($value)){
             foreach($value as $name2 => $value2){
-                $name2 = str_replace(['"', "\r", "\n"], "", $name2);
+                $name2  = str_replace(['"', "\r", "\n"], "", $name2);
+                $value2 = is_resource($value2) ? stream_get_contents($value2) : file_get_contents($value2);
+                if($value2 === false){
+                    continue;
+                }
                 $content .= "--$区切り\r\n";
                 $content .= "Content-Disposition: form-data; name=\"$name\"; filename=\"$name2\"\r\n";
                 $content .= "Content-Type: " . MIMEタイプ($name2) . "\r\n\r\n";
@@ -491,8 +489,8 @@ function ファイル送信(string $url, array $querymap=null, array $request_he
 
     $context = stream_context_create([
         'http' => [
-            'method' => 'POST',
-            'header' => $header,
+            'method'  => 'POST',
+            'header'  => $header,
             'content' => $content
         ]
     ]);
@@ -652,6 +650,10 @@ function メール送信($送信先, string $送信元="", string $送信者="",
         $body .= mb_convert_encoding($本文, "jis", "UTF-8") . "\r\n";
 
         foreach($添付 as $name => $value){
+            $value = is_resource($value) ? stream_get_contents($value) : file_get_contents($value);
+            if($value === false){
+                continue;
+            }
             $body .= "--{$区切り}\r\n";
             $body .= "Content-Type: " . MIMEタイプ($name) . "\r\n";
             $body .= "Content-Transfer-Encoding: base64\r\n";
@@ -1277,12 +1279,12 @@ function zip圧縮(string $zipfile, $filemap){
             return false;
         }
         foreach(パス一覧($path) as $k => $v){
-            is_dir($v)  ?  $zip->addEmptyDir($k) :  $zip->addFile($v, $k);
+            is_dir($v) ? $zip->addEmptyDir($k) : $zip->addFile($v, $k);
         }
     }
     else{
         foreach($filemap as $k => $v){
-            $zip->addFromString($k, $v);
+            is_resource($v) ? $zip->addFromString($k, stream_get_contents($v)) : $zip->addFile($v, $k);
         }
     }
     $zip->close();
@@ -1297,7 +1299,7 @@ function zip追加(string $zipfile, array $filemap){
         return false;
     }
     foreach($filemap as $k => $v){
-        $zip->addFromString($k, $v);
+        is_resource($v) ? $zip->addFromString($k, stream_get_contents($v)) : $zip->addFile($v, $k);
     }
     $zip->close();
     return $zipfile;
