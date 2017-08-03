@@ -2275,6 +2275,11 @@ class 設定 implements ArrayAccess, IteratorAggregate, Countable{
         return count($this->記憶);
     }
 
+    function __toString(){
+        return "設定";
+    }
+    
+
     function __set($name, $value){
     }
 }
