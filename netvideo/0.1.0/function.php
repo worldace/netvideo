@@ -251,32 +251,6 @@ function 整形(&$x, callable $func){
 }
 
 
-function 設定(string $name, $value="\0\rヌル\0\r"){
-    static $記憶 = [];
-    if($name === "全て"){
-        return $記憶;
-    }
-    if($value === "\0\rヌル\0\r"){ //取得動作
-        if(array_key_exists($name, $記憶)){
-            return $記憶[$name];
-        }
-        else{
-            内部エラー("$name は未設定です。取得できません", "警告");
-        }
-    }
-    else{ //設定動作
-        if(array_key_exists($name, $記憶)){
-            内部エラー("$name は設定済みです。再代入はできません", "警告");
-            return $value;
-        }
-        else{
-            $記憶[$name] = $value;
-            return $value;
-        }
-    }
-}
-
-
 function 入力(string $name, $default=""){
     if($name === ""){
         return $default;
@@ -2272,6 +2246,38 @@ class データベース{
     }
 }
 
+
+class 設定 implements ArrayAccess, IteratorAggregate, Countable{
+    private $記憶 = [];
+
+    function offsetGet($offset){
+        return $this->記憶[$offset] ?? null;
+    }
+
+    function offsetSet($offset, $value){
+        if(!isset($this->記憶[$offset])){
+            $this->記憶[$offset] = $value;
+        }
+    }
+
+    function offsetExists($offset){
+        return isset($this->記憶[$offset]);
+    }
+
+    function offsetUnset($offset){
+    }
+
+    function getIterator(){
+        return new ArrayIterator($this->記憶);
+    }
+
+    function count() { 
+        return count($this->記憶);
+    }
+
+    function __set($name, $value){
+    }
+}
 
 
 
