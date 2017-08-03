@@ -2282,6 +2282,45 @@ class 設定 implements ArrayAccess, IteratorAggregate, Countable{
 
     function __set($name, $value){
     }
+
+    function 配列化(string $name = null){
+        $return = [];
+        if(is_null($name)){
+            foreach($this->記憶 as $k => $v){
+                $this->array_set($return, $k, $v);
+            }
+        }
+        else{
+            $name2 = "$name.";
+            foreach($this->記憶 as $k => $v){
+                if(strpos($k, $name2) === 0){
+                    $k = substr($k, strlen($name2));
+                    $this->array_set($return, $k, $v);
+                }
+            }
+        }
+        return $return;
+    }
+
+    function array_set(&$array, $key, $value){
+        if(is_null($key)){
+            return $array = $value;
+        }
+        $keys = explode('.', $key);
+
+        while(count($keys) > 1){
+            $key = array_shift($keys);
+
+            if(!isset($array[$key]) or !is_array($array[$key])){
+                $array[$key] = [];
+            }
+
+            $array =& $array[$key];
+        }
+
+        $array[array_shift($keys)] = $value;
+    }
+
 }
 
 
