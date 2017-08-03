@@ -338,7 +338,7 @@ function ダウンロード(string $file, string $filename=null, int $timeout=60
         }
     }
     else{
-        if(!file_exists($file)){
+        if(!is_file($file)){
             内部エラー("ダウンロードさせるファイル $file は存在しません", "警告");
             return;
         }
