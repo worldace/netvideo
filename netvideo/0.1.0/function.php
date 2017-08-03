@@ -689,7 +689,7 @@ function FTPアップロード(array $upload, array $option) :array{ // http://p
 
     $files = [];
     foreach($upload as $k => $v){
-        if(is_dir($v)){
+        if($k[-1] === '/'){
             @ftp_mkdir($ftp, $k);
         }
         else{
