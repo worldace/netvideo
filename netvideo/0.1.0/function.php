@@ -192,19 +192,19 @@ class 検査{
         return (is_numeric($v) and !preg_match("/^-?0+\d/", $v));
     }
     static function 自然数($v) :bool{
-        return preg_match("/^[1-9][0-9]*$/", $v) > 0;
+        return preg_match("/^[1-9][0-9]*\z/", $v) > 0;
     }
     static function 整数($v) :bool{
-        return preg_match("/^(0|[1-9]\d*)$/", $v) > 0;
+        return preg_match("/^(0|[1-9]\d*)\z/", $v) > 0;
     }
     static function 数字($v) :bool{
-        return preg_match("/^[0-9]+$/", $v) > 0;
+        return preg_match("/^[0-9]+\z/", $v) > 0;
     }
     static function 英字($v) :bool{
-        return preg_match("/^[A-Za-z]+$/", $v) > 0;
+        return preg_match("/^[A-Za-z]+\z/", $v) > 0;
     }
     static function 英数字($v) :bool{
-        return preg_match("/^[A-Za-z0-9]+$/", $v) > 0;
+        return preg_match("/^[A-Za-z0-9]+\z/", $v) > 0;
     }
     static function URL($v) :bool{
         return preg_match("|^https?://.{4,}|i", $v) > 0;
