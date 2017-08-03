@@ -872,7 +872,7 @@ function 自然数なら($num, bool $zero=false) :bool{
         }
     }
     elseif(is_string($num)){
-        if(preg_match("/^[1-9][0-9]*$/", $num) or ($zero and $num === '0')){
+        if(preg_match("/\A[1-9][0-9]*\z/", $num) or ($zero and $num === '0')){
             return true;
         }
     }
@@ -920,9 +920,6 @@ function 日付(string $str='[年]/[0月]/[0日] [0時]:[0分]', int $time=0) :s
 
 
 function 経過(int $time) :string{
-    if(!preg_match("/^\d+$/", $time)){
-        return "";
-    }
     $時間差 = time() - $time;
     switch($時間差){
         case $時間差 < 1        : return "今";
@@ -1354,7 +1351,7 @@ function 一時保存(string $name, $data){
 
 function 一時取得(string $name, $default = false){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
-    return (file_exists($tempfile)) ? unserialize(file_get_contents($tempfile)) : $default;
+    return (is_file($tempfile)) ? unserialize(file_get_contents($tempfile)) : $default;
 }
 
 
