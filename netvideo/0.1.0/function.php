@@ -84,11 +84,8 @@ function route(string $method, array $files, $before=1) :bool{
 
 
 function 自動読み込み(string $dir=__DIR__) :void{
-    if(!絶対パスなら($dir)){
-        $dir = realpath($dir);
-    }
     spl_autoload_register(function($class) use($dir){
-        $class = str_replace(["_","\\"], "/", $class);
+        $class = str_replace("\\", "/", $class);
         if(file_exists("$dir/$class.php")){
             require_once "$dir/$class.php";
         }
