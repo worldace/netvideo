@@ -13,7 +13,7 @@ if(検査::失敗なら()){
 }
 
 
-$dbfile = sprintf("%s/upload/%s/%s.db", 設定['公開ディレクトリ'], date('Y/md', $_POST['登録時間']), $_POST['id']);
+$dbfile = sprintf("%s/upload/%s/%s.db", $_ENV['公開ディレクトリ'], date('Y/md', $_POST['登録時間']), $_POST['id']);
 if(!is_file($dbfile)){
     exit;
 }
