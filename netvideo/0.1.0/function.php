@@ -2245,7 +2245,7 @@ class データベース{
 }
 
 
-class 設定 implements ArrayAccess, IteratorAggregate, Countable{
+class 設定 implements \ArrayAccess, \IteratorAggregate, \Countable{
     private $記憶 = [];
     private $記法 = '.';
 
@@ -2302,7 +2302,7 @@ class 設定 implements ArrayAccess, IteratorAggregate, Countable{
     }
 
     function getIterator(){
-        return new ArrayIterator($this->記憶);
+        return new \ArrayIterator($this->記憶);
     }
 
     function count() { 
@@ -2321,7 +2321,7 @@ class 設定 implements ArrayAccess, IteratorAggregate, Countable{
     }
 
     function __toString(){
-        return "設定";
+        return __CLASS__;
     }
 
     function __set($name, $value){
