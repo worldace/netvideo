@@ -2249,20 +2249,55 @@ class データベース{
 
 class 設定 implements ArrayAccess, IteratorAggregate, Countable{
     private $記憶 = [];
+    private $記法 = '.';
 
 
-    function offsetGet($offset){
-        return $this->記憶[$offset] ?? null;
+    function offsetGet($name){
+        $array = $this->記憶;
+        foreach(explode($this->記法, $name) as $k){
+            if(isset($array[$k])){
+                $array = $array[$k];
+            }
+            else{
+                return;
+            }
+        }
+        return $array;
     }
 
-    function offsetSet($offset, $value){
-        if(!isset($this->記憶[$offset])){
-            $this->記憶[$offset] = $value;
+    function offsetSet($name, $value){
+        $array = &$this->記憶;
+        $keys  = explode($this->記法, $name);
+
+        while(count($keys) > 1){
+            $k = array_shift($keys);
+
+            if(!isset($array[$k])){
+                $array[$k] = [];
+            }
+            elseif(!is_array($array[$k])){
+                return;
+            }
+
+            $array = &$array[$k];
+        }
+
+        if(!isset($array[$keys[0]])){
+            $array[$keys[0]] = $value;
         }
     }
 
-    function offsetExists($offset){
-        return isset($this->記憶[$offset]);
+    function offsetExists($name){
+        $array = $this->記憶;
+        foreach(explode($this->記法, $name) as $k){
+            if(isset($array[$k])){
+                $array = $array[$k];
+            }
+            else{
+                return false;
+            }
+        }
+        return true;
     }
 
     function offsetUnset($offset){
@@ -2277,50 +2312,15 @@ class 設定 implements ArrayAccess, IteratorAggregate, Countable{
     }
 
     function __toString(){
-        return "設定";
+        return "設定オブジェクト";
     }
 
     function __set($name, $value){
     }
 
-    function 配列化(string $name = null){
-        $return = [];
-        if(is_null($name)){
-            foreach($this->記憶 as $k => $v){
-                $this->array_set($return, $k, $v);
-            }
-        }
-        else{
-            $name2 = "$name.";
-            foreach($this->記憶 as $k => $v){
-                if(strpos($k, $name2) === 0){
-                    $k = substr($k, strlen($name2));
-                    $this->array_set($return, $k, $v);
-                }
-            }
-        }
-        return $return;
+    function 記法(string $str){
+        $this->記法 = $str;
     }
-
-    function array_set(&$array, $key, $value){
-        if(is_null($key)){
-            return $array = $value;
-        }
-        $keys = explode('.', $key);
-
-        while(count($keys) > 1){
-            $key = array_shift($keys);
-
-            if(!isset($array[$key]) or !is_array($array[$key])){
-                $array[$key] = [];
-            }
-
-            $array =& $array[$key];
-        }
-
-        $array[array_shift($keys)] = $value;
-    }
-
 }
 
 
