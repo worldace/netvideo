@@ -2250,17 +2250,29 @@ class 設定 implements \ArrayAccess, \IteratorAggregate, \Countable{
     private $記法 = '.';
 
 
-    function offsetGet($name){
-        $array = $this->記憶;
-        foreach(explode($this->記法, $name) as $k){
-            if(isset($array[$k])){
-                $array = $array[$k];
+    function &offsetGet($name){
+        $keys = explode($this->記法, $name);
+        if(count($keys) === 1){
+            if(isset($this->記憶[$name])){
+                $return =& $this->記憶[$name];
             }
             else{
-                return;
+                $return = null;
             }
+            return $return;
         }
-        return $array;
+        else{
+            $return = $this->記憶;
+            foreach($keys as $k){
+                if(isset($return[$k])){
+                    $return = $return[$k];
+                }
+                else{
+                    return;
+                }
+            }
+            return $return;
+        }
     }
 
     function offsetSet($name, $value){
