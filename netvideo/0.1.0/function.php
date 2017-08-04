@@ -726,7 +726,7 @@ function URL(array $param=null) :string{
         if($url[-1] !== '/'){
             $url .= '/';
         }
-        $url .= implode(設定['PATH_INFO区切り文字'] ?? '/', $pathinfo);
+        $url .= implode($_ENV['pathinfo.区切り文字'] ?? '/', $pathinfo);
     }
 
     if(isset($query)){
@@ -737,10 +737,9 @@ function URL(array $param=null) :string{
 
 
 function PATH_INFO分解() :array{
-    $区切り文字 = defined("設定['PATH_INFO区切り文字']")  ?  設定['PATH_INFO区切り文字']  :  '/';
     $pathinfo = $_SERVER['PATH_INFO'] ?? '';
     $pathinfo = ltrim($pathinfo, '/');
-    $pathinfo = explode($区切り文字, $pathinfo);
+    $pathinfo = explode($_ENV['pathinfo.区切り文字'] ?? '/', $pathinfo);
     $return   = [];
 
     foreach($pathinfo as $v){

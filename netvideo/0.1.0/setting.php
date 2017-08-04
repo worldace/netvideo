@@ -3,27 +3,28 @@
 
 const 設定 = [
 
-//ホームページのURL
-'URL' => "http://127.0.0.1/netvideo/",
-
-//PATH_INFOの記法
-'PATH_INFO区切り文字' => '.',
-
 //公開ディレクトリのフルパス (最後のスラッシュは必要)
 '公開ディレクトリ' => __DIR__ . '/../../',
 
 //アプリディレクトリのフルパス (最後のスラッシュは必要)
 'アプリディレクトリ' => __DIR__ . '/',
 
-//php.ini
-'ini' => [
-    'session.cookie_httponly' => 1,
-],
-
 
 ];
 
+
 $_ENV = new 設定;
+
+//ホームページのURL
+$_ENV['url'] = "http://127.0.0.1/netvideo/";
+
+//PATH_INFOの記法
+$_ENV['pathinfo.区切り文字'] = '.';
+
+//php.ini
+$_ENV['ini'] = [
+    'session.cookie_httponly' => 1,
+];
 
 //動画データベースのドライバー
 $_ENV['データベース.接続.0'] = 'sqlite:' . __DIR__ . '/../video.db';
