@@ -1823,9 +1823,9 @@ class データベース{
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ];
  
-        $this->設定['取得件数']   = $_ENV['データベース.取得件数']   ?? 31;
-        $this->設定['クラス修飾'] = $_ENV['データベース.クラス修飾'] ?? '□';
-        $this->設定['ログ']       = $_ENV['データベース.ログ']       ?? null;
+        $this->設定['取得件数']               = $_ENV['データベース.取得件数']   ?? 31;
+        $this->設定['ログ']                   = $_ENV['データベース.ログ']       ?? null;
+        $this->設定['テーブルクラス名前空間'] = $_ENV['データベース.テーブルクラス名前空間'] ?? '□';
 
         $this->接続名  = md5($this->設定['接続'][0] . $this->設定['接続'][1] . $this->設定['接続'][2]);
 
@@ -1852,7 +1852,7 @@ class データベース{
             return $this->テーブル;
         }
 
-        $class = $this->設定['クラス修飾'] . $table;
+        $class = $this->設定['テーブルクラス名前空間'] . $table;
         assert(class_exists($class));
 
         $this->テーブル = $table;
@@ -1880,7 +1880,7 @@ class データベース{
         }
 
         if($this->設定['接続'][3][PDO::ATTR_DEFAULT_FETCH_MODE] & PDO::FETCH_CLASS){ //&は「含めば」
-            $state->setFetchMode(PDO::FETCH_CLASS, $this->設定['クラス修飾'].$this->テーブル); // http://php.net/manual/ja/pdostatement.setfetchmode.php
+            $state->setFetchMode(PDO::FETCH_CLASS, $this->設定['テーブルクラス名前空間'].$this->テーブル); // http://php.net/manual/ja/pdostatement.setfetchmode.php
         }
 
         for($i = 0;  $i < count($プレースホルダ);  $i++){
@@ -2094,7 +2094,7 @@ class データベース{
         $SQL文 = "create table IF NOT EXISTS {$this->テーブル} ($作成文) ";
 
         if($this->MySQLなら()){
-            $追加定義 = $this->設定['クラス修飾'] . $this->テーブル . "::追加定義";
+            $追加定義 = $this->設定['テーブルクラス名前空間'] . $this->テーブル . "::追加定義";
             $SQL文    = str_replace('autoincrement', 'auto_increment', $SQL文);
             $SQL文   .= defined($追加定義)  ?  constant($追加定義)  :  "ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci";
         }
@@ -2205,7 +2205,7 @@ class データベース{
     private function 型変換($arg) :array{
         $return = [];
 
-        if(!is_array($arg) and !($arg instanceof $this->設定['クラス修飾'].$this->テーブル)){
+        if(!is_array($arg) and !($arg instanceof $this->設定['テーブルクラス名前空間'].$this->テーブル)){
             return $return;
         }
 
