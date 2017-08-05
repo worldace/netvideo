@@ -111,23 +111,25 @@ function require_cache(string $file){
     }
 }
 
-/*
+
 function 非同期処理(string $file, $data=null) :void{
     if(!is_file($file)){
         return;
     }
 
     $file = escapeshellarg($file);
-    $data = escapeshellarg(json_encode($data, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_PARTIAL_OUTPUT_ON_ERROR));
+    $data = json_encode($data, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_PARTIAL_OUTPUT_ON_ERROR);
 
     if(preg_match('/WIN/i', PHP_OS)){
-        pclose(popen(sprintf('start php -f %s -- %s', $file, $data), 'r'));
+        $data = str_replace('"', '\\"', $data);
+        pclose(popen(sprintf('start php -f %s -- "%s"', $file, $data), 'r'));
     }
     else{
+        $data = escapeshellarg($data);
         exec(sprintf('php -f %s -- %s > /dev/null &', $file, $data));
     }
 }
-*/
+
 
 function 検査($var, $func, $message=null) :bool{
     if(is_callable($func)){
