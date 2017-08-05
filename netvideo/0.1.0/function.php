@@ -118,15 +118,14 @@ function 非同期処理(string $file, $data=null) :void{
     }
 
     $file = escapeshellarg($file);
-    $data = json_encode($data, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_PARTIAL_OUTPUT_ON_ERROR);
+    $data = base64_encode(json_encode($data, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_PARTIAL_OUTPUT_ON_ERROR));
 
     if(preg_match('/WIN/i', PHP_OS)){
-        $data = str_replace('"', '\\"', $data);
         pclose(popen(sprintf('start php -f %s -- "%s"', $file, $data), 'r'));
     }
     else{
         $data = escapeshellarg($data);
-        exec(sprintf('php -f %s -- %s > /dev/null &', $file, $data));
+        exec(sprintf("php -f %s -- '%s' > /dev/null &", $file, $data));
     }
 }
 
