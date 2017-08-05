@@ -2242,7 +2242,7 @@ class データベース{
 }
 
 
-class 設定 implements \ArrayAccess, \IteratorAggregate, \Countable{
+class 不変配列 implements \ArrayAccess, \IteratorAggregate, \Countable{
     private $記憶 = [];
     private $記法 = '.';
 

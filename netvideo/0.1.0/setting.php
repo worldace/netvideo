@@ -1,7 +1,7 @@
 <?php
 
 
-$_ENV = new 設定;
+$_ENV = new 不変配列;
 
 //ホームページのURL
 $_ENV['url'] = "http://127.0.0.1/netvideo/";
