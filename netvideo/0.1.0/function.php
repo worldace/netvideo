@@ -2305,10 +2305,8 @@ class 不変配列 implements \ArrayAccess, \IteratorAggregate, \Countable{
         return count($this->記憶);
     }
 
-    function __construct(array $array = null){
-        if(is_array($array)){
-            $this->記憶 = $array;
-        }
+    function __construct(array $array = []){
+        $this->記憶 = $array;
     }
     
 
