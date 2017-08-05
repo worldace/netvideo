@@ -124,7 +124,6 @@ function 非同期処理(string $file, $data=null) :void{
         pclose(popen(sprintf('start php -f %s -- %s', $file, $data), 'r'));
     }
     else{
-        $data = escapeshellarg($data);
         exec(sprintf('php -f %s -- %s > /dev/null &', $file, $data));
     }
 }
