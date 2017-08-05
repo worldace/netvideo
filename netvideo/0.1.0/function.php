@@ -111,7 +111,7 @@ function require_cache(string $file){
     }
 }
 
-
+/*
 function 非同期処理(string $file, $data=null) :void{
     if(!is_file($file)){
         return;
@@ -127,7 +127,7 @@ function 非同期処理(string $file, $data=null) :void{
         exec(sprintf('php -f %s -- %s > /dev/null &', $file, $data));
     }
 }
-
+*/
 
 function 検査($var, $func, $message=null) :bool{
     if(is_callable($func)){
