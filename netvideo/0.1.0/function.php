@@ -125,7 +125,7 @@ function 非同期処理(string $file, $data=null) :void{
     }
     else{
         $code = "\$arg=json_decode(base64_decode(\"$data\"),true);include(\"$file\");";
-        exec(sprintf('php -r %s > /dev/null &', escapeshellarg($code)));
+        exec(sprintf('nohup php -r %s > /dev/null &', escapeshellarg($code)));
     }
 }
 
