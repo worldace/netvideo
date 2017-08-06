@@ -734,10 +734,10 @@ function URL(array $param=null) :string{
 }
 
 
-function PATH_INFO分解() :array{
+function PATH_INFO分解(string $区切り文字='/') :array{
     $pathinfo = $_SERVER['PATH_INFO'] ?? '';
     $pathinfo = ltrim($pathinfo, '/');
-    $pathinfo = explode($_ENV['pathinfo.区切り文字'] ?? '/', $pathinfo);
+    $pathinfo = explode($区切り文字, $pathinfo);
     $return   = [];
 
     foreach($pathinfo as $v){
