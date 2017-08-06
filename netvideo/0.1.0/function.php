@@ -68,16 +68,16 @@ function リダイレクト(string $url) :void{
 }
 
 
-function route(string $method, array $files, $before=1) :bool{
+function route(string $method, array $files, $arg=1) :bool{
     $method = strtoupper($method);
     if(!in_array($method, ['GET', 'POST', 'ANY'])){
-        return 内部エラー("第1引数の指定メソッドは'GET'か'POST'か'ANY'のどれかにしてください");
+        return 内部エラー("第1引数のメソッド指定は'GET'か'POST'か'ANY'のどれかにしてください");
     }
     if($method !== $_SERVER['REQUEST_METHOD']){
         return false;
     }
     while(count($files)){
-        $before = require_once array_shift($files);
+        $arg = require_once array_shift($files);
     }
     exit;
 }
@@ -120,11 +120,11 @@ function 非同期処理(string $file, $data=null) :void{
     $data = base64_encode(json_encode($data, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_PARTIAL_OUTPUT_ON_ERROR));
 
     if(preg_match('/WIN/i', PHP_OS)){
-        $code = "\$data=json_decode(base64_decode('$data'),true);include('$file');";
+        $code = "\$arg=json_decode(base64_decode('$data'),true);include('$file');";
         pclose(popen(sprintf('start php -r %s', escapeshellarg($code)), 'r'));
     }
     else{
-        $code = "\$data=json_decode(base64_decode(\"$data\"),true);include(\"$file\");";
+        $code = "\$arg=json_decode(base64_decode(\"$data\"),true);include(\"$file\");";
         exec(sprintf('php -r %s > /dev/null &', escapeshellarg($code)));
     }
 }
