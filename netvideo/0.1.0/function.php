@@ -113,18 +113,19 @@ function require_cache(string $file){
 
 
 function 非同期処理(string $file, $data=null) :void{
-    if(!is_file($file)){
+    if(!is_file($file) or preg_match('/[\'\"]/', $file)){
         return;
     }
 
-    $file = escapeshellarg($file);
-    $data = escapeshellarg(base64_encode(json_encode($data, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_PARTIAL_OUTPUT_ON_ERROR)));
+    $data = base64_encode(json_encode($data, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_PARTIAL_OUTPUT_ON_ERROR));
 
     if(preg_match('/WIN/i', PHP_OS)){
-        pclose(popen(sprintf('start php -f %s -- %s', $file, $data), 'r'));
+        $code = "\$data=json_decode(base64_decode('$data'),true);include('$file');";
+        pclose(popen(sprintf('start php -r %s', escapeshellarg($code)), 'r'));
     }
     else{
-        exec(sprintf('php -f %s -- %s > /dev/null &', $file, $data));
+        $code = "\$data=json_decode(base64_decode(\"$data\"),true);include(\"$file\");";
+        exec(sprintf('php -r %s > /dev/null &', escapeshellarg($code)));
     }
 }
 
