@@ -2319,9 +2319,6 @@ class 不変配列 implements \ArrayAccess, \IteratorAggregate, \Countable{
         return __CLASS__;
     }
 
-    function __set($name, $value){
-    }
-
     function 記法(string $str){
         $this->記法 = $str;
     }
