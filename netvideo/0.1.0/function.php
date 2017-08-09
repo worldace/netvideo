@@ -2348,18 +2348,19 @@ class 部品{
 
 
     static function 開始() :bool{
-        assert($_ENV['部品.ディレクトリ']);
         if(self::$設定){
             return false;
         }
-        if(!is_dir($_ENV['部品.ディレクトリ'])){
-            trigger_error("部品ディレクトリ: {$_ENV['部品.ディレクトリ']} が見つかりません", E_USER_WARNING);
+
+        self::$設定['ディレクトリ'] = $_ENV['部品.ディレクトリ'] ?? __DIR__.'/部品/';
+        self::$設定['手動']         = $_ENV['部品.手動'] ?? false;
+        self::$設定['nonce']        = $_ENV['部品.nonce'] ?? null;
+
+        if(!is_dir(self::$設定['ディレクトリ'])){
+            trigger_error("部品ディレクトリが見つかりません", E_USER_WARNING);
             return false;
         }
 
-        self::$設定['ディレクトリ'] = $_ENV['部品.ディレクトリ'];
-        self::$設定['手動']         = $_ENV['部品.手動'] ?? false;
-        self::$設定['nonce']        = $_ENV['部品.nonce'] ?? null;
 
         self::$記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromparts'=>[]];
         self::$タグ = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromparts'=>''];
@@ -2443,9 +2444,6 @@ class 部品{
 
 
     private static function ファイル取得(string $部品名) :string{
-        if(!isset(self::$設定['ディレクトリ'])){
-            throw new \Exception("部品::開始() が行われていません"); //部品関数でキャッチする
-        }
         if(preg_match("/^[^a-zA-Z\x7f-\xff][^a-zA-Z0-9_\x7f-\xff]*/", $部品名)){
             throw new \Exception("部品名: $部品名 はPHP変数の命名規則に沿っていません"); //部品関数でキャッチする
         }
