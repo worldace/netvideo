@@ -2327,7 +2327,7 @@ class 不変配列 implements \ArrayAccess, \IteratorAggregate, \Countable{
 
 
 function 部品(string $部品名, ...$引数) :string{
-    assert($_ENV['部品.ディレクトリ']);
+    assert(isset($_ENV['部品.ディレクトリ']));
     try{
         return 部品::作成($部品名, $引数);
     }
