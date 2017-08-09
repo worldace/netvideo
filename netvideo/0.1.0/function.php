@@ -2356,7 +2356,7 @@ class 部品{
     static function 終了() :string{
         $return = self::$記憶['開始']  ?  self::差し込む(ob_get_clean())  :  "";
         self::$記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromparts'=>[], '開始'=>false];
-        self::$記憶 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromparts'=>''];
+        self::$タグ = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromparts'=>''];
         return $return;
     }
 
