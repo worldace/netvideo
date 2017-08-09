@@ -2347,20 +2347,19 @@ class 部品{
     private static $タグ;
 
 
-    static function 開始(string $dir, array $option=[]) :bool{
+    static function 開始() :bool{
+        assert($_ENV['部品.ディレクトリ']);
         if(self::$設定){
             return false;
         }
-        if(!is_dir($dir)){
-            trigger_error("部品ディレクトリ: $dir が見つかりません", E_USER_WARNING);
+        if(!is_dir($_ENV['部品.ディレクトリ'])){
+            trigger_error("部品ディレクトリ: {$_ENV['部品.ディレクトリ']} が見つかりません", E_USER_WARNING);
             return false;
         }
 
-        self::$設定 = $option + [
-            "手動"  => false,
-            "nonce" => null,
-        ];
-        self::$設定["ディレクトリ"] = realpath($dir);
+        self::$設定['ディレクトリ'] = $_ENV['部品.ディレクトリ'];
+        self::$設定['手動']         = $_ENV['部品.手動'] ?? false;
+        self::$設定['nonce']        = $_ENV['部品.nonce'] ?? null;
 
         self::$記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromparts'=>[]];
         self::$タグ = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromparts'=>''];
