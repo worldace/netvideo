@@ -2348,13 +2348,13 @@ class 部品{
 
 
     static function 開始() :void{
-        ob_start(["部品", "差し込む"]);
+        ob_start(["部品", "挿入"]);
         self::$記憶['開始'] = true;
     }
 
 
     static function 終了() :string{
-        $return = self::$記憶['開始']  ?  self::差し込む(ob_get_clean())  :  "";
+        $return = self::$記憶['開始']  ?  self::挿入(ob_get_clean())  :  "";
         self::$記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromparts'=>[], '開始'=>false];
         self::$タグ = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromparts'=>''];
         return $return;
@@ -2384,7 +2384,7 @@ class 部品{
     }
 
 
-    static function 差し込む(string $buf="") :string{
+    static function 挿入(string $buf="") :string{
         self::$タグ['fromparts'] = self::frompartsタグ作成();
 
         if(self::$タグ['jsinbody']){
