@@ -2327,6 +2327,7 @@ class 不変配列 implements \ArrayAccess, \IteratorAggregate, \Countable{
 
 
 function 部品(string $部品名, ...$引数) :string{
+    assert($_ENV['部品.ディレクトリ']);
     try{
         return 部品::作成($部品名, $引数);
     }
@@ -2342,42 +2343,20 @@ function 部品(string $部品名, ...$引数) :string{
 
 
 class 部品{
-    private static $設定;
-    private static $記憶;
-    private static $タグ;
+    private static $記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromparts'=>[]];
+    private static $タグ = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromparts'=>''];
 
 
-    static function 開始() :bool{
-        if(self::$設定){
-            return false;
-        }
-
-        self::$設定['ディレクトリ'] = $_ENV['部品.ディレクトリ'] ?? __DIR__.'/部品/';
-        self::$設定['手動']         = $_ENV['部品.手動'] ?? false;
-        self::$設定['nonce']        = $_ENV['部品.nonce'] ?? null;
-
-        if(!is_dir(self::$設定['ディレクトリ'])){
-            trigger_error("部品ディレクトリが見つかりません", E_USER_WARNING);
-            return false;
-        }
-
-
-        self::$記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromparts'=>[]];
-        self::$タグ = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromparts'=>''];
-
-        if(!self::$設定['手動']){
+    static function 開始() :void{
+        if(empty($_ENV['部品.手動'])){
             ob_start(["部品", "差し込む"]);
         }
-        return true;
     }
 
 
     static function 終了() :string{
-        if(!self::$設定){
-            return "";
-        }
-        $return = self::$設定['手動']  ?  ""  :  self::差し込む(ob_get_clean());
-        self::$設定 = self::$記憶 = self::$タグ = null;
+        $return = empty($_ENV['部品.手動'])  ?  self::差し込む(ob_get_clean())  :  "";
+        self::$記憶 = self::$タグ = null;
         return $return;
     }
 
@@ -2448,7 +2427,7 @@ class 部品{
             throw new \Exception("部品名: $部品名 はPHP変数の命名規則に沿っていません"); //部品関数でキャッチする
         }
 
-        $path = sprintf("%s/%s.html", self::$設定['ディレクトリ'], str_replace("_", "/", $部品名));
+        $path = sprintf("%s/%s.html", $_ENV['部品.ディレクトリ'], str_replace("_", "/", $部品名));
         $return = @file_get_contents($path);
         if($return === false){
             throw new \Exception("部品名: $部品名 の部品ファイル: $path が見つかりません"); //部品関数でキャッチする
@@ -2499,7 +2478,7 @@ class 部品{
 
     private static function タグ作成(array $array, string $link, string $部品名) :string{
         $return = "";
-        $部品ファイルの位置 = self::$設定['ディレクトリ'] . "/" . dirname(str_replace("_", "/", $部品名));
+        $部品ファイルの位置 = $_ENV['部品.ディレクトリ'] . "/" . dirname(str_replace("_", "/", $部品名));
 
         foreach($array as $v){
             preg_match("|^([^>]+)|", $v, $attr);
@@ -2520,8 +2499,8 @@ class 部品{
                 }
                 self::$記憶['読み込み済みURL'][] = $url;
             }
-            if(isset(self::$設定['nonce'])){
-                $v = preg_replace("/^<(\w+)/", sprintf('<$1 nonce="%s" ', self::$設定['nonce']), $v);
+            if(isset($_ENV['部品.nonce'])){
+                $v = preg_replace("/^<(\w+)/", sprintf('<$1 nonce="%s" ', $_ENV['部品.nonce']), $v);
             }
             $return .= "$v\n";
         }
@@ -2535,7 +2514,7 @@ class 部品{
             return "";
         }
 
-        $return  = isset(self::$設定['nonce'])  ?  sprintf('<script nonce="%s">', self::$設定['nonce'])  :  '<script>';
+        $return  = isset($_ENV['部品.nonce'])  ?  sprintf('<script nonce="%s">', $_ENV['部品.nonce'])  :  '<script>';
         $return .= "\n";
         $return .= "var fromparts = {};\n";
 
