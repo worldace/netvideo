@@ -39,7 +39,7 @@ file_put_contents("$dir/$id.png", $_POST['サムネイル'], LOCK_EX);
 データベース("コメント", "sqlite:$dir/$id.db")->テーブル作成();
 
 
-
+部品::開始();
 ?>
 <!DOCTYPE html>
 <html lang="ja">
