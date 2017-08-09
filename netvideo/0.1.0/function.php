@@ -2348,8 +2348,10 @@ class 部品{
 
 
     static function 開始() :void{
-        ob_start(["部品", "挿入"]);
-        self::$記憶['開始'] = true;
+        if(!self::$記憶['開始']){
+            self::$記憶['開始'] = true;
+            ob_start(["部品", "挿入"]);
+        }
     }
 
 
