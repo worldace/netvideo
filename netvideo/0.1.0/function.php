@@ -2343,20 +2343,20 @@ function 部品(string $部品名, ...$引数) :string{
 
 
 class 部品{
-    private static $記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromparts'=>[]];
+    private static $記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromparts'=>[], '開始'=>false];
     private static $タグ = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromparts'=>''];
 
 
     static function 開始() :void{
-        if(empty($_ENV['部品.手動'])){
-            ob_start(["部品", "差し込む"]);
-        }
+        ob_start(["部品", "差し込む"]);
+        self::$記憶['開始'] = true;
     }
 
 
     static function 終了() :string{
-        $return = empty($_ENV['部品.手動'])  ?  self::差し込む(ob_get_clean())  :  "";
-        self::$記憶 = self::$タグ = null;
+        $return = self::$記憶['開始']  ?  self::差し込む(ob_get_clean())  :  "";
+        self::$記憶 = ['部品コード'=>[], 'stack'=>[], '読み込み済みURL'=>[], 'fromparts'=>[], '開始'=>false];
+        self::$記憶 = ['css'=>'', 'jsinhead'=>'', 'jsinbody'=>'', 'fromparts'=>''];
         return $return;
     }
 
