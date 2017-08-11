@@ -85,7 +85,9 @@ function route(...$ARG) :bool{
             $arg = $ARG['v']($arg);
         }
         else{
-            $arg = require_once $ARG['v'];
+            $arg = (function() use($ARG, $arg){
+                return require_once $ARG['v'];
+            })();
         }
     }
     exit;
@@ -595,10 +597,10 @@ function メール送信(array $a) :bool{
         return 内部エラー("メールの本文が存在しません", "警告");
     }
 
+    $題名   = str_replace(["\r","\n"]        , "", $a['題名']);
     $送信先 = str_replace(["\r","\n"," ",","], "", $a['送信先']);
     $送信元 = str_replace(["\r","\n"," ",","], "", $a['送信元']);
     $送信者 = str_replace(["\r","\n",","]    , "", $a['送信者'] ?? '');
-    $題名   = str_replace(["\r","\n"]        , "", $a['題名']);
 
     $header[] = strlen($送信者)  ?  sprintf('From: %s <%s>', mb_encode_mimeheader($送信者,'utf-8'), $送信元)  :  "From: $送信元";
     $header[] = 'MIME-Version: 1.0';
