@@ -285,28 +285,23 @@ function 入力(string $name, $default=""){
 }
 
 
-function テンプレート(string $file_, array $data_, bool $エスケープする_=true) :string{
-    $h_ = function($arg) use (&$h_){
-        if(is_array($arg)){
-            return array_map($h_, $arg);
-        }
-        return htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
-    };
+function テンプレート(...$ARG) :string{
+    //名前節約のために$ARGのみ使用。[0]ファイル(文字列)、[1]データ(配列)、[2]エスケープするか(真偽)
     
-    if($エスケープする_){
-        foreach((array)$data_ as $key1_ => $val_){
-            $$key1_ = $h_($val_);
-            $key2_  = "__" . $key1_;
-            $$key2_ = $val_;
+    $ARG[2] = $ARG[2] ?? true;
+    if($ARG[2]){
+        foreach((array)$ARG[1] as $ARG['k'] => $ARG['v']){
+            ${$ARG['k']}     = h($ARG['v']);
+            ${'_'.$ARG['k']} = $ARG['v'];
         }
     }
     else{
-        foreach((array)$data_ as $key1_ => $val_){
-            $$key1_ = $val_;
+        foreach((array)$ARG[1] as $ARG['k'] => $ARG['v']){
+            ${$ARG['k']} = $ARG['v'];
         }
     }
     ob_start();
-    require $file_;
+    require $ARG[0];
     return ob_get_clean();
 }
 
