@@ -69,7 +69,7 @@ function リダイレクト(string $url) :void{
 
 
 function route(...$ARG) :bool{
-    //名前節約のために$ARGのみ使用。[0]メソッド(文字列)、[1]実行するもの(配列)、[2]引数(任意)
+    //名前節約のために$ARGのみ使用。[0]リクエストメソッド(文字列)、[1]実行するもの(配列)、[2]引数(任意)
 
     $ARG[0] = strtoupper($ARG[0]);
     if(!in_array($ARG[0], ['GET', 'POST', 'ANY'])){
@@ -581,63 +581,70 @@ function ファイル受信(string $dir, array $whitelist){
 }
 
 
-function メール送信($送信先, string $送信元="", string $送信者="", string $題名="", string $本文="", array $添付=null, $cc="", $bcc="", array $add=null) :bool{
-    $送信先 = str_replace(["\r","\n"," ",","], "", $送信先);
-    $送信元 = str_replace(["\r","\n"," ",","], "", $送信元);
-    $送信者 = str_replace(["\r","\n"], "", $送信者);
-    $題名   = str_replace(["\r","\n"], "", $題名);
-    $cc     = str_replace(["\r","\n"," ",","], "", $cc);
-    $bcc    = str_replace(["\r","\n"," ",","], "", $bcc);
-    $add    = str_replace(["\r","\n"], "", $add);
-
-    $送信先 = implode(",", (array)$送信先);
-    $題名   = mb_encode_mimeheader($題名, "jis");
-    $body   = mb_convert_encoding($本文, "jis", "UTF-8");
-
-    if($送信元 and $送信者){
-        $header .= "From: " . mb_encode_mimeheader($送信者,"jis") . " <$送信元>\r\n";
+function メール送信(array $a) :bool{
+    if(!isset($a['送信先'])){
+        return 内部エラー("メールの送信先が存在しません", "警告");
     }
-    else if($送信元){
-        $header .= "From: $送信元\r\n";
+    if(!isset($a['送信元'])){
+        return 内部エラー("メールの送信元が存在しません", "警告");
+    }
+    if(!isset($a['題名'])){
+        return 内部エラー("メールの題名が存在しません", "警告");
+    }
+    if(!isset($a['本文'])){
+        return 内部エラー("メールの本文が存在しません", "警告");
     }
 
-    if($cc) {
-        $cc = implode(",", (array)$cc);
-        $header .= "Cc: $cc\r\n";
+    $送信先 = str_replace(["\r","\n"," ",","], "", $a['送信先']);
+    $送信元 = str_replace(["\r","\n"," ",","], "", $a['送信元']);
+    $送信者 = str_replace(["\r","\n",","]    , "", $a['送信者'] ?? '');
+    $題名   = str_replace(["\r","\n"]        , "", $a['題名']);
+
+    $header[] = $送信者  ?  sprintf('From: %s <%s>', mb_encode_mimeheader($送信者,'utf-8'), $送信元)  :  "From: $送信元";
+    $header[] = 'MIME-Version: 1.0';
+    $header[] = 'Content-Transfer-Encoding: base64';
+
+    if(isset($a['cc'])){
+        foreach((array)$a['cc'] as $v){
+             $v = str_replace(["\r","\n"," ",","], "",  $v);
+             $header[] = "Cc: $v";
+        }
+    }
+    if(isset($a['bcc'])){
+        foreach((array)$a['bcc'] as $v){
+             $v = str_replace(["\r","\n"," ",","], "",  $v);
+             $header[] = "Bcc: $v";
+        }
     }
 
-    if($bcc){
-        $bcc = implode(",", (array)$bcc);
-        $header .= "Bcc: $bcc\r\n";
+    if(empty($a['ファイル'])){
+        $header[] = 'Content-Type: text/plain; charset=utf-8';
+        $body   = chunk_split(base64_encode($a['本文']));
     }
+    else{
+        $区切り = sprintf('__%s__', uniqid());
+        $header[] = "Content-Type: multipart/mixed; boundary=\"$区切り\"";
+        
+        $body  = "--$区切り\r\n";
+        $body .= "Content-Transfer-Encoding: base64\r\n";
+        $body .= "Content-Type: text/plain; charset=\"utf-8\"\r\n\r\n";
+        $body .= chunk_split(base64_encode($a['本文'])) . "\r\n";
 
-    if(is_array($add)){
-        $header .= implode("\r\n", $add) . "\r\n";
-    }
-
-    if(is_array($添付)){
-        $区切り = "__" . sha1(uniqid()) . "__";
-        $header .= "MIME-Version: 1.0\r\n";
-        $header .= "Content-Type: multipart/mixed; boundary=\"{$区切り}\"\r\n";
-
-        $body  = "--{$区切り}\r\n";
-        $body .= "Content-Type: text/plain; charset=\"ISO-2022-JP\"\r\n\r\n";
-        $body .= mb_convert_encoding($本文, "jis", "UTF-8") . "\r\n";
-
-        foreach($添付 as $name => $value){
-            $value = is_resource($value) ? stream_get_contents($value) : file_get_contents($value);
-            if($value === false){
+        foreach($a['ファイル'] as $k => $v){
+            $v = is_resource($v) ? stream_get_contents($v) : file_get_contents($v);
+            if($v === false){
                 continue;
             }
-            $body .= "--{$区切り}\r\n";
-            $body .= "Content-Type: " . MIMEタイプ($name) . "\r\n";
+            $body .= "--$区切り\r\n";
+            $body .= "Content-Type: " . MIMEタイプ($k) . "\r\n";
             $body .= "Content-Transfer-Encoding: base64\r\n";
-            $body .= "Content-Disposition: attachment; filename=\"" . mb_encode_mimeheader($name, "jis") . "\"\r\n\r\n";
-            $body .= chunk_split(base64_encode($value)) . "\r\n";
+            $body .= "Content-Disposition: attachment; filename=\"" . mb_encode_mimeheader($k, "utf-8") . "\"\r\n\r\n";
+            $body .= chunk_split(base64_encode($v)) . "\r\n";
         }
-        $body .= "--{$区切り}--\r\n";
+        $body .= "--$区切り--\r\n";
     }
-    return mail($送信先, $題名, $body, $header);
+
+    return mail(implode(",", (array)$送信先), mb_encode_mimeheader($題名,"utf-8"), $body, implode("\r\n", $header)."\r\n");
 }
 
 
