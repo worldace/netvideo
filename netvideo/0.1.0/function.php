@@ -80,12 +80,12 @@ function route(...$ARG) :bool{
     }
 
     $arg = $ARG[2] ?? 1;
-    foreach((array)$ARG[1] as $ARG[3]){
-        if(is_callable($ARG[3])){
-            $arg = $ARG[3]($arg);
+    foreach((array)$ARG[1] as $ARG['v']){
+        if(is_callable($ARG['v'])){
+            $arg = $ARG['v']($arg);
         }
         else{
-            $arg = require_once $ARG[3];
+            $arg = require_once $ARG['v'];
         }
     }
     exit;
