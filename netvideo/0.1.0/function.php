@@ -288,8 +288,7 @@ function 入力(string $name, $default=""){
 function テンプレート(...$ARG) :string{
     //名前節約のために$ARGのみ使用。[0]ファイル(文字列)、[1]データ(配列)、[2]エスケープするか(真偽)
     
-    $ARG[2] = $ARG[2] ?? true;
-    if($ARG[2]){
+    if($ARG[2] ?? true){
         foreach((array)$ARG[1] as $ARG['k'] => $ARG['v']){
             ${$ARG['k']}     = h($ARG['v']);
             ${'_'.$ARG['k']} = $ARG['v'];
