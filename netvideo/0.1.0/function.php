@@ -600,7 +600,7 @@ function メール送信(array $a) :bool{
     $送信者 = str_replace(["\r","\n",","]    , "", $a['送信者'] ?? '');
     $題名   = str_replace(["\r","\n"]        , "", $a['題名']);
 
-    $header[] = $送信者  ?  sprintf('From: %s <%s>', mb_encode_mimeheader($送信者,'utf-8'), $送信元)  :  "From: $送信元";
+    $header[] = strlen($送信者)  ?  sprintf('From: %s <%s>', mb_encode_mimeheader($送信者,'utf-8'), $送信元)  :  "From: $送信元";
     $header[] = 'MIME-Version: 1.0';
     $header[] = 'Content-Transfer-Encoding: base64';
 
