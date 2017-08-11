@@ -68,25 +68,22 @@ function リダイレクト(string $url) :void{
 }
 
 
-function route(...$ARG) :bool{
-    //名前節約のために$ARGのみ使用。[0]リクエストメソッド(文字列)、[1]実行するもの(配列)、[2]引数(任意)
-
-    $ARG[0] = strtoupper($ARG[0]);
-    if(!in_array($ARG[0], ['GET', 'POST', 'ANY'])){
-        return 内部エラー("第1引数のメソッド指定は'GET'か'POST'か'ANY'にしてください");
+function route(string $method, array $files, $arg=1) :bool{
+    $method = strtoupper($method);
+    if(!in_array($method, ['GET', 'POST', 'ANY'])){
+        return 内部エラー("リクエストメソッドの指定は'GET'か'POST'か'ANY'にしてください");
     }
-    if($ARG[0] !== $_SERVER['REQUEST_METHOD']){
+    if($method !== $_SERVER['REQUEST_METHOD']){
         return false;
     }
 
-    $arg = $ARG[2] ?? 1;
-    foreach((array)$ARG[1] as $ARG['v']){
-        if(is_callable($ARG['v'])){
-            $arg = $ARG['v']($arg);
+    foreach($files as $ARG){
+        if(is_callable($ARG)){
+            $arg = $ARG($arg);
         }
         else{
             $arg = (function() use($ARG, $arg){
-                return require_once $ARG['v'];
+                return require_once $ARG;
             })();
         }
     }
