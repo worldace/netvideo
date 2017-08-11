@@ -616,6 +616,12 @@ function メール送信(array $a) :bool{
              $header[] = "Bcc: $v";
         }
     }
+    if(isset($a['ヘッダ'])){
+        foreach((array)$a['ヘッダ'] as $v){
+             $v = str_replace(["\r","\n"], "",  $v);
+             $header[] = $v;
+        }
+    }
 
     if(empty($a['ファイル'])){
         $header[] = 'Content-Type: text/plain; charset=utf-8';
