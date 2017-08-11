@@ -641,9 +641,6 @@ function メール送信(array $a) :bool{
             if($v === false){
                 continue;
             }
-            if(is_int($k)){
-                $k = basename($v);
-            }
             $body .= "--$区切り\r\n";
             $body .= "Content-Type: " . MIMEタイプ($k) . "\r\n";
             $body .= "Content-Transfer-Encoding: base64\r\n";
