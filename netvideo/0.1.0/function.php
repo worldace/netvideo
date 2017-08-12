@@ -1010,6 +1010,7 @@ function 制御文字削除($arg, $LF=true){ // http://blog.sarabande.jp/post/52
 }
 
 
+
 function タグ(string $tag, array $attr=[]) :string{
     $閉じる   = true;
     $単独タグ = false;
