@@ -73,8 +73,10 @@ function route(string $method, array $files, $arg=1) :bool{
     if(!in_array($method, ['GET', 'POST', 'ANY'])){
         return 内部エラー("リクエストメソッドの指定は'GET'か'POST'か'ANY'にしてください");
     }
-    if($method !== $_SERVER['REQUEST_METHOD']){
-        return false;
+    if(isset($_SERVER['REQUEST_METHOD']) and $method !== 'ANY'){
+        if($method !== $_SERVER['REQUEST_METHOD']){
+            return false;
+        }
     }
 
     foreach($files as $ARG){
