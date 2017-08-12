@@ -678,18 +678,15 @@ function FTPアップロード(array $upload, array $option) :array{ // http://p
     ftp_pasv($ftp, $option['ftp.パッシブモード']);
     $転送モード = $option['ftp.バイナリモード'] ? FTP_BINARY : FTP_ASCII;
 
-    $files = [];
     foreach($upload as $k => $v){
         if($k[-1] === '/'){
             @ftp_mkdir($ftp, $k);
+            $return[$k] = $v;
         }
         else{
-            $files[$k] = $v;
-        }
-    }
-    foreach($files as $k => $v){
-        if(ftp_put($ftp, $k, $v, $転送モード)){
-            $return[$k] = $v;
+            if(ftp_put($ftp, $k, $v, $転送モード)){
+                $return[$k] = $v;
+            }
         }
     }
 
