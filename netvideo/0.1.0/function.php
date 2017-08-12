@@ -655,8 +655,8 @@ function メール送信(array $a) :bool{
 }
 
 
-function FTPアップロード(array $upload, array $option) :array{ // http://php.net/ftp
-    $return = [];
+function FTPアップロード(array $upload, array $option) :bool{ // http://php.net/ftp
+    $return = true;
     $option = $option + [
         'ftp.パッシブモード' => true,
         'ftp.バイナリモード' => true,
@@ -667,13 +667,11 @@ function FTPアップロード(array $upload, array $option) :array{ // http://p
     $ftp = ($option['ftp.暗号化'] and function_exists('ftp_ssl_connect')) ? 'ftp_ssl_connect' : 'ftp_connect';
     $ftp = $ftp($option['ftp.ホスト'], $option['ftp.ポート']);
     if(!$ftp){
-        内部エラー("FTPサーバに接続できませんでした", "警告");
-        return $return;
+        return 内部エラー("FTPサーバに接続できませんでした", "警告");
     }
 
     if(!ftp_login($ftp, $option['ftp.id'], $option['ftp.パスワード'])){
-        内部エラー("FTPサーバにログインできませんでした", "警告");
-        return $return;
+        return 内部エラー("FTPサーバにログインできませんでした", "警告");
     }
     ftp_pasv($ftp, $option['ftp.パッシブモード']);
     $転送モード = $option['ftp.バイナリモード'] ? FTP_BINARY : FTP_ASCII;
@@ -681,11 +679,10 @@ function FTPアップロード(array $upload, array $option) :array{ // http://p
     foreach($upload as $k => $v){
         if($k[-1] === '/'){
             @ftp_mkdir($ftp, $k);
-            $return[$k] = $v;
         }
         else{
-            if(ftp_put($ftp, $k, $v, $転送モード)){
-                $return[$k] = $v;
+            if(!ftp_put($ftp, $k, $v, $転送モード)){
+                $return = false;
             }
         }
     }
