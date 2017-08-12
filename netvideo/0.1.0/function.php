@@ -851,14 +851,14 @@ function PHP≧(string $str) :bool{
 }
 
 
-function 自然数なら($num, bool $zero=false) :bool{
+function 自然数なら($num) :bool{
     if(is_int($num)){
-        if(($num > 0) or ($zero and $num === 0)){
+        if($num > 0){
             return true;
         }
     }
     elseif(is_string($num)){
-        if(preg_match("/\A[1-9][0-9]*\z/", $num) or ($zero and $num === '0')){
+        if(preg_match("/\A[1-9][0-9]*\z/", $num)){
             return true;
         }
     }
