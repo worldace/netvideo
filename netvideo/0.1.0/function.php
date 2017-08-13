@@ -658,23 +658,23 @@ function メール送信(array $a) :bool{
 function FTPアップロード(array $upload, array $option) :bool{ // http://php.net/ftp
     $return = true;
     $option = $option + [
-        'ftp.パッシブモード' => true,
-        'ftp.バイナリモード' => true,
-        'ftp.ポート' => 21,
-        'ftp.暗号化' => false,
+        'パッシブモード' => true,
+        'バイナリモード' => true,
+        'ポート' => 21,
+        '暗号化' => false,
     ];
 
-    $ftp = ($option['ftp.暗号化'] and function_exists('ftp_ssl_connect')) ? 'ftp_ssl_connect' : 'ftp_connect';
-    $ftp = $ftp($option['ftp.ホスト'], $option['ftp.ポート']);
+    $ftp = ($option['暗号化'] and function_exists('ftp_ssl_connect')) ? 'ftp_ssl_connect' : 'ftp_connect';
+    $ftp = $ftp($option['ホスト'], $option['ポート']);
     if(!$ftp){
         return 内部エラー("FTPサーバに接続できませんでした", "警告");
     }
 
-    if(!ftp_login($ftp, $option['ftp.id'], $option['ftp.パスワード'])){
+    if(!ftp_login($ftp, $option['id'], $option['パスワード'])){
         return 内部エラー("FTPサーバにログインできませんでした", "警告");
     }
-    ftp_pasv($ftp, $option['ftp.パッシブモード']);
-    $転送モード = $option['ftp.バイナリモード'] ? FTP_BINARY : FTP_ASCII;
+    ftp_pasv($ftp, $option['パッシブモード']);
+    $転送モード = $option['バイナリモード'] ? FTP_BINARY : FTP_ASCII;
 
     foreach($upload as $k => $v){
         if($k[-1] === '/'){
