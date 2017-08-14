@@ -127,14 +127,14 @@ function 非同期処理(string $file, $data=null) :void{
         return;
     }
 
-    $data = base64_encode(serialize($data));
+    $data = base64_encode(json_encode($data, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_PARTIAL_OUTPUT_ON_ERROR));
 
     if(preg_match('/WIN/i', PHP_OS)){
-        $code = "\$arg=unserialize(base64_decode('$data'));include('$file');";
+        $code = "\$arg=json_decode(base64_decode('$data'),true);include('$file');";
         pclose(popen(sprintf('start php -r %s', escapeshellarg($code)), 'r'));
     }
     else{
-        $code = "\$arg=unserialize(base64_decode(\"$data\"));include(\"$file\");";
+        $code = "\$arg=json_decode(base64_decode(\"$data\"),true);include(\"$file\");";
         exec(sprintf('nohup php -r %s > /dev/null &', escapeshellarg($code)));
     }
 }
