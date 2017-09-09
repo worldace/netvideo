@@ -166,30 +166,26 @@ function 検査($var, $func, $message=null) :bool{
             内部エラー("第2引数の特別関数名が間違っています");
         }
     }
-
-    検査::$結果[] = $return ?: $message;
     return $return;
 }
 
 
 class 検査{
-    public static $結果 = [];
+    private $結果 = [];
 
+    function __invoke($var, $func, $message=null) :bool{
+        $return = 検査($var, $func, $message);
+        $this->結果[] = $return ?: $message;
+        return $return;
+    }
 
-    static function 失敗なら(&$result) :bool{
-        $result = self::$結果;
-        self::$結果 = [];
-
-        foreach($result as $v){
+    function 失敗なら(&$result) :bool{
+        foreach($result=$this->結果 as $v){
             if($v !== true){
                 return true;
             }
         }
         return false;
-    }
-
-    static function 開始() :void{
-        self::$結果 = [];
     }
 
 
