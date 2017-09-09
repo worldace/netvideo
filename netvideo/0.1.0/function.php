@@ -1814,7 +1814,7 @@ class データベース{
     private static $pdo = [];
     private $接続名 = "";
     private $テーブル = "";
-    private $主キー = "id";
+    private $主キー = "";
     private $where = [];
     private $設定  = [];
     private $定義  = [];
@@ -1870,7 +1870,7 @@ class データベース{
 
         $this->テーブル = $table;
         $this->定義     = constant("$class::定義");
-        $this->主キー   = defined ("$class::主キー")  ?  constant("$class::主キー")  :  "id";
+        $this->主キー   = key($this->定義);
 
         return $this;
     }
