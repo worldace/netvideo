@@ -179,13 +179,14 @@ class 検査{
         return $return;
     }
 
-    function 失敗なら(&$result) :bool{
-        foreach($result=$this->結果 as $v){
+    function 結果() :array{
+        $return = [];
+        foreach($this->結果 as $k => $v){
             if($v !== true){
-                return true;
+                $return[$k] = $v;
             }
         }
-        return false;
+        return $return;
     }
 
 
