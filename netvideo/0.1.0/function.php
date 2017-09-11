@@ -1391,12 +1391,9 @@ function CSV取得(string $path, $encode=null, string $区切り=null, string $�
     //文字コード検知
     if($encode === true){
         $encode = mb_detect_encoding($sample, ["utf-8", "sjis-win", "eucjp-win"]);
-        if(!$encode){
-            $encode = "utf-8";
+        if($encode === "UTF-8"){
+            $encode = null;
         }
-    }
-    if(preg_match("/^utf-?8/i", $encode)){
-        $encode = null;
     }
 
     //区切り検知
