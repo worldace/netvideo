@@ -1390,7 +1390,7 @@ function CSV取得(string $path, $encode=null, string $区切り=null, string $�
 
     //文字コード検知
     if($encode === true){
-        $encode = mb_detect_encoding($sample, ["utf-8", "sjis-win", "eucjp-win", "ascii", "ISO-2022-JP"]);
+        $encode = mb_detect_encoding($sample, ["utf-8", "sjis-win", "eucjp-win"]);
         if(!$encode){
             $encode = "utf-8";
         }
