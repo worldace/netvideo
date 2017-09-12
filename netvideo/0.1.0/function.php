@@ -10,17 +10,17 @@ function テキスト表示(string $str) :void{
 }
 
 
-function JSON表示($data, $allow=null) :void{
+function JSON表示($x, $allow=null) :void{
     $allow = ($allow)  ?  implode(" ", (array)$allow)  :  "*";
     header("Access-Control-Allow-Origin: $allow");
     header("Access-Control-Allow-Credentials: true");
     if(isset($_GET['callback']) and is_string($_GET['callback'])){ //JSONP
         header("Content-Type: application/javascript; charset=utf-8");
-        print $_GET['callback'] . "(" . json_encode($data, JSON_PARTIAL_OUTPUT_ON_ERROR) . ");";
+        print $_GET['callback'] . "(" . json_encode($x, JSON_PARTIAL_OUTPUT_ON_ERROR) . ");";
     }
     else{ //JSON
         header("Content-Type: application/json; charset=utf-8");
-        print json_encode($data, JSON_PARTIAL_OUTPUT_ON_ERROR);
+        print json_encode($x, JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
     exit;
 }
@@ -122,44 +122,44 @@ function require_cache(string $file){
 }
 
 
-function 非同期処理(string $file, $data=null) :void{
+function 非同期処理(string $file, $x=null) :void{
     if(!is_file($file) or preg_match('/[\'\"]/', $file)){
         return;
     }
 
-    $data = base64_encode(serialize($data));
+    $x = base64_encode(serialize($x));
 
     if(preg_match('/WIN/i', PHP_OS)){
-        $code = "\$arg=unserialize(base64_decode('$data'));include('$file');";
+        $code = "\$arg=unserialize(base64_decode('$x'));include('$file');";
         pclose(popen(sprintf('start php -r %s', escapeshellarg($code)), 'r'));
     }
     else{
-        $code = "\$arg=unserialize(base64_decode(\"$data\"));include(\"$file\");";
+        $code = "\$arg=unserialize(base64_decode(\"$x\"));include(\"$file\");";
         exec(sprintf('nohup php -r %s > /dev/null &', escapeshellarg($code)));
     }
 }
 
 
-function 検査($var, $func, $message=null) :bool{
+function 検査($x, $func, $message=null) :bool{
     if(is_callable($func)){
-        $return = $func($var);
+        $return = $func($x);
         if(!is_bool($return)){
             内部エラー("第2引数の関数はtrueかfalseを返してください");
         }
     }
     else{
         if(is_callable("検査::$func")){
-            $return = 検査::$func($var);
+            $return = 検査::$func($x);
         }
         else if(preg_match("/^(\d+)(文字|字|バイト)(以上|以下|以内|未満|より大きい|より小さい|と同じ)*$/u", $func, $match)){
             if(!isset($match[3])){
                 $match[3] = "と同じ";
             }
             if($match[2] === "文字" or $match[2] === "字"){
-                $return = 検査::文字数($var, (int)$match[1], $match[3]);
+                $return = 検査::文字数($x, (int)$match[1], $match[3]);
             }
             else{
-                $return = 検査::バイト数($var, (int)$match[1], $match[3]);
+                $return = 検査::バイト数($x, (int)$match[1], $match[3]);
             }
         }
         else{
@@ -173,8 +173,8 @@ function 検査($var, $func, $message=null) :bool{
 class 検査{
     private $結果 = [];
 
-    function __invoke($var, $func, $message=null) :bool{
-        $return = 検査($var, $func, $message);
+    function __invoke($x, $func, $message=null) :bool{
+        $return = 検査($x, $func, $message);
         $this->結果[] = $return ?: $message;
         return $return;
     }
@@ -839,19 +839,19 @@ function 開発環境なら() :bool{
 }
 
 
-function PHP≧(string $str) :bool{
-    return version_compare(PHP_VERSION, $str) >= 0;
+function PHP≧(string $version) :bool{
+    return version_compare(PHP_VERSION, $version) >= 0;
 }
 
 
-function 自然数なら($num) :bool{
-    if(is_int($num)){
-        if($num > 0){
+function 自然数なら($x) :bool{
+    if(is_int($x)){
+        if($x > 0){
             return true;
         }
     }
-    elseif(is_string($num)){
-        if(preg_match("/\A[1-9][0-9]*\z/", $num)){
+    elseif(is_string($x)){
+        if(preg_match("/\A[1-9][0-9]*\z/", $x)){
             return true;
         }
     }
@@ -884,17 +884,17 @@ function preg_match_replace(string $regex, string $replace, string $haystack, &$
 }
 */
 
-function 日付(string $str='[年]/[0月]/[0日] [0時]:[0分]', int $time=0) :string{
+function 日付(string $format='[年]/[0月]/[0日] [0時]:[0分]', int $time=0) :string{
     if(!$time){
         $time = time();
     }
-    $week = ['日','月','火','水','木','金','土'][date('w', $time)];
-    $from = ['[年]','[月]','[0月]','[日]','[0日]','[時]','[0時]','[0分]','[0秒]','[曜日]'];
-    $to   = ['Y'   ,'n'   ,'m'    ,'j'   ,'d'    ,'G'   ,'H'    ,'i'    ,'s'    ,$week];
-    $str  = str_replace($from, $to, $str);
-    $str  = str_replace('[分]', ltrim(date('i',$time),"0"), $str);
-    $str  = str_replace('[秒]', ltrim(date('s',$time),"0"), $str);
-    return date($str, $time);
+    $week   = ['日','月','火','水','木','金','土'][date('w', $time)];
+    $from   = ['[年]','[月]','[0月]','[日]','[0日]','[時]','[0時]','[0分]','[0秒]','[曜日]'];
+    $to     = ['Y'   ,'n'   ,'m'    ,'j'   ,'d'    ,'G'   ,'H'    ,'i'    ,'s'    ,$week];
+    $format = str_replace($from, $to, $format);
+    $format = str_replace('[分]', ltrim(date('i',$time),"0"), $format);
+    $format = str_replace('[秒]', ltrim(date('s',$time),"0"), $format);
+    return date($format, $time);
 }
 
 
@@ -953,41 +953,41 @@ function 日本語設定() :void{
 }
 
 
-function h($arg){
-    if(is_string($arg)){
-        $arg = htmlspecialchars($arg, ENT_QUOTES, "UTF-8", false);
+function h($x){
+    if(is_string($x)){
+        $x = htmlspecialchars($x, ENT_QUOTES, "UTF-8", false);
     }
-    else if(is_array($arg)){
-        array_walk_recursive($arg, function(&$v){
+    else if(is_array($x)){
+        array_walk_recursive($x, function(&$v){
             $v = htmlspecialchars($v, ENT_QUOTES, "UTF-8", false);
         });
     }
-    return $arg;
+    return $x;
 }
 
 
-function 改行置換($arg, string $replace=""){
-    if(is_string($arg)){
-        $arg = preg_replace("/\r\n|\n|\r/", $replace, $arg);
+function 改行置換($x, string $replace=""){
+    if(is_string($x)){
+        $x = preg_replace("/\r\n|\n|\r/", $replace, $x);
     }
-    else if(is_array($arg)){
-        array_walk_recursive($arg, function(&$v) use($replace){
+    else if(is_array($x)){
+        array_walk_recursive($x, function(&$v) use($replace){
             $v = preg_replace("/\r\n|\n|\r/", $replace, $v);
         });
     }
-    return $arg;
+    return $x;
 }
 
 
 
-function 制御文字削除($arg, $LF=true){ // http://blog.sarabande.jp/post/52701231276
-    if(is_string($arg)){
-        $arg = preg_replace("/\t/", "    ", $arg);
-        $arg = preg_replace("/\xC2[\x80-\x9F]/", "", $arg); //Unicode制御文字
-        $arg = ($LF === true)  ?  preg_replace("/[[:cntrl:]]/u", "", $arg)  :  preg_replace("/(?!\n)[[:cntrl:]]/u", "", $arg);
+function 制御文字削除($x, $LF=true){ // http://blog.sarabande.jp/post/52701231276
+    if(is_string($x)){
+        $x = preg_replace("/\t/", "    ", $x);
+        $x = preg_replace("/\xC2[\x80-\x9F]/", "", $x); //Unicode制御文字
+        $x = ($LF === true)  ?  preg_replace("/[[:cntrl:]]/u", "", $x)  :  preg_replace("/(?!\n)[[:cntrl:]]/u", "", $x);
     }
-    else if(is_array($arg)){
-        array_walk_recursive($arg, function(&$v, $k) use($LF){
+    else if(is_array($x)){
+        array_walk_recursive($x, function(&$v, $k) use($LF){
             $v = preg_replace("/\t/", "    ", $v);
             $v = preg_replace("/\xC2[\x80-\x9F]/", "", $v); //Unicode制御文字
             if(is_array($LF)){
@@ -999,7 +999,7 @@ function 制御文字削除($arg, $LF=true){ // http://blog.sarabande.jp/post/52
             $v = $bool  ?  preg_replace("/[[:cntrl:]]/u", "", $v)  :  preg_replace("/(?!\n)[[:cntrl:]]/u", "", $v);
         });
     }
-    return $arg;
+    return $x;
 }
 
 
@@ -1054,17 +1054,17 @@ function 属性文字列(array $attr=[]) :string{
 }
 
 
-function 自動リンク($arg, array $attr=[]){
+function 自動リンク($x, array $attr=[]){
     $attr_str = 属性文字列($attr);
-    if(is_string($arg)){
-        $arg = preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $arg);
+    if(is_string($x)){
+        $x = preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $x);
     }
-    else if(is_array($arg)){
-        array_walk_recursive($arg, function(&$v) use($attr_str){
+    else if(is_array($x)){
+        array_walk_recursive($x, function(&$v) use($attr_str){
             $v = preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $v);
         });
     }
-    return $arg;
+    return $x;
 }
 
 
@@ -1322,9 +1322,9 @@ function zip解凍(string $zipfile, string $解凍先="") :array{
 }
 
 
-function 一時保存(string $name, $data){
+function 一時保存(string $name, $x){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
-    $result = file_put_contents($tempfile, serialize($data), LOCK_EX);
+    $result = file_put_contents($tempfile, serialize($x), LOCK_EX);
     return ($result === false) ? false : $name;
 }
 
@@ -1335,9 +1335,9 @@ function 一時取得(string $name, $default = false){
 }
 
 
-function JSON保存(string $file, $data){
+function JSON保存(string $file, $x){
     $prefix = preg_match("/\.php$/i", $file) ? "<?php\n" : "";
-    $result = file_put_contents($file, $prefix.json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR), LOCK_EX);
+    $result = file_put_contents($file, $prefix.json_encode($x, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR), LOCK_EX);
     return ($result === false) ? false : $file;
 }
 
@@ -1477,8 +1477,8 @@ function CSV作成($array, $改行変換="\n", $常に囲む=null, string $d=','
 }
 
 
-function fromphp($data, string $name='fromphp') :string{
-    $json  = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
+function fromphp($x, string $name='fromphp') :string{
+    $json  = json_encode($x, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
     $valid = preg_match("/^[a-zA-Z_\$\x7f-\xff][a-zA-Z0-9_\$\x7f-\xff]*/", $name);
     return ($json !== false and $valid)  ?  "<script>var $name = $json;</script>\n"  :  "";
 }
@@ -1537,30 +1537,30 @@ function パスワード認証(string $password, string $hash) :bool{
 }
 
 
-function 暗号化(string $str, string $key) :string{
+function 暗号化(string $str, string $password) :string{
     $iv = openssl_random_pseudo_bytes(16); // openssl_cipher_iv_length('aes-128-cbc') == 16
-    return bin2hex($iv) . openssl_encrypt($str, 'aes-128-cbc', $key, 0, $iv); //先頭32バイトがiv
+    return bin2hex($iv) . openssl_encrypt($str, 'aes-128-cbc', $password, 0, $iv); //先頭32バイトがiv
 }
 
 
-function 復号化(string $str, string $key){
+function 復号化(string $str, string $password){
     $iv = substr($str, 0, 32);
-    return openssl_decrypt(substr($str, 32), 'aes-128-cbc', $key, 0, hex2bin($iv));
+    return openssl_decrypt(substr($str, 32), 'aes-128-cbc', $password, 0, hex2bin($iv));
 }
 
 
-function jwt発行(array $data, string $key) :string{
+function jwt発行(array $x, string $password) :string{
     $header     = ['typ'=>'jwt', 'alg'=>'HS256'];
     $segments[] = base64_encode_urlsafe(json_encode($header), JSON_PARTIAL_OUTPUT_ON_ERROR);
-    $segments[] = base64_encode_urlsafe(json_encode($data), JSON_PARTIAL_OUTPUT_ON_ERROR);
-    $sign       = hash_hmac('sha256', implode('.', $segments), $key, true);
+    $segments[] = base64_encode_urlsafe(json_encode($x), JSON_PARTIAL_OUTPUT_ON_ERROR);
+    $sign       = hash_hmac('sha256', implode('.', $segments), $password, true);
     $segments[] = base64_encode_urlsafe($sign);
 
     return implode('.', $segments);
 }
 
 
-function jwt認証(string $jwt, string $key){
+function jwt認証(string $jwt, string $password){
     if(substr_count($jwt, ".") !== 2) {
         return false;
     }
@@ -1576,7 +1576,7 @@ function jwt認証(string $jwt, string $key){
     if($header->alg !== "HS256"){
         return false;
     }
-    if($sign !== hash_hmac('sha256', "$headb64.$datab64", $key, true)){
+    if($sign !== hash_hmac('sha256', "$headb64.$datab64", $password, true)){
         return false;
     }
 
@@ -1584,22 +1584,22 @@ function jwt認証(string $jwt, string $key){
 }
 
 
-function base64_encode_urlsafe(string $input) :string{
-    return str_replace('=', '', strtr(base64_encode($input), '+/', '-_'));
+function base64_encode_urlsafe(string $str) :string{
+    return str_replace('=', '', strtr(base64_encode($str), '+/', '-_'));
 }
 
 
-function base64_decode_urlsafe(string $input) :string{
-    $remainder = strlen($input) % 4;
+function base64_decode_urlsafe(string $str) :string{
+    $remainder = strlen($str) % 4;
     if($remainder){
         $padlen = 4 - $remainder;
-        $input .= str_repeat('=', $padlen);
+        $str .= str_repeat('=', $padlen);
     }
-    return base64_decode(strtr($input, '-_', '+/'));
+    return base64_decode(strtr($str, '-_', '+/'));
 }
 
 
-function base_encode($val, int $base=62) :string{
+function base_encode($x, int $base=62) :string{
     if($base < 2 or $base > 62){
         内部エラー("進数は2～62の間で指定してください");
         return "";
@@ -1607,10 +1607,10 @@ function base_encode($val, int $base=62) :string{
     $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $str = '';
     do {
-        $mem = bcmod($val, $base);
+        $mem = bcmod($x, $base);
         $str = $chars[$mem] . $str;
-        $val = bcdiv(bcsub($val, $mem), $base);
-    } while(bccomp($val,0) > 0);
+        $x = bcdiv(bcsub($x, $mem), $base);
+    } while(bccomp($x,0) > 0);
 
     return $str;
 }
