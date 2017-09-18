@@ -423,7 +423,7 @@ $v.screen.showOsd = function(str){
 
     $v.screen.clearOsd();
     $v.screen.appendChild(osd);
-    $v.screen.osdTimer = window.setTimeout($v.screen.clearOsd, 1500);
+    $v.screen.osdTimer = window.setTimeout($v.screen.clearOsd, 3000);
 };
 
 
@@ -638,19 +638,19 @@ $v.video.addEventListener('error', function(event){
 
     switch(error.code){ // http://www.html5.jp/tag/elements/video.html
         case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-            alert("動画ファイルが存在しません");
+            $v.screen.showOsd("動画ファイルが存在しません");
             break;
         case error.MEDIA_ERR_DECODE:
-            alert("動画ファイルが未対応の形式です");
+            $v.screen.showOsd("動画ファイルが未対応の形式です");
             break;
         case error.MEDIA_ERR_NETWORK:
-            alert("動画ファイルのダウンロードが失敗しました");
+            $v.screen.showOsd("動画ファイルのダウンロードが失敗しました");
             break;
         case error.MEDIA_ERR_ABORTED:
-            //alert("動画の再生が中止されました");
+            //$v.screen.showOsd("動画の再生が中止されました");
             break;
         default:
-            alert("未知のエラーが発生しました");
+            $v.screen.showOsd("未知のエラーが発生しました");
             break;
     }
 });
