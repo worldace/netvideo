@@ -808,6 +808,54 @@ function トップURL(string $url) :string{
 }
 
 
+function 相対URLを絶対URLに変換(string $path, string $url) :string{
+    if(preg_match("|^[a-zA-Z]+:|", $path)){
+        return $path;
+    }
+
+    $url_parsed = explode('/', $url);
+    $url_home   = $url_parsed[0] . '//' . $url_parsed[2];
+    $url_parsed = parse_url($url);
+    $url_path   = $url_parsed['path'] ?? '/';
+
+    //-- ?query or #anchor
+    if($path[0] === '?' or $path[0] === '#'){
+        return $url_home . $url_path . $path;
+    }
+
+    //-- /path
+    if($path[0] === '/'){
+        return ($path[1] === '/')  ?  $url_parsed['scheme'].':'.$path  :  $url_home.$path;
+    }
+
+    //-- ./path or ../path
+    $path_parsed = array_filter(explode('/', $url_path), 'strlen');
+    if(strpos(end($path_parsed), '.') !== false){
+        array_pop($path_parsed);
+    }
+
+    foreach(explode('/', $path) as $v){
+        if($v === '.'){
+            continue;
+        }
+        if($v === '..'){
+            array_pop($path_parsed);
+            continue;
+        }
+        if($v !== ''){
+            $path_parsed[] = $v;
+        }
+    }
+
+    $return = $url_home . '/' . implode('/', $path_parsed);
+    if($path[-1] === '/'){
+        $return .= '/';
+    }
+
+    return $return;
+}
+
+
 function Windowsなら() :bool{
     return preg_match("/^WIN/i", PHP_OS);
 }
