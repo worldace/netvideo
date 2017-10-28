@@ -537,7 +537,7 @@ function FILES詰め直し() :array{
 }
 
 
-function ファイル受信(string $dir, array $whitelist){
+function ファイル受信(string $dir, array $whitelist=['.jpg','.jpeg','.png','.gif']){
     $files = FILES詰め直し();
     
     if(!$files){
