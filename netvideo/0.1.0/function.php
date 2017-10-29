@@ -1420,7 +1420,15 @@ function XML取得(string $xml) :array{
 }
 
 
-function CSV取得(string $path, $encode=null, string $区切り=null, string $囲い='"') :Generator{
+function CSV取得(string $path, array $設定 = []) :Generator{
+    $設定 += [
+        '入力コード'     => null,
+        '出力コード'     => null,
+        '区切り文字'     => null,
+        'エスケープ文字' => '"',
+        'スキップ'       => 0,
+    ];
+    
     $ini = ini_get("auto_detect_line_endings");
     ini_set("auto_detect_line_endings", true);
 
@@ -1437,15 +1445,12 @@ function CSV取得(string $path, $encode=null, string $区切り=null, string $�
 
 
     //文字コード検知
-    if($encode === true){
-        $encode = mb_detect_encoding($sample, ["utf-8", "sjis-win", "eucjp-win"]);
-        if($encode === "UTF-8"){
-            $encode = null;
-        }
+    if($設定['出力コード'] and !$設定['入力コード']){
+        $設定['入力コード'] = mb_detect_encoding($sample, ["utf-8", "sjis-win", "eucjp-win"]);
     }
 
     //区切り検知
-    if(!$区切り){
+    if(!$設定['区切り文字']){
         $sample  = substr($sample, 0, 256);
         $count_c = preg_match_all("/,/" , $sample);
         $count_t = preg_match_all("/\t/", $sample);
@@ -1453,16 +1458,20 @@ function CSV取得(string $path, $encode=null, string $区切り=null, string $�
             内部エラー("CSVファイルの区切り文字を検知できませんでした", "警告");
             return;
         }
-        $区切り = ($count_c > $count_t)  ?  ","  :  "\t";
+        $設定['区切り文字'] = ($count_c > $count_t)  ?  ","  :  "\t";
     }
 
     $i = 0;
-    while(($csv = CSV行取得($fp, $区切り, $囲い)) !== false){
+    while(($csv = CSV行取得($fp, $設定['区切り文字'], $設定['エスケープ文字'])) !== false){
+        if($設定['スキップ'] > 0){
+            $設定['スキップ']--;
+            continue;
+        }
         if($csv === ['']){
             $csv = [];
         }
-        if($encode){
-            mb_convert_variables("utf-8", $encode, $csv);
+        if($設定['出力コード']){
+            mb_convert_variables($設定['出力コード'], $設定['入力コード'], $csv);
         }
         yield $i => $csv;
         $i++;
