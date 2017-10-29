@@ -1420,7 +1420,7 @@ function XML取得(string $xml) :array{
 }
 
 
-function CSV取得(string $path, array $設定 = []) :Generator{
+function CSV取得(string $path, array $設定=[]) :Generator{
     $設定 += [
         '入力コード'     => null,
         '出力コード'     => null,
@@ -1508,7 +1508,14 @@ function CSV行取得(&$handle, $d=',', $e='"'){
 }
 
 
-function CSV作成($array, $改行変換="\n", $常に囲む=null, string $d=',', string $e='"') :string{
+function CSV作成($array, array $設定=[]) :string{
+    $設定 += [
+        '改行変換'       => "\n",
+        '常に囲む'       => false,
+        '区切り文字'     => ',',
+        'エスケープ文字' => '"',
+    ];
+    
     $return = "";
     if(!is_iterable($array) and !is_object($array)){
         return $return;
@@ -1521,14 +1528,14 @@ function CSV作成($array, $改行変換="\n", $常に囲む=null, string $d=','
         $newline = [];
         foreach($line as $cell){
             $cell = (string)$cell;
-            $cell = preg_replace("/\r\n|\n|\r/", $改行変換, $cell);
-            if($常に囲む === true or (strlen($cell) and !is_numeric($cell))){
-                $cell = str_replace($e, "$e$e", $cell);
-                $cell = $e . $cell . $e;
+            $cell = preg_replace("/\r\n|\n|\r/", $設定['改行変換'], $cell);
+            if($設定['常に囲む'] === true or (strlen($cell) and !is_numeric($cell))){
+                $cell = str_replace($設定['エスケープ文字'], $設定['エスケープ文字'].$設定['エスケープ文字'], $cell);
+                $cell = $設定['エスケープ文字'] . $cell . $設定['エスケープ文字'];
             }
             $newline[] = $cell;
         }
-        $return .= implode($d, $newline) . "\r\n";
+        $return .= implode($設定['区切り文字'], $newline) . "\r\n";
     }
     return $return;
 }
