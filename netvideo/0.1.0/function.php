@@ -1166,6 +1166,11 @@ function 配列探索($array, bool $枝要素を含む=false) :RecursiveIterator
 }
 
 
+function 配列掃除(array $array) :array{
+    return array_merge(array_diff($array, ['']));
+}
+
+
 function パーミッション(string $path, string $permission=null) :string{
     if(!file_exists($path)){
         内部エラー("パス $path は存在しません", "警告");
