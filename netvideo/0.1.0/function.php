@@ -921,6 +921,11 @@ function str_replace_once(string $needle, string $replace, string $haystack) :st
     return substr_replace($haystack, $replace, $pos, strlen($needle));
 }
 
+
+function BOM削除(string $str) :string{
+    return ltrim($str, "\xEF\xBB\xBF");
+}
+
 /*
 function preg_match_replace(string $regex, string $replace, string $haystack, &$match = null){
     if(preg_match($regex, $haystack, $match)){
