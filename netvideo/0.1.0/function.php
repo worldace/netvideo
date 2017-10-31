@@ -1863,6 +1863,16 @@ function クラス文字列化($class){
 }
 
 
+function クリップボードにコピー(string $str) :string{
+    if(preg_match('/WIN/i', PHP_OS)){
+        $clip = popen("clip", "w");
+        fputs($clip, $str);
+        pclose($clip);
+    }
+    return $str;
+}
+
+
 function データベース(string $table, array $setting=[]){
     return new データベース($table, $setting);
 }
