@@ -1450,7 +1450,7 @@ function CSV取得(string $path, array $設定=[]) :Generator{
         内部エラー("CSVファイル $path が開けません", "警告");
         return;
     }
-    $sample = fread($fp, 4096);
+    $sample = fread($fp, 1024);
     rewind($fp);
 
 
@@ -1461,9 +1461,9 @@ function CSV取得(string $path, array $設定=[]) :Generator{
 
     //区切り検知
     if(!$設定['区切り文字']){
-        $sample  = substr($sample, 0, 256);
-        $count_c = preg_match_all("/,/" , $sample);
-        $count_t = preg_match_all("/\t/", $sample);
+        $sample  = substr($sample, 0, 64);
+        $count_c = substr_count($sample, ",");
+        $count_t = substr_count($sample, "\t");
         if(!$count_c and !$count_t){
             内部エラー("CSVファイルの区切り文字を検知できませんでした", "警告");
             return;
@@ -1471,7 +1471,6 @@ function CSV取得(string $path, array $設定=[]) :Generator{
         $設定['区切り文字'] = ($count_c > $count_t)  ?  ","  :  "\t";
     }
 
-    $i = 0;
     while(($csv = CSV行取得($fp, $設定['区切り文字'], $設定['エスケープ文字'])) !== false){
         if($設定['スキップ'] > 0){
             $設定['スキップ']--;
@@ -1483,8 +1482,7 @@ function CSV取得(string $path, array $設定=[]) :Generator{
         if($設定['出力コード']){
             mb_convert_variables($設定['出力コード'], $設定['入力コード'], $csv);
         }
-        yield $i => $csv;
-        $i++;
+        yield $csv;
     }
     fclose($fp);
 }
