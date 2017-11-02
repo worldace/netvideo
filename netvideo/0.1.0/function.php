@@ -1410,6 +1410,28 @@ function JSON取得(string $file){
 }
 
 
+function JSON追記(string $file, $data) :bool{
+    $json = json_encode($data, JSON_PARTIAL_OUTPUT_ON_ERROR);
+
+    $fp = @fopen($file, 'rb+');
+    if(!$fp){
+        if(!file_exists($file)){
+            return (bool)file_put_contents($file, "[\n$json\n]", LOCK_EX);
+        }
+        else{
+            return false;
+        }
+    }
+    flock($fp, LOCK_EX);
+    fseek($fp, -1, SEEK_END);
+    ftruncate($fp, ftell($fp)+1);
+    fwrite($fp, ",$json\n]");
+    flock($fp, LOCK_UN);
+    fclose($fp);
+    return true;
+}
+
+
 function 配列保存(string $file, array $array){
     $return = file_put_contents($file, "<?php\nreturn " . var_export($array,true) . ";", LOCK_EX);
     return ($return === false) ? false : $file;
