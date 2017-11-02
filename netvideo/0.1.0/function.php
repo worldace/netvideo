@@ -1488,7 +1488,7 @@ function CSV取得(string $path, array $設定=[]) :Generator{
 }
 
 
-function CSV行取得(&$handle, $d=',', $e='"'){
+function CSV行取得($handle, $d=',', $e='"'){
     $d = preg_quote($d);
     $e = preg_quote($e);
     $line = "";
