@@ -1412,6 +1412,9 @@ function JSON取得(string $file){
 
 function JSON追記(string $file, $data) :bool{
     $json = json_encode($data, JSON_PARTIAL_OUTPUT_ON_ERROR);
+    if($json === false and $data !== false){
+        return false;
+    }
 
     $fp = @fopen($file, 'rb+');
     if(!$fp){
