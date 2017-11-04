@@ -1689,6 +1689,20 @@ function jwt認証(string $jwt, string $password, string $algorithm="HS256"){
 }
 
 
+function jwt分解(string $jwt){
+    if(substr_count($jwt, ".") !== 2) {
+        return false;
+    }
+
+    [$head64, $data64, $sign64] = explode('.', $jwt);
+    $head = json_decode(base64_decode_urlsafe($head64), true);
+    $data = json_decode(base64_decode_urlsafe($data64), true);
+    $sign = base64_decode_urlsafe($sign64);
+    
+    return [$head, $data, $sign];
+}
+
+
 function base64_encode_urlsafe(string $str) :string{
     return str_replace('=', '', strtr(base64_encode($str), '+/', '-_'));
 }
