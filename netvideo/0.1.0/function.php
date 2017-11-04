@@ -1657,7 +1657,7 @@ function jwt発行(array $x, string $password) :string{
 }
 
 
-function jwt認証(string $jwt, string $password){
+function jwt認証(string $jwt, string $password, string $algorithm="HS256"){
     if(substr_count($jwt, ".") !== 2) {
         return false;
     }
@@ -1671,12 +1671,12 @@ function jwt認証(string $jwt, string $password){
         return false;
     }
     
-    if($header->alg === "HS256"){
+    if($header->alg === "HS256" and $algorithm === "HS256"){
         if($sign !== hash_hmac('sha256', "$headb64.$datab64", $password, true)){
             return false;
         }
     }
-    elseif($header->alg === "RS256"){
+    elseif($header->alg === "RS256" and $algorithm === "RS256"){
         if(openssl_verify("$headb64.$datab64", $sign, $password, 'sha256') !== 1){
             return false;
         }
