@@ -1670,10 +1670,18 @@ function jwt認証(string $jwt, string $password){
     if(!$header or !$data) {
         return false;
     }
-    if($header->alg !== "HS256"){
-        return false;
+    
+    if($header->alg === "HS256"){
+        if($sign !== hash_hmac('sha256', "$headb64.$datab64", $password, true)){
+            return false;
+        }
     }
-    if($sign !== hash_hmac('sha256', "$headb64.$datab64", $password, true)){
+    elseif($header->alg === "RS256"){
+        if(openssl_verify("$headb64.$datab64", $sign, $password, 'sha256') !== 1){
+            return false;
+        }
+    }
+    else{
         return false;
     }
 
