@@ -1662,22 +1662,22 @@ function jwt認証(string $jwt, string $password, string $algorithm="HS256"){
         return false;
     }
 
-    list($headb64, $datab64, $cryptob64) = explode('.', $jwt);
-    $header = json_decode(base64_decode_urlsafe($headb64));
-    $data   = json_decode(base64_decode_urlsafe($datab64), true);
-    $sign   = base64_decode_urlsafe($cryptob64);
+    [$head64, $data64, $sign64] = explode('.', $jwt);
+    $head = json_decode(base64_decode_urlsafe($head64), true);
+    $data = json_decode(base64_decode_urlsafe($data64), true);
+    $sign = base64_decode_urlsafe($sign64);
 
-    if(!$header or !$data) {
+    if(!isset($head['alg']) or !is_array($data)){
         return false;
     }
     
-    if($header->alg === "HS256" and $algorithm === "HS256"){
-        if($sign !== hash_hmac('sha256', "$headb64.$datab64", $password, true)){
+    if($head['alg'] === "HS256" and $algorithm === "HS256"){
+        if($sign !== hash_hmac('sha256', "$head64.$data64", $password, true)){
             return false;
         }
     }
-    elseif($header->alg === "RS256" and $algorithm === "RS256"){
-        if(openssl_verify("$headb64.$datab64", $sign, $password, 'sha256') !== 1){
+    elseif($head['alg'] === "RS256" and $algorithm === "RS256"){
+        if(openssl_verify("$head64.$data64", $sign, $password, 'sha256') !== 1){
             return false;
         }
     }
