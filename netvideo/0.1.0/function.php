@@ -1699,6 +1699,10 @@ function jwt分解(string $jwt){
     $data = json_decode(base64_decode_urlsafe($data64), true);
     $sign = base64_decode_urlsafe($sign64);
     
+    if(!is_array($head) or !is_array($data) or !is_string($sign)){
+        return false;
+    }
+
     return [$head, $data, $sign];
 }
 
