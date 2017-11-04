@@ -1659,19 +1659,19 @@ function jwt発行(array $x, string $password) :string{
 
 function jwt認証(string $jwt_str, string $password, string $algorithm="HS256"){
     $jwt = jwt分解($jwt_str);
-    if($jwt === false or !isset($jwt[0]['alg'])){
+    if($jwt === false or !isset($jwt['head']['alg'])){
         return false;
     }
     [$head64, $data64, $sign64] = explode('.', $jwt_str);
 
     
-    if($jwt[0]['alg'] === "HS256" and $algorithm === "HS256"){
-        if($jwt[2] !== hash_hmac('sha256', "$head64.$data64", $password, true)){
+    if($jwt['head']['alg'] === "HS256" and $algorithm === "HS256"){
+        if($jwt['sign'] !== hash_hmac('sha256', "$head64.$data64", $password, true)){
             return false;
         }
     }
-    elseif($jwt[0]['alg'] === "RS256" and $algorithm === "RS256"){
-        if(openssl_verify("$head64.$data64", $jwt[2], $password, 'sha256') !== 1){
+    elseif($jwt['head']['alg'] === "RS256" and $algorithm === "RS256"){
+        if(openssl_verify("$head64.$data64", $jwt['sign'], $password, 'sha256') !== 1){
             return false;
         }
     }
@@ -1679,7 +1679,7 @@ function jwt認証(string $jwt_str, string $password, string $algorithm="HS256")
         return false;
     }
 
-    return $jwt[1];
+    return $jwt['data'];
 }
 
 
@@ -1697,7 +1697,7 @@ function jwt分解(string $jwt){
         return false;
     }
 
-    return [$head, $data, $sign];
+    return ['head'=>$head, 'data'=>$data, 'sign'=>$sign];
 }
 
 
