@@ -1657,27 +1657,21 @@ function jwt発行(array $x, string $password) :string{
 }
 
 
-function jwt認証(string $jwt, string $password, string $algorithm="HS256"){
-    if(substr_count($jwt, ".") !== 2) {
+function jwt認証(string $jwt_str, string $password, string $algorithm="HS256"){
+    $jwt = jwt分解($jwt_str);
+    if($jwt === false or !isset($jwt[0]['alg'])){
         return false;
     }
+    [$head64, $data64, $sign64] = explode('.', $jwt_str);
 
-    [$head64, $data64, $sign64] = explode('.', $jwt);
-    $head = json_decode(base64_decode_urlsafe($head64), true);
-    $data = json_decode(base64_decode_urlsafe($data64), true);
-    $sign = base64_decode_urlsafe($sign64);
-
-    if(!isset($head['alg']) or !is_array($data)){
-        return false;
-    }
     
-    if($head['alg'] === "HS256" and $algorithm === "HS256"){
-        if($sign !== hash_hmac('sha256', "$head64.$data64", $password, true)){
+    if($jwt[0]['alg'] === "HS256" and $algorithm === "HS256"){
+        if($jwt[2] !== hash_hmac('sha256', "$head64.$data64", $password, true)){
             return false;
         }
     }
-    elseif($head['alg'] === "RS256" and $algorithm === "RS256"){
-        if(openssl_verify("$head64.$data64", $sign, $password, 'sha256') !== 1){
+    elseif($jwt[0]['alg'] === "RS256" and $algorithm === "RS256"){
+        if(openssl_verify("$head64.$data64", $jwt[2], $password, 'sha256') !== 1){
             return false;
         }
     }
@@ -1685,7 +1679,7 @@ function jwt認証(string $jwt, string $password, string $algorithm="HS256"){
         return false;
     }
 
-    return $data;
+    return $jwt[1];
 }
 
 
