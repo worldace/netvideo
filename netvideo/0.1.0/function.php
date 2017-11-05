@@ -1646,30 +1646,23 @@ function 復号化(string $str, string $password){
 }
 
 
-function jwt発行(array $x, string $password, string $algorithm="HS256"){
-    if($algorithm === "HS256" or $algorithm === "RS256"){
-        $header = ['typ'=>'jwt', 'alg'=>$algorithm];
-    }
-    else{
+function jwt発行(array $data, string $password, string $algorithm="HS256"){
+    if($algorithm !== "HS256" and $algorithm !== "RS256"){
         return false;
     }
 
-    $segments[] = base64_encode_urlsafe(json_encode($header), JSON_PARTIAL_OUTPUT_ON_ERROR);
-    $segments[] = base64_encode_urlsafe(json_encode($x), JSON_PARTIAL_OUTPUT_ON_ERROR);
+    $head64 = base64_encode_urlsafe(json_encode(['typ'=>'jwt', 'alg'=>$algorithm]), JSON_PARTIAL_OUTPUT_ON_ERROR);
+    $data64 = base64_encode_urlsafe(json_encode($data), JSON_PARTIAL_OUTPUT_ON_ERROR);
 
     if($algorithm === "HS256"){
-        $sign = hash_hmac('sha256', implode('.', $segments), $password, true);
+        $sign = hash_hmac('sha256', "$head64.$data64", $password, true);
     }
     elseif($algorithm === "RS256"){
-        $sign = '';
-        if(openssl_sign(implode('.', $segments), $sign, $password, 'sha256') === false){
-            return false;
-        }
+        openssl_sign("$head64.$data64", $sign, $password, 'sha256');
     }
+    $sign64 = base64_encode_urlsafe($sign);
 
-    $segments[] = base64_encode_urlsafe($sign);
-
-    return implode('.', $segments);
+    return "$head64.$data64.$sign64";
 }
 
 
