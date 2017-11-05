@@ -1666,31 +1666,6 @@ function jwt発行(array $data, string $password, string $algorithm="HS256"){
 }
 
 
-function jwt認証(string $jwt, string $password, string $algorithm="HS256"){
-    if(substr_count($jwt, ".") !== 2){
-        return false;
-    }
-    [$head, $data, $sign] = explode('.', $jwt);
-    $sign = base64_decode_urlsafe($sign);
-
-    if($algorithm === "HS256"){
-        if($sign !== hash_hmac('sha256', "$head.$data", $password, true)){
-            return false;
-        }
-    }
-    elseif($algorithm === "RS256"){
-        if(openssl_verify("$head.$data", $sign, $password, 'sha256') !== 1){
-            return false;
-        }
-    }
-    else{
-        return false;
-    }
-
-    return true;
-}
-
-
 function jwt分解(string $jwt, bool $returnAll = false){
     if(substr_count($jwt, ".") !== 2) {
         return false;
@@ -1711,6 +1686,31 @@ function jwt分解(string $jwt, bool $returnAll = false){
     }
 
     return ['head'=>$head, 'data'=>$data, 'sign'=>$sign];
+}
+
+
+function jwt認証(string $jwt, string $password, string $algorithm="HS256"){
+    if(substr_count($jwt, ".") !== 2){
+        return false;
+    }
+    [$head64, $data64, $sign64] = explode('.', $jwt);
+    $sign = base64_decode_urlsafe($sign64);
+
+    if($algorithm === "HS256"){
+        if($sign !== hash_hmac('sha256', "$head64.$data64", $password, true)){
+            return false;
+        }
+    }
+    elseif($algorithm === "RS256"){
+        if(openssl_verify("$head64.$data64", $sign, $password, 'sha256') !== 1){
+            return false;
+        }
+    }
+    else{
+        return false;
+    }
+
+    return true;
 }
 
 
