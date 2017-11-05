@@ -1646,7 +1646,7 @@ function 復号化(string $str, string $password){
 }
 
 
-function jwt発行(array $x, string $password, string $algorithm="HS256") :string{
+function jwt発行(array $x, string $password, string $algorithm="HS256"){
     if($algorithm === "HS256" or $algorithm === "RS256"){
         $header = ['typ'=>'jwt', 'alg'=>$algorithm];
     }
