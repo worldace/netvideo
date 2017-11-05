@@ -1666,21 +1666,20 @@ function jwt発行(array $data, string $password, string $algorithm="HS256"){
 }
 
 
-function jwt認証(string $jwt_str, string $password, string $algorithm="HS256"){
-    $jwt = jwt分解($jwt_str);
-    if($jwt === false or !isset($jwt['head']['alg'])){
+function jwt認証(string $jwt, string $password, string $algorithm="HS256"){
+    if(substr_count($jwt, ".") !== 2){
         return false;
     }
-    [$head64, $data64, $sign64] = explode('.', $jwt_str);
+    [$head, $data, $sign] = explode('.', $jwt);
+    $sign = base64_decode_urlsafe($sign);
 
-    
-    if($jwt['head']['alg'] === "HS256" and $algorithm === "HS256"){
-        if($jwt['sign'] !== hash_hmac('sha256', "$head64.$data64", $password, true)){
+    if($algorithm === "HS256"){
+        if($sign !== hash_hmac('sha256', "$head.$data", $password, true)){
             return false;
         }
     }
-    elseif($jwt['head']['alg'] === "RS256" and $algorithm === "RS256"){
-        if(openssl_verify("$head64.$data64", $jwt['sign'], $password, 'sha256') !== 1){
+    elseif($algorithm === "RS256"){
+        if(openssl_verify("$head.$data", $sign, $password, 'sha256') !== 1){
             return false;
         }
     }
@@ -1688,21 +1687,26 @@ function jwt認証(string $jwt_str, string $password, string $algorithm="HS256")
         return false;
     }
 
-    return $jwt['data'];
+    return true;
 }
 
 
-function jwt分解(string $jwt){
+function jwt分解(string $jwt, bool $returnAll = false){
     if(substr_count($jwt, ".") !== 2) {
         return false;
     }
 
     [$head64, $data64, $sign64] = explode('.', $jwt);
-    $head = json_decode(base64_decode_urlsafe($head64), true);
     $data = json_decode(base64_decode_urlsafe($data64), true);
+
+    if($returnAll === false){
+        return is_array($data) ? $data : false;
+    }
+
+    $head = json_decode(base64_decode_urlsafe($head64), true);
     $sign = base64_decode_urlsafe($sign64);
-    
-    if(!is_array($head) or !is_array($data) or !is_string($sign)){
+
+    if(!is_array($head) or !is_string($sign)){
         return false;
     }
 
