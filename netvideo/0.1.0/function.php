@@ -1696,21 +1696,13 @@ function jwt認証(string $jwt, string $password, string $algorithm="HS256"){
     [$head64, $data64, $sign64] = explode('.', $jwt);
     $sign = base64_decode_urlsafe($sign64);
 
-    if($algorithm === "HS256"){
-        if($sign !== hash_hmac('sha256', "$head64.$data64", $password, true)){
-            return false;
-        }
+    if($algorithm === "HS256" and $sign === hash_hmac('sha256', "$head64.$data64", $password, true)){
+        return true;
     }
-    elseif($algorithm === "RS256"){
-        if(openssl_verify("$head64.$data64", $sign, $password, 'sha256') !== 1){
-            return false;
-        }
+    elseif($algorithm === "RS256" and openssl_verify("$head64.$data64", $sign, $password, 'sha256') === 1){
+        return true;
     }
-    else{
-        return false;
-    }
-
-    return true;
+    return false;
 }
 
 
