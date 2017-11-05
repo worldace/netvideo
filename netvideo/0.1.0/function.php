@@ -1646,11 +1646,27 @@ function 復号化(string $str, string $password){
 }
 
 
-function jwt発行(array $x, string $password) :string{
-    $header     = ['typ'=>'jwt', 'alg'=>'HS256'];
+function jwt発行(array $x, string $password, string $algorithm="HS256") :string{
+    if($algorithm === "HS256" or $algorithm === "RS256"){
+        $header = ['typ'=>'jwt', 'alg'=>$algorithm];
+    }
+    else{
+        return false;
+    }
+
     $segments[] = base64_encode_urlsafe(json_encode($header), JSON_PARTIAL_OUTPUT_ON_ERROR);
     $segments[] = base64_encode_urlsafe(json_encode($x), JSON_PARTIAL_OUTPUT_ON_ERROR);
-    $sign       = hash_hmac('sha256', implode('.', $segments), $password, true);
+
+    if($algorithm === "HS256"){
+        $sign = hash_hmac('sha256', implode('.', $segments), $password, true);
+    }
+    elseif($algorithm === "RS256"){
+        $sign = '';
+        if(openssl_sign(implode('.', $segments), $sign, $password, 'sha256') === false){
+            return false;
+        }
+    }
+
     $segments[] = base64_encode_urlsafe($sign);
 
     return implode('.', $segments);
