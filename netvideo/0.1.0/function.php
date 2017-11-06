@@ -1689,7 +1689,7 @@ function jwt分解(string $jwt, bool $returnAll = false){
 }
 
 
-function jwt認証(string $jwt, string $password, string $algorithm="HS256"){
+function jwt認証(string $jwt, $password, string $algorithm="HS256"){
     if(substr_count($jwt, ".") !== 2){
         return false;
     }
