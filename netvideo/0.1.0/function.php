@@ -1707,16 +1707,11 @@ function jwt認証(string $jwt, string $password, string $algorithm="HS256"){
 
 
 function base64_encode_urlsafe(string $str) :string{
-    return str_replace('=', '', strtr(base64_encode($str), '+/', '-_'));
+    return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
 }
 
 
 function base64_decode_urlsafe(string $str) :string{
-    $remainder = strlen($str) % 4;
-    if($remainder){
-        $padlen = 4 - $remainder;
-        $str .= str_repeat('=', $padlen);
-    }
     return base64_decode(strtr($str, '-_', '+/'));
 }
 
