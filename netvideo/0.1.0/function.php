@@ -104,20 +104,20 @@ function 自動読み込み(string $dir=__DIR__) :void{
 
 
 function require_cache(string $file){
-    static $記憶 = [];
+    static $cache = [];
 
     if(!絶対パスなら($file)){
         $file = realpath($file);
     }
     if(!isset($記憶[$file])){
-        $記憶[$file] = require($file);
+        $cache[$file] = require $file;
     }
-    
+
     if(is_object($記憶[$file])){
-        return clone $記憶[$file];
+        return clone $cache[$file];
     }
     else{
-        return $記憶[$file];
+        return $cache[$file];
     }
 }
 
@@ -2846,11 +2846,12 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
 
     function 検索($selector){
+        $that = clone $this;
         $新選択 = [];
-        foreach($this->選択 as $where){
-            $新選択 = array_merge($新選択, $this->セレクタ検索($selector, false, $where));
+        foreach($that->選択 as $where){
+            $新選択 = array_merge($新選択, $that->セレクタ検索($selector, false, $where));
         }
-        return $this->選択保存($this->重複ノード解消($新選択));
+        return $that->選択保存($that->重複ノード解消($新選択));
     }
 
 
@@ -3070,26 +3071,27 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 
 
     function __invoke($selector = null){
+        $that = clone $this;
         if(is_string($selector)){
             if(!preg_match("/^</", $selector)){
-                $this->セレクタ検索($selector);
-                return clone $this;
+                $that->セレクタ検索($selector);
+                return $that;
             }
             else{
-                return clone $this->選択保存($this->DOM箱作成($selector));
+                return $that->選択保存($that->DOM箱作成($selector));
             }
         }
         else if($selector instanceof self){
-            return clone $this->選択保存($this->DOM箱作成($selector));
+            return $that->選択保存($that->DOM箱作成($selector));
         }
         else if($selector instanceof \DOMElement){
-            return clone $this->選択保存($this->DOM箱作成($selector));
+            return $that->選択保存($that->DOM箱作成($selector));
         }
         else if(is_array($selector)){
-            return clone $this->選択保存($this->DOM箱作成($selector));
+            return $that->選択保存($that->DOM箱作成($selector));
         }
         else{
-            return clone $this;
+            return $that;
         }
     }
 
