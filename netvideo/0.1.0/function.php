@@ -2677,6 +2677,10 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
         libxml_use_internal_errors(true);  // loadHTML() の警告抑制
         libxml_disable_entity_loader(true);
 
+        if(preg_match('|^https?://|', $str)){
+            $str = file_get_contents($str);
+        }
+
         $str = preg_replace("/^[^<]+/", "", $str);
         if(!preg_match("/^<\?xml/i", $str)){ //HTML
             if(!preg_match("/^<\!DOCTYPE/i", $str)){ //ドキュメントタイプがないと変なドキュメントタイプが勝手に追加されるので対策
