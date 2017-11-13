@@ -1146,7 +1146,7 @@ function 連想配列なら($array) :bool{
 
 
 /*
-function 配列探索($array, bool $leafonly = false) :Generator{
+function 配列探索($array, bool $leafonly = false) :\Generator{
     foreach($array as $k => $v){
         if(is_iterable($v) or is_object($v)){
             if(!$leafonly){
@@ -1168,6 +1168,15 @@ function 配列探索($array, bool $枝要素を含む=false) :RecursiveIterator
 
 function 配列掃除(array $array) :array{
     return array_merge(array_diff($array, ['']));
+}
+
+
+function 配列フォーマット(array $array, string $format) :string{
+    $return = '';
+    foreach($array as $k => $v){
+        $return .= str_replace(['%k','%v'], [$k, $v], $format);
+    }
+    return $return;
 }
 
 
@@ -1455,7 +1464,7 @@ function XML取得(string $xml) :array{
 }
 
 
-function CSV取得(string $path, array $設定=[]) :Generator{
+function CSV取得(string $path, array $設定=[]) :\Generator{
     $設定 += [
         '入力コード'     => null,
         '出力コード'     => null,
