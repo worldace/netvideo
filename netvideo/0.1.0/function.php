@@ -1389,15 +1389,14 @@ function zip解凍(string $zipfile, string $解凍先="") :array{
 }
 
 
-function 一時保存(string $name, $x){
-    $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
+function 一時保存($x){
+    $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . uniqid();
     $result = file_put_contents($tempfile, serialize($x), LOCK_EX);
-    return ($result === false) ? false : $name;
+    return ($result !== false) ? $tempfile : false;
 }
 
 
-function 一時取得(string $name, $default = false){
-    $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . md5($name);
+function 一時取得(string $tempfile, $default = false){
     return (is_file($tempfile)) ? unserialize(file_get_contents($tempfile)) : $default;
 }
 
