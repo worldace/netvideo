@@ -1803,7 +1803,9 @@ function CSRF確認() :bool{
 
 
 function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments/media-types/media-types.xhtml
-    $list = [
+    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    
+    return [
         'jpg'  => 'image/jpeg',
         'jpeg' => 'image/jpeg',
         'png'  => 'image/png',
@@ -1835,9 +1837,7 @@ function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments
         'wmv'  => 'video/x-ms-wmv',
         '3g2'  => 'video/3gpp2',
         'mp4'  => 'video/mp4',
-    ];
-    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-    return $list[$ext] ?: "application/octet-stream";
+    ][$ext] ?? "application/octet-stream";
 }
 
 
