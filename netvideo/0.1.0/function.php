@@ -10,7 +10,7 @@ function テキスト表示(string $str) :void{
 }
 
 
-function JSON表示($x, $allow=null) :void{
+function JSON表示($x, $allow = null) :void{
     $allow = ($allow)  ?  implode(" ", (array)$allow)  :  "*";
     header("Access-Control-Allow-Origin: $allow");
     header("Access-Control-Allow-Credentials: true");
@@ -68,7 +68,7 @@ function リダイレクト(string $url) :void{
 }
 
 
-function route(string $method, array $files, $arg=1) :bool{
+function route(string $method, array $files, $arg = 1) :bool{
     $method = strtoupper($method);
     if(!in_array($method, ['GET', 'POST', 'ANY'])){
         return 内部エラー("リクエストメソッドの指定は'GET'か'POST'か'ANY'にしてください");
@@ -93,7 +93,7 @@ function route(string $method, array $files, $arg=1) :bool{
 }
 
 
-function 自動読み込み(string $dir=__DIR__) :void{
+function 自動読み込み(string $dir = __DIR__) :void{
     spl_autoload_register(function($class) use($dir){
         $class = str_replace("\\", "/", $class);
         if(file_exists("$dir/$class.php")){
@@ -122,7 +122,7 @@ function require_cache(string $file){
 }
 
 
-function 非同期処理(string $file, $x=null) :void{
+function 非同期処理(string $file, $x = null) :void{
     if(!is_file($file) or preg_match('/[\'\"]/', $file)){
         return;
     }
@@ -140,7 +140,7 @@ function 非同期処理(string $file, $x=null) :void{
 }
 
 
-function 検査($x, $func, $message=null) :bool{
+function 検査($x, $func, $message = null) :bool{
     if(is_callable($func)){
         $return = $func($x);
         if(!is_bool($return)){
@@ -173,7 +173,7 @@ function 検査($x, $func, $message=null) :bool{
 class 検査{
     private $結果 = [];
 
-    function __invoke($x, $func, $message=null) :bool{
+    function __invoke($x, $func, $message = null) :bool{
         $return = 検査($x, $func, $message);
         $this->結果[] = $return ?: $message;
         return $return;
@@ -256,7 +256,7 @@ function 整形(&$x, callable $func){
 }
 
 
-function 入力(string $name, $default=""){
+function 入力(string $name, $default = ""){
     if($name === ""){
         return $default;
     }
@@ -303,7 +303,7 @@ function テンプレート(...$ARG) :string{
 }
 
 
-function ダウンロード(string $file, string $filename=null, int $timeout=60*60*6) :void{
+function ダウンロード(string $file, string $filename = null, int $timeout = 60*60*6) :void{
     if(preg_match('/^data:.*,/i', $file, $m)){
         $filesize = strlen($file) - strlen($m[0]);
         if(!$filename){
@@ -333,7 +333,7 @@ function ダウンロード(string $file, string $filename=null, int $timeout=60
 }
 
 
-function 並列GET送信(array $url, int $並列数=5, array $option=[]) :array{
+function 並列GET送信(array $url, int $並列数 = 5, array $option = []) :array{
     $option = $option + [ // http://php.net/manual/ja/function.curl-setopt.php
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
@@ -370,7 +370,7 @@ function 並列GET送信(array $url, int $並列数=5, array $option=[]) :array{
 }
 
 
-function GET送信(string $url, array $querymap=null, array $request_header=[]){
+function GET送信(string $url, array $querymap = null, array $request_header = []){
     $_ENV['RESPONSE_HEADER'] = [];
     if($querymap){
         $url .= preg_match("/\?/", $url) ? "&" : "?";
@@ -394,7 +394,7 @@ function GET送信(string $url, array $querymap=null, array $request_header=[]){
 }
 
 
-function POST送信(string $url, array $querymap=null, array $request_header=[]){
+function POST送信(string $url, array $querymap = null, array $request_header = []){
     $_ENV['RESPONSE_HEADER'] = [];
     $content = http_build_query((array)$querymap, "", "&");
 
@@ -422,7 +422,7 @@ function POST送信(string $url, array $querymap=null, array $request_header=[])
 }
 
 
-function ファイル送信(string $url, array $querymap=null, array $request_header=[]){
+function ファイル送信(string $url, array $querymap = null, array $request_header = []){
     $_ENV['RESPONSE_HEADER'] = [];
     $区切り = "__" . sha1(uniqid()) . "__";
     foreach((array)$querymap as $name => $value){
@@ -473,7 +473,7 @@ function ファイル送信(string $url, array $querymap=null, array $request_he
 }
 
 
-function HEAD送信(string $url, array $querymap=null, array $request_header=[]){
+function HEAD送信(string $url, array $querymap = null, array $request_header = []){
     $_ENV['RESPONSE_HEADER'] = [];
     if($querymap){
         $url .= preg_match("/\?/", $url) ? "&" : "?";
@@ -537,7 +537,7 @@ function FILES詰め直し() :array{
 }
 
 
-function ファイル受信(string $dir, array $whitelist=['.jpg','.jpeg','.png','.gif']){
+function ファイル受信(string $dir, array $whitelist = ['.jpg','.jpeg','.png','.gif']){
     $files = FILES詰め直し();
     
     if(!$files){
@@ -712,7 +712,7 @@ function キャッシュ無効(){
 }
 
 
-function URL(array $param=null) :string{
+function URL(array $param = null) :string{
     assert(isset(設定['URL']));
     $url = 設定['URL'];
 
@@ -742,7 +742,7 @@ function URL(array $param=null) :string{
 }
 
 
-function PATH_INFO分解(string $区切り文字='/') :array{
+function PATH_INFO分解(string $区切り文字 = '/') :array{
     $pathinfo = $_SERVER['PATH_INFO'] ?? '';
     $pathinfo = ltrim($pathinfo, '/');
     $pathinfo = explode($区切り文字, $pathinfo);
@@ -773,7 +773,7 @@ function PATH_INFO設定() :string{
 }
 
 
-function 現在のURL(bool $cut_query=false) :string{
+function 現在のURL(bool $cut_query = false) :string{
     $port   = "";
     if(filter_input(INPUT_SERVER, 'HTTPS', FILTER_VALIDATE_BOOLEAN)){
         $scheme = "https://";
@@ -907,7 +907,7 @@ function 自然数なら($x) :bool{
 }
 
 
-function str_match(string $needle, string $haystack, &$match=null) :bool{
+function str_match(string $needle, string $haystack, &$match = null) :bool{
     $match = strpos($haystack, $needle);
     return $match !== false;
 }
@@ -937,7 +937,7 @@ function preg_match_replace(string $regex, string $replace, string $haystack, &$
 }
 */
 
-function 日付(string $format='[年]/[0月]/[0日] [0時]:[0分]', int $time=0) :string{
+function 日付(string $format = '[年]/[0月]/[0日] [0時]:[0分]', int $time = 0) :string{
     if(!$time){
         $time = time();
     }
@@ -965,7 +965,7 @@ function 経過(int $time) :string{
 }
 
 
-function カレンダー配列(int $年=null, int $月=null) :array{
+function カレンダー配列(int $年 = null, int $月 = null) :array{
     if(!$年 or !$月){
         $date = new \DateTime('first day of');
     }
@@ -1019,7 +1019,7 @@ function h($x){
 }
 
 
-function 改行置換($x, string $replace=""){
+function 改行置換($x, string $replace = ""){
     if(is_string($x)){
         $x = preg_replace("/\r\n|\n|\r/", $replace, $x);
     }
@@ -1033,7 +1033,7 @@ function 改行置換($x, string $replace=""){
 
 
 
-function 制御文字削除($x, $LF=true){ // http://blog.sarabande.jp/post/52701231276
+function 制御文字削除($x, $LF = true){ // http://blog.sarabande.jp/post/52701231276
     if(is_string($x)){
         $x = preg_replace("/\t/", "    ", $x);
         $x = preg_replace("/\xC2[\x80-\x9F]/", "", $x); //Unicode制御文字
@@ -1057,7 +1057,7 @@ function 制御文字削除($x, $LF=true){ // http://blog.sarabande.jp/post/5270
 
 
 
-function タグ(string $tag, array $attr=[]) :string{
+function タグ(string $tag, array $attr = []) :string{
     $閉じる   = true;
     $単独タグ = false;
     if(preg_match("|^\!|", $tag)){
@@ -1085,7 +1085,7 @@ function タグ(string $tag, array $attr=[]) :string{
 }
 
 
-function 属性文字列(array $attr=[]) :string{
+function 属性文字列(array $attr = []) :string{
     $str = "";
     foreach($attr as $key => $val){
         if($key === "本文"){
@@ -1107,7 +1107,7 @@ function 属性文字列(array $attr=[]) :string{
 }
 
 
-function 自動リンク($x, array $attr=[]){
+function 自動リンク($x, array $attr = []){
     $attr_str = 属性文字列($attr);
     if(is_string($x)){
         $x = preg_replace("|(https?://[^[:space:]　\r\n<>]+)|ui", "<a href=\"$1\"$attr_str>$1</a>", $x);
@@ -1121,7 +1121,7 @@ function 自動リンク($x, array $attr=[]){
 }
 
 
-function 配列HTML(array $array, array $attr=[]) :string{
+function 配列HTML(array $array, array $attr = []) :string{
     $firstkey = key($array);
 
     if(is_array($array[$firstkey])){
@@ -1160,7 +1160,7 @@ function 配列探索($array, bool $leafonly = false) :\Generator{
     }
 }
 */
-function 配列探索($array, bool $枝要素を含む=false) :RecursiveIteratorIterator{
+function 配列探索($array, bool $枝要素を含む = false) :RecursiveIteratorIterator{
     $option = $枝要素を含む  ?  RecursiveIteratorIterator::SELF_FIRST  :  RecursiveIteratorIterator::LEAVES_ONLY;
     return new \RecursiveIteratorIterator(new \RecursiveArrayIterator($array), $option);
 }
@@ -1180,7 +1180,7 @@ function 配列フォーマット(array $array, string $format) :string{
 }
 
 
-function パーミッション(string $path, string $permission=null) :string{
+function パーミッション(string $path, string $permission = null) :string{
     if(!file_exists($path)){
         内部エラー("パス $path は存在しません", "警告");
         return "";
@@ -1192,7 +1192,7 @@ function パーミッション(string $path, string $permission=null) :string{
 }
 
 
-function ファイル一覧(string $dir, $再帰=true) :array{
+function ファイル一覧(string $dir, $再帰 = true) :array{
     static $length = 0;
     $return = [];
     $再帰 = (int)$再帰;
@@ -1222,7 +1222,7 @@ function ファイル一覧(string $dir, $再帰=true) :array{
 }
 
 
-function ディレクトリ一覧(string $dir, $recursive=true) :array{
+function ディレクトリ一覧(string $dir, $recursive = true) :array{
     static $strlen = 0;
     $return = [];
     $recursive = (int)$recursive;
@@ -1252,7 +1252,7 @@ function ディレクトリ一覧(string $dir, $recursive=true) :array{
 }
 
 
-function パス一覧(string $dir, $recursive=true) :array{
+function パス一覧(string $dir, $recursive = true) :array{
     static $strlen = 0;
     $return = [];
     $recursive = (int)$recursive;
@@ -1285,7 +1285,7 @@ function パス一覧(string $dir, $recursive=true) :array{
 }
 
 
-function ディレクトリ作成(string $dir, string $permission="707"){
+function ディレクトリ作成(string $dir, string $permission = "707"){
     if(is_dir($dir)){
         パーミッション($dir, $permission);
         return $dir;
@@ -1350,7 +1350,7 @@ function zip追加(string $zipfile, array $filemap){
 }
 
 
-function zip解凍(string $zipfile, string $解凍先="") :array{
+function zip解凍(string $zipfile, string $解凍先 = "") :array{
     $return= [];
 
     $zip = new \ZipArchive(); // http://php.net/ziparchive
@@ -1463,7 +1463,7 @@ function XML取得(string $xml) :array{
 }
 
 
-function CSV取得(string $path, array $設定=[]) :\Generator{
+function CSV取得(string $path, array $設定 = []) :\Generator{
     $設定 += [
         '入力コード'     => null,
         '出力コード'     => null,
@@ -1521,7 +1521,7 @@ function CSV取得(string $path, array $設定=[]) :\Generator{
 }
 
 
-function CSV行取得($handle, $d=',', $e='"'){
+function CSV行取得($handle, $d = ',', $e = '"'){
     $d = preg_quote($d);
     $e = preg_quote($e);
     $line = "";
@@ -1549,7 +1549,7 @@ function CSV行取得($handle, $d=',', $e='"'){
 }
 
 
-function CSV作成($array, array $設定=[]) :string{
+function CSV作成($array, array $設定 = []) :string{
     $設定 += [
         '改行変換'       => "\n",
         '常に囲む'       => false,
@@ -1582,7 +1582,7 @@ function CSV作成($array, array $設定=[]) :string{
 }
 
 
-function fromphp($x, string $name='fromphp') :string{
+function fromphp($x, string $name = 'fromphp') :string{
     $json  = json_encode($x, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
     $valid = preg_match("/^[a-zA-Z_\$\x7f-\xff][a-zA-Z0-9_\$\x7f-\xff]*/", $name);
     return ($json !== false and $valid)  ?  "<script>$name = $json;</script>\n"  :  "";
@@ -1603,13 +1603,13 @@ function 当たり($確率) :bool{
 }
 
 
-function uuid(bool $hyphen=false) :string{ //uuid v4 http://php.net/manual/en/function.uniqid.php#94959
+function uuid(bool $hyphen = false) :string{ //uuid v4 http://php.net/manual/en/function.uniqid.php#94959
     $format = $hyphen  ?  '%04x%04x-%04x-%04x-%04x-%04x%04x%04x'  :  '%04x%04x%04x%04x%04x%04x%04x%04x';
     return sprintf($format, mt_rand(0,0xffff),mt_rand(0,0xffff), mt_rand(0,0xffff), mt_rand(0,0x0fff)|0x4000, mt_rand(0,0x3fff)|0x8000, mt_rand(0,0xffff),mt_rand(0,0xffff),mt_rand(0,0xffff));
 }
 
 
-function ID発行(bool $more=false) :string{
+function ID発行(bool $more = false) :string{
     [$micro, $sec] = explode(" ", microtime());
     $micro = substr($micro, 2, 6);
     $rand  = mt_rand(1000, 5202); //5202より大きいと12桁になる
@@ -1622,7 +1622,7 @@ function ID発行(bool $more=false) :string{
 }
 
 
-function パスワード発行(int $length=8, bool $userfriendly=false) :string{
+function パスワード発行(int $length = 8, bool $userfriendly = false) :string{
     $chars = $userfriendly  ?  'abcdefghijkmnprstwxyz2345678'  :  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $max = strlen($chars) - 1;
     for($i = 0;  $i < $length;  $i++){
@@ -1654,7 +1654,7 @@ function 復号化(string $str, string $password){
 }
 
 
-function jwt発行(array $data, string $password, string $algorithm="HS256"){
+function jwt発行(array $data, string $password, string $algorithm = "HS256"){
     if($algorithm !== "HS256" and $algorithm !== "RS256"){
         return false;
     }
@@ -1697,7 +1697,7 @@ function jwt分解(string $jwt, bool $returnAll = false){
 }
 
 
-function jwt認証(string $jwt, $password, string $algorithm="HS256"){
+function jwt認証(string $jwt, $password, string $algorithm = "HS256"){
     if(substr_count($jwt, ".") !== 2){
         return false;
     }
@@ -1724,7 +1724,7 @@ function base64_decode_urlsafe(string $str) :string{
 }
 
 
-function base_encode($x, int $base=62) :string{
+function base_encode($x, int $base = 62) :string{
     if($base < 2 or $base > 62){
         内部エラー("進数は2～62の間で指定してください");
         return "";
@@ -1741,7 +1741,7 @@ function base_encode($x, int $base=62) :string{
 }
 
 
-function base_decode(string $str, int $base=62) :string{
+function base_decode(string $str, int $base = 62) :string{
     if($base < 2 or $base > 62){
         内部エラー("進数は2～62の間で指定してください");
         return "";
@@ -1758,7 +1758,7 @@ function base_decode(string $str, int $base=62) :string{
 }
 
 
-function ベーシック認証(callable $認証関数, string $realm="member only"){
+function ベーシック認証(callable $認証関数, string $realm = "member only"){
     if(isset($_SERVER['PHP_AUTH_USER']) and isset($_SERVER['PHP_AUTH_PW'])){
         if($認証関数($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) === true){
             return $_SERVER['PHP_AUTH_USER'];
@@ -1804,7 +1804,6 @@ function CSRF確認() :bool{
 
 function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments/media-types/media-types.xhtml
     $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-    
     return [
         'jpg'  => 'image/jpeg',
         'jpeg' => 'image/jpeg',
@@ -1934,7 +1933,7 @@ function クリップボードにコピー(string $str) :string{
 }
 
 
-function データベース(string $table, array $setting=[]){
+function データベース(string $table, array $setting = []){
     return new データベース($table, $setting);
 }
 
@@ -1950,7 +1949,7 @@ class データベース{
 
 
 
-    function __construct(string $table, array $setting=[]){
+    function __construct(string $table, array $setting = []){
         assert(isset($_ENV['データベース.接続.0']));
 
         $this->設定['接続'][0] = $setting[0] ?? $_ENV['データベース.接続.0'];
@@ -1989,7 +1988,7 @@ class データベース{
     }
 
 
-    function テーブル(string $table=null){
+    function テーブル(string $table = null){
         if(!$table){
             return $this->テーブル;
         }
@@ -2005,7 +2004,7 @@ class データベース{
     }
 
 
-    function 実行(string $SQL文, array $プレースホルダ=[]){
+    function 実行(string $SQL文, array $プレースホルダ = []){
         $this->where = [];
 
         if(!isset(self::$pdo[$this->接続名])){
@@ -2045,7 +2044,7 @@ class データベース{
     }
 
 
-    function 取得(?int $offset=0, ?int $limit=0, array $order=[]){
+    function 取得(?int $offset = 0, ?int $limit = 0, array $order = []){
         [$where文, $プレースホルダ] = $this->where文('where');
 
         $プレースホルダ[] = (int)($limit ?: $this->設定['取得件数']);
@@ -2059,7 +2058,7 @@ class データベース{
     }
 
 
-    function 列取得($列, ?int $offset=0, ?int $limit=0, array $order=[]){
+    function 列取得($列, ?int $offset = 0, ?int $limit = 0, array $order = []){
         if(!$this->列なら($列)){
             return false;
         }
@@ -2119,7 +2118,7 @@ class データベース{
     }
 
 
-    function 検索($word, $列, ?int $offset=0, ?int $limit=0, array $order=[]){
+    function 検索($word, $列, ?int $offset = 0, ?int $limit = 0, array $order = []){
         $列 = (array)$列;
         if(!$this->列なら($列)){
             return false;
@@ -2248,7 +2247,7 @@ class データベース{
     }
 
 
-    function where(string $where文, array $プレースホルダ=[]) :データベース{
+    function where(string $where文, array $プレースホルダ = []) :データベース{
         $this->where = [$where文, $プレースホルダ];
         return $this;
     }
@@ -2317,7 +2316,7 @@ class データベース{
     }
 
 
-    private function where文(string $prefix='') :array{
+    private function where文(string $prefix = '') :array{
         if($this->where){
             $this->where[0] = preg_replace("/^where/i", "", ltrim($this->where[0]));
             $where文        = sprintf("%s %s", $prefix, $this->where[0]);
@@ -2331,7 +2330,7 @@ class データベース{
     }
 
 
-    private function 順番文(array $arg=null) :string{
+    private function 順番文(array $arg = null) :string{
         if(is_array($arg) and $this->列なら(key($arg))){
             $列名 = key($arg);
             $順番 = ($arg[$列名] === "大きい順") ? 'desc' : 'asc';
@@ -2527,7 +2526,7 @@ class 部品{
     }
 
 
-    static function 挿入(string $buf="") :string{
+    static function 挿入(string $buf = "") :string{
         self::$タグ['fromparts'] = self::frompartsタグ作成();
 
         if(self::$タグ['jsinbody']){
@@ -3540,7 +3539,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
 }
 
 
-function 内部エラー(string $str="エラーが発生しました", string $type="停止", string $除外パス="") :bool{
+function 内部エラー(string $str = "エラーが発生しました", string $type = "停止", string $除外パス = "") :bool{
     $backtrace = debug_backtrace();
     $除外パス  = $除外パス ?: $backtrace[0]['file'];
 
