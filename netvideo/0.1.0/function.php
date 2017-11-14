@@ -1759,7 +1759,7 @@ function base_decode(string $str, int $base = 62) :string{
 
 
 function ベーシック認証(callable $認証関数, string $realm = "member only"){
-    if(isset($_SERVER['PHP_AUTH_USER']) and isset($_SERVER['PHP_AUTH_PW'])){
+    if(isset($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])){
         if($認証関数($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) === true){
             return $_SERVER['PHP_AUTH_USER'];
         }
@@ -1803,8 +1803,7 @@ function CSRF確認() :bool{
 
 
 function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments/media-types/media-types.xhtml
-    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-    return [
+    static $mime = [
         'jpg'  => 'image/jpeg',
         'jpeg' => 'image/jpeg',
         'png'  => 'image/png',
@@ -1836,7 +1835,10 @@ function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments
         'wmv'  => 'video/x-ms-wmv',
         '3g2'  => 'video/3gpp2',
         'mp4'  => 'video/mp4',
-    ][$ext] ?? "application/octet-stream";
+    ];
+
+    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    return $mime[$ext] ?? "application/octet-stream";
 }
 
 
