@@ -1223,7 +1223,7 @@ function ファイル一覧(string $dir, bool $recursive = true, string $base = 
 }
 
 
-function ディレクトリ一覧(string $dir, $recursive = true, string $base = '') :array{
+function ディレクトリ一覧(string $dir, bool $recursive = true, string $base = '') :array{
     $return = [];
 
    if($base === ''){ //初回
@@ -1252,7 +1252,7 @@ function ディレクトリ一覧(string $dir, $recursive = true, string $base =
 }
 
 
-function パス一覧(string $dir, $recursive = true, string $base = '') :array{
+function パス一覧(string $dir, bool $recursive = true, string $base = '') :array{
     $return = [];
 
    if($base === ''){ //初回
