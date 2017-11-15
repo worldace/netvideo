@@ -1210,11 +1210,13 @@ function ファイル一覧(string $dir, bool $recursive = true, string $base = 
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path     = "$dir/$file";
         $relative = substr($path, strlen($base)+1);
-        if(is_file($path)){
-            $return[$relative] = $path;
+        if(is_dir($path)){
+            if($recursive){
+                $return = array_merge($return, ファイル一覧($path, true, $base));
+            }
         }
-        elseif(is_dir($path) and $recursive){
-            $return = array_merge($return, ファイル一覧($path, true, $base));
+        else{
+            $return[$relative] = $path;
         }
     }
     return $return;
