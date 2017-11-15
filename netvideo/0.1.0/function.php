@@ -1211,14 +1211,19 @@ function ファイル一覧(string $dir, bool $recursive = true, string $base = 
         $path     = "$dir/$file";
         $relative = substr($path, strlen($base)+1);
         if(is_dir($path)){
-            if($recursive){
-                $return = array_merge($return, ファイル一覧($path, true, $base));
-            }
+            $dirlist[] = $path;
         }
         else{
             $return[$relative] = $path;
         }
     }
+
+    if($recursive){
+        foreach($dirlist ?? [] as $v){
+            $return = array_merge($return, ファイル一覧($v, true, $base));
+        }
+    }
+
     return $return;
 }
 
@@ -1243,11 +1248,16 @@ function ディレクトリ一覧(string $dir, bool $recursive = true, string $b
         $relative = substr($path, strlen($base)+1);
         if(is_dir($path)){
             $return[$relative.'/'] = $path.'/';
-            if($recursive){
-                $return = array_merge($return, ディレクトリ一覧($path, true, $base));
-            }
+            $dirlist[] = $path;
         }
     }
+
+    if($recursive){
+        foreach($dirlist ?? [] as $v){
+            $return = array_merge($return, ディレクトリ一覧($v, true, $base));
+        }
+    }
+
     return $return;
 }
 
@@ -1272,14 +1282,19 @@ function パス一覧(string $dir, bool $recursive = true, string $base = '') :a
         $relative = substr($path, strlen($base)+1);
         if(is_dir($path)){
             $return[$relative.'/'] = $path.'/';
-            if($recursive){
-                $return = array_merge($return, パス一覧($path, true, $base));
-            }
+            $dirlist[] = $path;
         }
         else{
             $return[$relative] = $path;
         }
     }
+
+    if($recursive){
+        foreach($dirlist ?? [] as $v){
+            $return = array_merge($return, パス一覧($v, true, $base));
+        }
+    }
+
     return $return;
 }
 
