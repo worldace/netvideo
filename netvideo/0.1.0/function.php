@@ -1195,7 +1195,7 @@ function パーミッション(string $path, string $permission = null) :string{
 function ファイル一覧(string $dir, bool $recursive = true, string $base = '') :array{
     $return = [];
 
-   if(!$base){ //初回
+   if($base === ''){ //初回
         if(!is_dir($dir)){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return $return;
@@ -1224,7 +1224,7 @@ function ファイル一覧(string $dir, bool $recursive = true, string $base = 
 function ディレクトリ一覧(string $dir, $recursive = true, string $base = '') :array{
     $return = [];
 
-   if(!$base){ //初回
+   if($base === ''){ //初回
         if(!is_dir($dir)){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return $return;
@@ -1253,7 +1253,7 @@ function ディレクトリ一覧(string $dir, $recursive = true, string $base =
 function パス一覧(string $dir, $recursive = true, string $base = '') :array{
     $return = [];
 
-   if(!$base){ //初回
+   if($base === ''){ //初回
         if(!is_dir($dir)){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return $return;
