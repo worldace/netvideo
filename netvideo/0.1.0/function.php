@@ -10,17 +10,17 @@ function テキスト表示(string $str) :void{
 }
 
 
-function JSON表示($x, $allow = null) :void{
-    $allow = ($allow)  ?  implode(" ", (array)$allow)  :  "*";
-    header("Access-Control-Allow-Origin: $allow");
+function JSON表示($value, $許可オリジン = null) :void{
+    $許可オリジン = $許可オリジン  ?  implode(" ", (array)$許可オリジン)  :  "*";
+    header("Access-Control-Allow-Origin: $許可オリジン");
     header("Access-Control-Allow-Credentials: true");
     if(isset($_GET['callback']) and is_string($_GET['callback'])){ //JSONP
         header("Content-Type: application/javascript; charset=utf-8");
-        print $_GET['callback'] . "(" . json_encode($x, JSON_PARTIAL_OUTPUT_ON_ERROR) . ");";
+        print $_GET['callback'] . "(" . json_encode($value, JSON_PARTIAL_OUTPUT_ON_ERROR) . ");";
     }
     else{ //JSON
         header("Content-Type: application/json; charset=utf-8");
-        print json_encode($x, JSON_PARTIAL_OUTPUT_ON_ERROR);
+        print json_encode($value, JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
     exit;
 }
@@ -122,44 +122,44 @@ function require_cache(string $file){
 }
 
 
-function 非同期処理(string $file, $x = null) :void{
+function 非同期処理(string $file, $value = null) :void{
     if(!is_file($file) or preg_match('/[\'\"]/', $file)){
         return;
     }
 
-    $x = base64_encode(serialize($x));
+    $value = base64_encode(serialize($value));
 
     if(preg_match('/WIN/i', PHP_OS)){
-        $code = "\$arg=unserialize(base64_decode('$x'));include('$file');";
+        $code = "\$arg=unserialize(base64_decode('$value'));include('$file');";
         pclose(popen(sprintf('start php -r %s', escapeshellarg($code)), 'r'));
     }
     else{
-        $code = "\$arg=unserialize(base64_decode(\"$x\"));include(\"$file\");";
+        $code = "\$arg=unserialize(base64_decode(\"$value\"));include(\"$file\");";
         exec(sprintf('nohup php -r %s > /dev/null &', escapeshellarg($code)));
     }
 }
 
 
-function 検査($x, $func, $message = null) :bool{
+function 検査($value, $func, $message = null) :bool{
     if(is_callable($func)){
-        $return = $func($x);
+        $return = $func($value);
         if(!is_bool($return)){
             内部エラー("第2引数の関数はtrueかfalseを返してください");
         }
     }
     else{
         if(is_callable("検査::$func")){
-            $return = 検査::$func($x);
+            $return = 検査::$func($value);
         }
         else if(preg_match("/^(\d+)(文字|字|バイト)(以上|以下|以内|未満|より大きい|より小さい|と同じ)*$/u", $func, $match)){
             if(!isset($match[3])){
                 $match[3] = "と同じ";
             }
             if($match[2] === "文字" or $match[2] === "字"){
-                $return = 検査::文字数($x, (int)$match[1], $match[3]);
+                $return = 検査::文字数($value, (int)$match[1], $match[3]);
             }
             else{
-                $return = 検査::バイト数($x, (int)$match[1], $match[3]);
+                $return = 検査::バイト数($value, (int)$match[1], $match[3]);
             }
         }
         else{
@@ -173,8 +173,8 @@ function 検査($x, $func, $message = null) :bool{
 class 検査{
     private $結果 = [];
 
-    function __invoke($x, $func, $message = null) :bool{
-        $return = 検査($x, $func, $message);
+    function __invoke($value, $func, $message = null) :bool{
+        $return = 検査($value, $func, $message);
         $this->結果[] = $return ?: $message;
         return $return;
     }
@@ -250,9 +250,9 @@ class 検査{
 }
 
 
-function 整形(&$x, callable $func){
-    $x = $func($x);
-    return $x;
+function 整形(&$value, callable $func){
+    $value = $func($value);
+    return $value;
 }
 
 
@@ -892,14 +892,14 @@ function PHP≧(string $version) :bool{
 }
 
 
-function 自然数なら($x) :bool{
-    if(is_int($x)){
-        if($x > 0){
+function 自然数なら($value) :bool{
+    if(is_int($value)){
+        if($value > 0){
             return true;
         }
     }
-    elseif(is_string($x)){
-        if(preg_match("/\A[1-9][0-9]*\z/", $x)){
+    elseif(is_string($value)){
+        if(preg_match("/\A[1-9][0-9]*\z/", $value)){
             return true;
         }
     }
@@ -1389,9 +1389,9 @@ function zip解凍(string $zipfile, string $解凍先 = "") :array{
 }
 
 
-function 一時保存($x){
+function 一時保存($value){
     $tempfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . get_current_user() . "_" . uniqid();
-    $result = file_put_contents($tempfile, serialize($x), LOCK_EX);
+    $result = file_put_contents($tempfile, serialize($value), LOCK_EX);
     return ($result !== false) ? $tempfile : false;
 }
 
@@ -1401,9 +1401,9 @@ function 一時取得(string $tempfile, $default = false){
 }
 
 
-function JSON保存(string $file, $x){
+function JSON保存(string $file, $value){
     $prefix = preg_match("/\.php$/i", $file) ? "<?php\n" : "";
-    $result = file_put_contents($file, $prefix.json_encode($x, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR), LOCK_EX);
+    $result = file_put_contents($file, $prefix.json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR), LOCK_EX);
     return ($result === false) ? false : $file;
 }
 
@@ -1582,8 +1582,8 @@ function CSV作成($array, array $設定 = []) :string{
 }
 
 
-function fromphp($x, string $name = 'fromphp') :string{
-    $json  = json_encode($x, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
+function fromphp($value, string $name = 'fromphp') :string{
+    $json  = json_encode($value, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
     $valid = preg_match("/^[a-zA-Z_\$\x7f-\xff][a-zA-Z0-9_\$\x7f-\xff]*/", $name);
     return ($json !== false and $valid)  ?  "<script>$name = $json;</script>\n"  :  "";
 }
@@ -1724,7 +1724,7 @@ function base64_decode_urlsafe(string $str) :string{
 }
 
 
-function base_encode($x, int $base = 62) :string{
+function base_encode($value, int $base = 62) :string{
     if($base < 2 or $base > 62){
         内部エラー("進数は2～62の間で指定してください");
         return "";
@@ -1732,10 +1732,10 @@ function base_encode($x, int $base = 62) :string{
     $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $str = '';
     do {
-        $mem = bcmod($x, $base);
-        $str = $chars[$mem] . $str;
-        $x = bcdiv(bcsub($x, $mem), $base);
-    } while(bccomp($x,0) > 0);
+        $mem   = bcmod($value, $base);
+        $str   = $chars[$mem] . $str;
+        $value = bcdiv(bcsub($value, $mem), $base);
+    } while(bccomp($value,0) > 0);
 
     return $str;
 }
