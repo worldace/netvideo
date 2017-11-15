@@ -1192,59 +1192,57 @@ function パーミッション(string $path, string $permission = null) :string{
 }
 
 
-function ファイル一覧(string $dir, $再帰 = true) :array{
-    static $length = 0;
+function ファイル一覧(string $dir, bool $recursive = true, string $base = '') :array{
     $return = [];
-    $再帰 = (int)$再帰;
-    if($再帰 < 2){
+
+   if(!$base){ //初回
         if(!is_dir($dir)){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return $return;
         }
-        $dir    = realpath($dir);
-        $length = strlen($dir) + 1;
+        $dir = realpath($dir);
         if(preg_match("/^WIN/i", PHP_OS)){
             $dir = str_replace("\\", "/", $dir);
         }
+        $base = $dir;
     }
+
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
         $path     = "$dir/$file";
-        $relative = substr($path, $length);
+        $relative = substr($path, strlen($base)+1);
         if(is_file($path)){
             $return[$relative] = $path;
         }
-        elseif(is_dir($path) and $再帰){
-            $再帰++;
-            $return = array_merge($return, ファイル一覧($path, $再帰));
+        elseif(is_dir($path) and $recursive){
+            $return = array_merge($return, ファイル一覧($path, true, $base));
         }
     }
     return $return;
 }
 
 
-function ディレクトリ一覧(string $dir, $recursive = true) :array{
-    static $strlen = 0;
+function ディレクトリ一覧(string $dir, $recursive = true, string $base = '') :array{
     $return = [];
-    $recursive = (int)$recursive;
-    if($recursive < 2){
+
+   if(!$base){ //初回
         if(!is_dir($dir)){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return $return;
         }
         $dir = realpath($dir);
-        $strlen = strlen($dir) + 1;
         if(preg_match("/^WIN/i", PHP_OS)){
             $dir = str_replace("\\", "/", $dir);
         }
+        $base = $dir;
     }
+
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
-        $path = "$dir/$file";
-        $relative = substr($path, $strlen);
+        $path     = "$dir/$file";
+        $relative = substr($path, strlen($base)+1);
         if(is_dir($path)){
             $return[$relative.'/'] = $path.'/';
             if($recursive){
-                $recursive++;
-                $return = array_merge($return, ディレクトリ一覧($path, $recursive));
+                $return = array_merge($return, ディレクトリ一覧($path, true, $base));
             }
         }
     }
@@ -1252,29 +1250,28 @@ function ディレクトリ一覧(string $dir, $recursive = true) :array{
 }
 
 
-function パス一覧(string $dir, $recursive = true) :array{
-    static $strlen = 0;
+function パス一覧(string $dir, $recursive = true, string $base = '') :array{
     $return = [];
-    $recursive = (int)$recursive;
-    if($recursive < 2){
+
+   if(!$base){ //初回
         if(!is_dir($dir)){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
             return $return;
         }
         $dir = realpath($dir);
-        $strlen = strlen($dir) + 1;
         if(preg_match("/^WIN/i", PHP_OS)){
             $dir = str_replace("\\", "/", $dir);
         }
+        $base = $dir;
     }
+
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
-        $path = "$dir/$file";
-        $relative = substr($path, $strlen);
+        $path     = "$dir/$file";
+        $relative = substr($path, strlen($base)+1);
         if(is_dir($path)){
             $return[$relative.'/'] = $path.'/';
             if($recursive){
-                $recursive++;
-                $return = array_merge($return, パス一覧($path, $recursive));
+                $return = array_merge($return, パス一覧($path, true, $base));
             }
         }
         else{
