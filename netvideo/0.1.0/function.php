@@ -903,12 +903,12 @@ function str_replace_once(string $needle, string $replace, string $haystack) :st
 
 
 function strf(string $format, ...$replacement){
-    return preg_replace_callback('/%(s|n|e|u|b|j)/', function($m) use(&$replacement){
+    return preg_replace_callback('/%(s|n|h|u|b|j)/', function($m) use(&$replacement){
         if    ($m[0] === '%n'){ return "\n"; }
 
         $v = array_shift($replacement);
         if    ($m[0] === '%s'){ return $v; }
-        elseif($m[0] === '%e'){ return htmlspecialchars($v, ENT_QUOTES, 'UTF-8', false); }
+        elseif($m[0] === '%h'){ return htmlspecialchars($v, ENT_QUOTES, 'UTF-8', false); }
         elseif($m[0] === '%u'){ return rawurlencode($v); }
         elseif($m[0] === '%b'){ return base64_encode($v); }
         elseif($m[0] === '%j'){ return json_encode($v, JSON_PARTIAL_OUTPUT_ON_ERROR); }
