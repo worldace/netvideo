@@ -26,37 +26,17 @@ function JSON表示($value, $許可オリジン = null) :void{
 }
 
 
-function RSS表示(array $items, array $channel) :void{ // http://www.futomi.com/lecture/japanese/rss20.html
-    $tag = function ($name, $value){
-        return "<$name>$value</$name>\n";
-    };
-    
-    if(isset($channel["title"])){
-        $rss .= $tag("title", h($channel['title']));
+function RSS表示(array $item, array $head) :void{ // http://www.futomi.com/lecture/japanese/rss20.html
+
+    $content = sprintf("<title>%s</title>\n<link>%s</link>\n<description>%s</description>\n", h($head['title']), h($head['link']), h($head['description']));
+
+    foreach($item as $v){
+        $pubDate  = isset($v["pubDate"]) ? date("r", $v['pubDate']) : '';
+        $content .= sprintf("<item>\n <title>%s</title>\n <link>%s</link>\n <pubDate>%s</pubDate>\n</item>\n", h($v['title']), h($v['link']), $pubDate);
     }
-    if(isset($channel["link"])){
-        $rss .= $tag("link", h($channel['link']));
-    }
-    if(isset($channel["description"])){
-        $rss .= $tag("description", h($channel['description']));
-    }
-    
-    foreach($items as $item){
-        $rss .= "<item>\n";
-        if(isset($item["title"])){
-            $rss .= $tag("title", h($item['title']));
-        }
-        if(isset($item["link"])){
-            $rss .= $tag("link", h($item['link']));
-        }
-        if(isset($item["pubDate"])){
-            $rss .= $tag("pubDate", date("r", $item["pubDate"]));
-        }
-        $rss .= "</item>\n";
-    }
-    
+
     header("Content-Type: application/xml; charset=UTF-8");
-    print "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\">\n<channel>\n{$rss}</channel>\n</rss>";
+    printf('<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel>%s</channel></rss>', $content);
     exit;
 }
 
