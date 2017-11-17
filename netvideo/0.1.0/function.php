@@ -36,7 +36,7 @@ function RSS表示(array $item, array $head) :void{ // http://www.futomi.com/lec
     }
 
     header("Content-Type: application/xml; charset=UTF-8");
-    printf('<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel>%s</channel></rss>', $content);
+    printf("<?xml version='1.0' encoding='UTF-8'?>\n<rss version='2.0'>\n<channel>\n%s</channel>\n</rss>", $content);
     exit;
 }
 
