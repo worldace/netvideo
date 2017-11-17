@@ -1449,7 +1449,7 @@ function ディレクトリ削除(string $dir){
     }
 
     foreach(array_diff(scandir($dir), ['.','..']) as $file){
-        (is_dir("$dir/$file")) ? ディレクトリ削除("$dir/$file") : unlink("$dir/$file");
+        is_dir("$dir/$file")  ?  ディレクトリ削除("$dir/$file")  :  unlink("$dir/$file");
     }
 
     return rmdir($dir) ? $dir : false;
