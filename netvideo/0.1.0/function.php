@@ -387,11 +387,11 @@ function GET送信(string $url, array $query = null, array $request_header = [])
     $_ENV['RESPONSE_HEADER'] = [];
 
     if($query){
-        $url .= preg_match("/\?/", $url) ? "&" : "?";
-        $url .= http_build_query($query, "", "&", PHP_QUERY_RFC3986);
+        $url .= preg_match("/\?/", $url) ? '&' : '?';
+        $url .= http_build_query($query, '', '&', PHP_QUERY_RFC3986);
     }
 
-    $header = "";
+    $header = '';
 
     foreach($request_header as $k => $v){
         $k = str_replace([":", "\r", "\n"], "", $k);
@@ -508,11 +508,11 @@ function HEAD送信(string $url, array $query = null, array $request_header = []
     $_ENV['RESPONSE_HEADER'] = [];
 
     if($query){
-        $url .= preg_match("/\?/", $url) ? "&" : "?";
-        $url .= http_build_query($query, "", "&", PHP_QUERY_RFC3986);
+        $url .= preg_match("/\?/", $url) ? '&' : '?';
+        $url .= http_build_query($query, '', '&', PHP_QUERY_RFC3986);
     }
 
-    $header = "";
+    $header = '';
 
     foreach($request_header as $k => $v){
         $k = str_replace([":", "\r", "\n"], "", $k);
@@ -793,7 +793,7 @@ function URL(array $param = null) :string{
     }
 
     if(isset($query)){
-        $url .= "?" . http_build_query($query, "", "&", PHP_QUERY_RFC3986); // 設定['URL']で?を含むURLには非対応
+        $url .= '?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986); // 設定['URL']で?を含むURLには非対応
     }
 
     return $url;
@@ -808,7 +808,7 @@ function PATH_INFO分解(string $区切り文字 = '/') :array{
     $return   = [];
 
     foreach($pathinfo as $v){
-        if($v !== ""){
+        if($v !== ''){
             $return[] = $v;
         }
     }
@@ -824,14 +824,14 @@ function PATH_INFO設定() :string{
     }
 
     if(!isset($_SERVER['DOCUMENT_ROOT'], $_SERVER['SCRIPT_FILENAME'], $_SERVER['REDIRECT_URL'])){
-        $_SERVER['PATH_INFO'] = "";
+        $_SERVER['PATH_INFO'] = '';
         return $_SERVER['PATH_INFO'];
     }
 
     //サンプル: $_SERVER = ["SCRIPT_FILENAME"=>"/virtual/id/public_html/p/index.php", "DOCUMENT_ROOT"=>"/virtual/id/public_html", "REDIRECT_URL"=>"/p/312/8888"]; //※"REDIRECT_URL"の値はURLデコードされている
-    $dir = substr_replace($_SERVER["SCRIPT_FILENAME"], "", 0, strlen($_SERVER["DOCUMENT_ROOT"]));
+    $dir = substr_replace($_SERVER['SCRIPT_FILENAME'], '', 0, strlen($_SERVER['DOCUMENT_ROOT']));
     $dir = dirname($dir);
-    $_SERVER['PATH_INFO'] = (strlen($dir) === 1)  ?  $_SERVER['REDIRECT_URL']  :  substr_replace($_SERVER['REDIRECT_URL'], "", 0, strlen($dir));
+    $_SERVER['PATH_INFO'] = (strlen($dir) === 1)  ?  $_SERVER['REDIRECT_URL']  :  substr_replace($_SERVER['REDIRECT_URL'], '', 0, strlen($dir));
 
     return $_SERVER['PATH_INFO'];
 }
@@ -839,45 +839,45 @@ function PATH_INFO設定() :string{
 
 
 function 現在のURL(bool $cut_query = false) :string{
-    $port   = "";
+    $port = '';
 
     if(filter_input(INPUT_SERVER, 'HTTPS', FILTER_VALIDATE_BOOLEAN)){
-        $scheme = "https://";
+        $scheme = 'https://';
         if($_SERVER['SERVER_PORT'] != 443){
-            $port = ":" . $_SERVER['SERVER_PORT'];
+            $port = ':' . $_SERVER['SERVER_PORT'];
         }
     }
     else {
-        $scheme = "http://";
+        $scheme = 'http://';
         if($_SERVER['SERVER_PORT'] != 80){
-            $port = ":" . $_SERVER['SERVER_PORT'];
+            $port = ':' . $_SERVER['SERVER_PORT'];
         }
     }
 
-    $url = $scheme . $_SERVER["HTTP_HOST"] . $port . $_SERVER['REQUEST_URI'];
+    $url = $scheme . $_SERVER['HTTP_HOST'] . $port . $_SERVER['REQUEST_URI'];
 
-    return $cut_query  ?  preg_replace("/\?.*$/", "", $url)  :  $url;
+    return $cut_query  ?  preg_replace("/\?.*$/", '', $url)  :  $url;
 }
 
 
 
 function ホームURL(string $url) :string{
-    $parsed = explode("/", $url);
+    $parsed = explode('/', $url);
 
     if(!isset($parsed[2])){
         内部エラー("$url はURL文字列ではありません", "警告");
         return $url;
     }
 
-    return $parsed[0] . "//" . $parsed[2] . "/";
+    return $parsed[0] . '//' . $parsed[2] . '/';
 }
 
 
 
 function トップURL(string $url) :string{
-    $url = preg_replace("/\?.*/", "", $url);
+    $url = preg_replace("/\?.*/", '', $url);
 
-    return (substr_count($url, "/") === 2) ? $url."/" : dirname($url."a")."/";
+    return (substr_count($url, '/') === 2) ? $url.'/' : dirname($url.'a').'/';
 }
 
 
@@ -1881,7 +1881,7 @@ function jwt発行(array $data, string $password, string $algorithm = 'HS256'){
 
 
 function jwt分解(string $jwt, bool $returnAll = false){
-    if(substr_count($jwt, ".") !== 2) {
+    if(substr_count($jwt, '.') !== 2) {
         return false;
     }
 
