@@ -5,7 +5,7 @@
 
 
 function テキスト表示(string $str) :void{
-    header("Content-Type: text/plain; charset=utf-8");
+    header('Content-Type: text/plain; charset=utf-8');
     print $str;
 
     exit;
@@ -14,17 +14,17 @@ function テキスト表示(string $str) :void{
 
 
 function JSON表示($value, $許可オリジン = null) :void{
-    $許可オリジン = $許可オリジン  ?  implode(" ", (array)$許可オリジン)  :  "*";
+    $許可オリジン = $許可オリジン  ?  implode(' ', (array)$許可オリジン)  :  '*';
 
     header("Access-Control-Allow-Origin: $許可オリジン");
     header("Access-Control-Allow-Credentials: true");
 
     if(isset($_GET['callback']) and is_string($_GET['callback'])){ //JSONP
-        header("Content-Type: application/javascript; charset=utf-8");
-        print $_GET['callback'] . "(" . json_encode($value, JSON_PARTIAL_OUTPUT_ON_ERROR) . ");";
+        header('Content-Type: application/javascript; charset=utf-8');
+        printf('%s(%s);', $_GET['callback'], json_encode($value, JSON_PARTIAL_OUTPUT_ON_ERROR));
     }
     else{ //JSON
-        header("Content-Type: application/json; charset=utf-8");
+        header('Content-Type: application/json; charset=utf-8');
         print json_encode($value, JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
 
@@ -383,12 +383,12 @@ function 並列GET送信(array $url, int $並列数 = 5, array $option = []) :ar
 
 
 
-function GET送信(string $url, array $querymap = null, array $request_header = []){
+function GET送信(string $url, array $query = null, array $request_header = []){
     $_ENV['RESPONSE_HEADER'] = [];
 
-    if($querymap){
+    if($query){
         $url .= preg_match("/\?/", $url) ? "&" : "?";
-        $url .= http_build_query($querymap, "", "&", PHP_QUERY_RFC3986);
+        $url .= http_build_query($query, "", "&", PHP_QUERY_RFC3986);
     }
 
     $header = "";
@@ -414,13 +414,13 @@ function GET送信(string $url, array $querymap = null, array $request_header = 
 
 
 
-function POST送信(string $url, array $querymap = null, array $request_header = []){
+function POST送信(string $url, array $query = null, array $request_header = []){
     $_ENV['RESPONSE_HEADER'] = [];
-    $content = http_build_query((array)$querymap, "", "&");
+    $content = http_build_query((array)$query, '', '&');
 
     $request_header = [
-        "content-type"   => "application/x-www-form-urlencoded; charset=UTF-8",
-        "content-length" => strlen($content),
+        'content-type'   => 'application/x-www-form-urlencoded; charset=UTF-8',
+        'content-length' => strlen($content),
     ] + array_change_key_case($request_header);
 
     $header = "";
@@ -447,11 +447,11 @@ function POST送信(string $url, array $querymap = null, array $request_header =
 
 
 
-function ファイル送信(string $url, array $querymap = null, array $request_header = []){
+function ファイル送信(string $url, array $query = null, array $request_header = []){
     $_ENV['RESPONSE_HEADER'] = [];
     $区切り = "__" . sha1(uniqid()) . "__";
 
-    foreach((array)$querymap as $name => $value){
+    foreach((array)$query as $name => $value){
         $name = str_replace(['"', "\r", "\n"], "", $name);
         if(is_array($value)){
             foreach($value as $name2 => $value2){
@@ -476,11 +476,11 @@ function ファイル送信(string $url, array $querymap = null, array $request_
     $content .= "--$区切り--\r\n";
 
     $request_header = [
-        "content-type"   => "multipart/form-data; boundary=$区切り",
-        "content-length" => strlen($content),
+        'content-type'   => "multipart/form-data; boundary=$区切り",
+        'content-length' => strlen($content),
     ] + array_change_key_case($request_header);
 
-    $header = "";
+    $header = '';
 
     foreach($request_header as $k => $v){
         $k = str_replace([":", "\r", "\n"], "", $k);
@@ -504,12 +504,12 @@ function ファイル送信(string $url, array $querymap = null, array $request_
 
 
 
-function HEAD送信(string $url, array $querymap = null, array $request_header = []){
+function HEAD送信(string $url, array $query = null, array $request_header = []){
     $_ENV['RESPONSE_HEADER'] = [];
 
-    if($querymap){
+    if($query){
         $url .= preg_match("/\?/", $url) ? "&" : "?";
-        $url .= http_build_query($querymap, "", "&", PHP_QUERY_RFC3986);
+        $url .= http_build_query($query, "", "&", PHP_QUERY_RFC3986);
     }
 
     $header = "";
@@ -603,7 +603,7 @@ function ファイル受信(string $dir, array $whitelist = ['.jpg','.jpeg','.pn
             if($v2['error'] !== UPLOAD_ERR_OK){
                 continue;
             }
-            $ext = pathinfo($v2["name"], PATHINFO_EXTENSION); //拡張子なしは空文字列
+            $ext = pathinfo($v2['name'], PATHINFO_EXTENSION); //拡張子なしは空文字列
             $ext = strtolower($ext);
             if(!in_array($ext, $whitelist, true)){
                 continue;
@@ -613,7 +613,7 @@ function ファイル受信(string $dir, array $whitelist = ['.jpg','.jpeg','.pn
             }
 
             $savepath = $dir. DIRECTORY_SEPARATOR . uniqid(bin2hex(random_bytes(2))) . $ext;
-            if(!move_uploaded_file($v2["tmp_name"], $savepath)){
+            if(!move_uploaded_file($v2['tmp_name'], $savepath)){
                 continue;
             }
             $return[$k1][$k2] = $savepath;
@@ -1776,8 +1776,7 @@ function fromphp($value, string $name = 'fromphp') :string{
 
 
 
-function 当たり($確率) :bool{
-    $確率 = (float)$確率;
+function 当たり(float $確率) :bool{
 
     if($確率 <= 0){
         return false;
@@ -1859,18 +1858,18 @@ function 復号化(string $str, string $password){
 
 
 
-function jwt発行(array $data, string $password, string $algorithm = "HS256"){
-    if($algorithm !== "HS256" and $algorithm !== "RS256"){
+function jwt発行(array $data, string $password, string $algorithm = 'HS256'){
+    if($algorithm !== 'HS256' and $algorithm !== 'RS256'){
         return false;
     }
 
     $head64 = base64_encode_urlsafe(json_encode(['typ'=>'jwt', 'alg'=>$algorithm]), JSON_PARTIAL_OUTPUT_ON_ERROR);
     $data64 = base64_encode_urlsafe(json_encode($data), JSON_PARTIAL_OUTPUT_ON_ERROR);
 
-    if($algorithm === "HS256"){
+    if($algorithm === 'HS256'){
         $sign = hash_hmac('sha256', "$head64.$data64", $password, true);
     }
-    elseif($algorithm === "RS256"){
+    elseif($algorithm === 'RS256'){
         openssl_sign("$head64.$data64", $sign, $password, 'sha256');
     }
 
@@ -1905,18 +1904,18 @@ function jwt分解(string $jwt, bool $returnAll = false){
 
 
 
-function jwt認証(string $jwt, $password, string $algorithm = "HS256"){
-    if(substr_count($jwt, ".") !== 2){
+function jwt認証(string $jwt, $password, string $algorithm = 'HS256'){
+    if(substr_count($jwt, '.') !== 2){
         return false;
     }
 
     [$head64, $data64, $sign64] = explode('.', $jwt);
     $sign = base64_decode_urlsafe($sign64);
 
-    if($algorithm === "HS256" and $sign === hash_hmac('sha256', "$head64.$data64", $password, true)){
+    if($algorithm === 'HS256' and $sign === hash_hmac('sha256', "$head64.$data64", $password, true)){
         return true;
     }
-    elseif($algorithm === "RS256" and openssl_verify("$head64.$data64", $sign, $password, 'sha256') === 1){
+    elseif($algorithm === 'RS256' and openssl_verify("$head64.$data64", $sign, $password, 'sha256') === 1){
         return true;
     }
 
@@ -1939,8 +1938,8 @@ function base64_decode_urlsafe(string $str) :string{
 
 function base_encode($value, int $base = 62) :string{
     if($base < 2 or $base > 62){
-        内部エラー("進数は2～62の間で指定してください");
-        return "";
+        内部エラー('進数は2～62の間で指定してください');
+        return '';
     }
 
     $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -1959,14 +1958,14 @@ function base_encode($value, int $base = 62) :string{
 
 function base_decode(string $str, int $base = 62) :string{
     if($base < 2 or $base > 62){
-        内部エラー("進数は2～62の間で指定してください");
-        return "";
+        内部エラー('進数は2～62の間で指定してください');
+        return '';
     }
 
     $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $arr   = array_flip(str_split($chars));
     $len   = strlen($str);
-    $val   = "0";
+    $val   = '0';
 
     for($i = 0;  $i < $len;  $i++){
         $val = bcadd($val, bcmul($arr[$str[$i]], bcpow($base, $len-$i-1)));
@@ -1977,7 +1976,7 @@ function base_decode(string $str, int $base = 62) :string{
 
 
 
-function ベーシック認証(callable $認証関数, string $realm = "member only"){
+function ベーシック認証(callable $認証関数, string $realm = 'member only'){
     if(isset($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])){
         if($認証関数($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) === true){
             return $_SERVER['PHP_AUTH_USER'];
@@ -2013,7 +2012,7 @@ function CSRFタグ() :string{ // ajax: http://d.hatena.ne.jp/hasegawayosuke/201
     $token = uuid();
     setcookie('csrf-token', $token, 0, '/');
 
-    return sprintf('<input type="hidden" name="csrf-token" value="%s">', $token) . "\n";
+    return sprintf('<input type="hidden" name="csrf-token" value="%s">'."\n", $token);
 }
 
 
@@ -2067,7 +2066,7 @@ function MIMEタイプ(string $path) :string{ // http://www.iana.org/assignments
 
     $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
 
-    return $mime[$ext] ?? "application/octet-stream";
+    return $mime[$ext] ?? 'application/octet-stream';
 }
 
 
@@ -2101,7 +2100,7 @@ function ベンチマーク(callable $func, ...$arg) :int{
 
 
 function 関数文字列化($func){
-    if(is_string($func) and preg_match("/::/", $func)){
+    if(is_string($func) and preg_match('/::/', $func)){
         if(!method_exists(...explode('::', $func))){
             return false;
         }
