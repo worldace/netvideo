@@ -26,8 +26,9 @@ function JSON表示($value, $許可オリジン = null) :void{
 }
 
 
-function RSS表示(array $item, array $head) :void{ // http://www.futomi.com/lecture/japanese/rss20.html
+function RSS表示(array $head, array $item) :void{ // http://www.futomi.com/lecture/japanese/rss20.html
 
+    $head['description'] = $head['description'] ?? $head['title'];
     $content = sprintf("<title>%s</title>\n<link>%s</link>\n<description>%s</description>\n", h($head['title']), h($head['link']), h($head['description']));
 
     foreach($item as $v){
@@ -36,7 +37,7 @@ function RSS表示(array $item, array $head) :void{ // http://www.futomi.com/lec
     }
 
     header("Content-Type: application/xml; charset=UTF-8");
-    printf("<?xml version='1.0' encoding='UTF-8'?>\n<rss version='2.0'>\n<channel>\n%s</channel>\n</rss>", $content);
+    print "<?xml version='1.0' encoding='UTF-8'?>\n<rss version='2.0'>\n<channel>\n$content</channel>\n</rss>";
     exit;
 }
 
