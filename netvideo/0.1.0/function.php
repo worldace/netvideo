@@ -32,6 +32,7 @@ function JSON表示($value, $許可オリジン = null) :void{
 }
 
 
+
 function RSS表示(array $head, array $item) :void{ // http://www.futomi.com/lecture/japanese/rss20.html
 
     $head['description'] = $head['description'] ?? $head['title'];
@@ -328,8 +329,9 @@ function ダウンロード(string $file, string $filename = null, int $timeout 
 
     ini_set("max_execution_time", $timeout);
 
-    $filename = str_replace(['"',"'","\r","\n"], "", $filename);
+    $filename  = str_replace(['"',"'","\r","\n"], "", $filename);
     $filenameE = rawurlencode($filename);
+
     header("Content-Type: application/force-download");
     header("Content-Length: $filesize");
     header("Content-Disposition: attachment; filename=\"$filename\"; filename*=UTF-8''$filenameE");
@@ -743,7 +745,7 @@ function ホスト確認(string $host) :bool{
     if(preg_match("|^https?://|i", $host)){ //URLなら
         $host = parse_url($host, PHP_URL_HOST);
     }
-    else if(filter_var($host, FILTER_VALIDATE_EMAIL)){ //メールアドレスなら
+    elseif(filter_var($host, FILTER_VALIDATE_EMAIL)){ //メールアドレスなら
         $host = array_pop(explode("@", $host));
         return checkdnsrr($host, 'MX') || checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA');
     }
@@ -854,7 +856,7 @@ function 現在のURL(bool $cut_query = false) :string{
 
     $url = $scheme . $_SERVER["HTTP_HOST"] . $port . $_SERVER['REQUEST_URI'];
 
-    return $cut_query ? preg_replace("/\?.*$/","",$url) : $url;
+    return $cut_query  ?  preg_replace("/\?.*$/", "", $url)  :  $url;
 }
 
 
@@ -1345,16 +1347,12 @@ function ファイル一覧(string $dir, bool $recursive = true, string $base = 
         $path     = "$dir/$file";
         $relative = substr($path, strlen($base)+1);
         if(is_dir($path)){
-            $dirlist[] = $path;
+            if($recursive){
+                $return = array_merge($return, ファイル一覧($path, true, $base));
+            }
         }
         else{
             $return[$relative] = $path;
-        }
-    }
-
-    if($recursive){
-        foreach($dirlist ?? [] as $v){
-            $return = array_merge($return, ファイル一覧($v, true, $base));
         }
     }
 
@@ -1383,13 +1381,9 @@ function ディレクトリ一覧(string $dir, bool $recursive = true, string $b
         $relative = substr($path, strlen($base)+1);
         if(is_dir($path)){
             $return[$relative.'/'] = $path.'/';
-            $dirlist[] = $path;
-        }
-    }
-
-    if($recursive){
-        foreach($dirlist ?? [] as $v){
-            $return = array_merge($return, ディレクトリ一覧($v, true, $base));
+            if($recursive){
+                $return = array_merge($return, ディレクトリ一覧($path, true, $base));
+            }
         }
     }
 
@@ -1418,16 +1412,12 @@ function パス一覧(string $dir, bool $recursive = true, string $base = '') :a
         $relative = substr($path, strlen($base)+1);
         if(is_dir($path)){
             $return[$relative.'/'] = $path.'/';
-            $dirlist[] = $path;
+            if($recursive){
+                $return = array_merge($return, パス一覧($path, true, $base));
+            }
         }
         else{
             $return[$relative] = $path;
-        }
-    }
-
-    if($recursive){
-        foreach($dirlist ?? [] as $v){
-            $return = array_merge($return, パス一覧($v, true, $base));
         }
     }
 
