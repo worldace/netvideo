@@ -1107,14 +1107,14 @@ function カレンダー配列(int $年 = null, int $月 = null) :array{
 
 
 function 日本語設定() :void{
-    if(!preg_match("/^WIN/i", PHP_OS)){
+    if(!preg_match('/^WIN/i', PHP_OS)){
         setlocale(LC_ALL, 'ja_JP.UTF-8'); // windows -> 'Japanese_Japan.932';
     }
 
-    ini_set("default_charset", "UTF-8");
-    ini_set("mbstring.language", "Japanese");
-    ini_set("mbstring.detect_order", "UTF-8,SJIS-win,eucJP-win,ASCII");
-    ini_set("date.timezone", "Asia/Tokyo");
+    ini_set('default_charset', 'UTF-8');
+    ini_set('mbstring.language', 'Japanese');
+    ini_set('mbstring.detect_order', 'UTF-8,SJIS-win,eucJP-win,ASCII');
+    ini_set('date.timezone', 'Asia/Tokyo');
 }
 
 
@@ -1329,12 +1329,11 @@ function パーミッション(string $path, string $permission = null) :string{
 
 
 function ファイル一覧(string $dir, bool $recursive = true, string $base = '') :array{
-    $return = [];
 
    if($base === ''){ //初回
         if(!is_dir($dir)){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
-            return $return;
+            return [];
         }
         $dir = realpath($dir);
         if(preg_match("/^WIN/i", PHP_OS)){
@@ -1356,18 +1355,17 @@ function ファイル一覧(string $dir, bool $recursive = true, string $base = 
         }
     }
 
-    return $return;
+    return $return ?? [];
 }
 
 
 
 function ディレクトリ一覧(string $dir, bool $recursive = true, string $base = '') :array{
-    $return = [];
 
    if($base === ''){ //初回
         if(!is_dir($dir)){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
-            return $return;
+            return [];
         }
         $dir = realpath($dir);
         if(preg_match("/^WIN/i", PHP_OS)){
@@ -1387,18 +1385,17 @@ function ディレクトリ一覧(string $dir, bool $recursive = true, string $b
         }
     }
 
-    return $return;
+    return $return ?? [];
 }
 
 
 
 function パス一覧(string $dir, bool $recursive = true, string $base = '') :array{
-    $return = [];
 
    if($base === ''){ //初回
         if(!is_dir($dir)){
             内部エラー("ディレクトリ $dir は存在しません", "警告");
-            return $return;
+            return [];
         }
         $dir = realpath($dir);
         if(preg_match("/^WIN/i", PHP_OS)){
@@ -1421,7 +1418,7 @@ function パス一覧(string $dir, bool $recursive = true, string $base = '') :a
         }
     }
 
-    return $return;
+    return $return ?? [];
 }
 
 
