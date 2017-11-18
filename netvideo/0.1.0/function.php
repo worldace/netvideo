@@ -859,14 +859,14 @@ function 現在のURL(bool $cut_query = false) :string{
 
 
 function ホームURL(string $url) :string{
-    $parsed = explode('/', $url);
+    $part = explode('/', $url);
 
-    if(!isset($parsed[2])){
+    if(!isset($part[2])){
         内部エラー("$url はURL文字列ではありません", "警告");
         return $url;
     }
 
-    return $parsed[0] . '//' . $parsed[2] . '/';
+    return $part[0] . '//' . $part[2] . '/';
 }
 
 
@@ -874,7 +874,7 @@ function ホームURL(string $url) :string{
 function トップURL(string $url) :string{
     $url = preg_replace("/\?.*/", '', $url);
 
-    return (substr_count($url, '/') === 2) ? $url.'/' : dirname($url.'a').'/';
+    return (substr_count($url, '/') === 2)  ?  $url.'/'  :  dirname($url.'a').'/';
 }
 
 
@@ -1011,7 +1011,7 @@ function str_replace_once(string $needle, string $replace, string $haystack) :st
 
 function strf(string $format, ...$replacement){
     return preg_replace_callback('/%(s|n|h|u|b|j)/', function($m) use(&$replacement){
-        if    ($m[0] === '%n'){ return "\n"; }
+        if($m[0] === '%n'){ return "\n"; }
 
         $v = array_shift($replacement);
         if    ($m[0] === '%s'){ return $v; }
@@ -1204,6 +1204,8 @@ function タグ(string $tag, array $attr = []) :string{
 
 
 function 属性文字列(array $attr = []) :string{
+    $return = '';
+
     foreach($attr as $k => $v){
         if($k === "本文"){
             continue;
@@ -1221,7 +1223,7 @@ function 属性文字列(array $attr = []) :string{
         $return .= " $k=\"$v\"";
     }
 
-    return $return ?? '';
+    return $return;
 }
 
 
@@ -1301,11 +1303,13 @@ function 配列掃除(array $array) :array{
 
 
 function 配列フォーマット(array $array, string $format) :string{
+    $return = '';
+
     foreach($array as $k => $v){
         $return .= str_replace(['%k','%v'], [$k, $v], $format);
     }
 
-    return $return ?? '';
+    return $return;
 }
 
 
