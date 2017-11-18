@@ -102,15 +102,12 @@ function 自動読み込み(string $dir = __DIR__) :bool{
 function require_cache(string $file){
     static $cache = [];
 
-    if(!絶対パスなら($file)){
+    if(!isset($cache[$file])){
         $file = realpath($file);
-    }
-
-    if(!isset($記憶[$file])){
         $cache[$file] = require $file;
     }
 
-    return is_object($記憶[$file])  ?  clone $cache[$file]  :  $cache[$file];
+    return is_object($cache[$file])  ?  clone $cache[$file]  :  $cache[$file];
 }
 
 
