@@ -85,12 +85,15 @@ function route(string $method, array $files, $arg = 1) :bool{
 
 
 
-function 自動読み込み(string $dir = __DIR__) :void{
-    spl_autoload_register(function($class) use($dir){
+function 自動読み込み(string $dir = __DIR__) :bool{
+    $dir = realpath($dir);
+    if(!$dir){
+        return 内部エラー("ディレクトリが存在しません");
+    }
+
+    return spl_autoload_register(function($class) use($dir){
         $class = str_replace("\\", "/", $class);
-        if(file_exists("$dir/$class.php")){
-            require_once "$dir/$class.php";
-        }
+        require_once "$dir/$class.php";
     });
 }
 
@@ -1774,7 +1777,8 @@ function fromphp($value, string $name = 'fromphp') :string{
 
 
 
-function 当たり(float $確率) :bool{
+function 当たり($確率) :bool{
+    $確率 = (float)$確率;
 
     if($確率 <= 0){
         return false;
