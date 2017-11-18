@@ -381,7 +381,7 @@ function 並列GET送信(array $url, int $並列数 = 5, array $option = []) :ar
 
 
 function GET送信(string $url, array $query = null, array $request_header = []){
-    $_ENV['RESPONSE_HEADER'] = [];
+    $_SERVER['response_header'] = [];
 
     if($query){
         $url .= preg_match("/\?/", $url) ? '&' : '?';
@@ -404,7 +404,7 @@ function GET送信(string $url, array $query = null, array $request_header = [])
     ]);
 
     $return = file_get_contents($url, false, $context);
-    $_ENV['RESPONSE_HEADER'] = $http_response_header ?? [];
+    $_SERVER['response_header'] = $http_response_header ?? [];
 
     return $return;
 }
@@ -412,7 +412,7 @@ function GET送信(string $url, array $query = null, array $request_header = [])
 
 
 function POST送信(string $url, array $query = null, array $request_header = []){
-    $_ENV['RESPONSE_HEADER'] = [];
+    $_SERVER['response_header'] = [];
     $content = http_build_query((array)$query, '', '&');
 
     $request_header = [
@@ -437,7 +437,7 @@ function POST送信(string $url, array $query = null, array $request_header = []
     ]);
 
     $return = file_get_contents($url, false, $context);
-    $_ENV['RESPONSE_HEADER'] = $http_response_header ?? [];
+    $_SERVER['response_header'] = $http_response_header ?? [];
 
     return $return;
 }
@@ -445,7 +445,7 @@ function POST送信(string $url, array $query = null, array $request_header = []
 
 
 function ファイル送信(string $url, array $query = null, array $request_header = []){
-    $_ENV['RESPONSE_HEADER'] = [];
+    $_SERVER['response_header'] = [];
     $区切り = "__" . sha1(uniqid()) . "__";
 
     foreach((array)$query as $name => $value){
@@ -494,7 +494,7 @@ function ファイル送信(string $url, array $query = null, array $request_hea
     ]);
 
     $return = file_get_contents($url, false, $context);
-    $_ENV['RESPONSE_HEADER'] = $http_response_header ?? [];
+    $_SERVER['response_header'] = $http_response_header ?? [];
 
     return $return;
 }
@@ -502,7 +502,7 @@ function ファイル送信(string $url, array $query = null, array $request_hea
 
 
 function HEAD送信(string $url, array $query = null, array $request_header = []){
-    $_ENV['RESPONSE_HEADER'] = [];
+    $_SERVER['response_header'] = [];
 
     if($query){
         $url .= preg_match("/\?/", $url) ? '&' : '?';
@@ -525,9 +525,9 @@ function HEAD送信(string $url, array $query = null, array $request_header = []
     ]);
 
     $return = file_get_contents($url, false, $context);
-    $_ENV['RESPONSE_HEADER'] = $http_response_header ?? [];
+    $_SERVER['response_header'] = $http_response_header ?? [];
 
-    foreach(array_reverse($_ENV['RESPONSE_HEADER']) as $v){
+    foreach(array_reverse($_SERVER['response_header']) as $v){
         if(preg_match("|^HTTP/\d+\.\d+\s+(\d+)|i", $v, $match)){
             $return = (int)$match[1];
             break;
@@ -766,8 +766,8 @@ function キャッシュ無効(){
 
 
 function URL(array $param = null) :string{
-    assert(isset(設定['URL']));
-    $url = 設定['URL'];
+    assert(isset($_ENV['url']));
+    $url = $_ENV['url'];
 
     if(!$param){
         return $url;
@@ -1902,7 +1902,7 @@ function jwt分解(string $jwt, bool $returnAll = false){
 
 
 
-function jwt認証(string $jwt, $password, string $algorithm = 'HS256'){
+function jwt認証(string $jwt, $password, string $algorithm = 'HS256') :bool{
     if(substr_count($jwt, '.') !== 2){
         return false;
     }
