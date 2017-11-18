@@ -2900,7 +2900,7 @@ class 部品{
 
 
 
-class 文書 implements Countable, IteratorAggregate, ArrayAccess{
+class 文書 implements \Countable, \IteratorAggregate, \ArrayAccess{
     private $文書;
     private $選択 = [];
     private $選択記憶 = [];
@@ -3460,7 +3460,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
     }
 
 
-    private function セレクタ検索($selector = null, $記録する = true, DOMNode $context = null){
+    private function セレクタ検索($selector = null, $記録する = true, \DOMNode $context = null){
         $return = [];
         if(!$selector){
             return $return;
@@ -3487,7 +3487,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
     }
 
 
-    private function 家族探索(DOMNode $開始ノード, $続柄, $一人だけ){
+    private function 家族探索(\DOMNode $開始ノード, $続柄, $一人だけ){
         $return = [];
         $node = $開始ノード->$続柄;
         while($node){
@@ -3570,7 +3570,7 @@ class 文書 implements Countable, IteratorAggregate, ArrayAccess{
     }
 
 
-    private function xml2array(DOMElement $node){
+    private function xml2array(\DOMElement $node){
         $return = [];
 
         foreach($node->attributes as $attr){
