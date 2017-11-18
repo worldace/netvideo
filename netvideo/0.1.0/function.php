@@ -61,10 +61,7 @@ function リダイレクト(string $url) :void{
 
 function route(string $method, array $files, $arg = 1) :bool{
     $method = strtoupper($method);
-
-    if(!in_array($method, ['GET', 'POST', 'ANY'])){
-        return 内部エラー("リクエストメソッドの指定は'GET'か'POST'か'ANY'にしてください");
-    }
+    assert(in_array($method, ['GET', 'POST', 'ANY']));
 
     if(isset($_SERVER['REQUEST_METHOD']) and $method !== 'ANY'){
         if($method !== $_SERVER['REQUEST_METHOD']){
