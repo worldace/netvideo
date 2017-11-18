@@ -63,10 +63,8 @@ function route(string $method, array $files, $arg = 1) :bool{
     $method = strtoupper($method);
     assert(in_array($method, ['GET', 'POST', 'ANY']));
 
-    if(isset($_SERVER['REQUEST_METHOD']) and $method !== 'ANY'){
-        if($method !== $_SERVER['REQUEST_METHOD']){
-            return false;
-        }
+    if($method !== $_SERVER['REQUEST_METHOD'] and $method !== 'ANY'){
+        return false;
     }
 
     foreach($files as $ARG){
