@@ -14,18 +14,20 @@ function テキスト表示(string $str) :void{
 
 
 function JSON表示($value, $許可オリジン = null) :void{
+
+    $json = json_encode($value, JSON_PARTIAL_OUTPUT_ON_ERROR);
     $許可オリジン = $許可オリジン  ?  implode(' ', (array)$許可オリジン)  :  '*';
 
     header("Access-Control-Allow-Origin: $許可オリジン");
     header("Access-Control-Allow-Credentials: true");
 
-    if(isset($_GET['callback']) and is_string($_GET['callback'])){ //JSONP
+    if(isset($_GET['callback'])){ //JSONP
         header('Content-Type: application/javascript; charset=utf-8');
-        printf('%s(%s);', $_GET['callback'], json_encode($value, JSON_PARTIAL_OUTPUT_ON_ERROR));
+        printf('%s(%s);', $_GET['callback'], $json);
     }
     else{ //JSON
         header('Content-Type: application/json; charset=utf-8');
-        print json_encode($value, JSON_PARTIAL_OUTPUT_ON_ERROR);
+        print $json;
     }
 
     exit;
@@ -86,7 +88,7 @@ function route(string $method, array $files, $arg = 1) :bool{
 function 自動読み込み(string $dir = __DIR__) :bool{
     $dir = realpath($dir);
     if(!$dir){
-        return 内部エラー("ディレクトリが存在しません");
+        return 内部エラー("指定ディレクトリが存在しません");
     }
 
     return spl_autoload_register(function($class) use($dir){
