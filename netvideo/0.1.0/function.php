@@ -3773,23 +3773,18 @@ class 文書 implements \Countable, \IteratorAggregate, \ArrayAccess{
 
 
 function 内部エラー(string $str = 'エラーが発生しました', string $type = '停止', string $除外パス = '') :bool{
+    $message   = sprintf("【%s】%s \n", $type, $str);
     $backtrace = debug_backtrace();
     $除外パス  = $除外パス ?: $backtrace[0]['file'];
 
     foreach($backtrace as $k => $v){
-        if(strpos($v['file'], $除外パス) !== 0){
-            break;
+        if(strpos($v['file'], $除外パス) === 0){
+            continue;
         }
-    }
-
-    array_splice($backtrace, 0, $k);
-    $message = sprintf("【%s】%s \n%s :%s行目 %s%s%s()\n\n", $type, $str, $v['file'], $v['line'], @$v['class'], @$v['type'], @$v['function']);
-
-    $message .= "--------------------------------------------\n";
-    foreach($backtrace as $k => $v){
         $message .= sprintf("%s :%s行目 %s%s%s()\n", $v['file'], $v['line'], @$v['class'], @$v['type'], @$v['function']);
     }
-    $message .= "--------------------------------------------\n";
+
+    $message .= "\n";
 
     if(PHP_SAPI !== 'cli'){
         $message = nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8', false));
