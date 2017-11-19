@@ -41,11 +41,11 @@ function RSS表示(array $head, array $item) :void{ // http://www.futomi.com/lec
     $content = sprintf("<title>%s</title>\n<link>%s</link>\n<description>%s</description>\n", h($head['title']), h($head['link']), h($head['description']));
 
     foreach($item as $v){
-        $pubDate  = isset($v["pubDate"]) ? date("r", $v['pubDate']) : '';
+        $pubDate  = isset($v['pubDate']) ? date('r', $v['pubDate']) : '';
         $content .= sprintf("<item>\n <title>%s</title>\n <link>%s</link>\n <pubDate>%s</pubDate>\n</item>\n", h($v['title']), h($v['link']), $pubDate);
     }
 
-    header("Content-Type: application/xml; charset=UTF-8");
+    header('Content-Type: application/xml; charset=UTF-8');
     print "<?xml version='1.0' encoding='UTF-8'?>\n<rss version='2.0'>\n<channel>\n$content</channel>\n</rss>";
 
     exit;
@@ -1306,7 +1306,7 @@ function 配列フォーマット(array $array, string $format) :string{
     $return = '';
 
     foreach($array as $k => $v){
-        $return .= str_replace(['%k','%v'], [$k, $v], $format);
+        $return .= str_replace(['%k','%v', '%n'], [$k, $v, "\n"], $format);
     }
 
     return $return;
