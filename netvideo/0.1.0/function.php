@@ -120,12 +120,16 @@ function 非同期処理(string $file, $value = null) :void{
     $value = base64_encode(serialize($value));
 
     if(preg_match('/WIN/i', PHP_OS)){
-        $code = "\$arg=unserialize(base64_decode('$value'));include('$file');";
-        pclose(popen(sprintf('start php -r %s', escapeshellarg($code)), 'r'));
+        $code = "\$arg=fgets(STDIN);\$arg=unserialize(base64_decode(\$arg));include('$file');";
+        $proc = popen(sprintf('start /b php -r %s', escapeshellarg($code)), 'w');
+        fputs($proc, $value);
+        pclose($proc);
     }
     else{
-        $code = "\$arg=unserialize(base64_decode(\"$value\"));include(\"$file\");";
-        exec(sprintf('nohup php -r %s > /dev/null &', escapeshellarg($code)));
+        $code = "\$arg=fgets(STDIN);\$arg=unserialize(base64_decode(\$arg));include(\"$file\");";
+        $proc = popen(sprintf('nohup php -r %s > /dev/null &', escapeshellarg($code)), 'w');
+        fputs($proc, $value);
+        pclose($proc);
     }
 }
 
@@ -3773,7 +3777,9 @@ class 文書 implements \Countable, \IteratorAggregate, \ArrayAccess{
 
 
 function 内部エラー(string $str = 'エラーが発生しました', string $type = '停止', string $除外パス = '') :bool{
-    $message   = sprintf("【%s】%s \n\n", $type, $str);
+    assert(in_array($type, ['停止', '警告', '注意']));
+
+    $message   = sprintf("【%s】%s \n\n→", $type, $str);
     $backtrace = debug_backtrace();
     $除外パス  = $除外パス ?: $backtrace[0]['file'];
 
