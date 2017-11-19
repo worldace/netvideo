@@ -3775,7 +3775,6 @@ class 文書 implements \Countable, \IteratorAggregate, \ArrayAccess{
 function 内部エラー(string $str = 'エラーが発生しました', string $type = '停止', string $除外パス = '') :bool{
     $backtrace = debug_backtrace();
     $除外パス  = $除外パス ?: $backtrace[0]['file'];
-    $flag      = false;
 
     foreach($backtrace as $k => $v){
         if(strpos($v['file'], $除外パス) !== 0){
