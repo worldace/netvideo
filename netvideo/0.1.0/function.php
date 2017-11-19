@@ -1652,13 +1652,13 @@ function CSV取得(string $path, array $設定 = []) :\Generator{
         'スキップ'       => 0,
     ];
     
-    $ini = ini_get("auto_detect_line_endings");
-    ini_set("auto_detect_line_endings", true);
-    $fp = fopen($path, "rb");
-    ini_set("auto_detect_line_endings", $ini);
+    $ini = ini_get('auto_detect_line_endings');
+    ini_set('auto_detect_line_endings', true);
+    $fp = fopen($path, 'rb');
+    ini_set('auto_detect_line_endings', $ini);
 
     if($fp === false){
-        内部エラー("CSVファイル $path が開けません", "警告");
+        内部エラー("CSVファイル $path が開けません", '警告');
         return;
     }
 
@@ -1667,19 +1667,19 @@ function CSV取得(string $path, array $設定 = []) :\Generator{
 
     //文字コード検知
     if($設定['出力コード'] and !$設定['入力コード']){
-        $設定['入力コード'] = mb_detect_encoding($sample, ["utf-8", "sjis-win", "eucjp-win"]);
+        $設定['入力コード'] = mb_detect_encoding($sample, ['utf-8', 'sjis-win', 'eucjp-win']);
     }
 
     //区切り検知
     if(!$設定['区切り文字']){
         $sample  = substr($sample, 0, 64);
-        $count_c = substr_count($sample, ",");
+        $count_c = substr_count($sample, ',');
         $count_t = substr_count($sample, "\t");
         if(!$count_c and !$count_t){
-            内部エラー("CSVファイルの区切り文字を検知できませんでした", "警告");
+            内部エラー('CSVファイルの区切り文字を検知できませんでした', '警告');
             return;
         }
-        $設定['区切り文字'] = ($count_c > $count_t)  ?  ","  :  "\t";
+        $設定['区切り文字'] = ($count_c > $count_t)  ?  ','  :  "\t";
     }
 
     while(($csv = CSV行取得($fp, $設定['区切り文字'], $設定['エスケープ文字'])) !== false){
@@ -3772,7 +3772,7 @@ class 文書 implements \Countable, \IteratorAggregate, \ArrayAccess{
 }
 
 
-function 内部エラー(string $str = "エラーが発生しました", string $type = "停止", string $除外パス = "") :bool{
+function 内部エラー(string $str = 'エラーが発生しました', string $type = '停止', string $除外パス = '') :bool{
     $backtrace = debug_backtrace();
     $除外パス  = $除外パス ?: $backtrace[0]['file'];
 
@@ -3783,8 +3783,8 @@ function 内部エラー(string $str = "エラーが発生しました", string 
     }
     $message = sprintf("【%s】%s \n%s :%s行目 %s%s%s()\n\n", $type, $str, $trace['file'], $trace['line'], @$trace['class'], @$trace['type'], @$trace['function']);
 
-    if(PHP_SAPI !== "cli"){
-        $message = nl2br(htmlspecialchars($message, ENT_QUOTES, "UTF-8", false));
+    if(PHP_SAPI !== 'cli'){
+        $message = nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8', false));
     }
 
     trigger_error($message, ['停止'=>E_USER_ERROR, '警告'=>E_USER_WARNING, '注意'=>E_USER_NOTICE][$type]);
