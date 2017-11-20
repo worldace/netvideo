@@ -35,24 +35,6 @@ function JSON表示($value, $許可オリジン = null) :void{
 
 
 
-function RSS表示(array $head, array $item) :void{ // http://www.futomi.com/lecture/japanese/rss20.html
-
-    $head['description'] = $head['description'] ?? $head['title'];
-    $content = sprintf("<title>%s</title>\n<link>%s</link>\n<description>%s</description>\n", h($head['title']), h($head['link']), h($head['description']));
-
-    foreach($item as $v){
-        $pubDate  = isset($v['pubDate']) ? date('r', $v['pubDate']) : '';
-        $content .= sprintf("<item>\n <title>%s</title>\n <link>%s</link>\n <pubDate>%s</pubDate>\n</item>\n", h($v['title']), h($v['link']), $pubDate);
-    }
-
-    header('Content-Type: application/xml; charset=UTF-8');
-    print "<?xml version='1.0' encoding='UTF-8'?>\n<rss version='2.0'>\n<channel>\n$content</channel>\n</rss>";
-
-    exit;
-}
-
-
-
 function リダイレクト(string $url) :void{
     header("Location: $url");
 
@@ -3773,6 +3755,28 @@ class 文書 implements \Countable, \IteratorAggregate, \ArrayAccess{
         return implode('', $parts);
     }
 }
+
+
+
+class RSS{
+    private $rss;
+
+    function __construct(string $title, string $link, string $description = null){
+        $description = $description ?? $title;
+        $this->rss = sprintf("<title>%s</title>\n<link>%s</link>\n<description>%s</description>\n", h($title), h($link), h($description));
+    }
+
+    function __invoke(string $title, string $link, string $pubDate = null){
+        $pubDate  = isset($pubDate) ? date('r', $pubDate) : '';
+        $this->rss .= sprintf("<item>\n <title>%s</title>\n <link>%s</link>\n <pubDate>%s</pubDate>\n</item>\n", h($title), h($link), $pubDate);
+    }
+
+    function  __toString(){
+        header('Content-Type: application/xml; charset=UTF-8');
+        return "<?xml version='1.0' encoding='UTF-8'?>\n<rss version='2.0'>\n<channel>\n{$this->rss}</channel>\n</rss>";
+    }
+}
+
 
 
 function 内部エラー(string $str = 'エラーが発生しました', string $type = '停止', string $除外パス = '') :bool{
