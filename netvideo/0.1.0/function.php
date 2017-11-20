@@ -117,7 +117,7 @@ function 非同期処理(string $file, $value = null) :void{
         return;
     }
 
-    if(preg_match('/WIN/i', PHP_OS)){
+    if(preg_match('/^WIN/i', PHP_OS)){
         $code = sprintf('$arg=stream_get_contents(STDIN);$arg=unserialize(base64_decode($arg));include(\'%s\');', $file);
         $cmd  = sprintf('start /b php -r %s', escapeshellarg($code));
     }
