@@ -117,20 +117,18 @@ function 非同期処理(string $file, $value = null) :void{
         return;
     }
 
-    $value = base64_encode(serialize($value));
-
     if(preg_match('/WIN/i', PHP_OS)){
-        $code = "\$arg=stream_get_contents(STDIN);\$arg=unserialize(base64_decode(\$arg));include('$file');";
-        $proc = popen(sprintf('start /b php -r %s', escapeshellarg($code)), 'w');
-        fputs($proc, $value);
-        pclose($proc);
+        $code = sprintf('$arg=stream_get_contents(STDIN);$arg=unserialize(base64_decode($arg));include(\'%s\');', $file);
+        $cmd  = sprintf('start /b php -r %s', escapeshellarg($code));
     }
     else{
-        $code = "\$arg=stream_get_contents(STDIN);\$arg=unserialize(base64_decode(\$arg));include(\"$file\");";
-        $proc = popen(sprintf('nohup php -r %s > /dev/null &', escapeshellarg($code)), 'w');
-        fputs($proc, $value);
-        pclose($proc);
+        $code = sprintf('$arg=stream_get_contents(STDIN);$arg=unserialize(base64_decode($arg));include("%s");', $file);
+        $cmd  = sprintf('nohup php -r %s > /dev/null &', escapeshellarg($code));
     }
+
+    $proc = popen($cmd, 'w');
+    fputs($proc, base64_encode(serialize($value)));
+    pclose($proc);
 }
 
 
