@@ -120,13 +120,13 @@ function 非同期処理(string $file, $value = null) :void{
     $value = base64_encode(serialize($value));
 
     if(preg_match('/WIN/i', PHP_OS)){
-        $code = "\$arg=fgets(STDIN);\$arg=unserialize(base64_decode(\$arg));include('$file');";
+        $code = "\$arg=stream_get_contents(STDIN);\$arg=unserialize(base64_decode(\$arg));include('$file');";
         $proc = popen(sprintf('start /b php -r %s', escapeshellarg($code)), 'w');
         fputs($proc, $value);
         pclose($proc);
     }
     else{
-        $code = "\$arg=fgets(STDIN);\$arg=unserialize(base64_decode(\$arg));include(\"$file\");";
+        $code = "\$arg=stream_get_contents(STDIN);\$arg=unserialize(base64_decode(\$arg));include(\"$file\");";
         $proc = popen(sprintf('nohup php -r %s > /dev/null &', escapeshellarg($code)), 'w');
         fputs($proc, $value);
         pclose($proc);
