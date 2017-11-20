@@ -1452,7 +1452,7 @@ function zip圧縮(string $zipfile, $filelist){
             return 内部エラー("ディレクトリ $dir は存在しません", "警告");
         }
         foreach(パス一覧($dir) as $k => $v){
-            is_dir($v)  ?  $zip->addEmptyDir($k)  :  $zip->addFile($v, $k);
+            $k[-1] === '/'  ?  $zip->addEmptyDir($k)  :  $zip->addFile($v, $k);
         }
     }
     else{
