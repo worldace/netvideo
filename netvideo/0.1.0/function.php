@@ -144,7 +144,7 @@ function 検査($value, $func, $message = null) :bool{
         if(is_callable("検査::$func")){
             $return = 検査::$func($value);
         }
-        else if(preg_match("/^(\d+)(文字|字|バイト)(以上|以下|以内|未満|より大きい|より小さい|と同じ)*$/u", $func, $match)){
+        elseif(preg_match("/^(\d+)(文字|字|バイト)(以上|以下|以内|未満|より大きい|より小さい|と同じ)*$/u", $func, $match)){
             if(!isset($match[3])){
                 $match[3] = "と同じ";
             }
@@ -3007,13 +3007,13 @@ class 文書 implements \Countable, \IteratorAggregate, \ArrayAccess{
             }
             return $return;
         }
-        else if(is_string($name)){ //属性値を1つ設定
+        elseif(is_string($name)){ //属性値を1つ設定
             foreach($this->選択 as $where){
                 $where->setAttribute($name, $value);
             }
             return $this;
         }
-        else if(is_array($name)){ //属性を複数設定
+        elseif(is_array($name)){ //属性を複数設定
             foreach($this->選択 as $where){
                 foreach($name as $k => $v){
                     $where->setAttribute($k, $v);
@@ -3021,7 +3021,7 @@ class 文書 implements \Countable, \IteratorAggregate, \ArrayAccess{
             }
             return $this;
         }
-        else if($name === null){ //全属性取得
+        elseif($name === null){ //全属性取得
             $return = [];
             if(isset($this->選択[0])){
                 $attrs = $this->選択[0]->attributes;
@@ -3061,7 +3061,7 @@ class 文書 implements \Countable, \IteratorAggregate, \ArrayAccess{
                     $dom->setAttribute($k, $v);
                 }
             }
-            else if(is_string($attr)){
+            elseif(is_string($attr)){
                 $dom->textContent = $attr;
             }
             if(is_string($content)){
@@ -3327,13 +3327,13 @@ class 文書 implements \Countable, \IteratorAggregate, \ArrayAccess{
                 return $that->選択保存($that->DOM箱作成($selector));
             }
         }
-        else if($selector instanceof self){
+        elseif($selector instanceof self){
             return $that->選択保存($that->DOM箱作成($selector));
         }
-        else if($selector instanceof \DOMElement){
+        elseif($selector instanceof \DOMElement){
             return $that->選択保存($that->DOM箱作成($selector));
         }
-        else if(is_array($selector)){
+        elseif(is_array($selector)){
             return $that->選択保存($that->DOM箱作成($selector));
         }
         else{
@@ -3588,7 +3588,7 @@ class 文書 implements \Countable, \IteratorAggregate, \ArrayAccess{
             if($child->nodeType === XML_ELEMENT_NODE){
                 $return[$child->nodeName][] = $this->xml2array($child);
             }
-            else if($child->nodeType === XML_TEXT_NODE){
+            elseif($child->nodeType === XML_TEXT_NODE){
                 $return['#text'] = $child->textContent;
             }
         }
@@ -3672,7 +3672,7 @@ class 文書 implements \Countable, \IteratorAggregate, \ArrayAccess{
                         break;
                 }
             }
-            else if ($pregMatchDelete($regex['attr_box'], $selector, $e)) {
+            elseif ($pregMatchDelete($regex['attr_box'], $selector, $e)) {
                 $parts[] = '[@' . $e[1] . ']';  // 単項(存在性)
             }
 
@@ -3693,7 +3693,7 @@ class 文書 implements \Countable, \IteratorAggregate, \ArrayAccess{
                             break;
                     }
                 }
-                else if ($pregMatchDelete($regex['attr_box'], $e[1], $e)) {
+                elseif ($pregMatchDelete($regex['attr_box'], $e[1], $e)) {
                     $parts[] = '[not(@' . $e[1] . ')]'; // 単項(存在性)
                 }
             }
@@ -3720,13 +3720,13 @@ class 文書 implements \Countable, \IteratorAggregate, \ArrayAccess{
                         if (is_numeric($e[3])) {
                             $parts[] = '[count(preceding-sibling::*) = ' . $e[3] . ' - 1]';
                         }
-                        else if ($e[3] == 'odd') {
+                        elseif ($e[3] == 'odd') {
                             $parts[] = '[count(preceding-sibling::*) mod 2 = 0]';
                         }
-                        else if ($e[3] == 'even') {
+                        elseif ($e[3] == 'even') {
                             $parts[] = '[count(preceding-sibling::*) mod 2 = 1]';
                         }
-                        else if (preg_match('/^([+-]?)(\d*)n(\s*([+-])\s*(\d+))?\s*$/i', $e[3], $sub_e)) {
+                        elseif (preg_match('/^([+-]?)(\d*)n(\s*([+-])\s*(\d+))?\s*$/i', $e[3], $sub_e)) {
                             $coefficient = $sub_e[2]==='' ? 1 : intval($sub_e[2]);
                             $constant_term = array_key_exists(3, $sub_e) ?  intval($sub_e[4]==='+' ? $sub_e[5] : -1 * $sub_e[5]) : 0;
                             if($sub_e[1]==='-') {
