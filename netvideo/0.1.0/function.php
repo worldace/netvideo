@@ -1457,27 +1457,25 @@ function ディレクトリ削除(string $dir){
 
 
 
-function zip圧縮(string $zipfile, $filemap){
+function zip圧縮(string $zipfile, $filelist){
     $zip = new \ZipArchive(); // http://php.net/ziparchive
 
     if($zip->open($zipfile, ZipArchive::CREATE) !== true){
-        内部エラー("ZIPファイル $zipfile を作成できません", "警告");
-        return false;
+        return 内部エラー("ZIPファイル $zipfile を作成できません", "警告");
     }
 
-    if(is_string($filemap)){
-        $path = realpath($filemap);
-        if($path === false){
-            内部エラー("ディレクトリ $filemap は存在しません", "警告");
-            return false;
+    if(is_string($filelist)){
+        $dir = realpath($filelist);
+        if(!$dir){
+            return 内部エラー("ディレクトリ $dir は存在しません", "警告");
         }
-        foreach(パス一覧($path) as $k => $v){
-            is_dir($v) ? $zip->addEmptyDir($k) : $zip->addFile($v, $k);
+        foreach(パス一覧($dir) as $k => $v){
+            is_dir($v)  ?  $zip->addEmptyDir($k)  :  $zip->addFile($v, $k);
         }
     }
     else{
-        foreach($filemap as $k => $v){
-            is_resource($v) ? $zip->addFromString($k, stream_get_contents($v)) : $zip->addFile($v, $k);
+        foreach($filelist as $k => $v){
+            is_resource($v)  ?  $zip->addFromString($k, stream_get_contents($v))  :  $zip->addFile($v, $k);
         }
     }
 
@@ -1488,16 +1486,15 @@ function zip圧縮(string $zipfile, $filemap){
 
 
 
-function zip追加(string $zipfile, array $filemap){
+function zip追加(string $zipfile, array $filelist){
     $zip = new \ZipArchive(); // http://php.net/ziparchive
 
     if($zip->open($zipfile) !== true){
-        内部エラー("ZIPファイル $zipfile を開けません", "警告");
-        return false;
+        return 内部エラー("ZIPファイル $zipfile を開けません", "警告");
     }
 
-    foreach($filemap as $k => $v){
-        is_resource($v) ? $zip->addFromString($k, stream_get_contents($v)) : $zip->addFile($v, $k);
+    foreach($filelist as $k => $v){
+        is_resource($v)  ?  $zip->addFromString($k, stream_get_contents($v))  :  $zip->addFile($v, $k);
     }
 
     $zip->close();
@@ -1526,16 +1523,20 @@ function zip解凍(string $zipfile, string $解凍先 = "") :array{
     $解凍先 .= DIRECTORY_SEPARATOR;
 
     for($i = 0;  $i < $zip->numFiles;  $i++){
-        $name   = $zip->getNameIndex($i, ZipArchive::FL_ENC_RAW);
-        $encode = mb_detect_encoding($name, ["utf-8", "sjis-win", "eucjp"]);
+        $name = $zip->getNameIndex($i, ZipArchive::FL_ENC_RAW);
+
+        //ファイル名のエンコードについて
+        $encode = mb_detect_encoding($name, ['utf-8', 'sjis-win', 'eucjp']);
         if($encode !== 'UTF-8'){
-            $name = mb_convert_encoding($name, "utf-8", $encode);
+            $name = mb_convert_encoding($name, 'utf-8', $encode);
         }
 
+        //解凍先ディレクトリがないなら作る
         $dir = ($name[-1] === '/') ? $解凍先.$name : $解凍先.dirname($name);
         if(!is_dir($dir)){
             mkdir($dir, 0755, true);
         }
+
         if($name[-1] === '/'){
             continue;
         }
