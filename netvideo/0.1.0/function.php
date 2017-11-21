@@ -1486,23 +1486,21 @@ function zip追加(string $zipfile, array $filelist){
 
 
 
-function zip解凍(string $zipfile, string $解凍先 = "") :array{
-    $return = [];
+function zip解凍(string $zipfile, string $解凍先 = ""){
     $zip    = new \ZipArchive(); // http://php.net/ziparchive
 
     if($zip->open($zipfile) !== true){
-        内部エラー("ZIPファイル $zipfile を開けません", "警告");
-        return $return;
+        return  内部エラー("ZIPファイル $zipfile を開けません", "警告");
     }
 
     $解凍先  = $解凍先 ? realpath($解凍先) : realpath(dirname($zipfile));
 
     if($解凍先 === false){
-        内部エラー("解凍先ディレクトリが存在しません", "警告");
-        return $return;
+        return 内部エラー("解凍先ディレクトリが存在しません", "警告");
     }
 
     $解凍先 .= DIRECTORY_SEPARATOR;
+    $return  = [];
 
     for($i = 0;  $i < $zip->numFiles;  $i++){
         $name = $zip->getNameIndex($i, ZipArchive::FL_ENC_RAW);
