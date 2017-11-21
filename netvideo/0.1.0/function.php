@@ -96,6 +96,7 @@ function require_cache(string $file){
 
 function 非同期処理(string $file, $value = null) :void{
     if(!is_file($file) or preg_match('/[\'\"]/', $file)){
+        内部エラー("PHPファイル $file が存在しません", "警告");
         return;
     }
 
@@ -1487,7 +1488,7 @@ function zip追加(string $zipfile, array $filelist){
 
 
 function zip解凍(string $zipfile, string $解凍先 = ""){
-    $zip    = new \ZipArchive(); // http://php.net/ziparchive
+    $zip = new \ZipArchive(); // http://php.net/ziparchive
 
     if($zip->open($zipfile) !== true){
         return  内部エラー("ZIPファイル $zipfile を開けません", "警告");
