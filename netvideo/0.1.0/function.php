@@ -84,8 +84,11 @@ function 自動読み込み(string $dir = __DIR__) :bool{
 function require_cache(string $file){
     static $cache = [];
 
-    if(!isset($cache[$file])){
+    if(!絶対パスなら($file)){
         $file = realpath($file);
+    }
+
+    if(!isset($cache[$file])){
         $cache[$file] = require $file;
     }
 
