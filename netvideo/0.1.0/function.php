@@ -2063,19 +2063,20 @@ function ベンチマーク(callable $func, ...$arg){
     $end   = $start + 1;
 
     if($arg){
-        for($count = 0;  microtime(true) <= $end;  $count++){
+        for($count = -1;  microtime(true) <= $end;  $count++){
             $func(...$arg);
         }
     }
     else{
-        for($count = 0;  microtime(true) <= $end;  $count++){
+        for($count = -1;  microtime(true) <= $end;  $count++){
             $func();
         }
     }
 
     $finish = microtime(true);
 
-    $count = ($count > 1) ? number_format($count) : number_format(1/($finish-$start), 3);
+    print $count;
+    $count = ($count > 0) ? number_format($count) : number_format(1/($finish-$start), 3);
     printf("case%s: %s回\n", $i, $count);
 
     return $count;
