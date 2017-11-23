@@ -81,10 +81,16 @@ function 自動読み込み(string $dir = __DIR__) :bool{
 
 
 
-function require_cache(string $file){
+function モジュール(string $file){
+    assert(is_dir($_ENV['モジュール.ディレクトリ']));
+    static $dir;
     static $cache = [];
 
-    $file = realpath($file);
+    if(!isset($dir)){
+        $dir = realpath($_ENV['モジュール.ディレクトリ']);
+    }
+
+    $file = "$dir/$file.php";
 
     if(!isset($cache[$file])){
         $cache[$file] = require $file;
@@ -1522,7 +1528,7 @@ function zip解凍(string $zipfile, string $解凍先 = ""){
         if($name[-1] === '/'){
             continue;
         }
-        if(file_put_contents($解凍先.$name, $zip->getStream($zip->getNameIndex($i))) !== false){ // $zip->getFromIndex($i) という方法もあるけど
+        if(file_put_contents($解凍先.$name, $zip->getStream($zip->getNameIndex($i)), LOCK_EX) !== false){ // $zip->getFromIndex($i) という方法もあるけど
             $return[] = $解凍先.$name;
         }
     }
