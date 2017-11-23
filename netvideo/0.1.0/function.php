@@ -82,15 +82,9 @@ function 自動読み込み(string $dir = __DIR__) :bool{
 
 
 function モジュール(string $file){
-    assert(is_dir($_ENV['モジュール.ディレクトリ']));
-    static $dir;
     static $cache = [];
 
-    if(!isset($dir)){
-        $dir = realpath($_ENV['モジュール.ディレクトリ']);
-    }
-
-    $file = "$dir/$file.php";
+    $file = realpath($file);
 
     if(!isset($cache[$file])){
         $cache[$file] = require $file;
