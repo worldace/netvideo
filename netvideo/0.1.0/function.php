@@ -1300,6 +1300,26 @@ function 配列フォーマット(array $array, string $format) :string{
 
 
 
+function 列ソート(array &$array, $key, string $sort) :bool{
+    if(!array_key_exists($key, $array[0])){
+        return 内部エラー("この配列にはキー「{$key}」が存在しません", '警告');
+    }
+
+    if($sort === '大きい順'){
+        $sort = SORT_DESC;
+    }
+    elseif($sort === '小さい順'){
+        $sort = SORT_ASC;
+    }
+    else{
+        return 内部エラー('ソート方法は「大きい順」か「小さい順」のどちらかにしてください', '警告');
+    }
+
+    return array_multisort(array_column($array, $key), $sort, SORT_NATURAL, $array);
+}
+
+
+
 function パーミッション(string $path, string $permission = null) :string{
     if(!file_exists($path)){
         内部エラー("パス $path は存在しません", "警告");
