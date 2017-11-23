@@ -1300,9 +1300,10 @@ function 配列フォーマット(array $array, string $format) :string{
 
 
 
-function 列ソート(array &$array, $key, string $sort) :bool{
+function 列ソート(array $array, $key, string $sort) :array{
     if(!array_key_exists($key, $array[0])){
-        return 内部エラー("この配列にはキー「{$key}」が存在しません", '警告');
+        内部エラー("この配列にはキー「{$key}」が存在しません", '警告');
+        return $array;
     }
 
     if($sort === '大きい順'){
@@ -1312,10 +1313,13 @@ function 列ソート(array &$array, $key, string $sort) :bool{
         $sort = SORT_ASC;
     }
     else{
-        return 内部エラー('ソート方法は「大きい順」か「小さい順」のどちらかにしてください', '警告');
+        内部エラー('ソート方法は「大きい順」か「小さい順」のどちらかにしてください', '警告');
+        return $array;
     }
 
-    return array_multisort(array_column($array, $key), $sort, SORT_NATURAL, $array);
+    array_multisort(array_column($array, $key), $sort, SORT_NATURAL, $array);
+
+    return $array;
 }
 
 
