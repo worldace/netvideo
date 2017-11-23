@@ -1657,10 +1657,9 @@ function CSV取得(string $path, array $設定 = []) :\Generator{
         'スキップ'       => 0,
     ];
     
-    $ini = ini_get('auto_detect_line_endings');
     ini_set('auto_detect_line_endings', true);
     $fp = fopen($path, 'rb');
-    ini_set('auto_detect_line_endings', $ini);
+    ini_restore ('auto_detect_line_endings');
 
     if($fp === false){
         内部エラー("CSVファイル $path が開けません", '警告');
