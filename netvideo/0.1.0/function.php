@@ -1301,7 +1301,7 @@ function 配列フォーマット(array $array, string $format) :string{
 
 
 function 列ソート(array &$array, $key, string $sort) :bool{
-    if(!array_key_exists($key, $array[0])){
+    if(!isset($array[0][$key])){
         return 内部エラー("この配列にはキー「{$key}」が存在しません", '警告');
     }
 
