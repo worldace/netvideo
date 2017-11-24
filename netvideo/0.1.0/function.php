@@ -75,7 +75,10 @@ function 自動読み込み(string $dir = __DIR__) :bool{
 
     return spl_autoload_register(function($class) use($dir){
         $class = str_replace("\\", "/", $class);
-        require_once "$dir/$class.php";
+        
+        if(file_exists("$dir/$class.php")){
+            require_once "$dir/$class.php";
+        }
     });
 }
 
