@@ -1301,19 +1301,13 @@ function 配列フォーマット(array $array, string $format) :string{
 
 
 function 列ソート(array &$array, $key, string $sort) :bool{
+    assert($sort === '大きい順' or $sort === '小さい順');
+
     if(!isset($array[0][$key])){
         return 内部エラー("この配列にはキー「{$key}」が存在しません", '警告');
     }
 
-    if($sort === '大きい順'){
-        $sort = SORT_DESC;
-    }
-    elseif($sort === '小さい順'){
-        $sort = SORT_ASC;
-    }
-    else{
-        return 内部エラー('ソート方法は「大きい順」か「小さい順」のどちらかにしてください', '警告');
-    }
+    $sort = ['大きい順'=>SORT_DESC, '小さい順'=>SORT_ASC][$sort];
 
     return array_multisort(array_column($array, $key), $sort, SORT_NATURAL, $array);
 }
