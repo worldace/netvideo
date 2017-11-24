@@ -1509,7 +1509,7 @@ function zip解凍(string $zipfile, string $解凍先 = ""){
     $zip = new \ZipArchive(); // http://php.net/ziparchive
 
     if($zip->open($zipfile) !== true){
-        return  内部エラー("ZIPファイル $zipfile を開けません", "警告");
+        return 内部エラー("ZIPファイル $zipfile を開けません", "警告");
     }
 
     $解凍先  = $解凍先 ? realpath($解凍先) : realpath(dirname($zipfile));
@@ -1666,9 +1666,15 @@ function CSV取得(string $path, array $設定 = []) :\Generator{
     $sample = fread($fp, 1024);
     rewind($fp);
 
+    //BOM検知
+    if(preg_match("/^\xEF\xBB\xBF/", $sample)){
+        $設定['入力コード'] = 'UTF-8';
+        fseek($fp, 3);
+    }
+    
     //文字コード検知
     if($設定['出力コード'] and !$設定['入力コード']){
-        $設定['入力コード'] = mb_detect_encoding($sample, ['utf-8', 'sjis-win', 'eucjp-win']);
+        $設定['入力コード'] = mb_detect_encoding($sample, ['UTF-8', 'SJIS-WIN', 'EUCJP-WIN']);
     }
 
     //区切り検知
