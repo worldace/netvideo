@@ -1438,12 +1438,13 @@ function ファイル編集(string $file, callable $func, ...$arg) :bool{
     flock($fp, LOCK_EX);
 
     if(preg_match('/array/i', $引数の型)){
+        $contents = [];
         while(($line = fgets($fp)) !== false){
             $contents[] = $line;
         }
     }
     elseif(preg_match('/generator/i', $引数の型)){
-        $generator = function() use($fp) :\Generator{
+        $generator = function() use($fp) {
             while(($line = fgets($fp)) !== false){
                yield $line;
             }
