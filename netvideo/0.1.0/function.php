@@ -21,7 +21,7 @@ function JSON表示($value, $許可オリジン = null) :void{
     header("Access-Control-Allow-Origin: $許可オリジン");
     header("Access-Control-Allow-Credentials: true");
 
-    if(isset($_GET['callback'])){ //JSONP
+    if(!empty($_GET['callback'])){ //JSONP
         header('Content-Type: application/javascript; charset=utf-8');
         printf('%s(%s);', $_GET['callback'], $json);
     }
@@ -1427,7 +1427,7 @@ function パス一覧(string $dir, bool $recursive = true, string $base = '') :a
 
 
 
-function ファイル編集(string $file, callable $func) :bool{
+function ファイル編集(string $file, callable $func, ...$arg) :bool{
     $引数の型 = 引数の型($func, 0);
     $fp       = @fopen($file, 'rb+');
 
@@ -1454,7 +1454,7 @@ function ファイル編集(string $file, callable $func) :bool{
         $contents = stream_get_contents($fp);
     }
 
-    $contents = $func($contents);
+    $contents = $func($contents, ...$arg);
 
     if(!is_string($contents)){
         return false;
