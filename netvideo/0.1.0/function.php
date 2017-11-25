@@ -330,13 +330,13 @@ function ダウンロード(string $file, string $filename = null, int $timeout 
 
 
 function 並列GET送信(array $url, int $並列数 = 5, array $option = []) :array{
-    $option = $option + [ // http://php.net/manual/ja/function.curl-setopt.php
+    $option = $option + [ 
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_MAXREDIRS => 10,
         CURLOPT_TIMEOUT => 10,
         CURLOPT_SSL_VERIFYPEER => false,
-    ];
+    ]; // http://php.net/manual/ja/function.curl-setopt.php
 
     $mh = curl_multi_init();
     curl_multi_setopt($mh, CURLMOPT_PIPELINING, 1); // http://php.net/manual/ja/function.curl-multi-setopt.php
@@ -1427,6 +1427,50 @@ function パス一覧(string $dir, bool $recursive = true, string $base = '') :a
 
 
 
+function ファイル編集(string $file, callable $func) :bool{
+    $引数の型 = 引数の型($func, 0);
+    $fp       = @fopen($file, 'rb+');
+
+    if(!$fp){
+        return 内部エラー("ファイル $file が開けません", '警告');
+    }
+
+    flock($fp, LOCK_EX);
+
+    if(preg_match('/array/i', $引数の型)){
+        while(($line = fgets($fp)) !== false){
+            $contents[] = $line;
+        }
+    }
+    elseif(preg_match('/generator/i', $引数の型)){
+        $generator = function() use($fp) :\Generator{
+            while(($line = fgets($fp)) !== false){
+               yield $line;
+            }
+        };
+        $contents = $generator();
+    }
+    else{
+        $contents = stream_get_contents($fp);
+    }
+
+    $contents = $func($contents);
+
+    if(!is_string($contents)){
+        return false;
+    }
+
+    ftruncate($fp, 0);
+	rewind($fp);
+    fwrite($fp, $contents);
+    flock($fp, LOCK_UN);
+    fclose($fp);
+
+    return true;
+}
+
+
+
 function ディレクトリ作成(string $dir, string $permission = "707"){
     if(is_dir($dir)){
         パーミッション($dir, $permission);
@@ -2158,6 +2202,18 @@ function クラス文字列化($class){
     $return = preg_replace("/}.*$/", "}", $return);
 
     return $return;
+}
+
+
+
+function 引数の型(callable $func, int $i) :string{
+    if(is_array($func)){
+        $ref = new \ReflectionMethod(...$func);
+    }
+    else{
+        $ref = new \ReflectionFunction($func);
+    }
+    return (string)$ref->getParameters()[$i]->getType();
 }
 
 
