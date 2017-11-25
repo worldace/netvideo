@@ -1456,7 +1456,7 @@ function ファイル編集(string $file, callable $func, ...$arg) :bool{
 
     $contents = $func($contents, ...$arg);
 
-    if(!is_string($contents)){
+    if($contents === false){
         return false;
     }
 
