@@ -1433,9 +1433,9 @@ function パス一覧(string $dir, bool $recursive = true, string $base = '') :a
 
 
 
-function ファイル編集(string $file, callable $func, ...$arg) :bool{
+function ファイル編集(string $file, callable $func, ...$arg){
     $引数の型 = 引数の型($func, 0);
-    $fp       = @fopen($file, 'rb+');
+    $fp       = @fopen($file, 'cb+');
 
     if(!$fp){
         return 内部エラー("ファイル $file が開けません", '警告');
@@ -1473,7 +1473,7 @@ function ファイル編集(string $file, callable $func, ...$arg) :bool{
     flock($fp, LOCK_UN);
     fclose($fp);
 
-    return true;
+    return $file;
 }
 
 
