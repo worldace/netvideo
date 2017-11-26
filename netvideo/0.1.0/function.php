@@ -1463,7 +1463,7 @@ function ファイル編集(string $file, callable $func, ...$arg) :bool{
 
     $contents = $func($contents, ...$arg);
 
-    if($contents === false || $contents === null){
+    if(!is_string($contents) and !is_int($contents)){
         return false;
     }
 
