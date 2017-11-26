@@ -1013,6 +1013,12 @@ function strf(string $format, ...$replacement){
 
 
 
+function 一文字分解(string $str) :array{
+    return preg_split('//u', $str, 0, PREG_SPLIT_NO_EMPTY);
+}
+
+
+
 function BOM削除(string $str) :string{
     return ltrim($str, "\xEF\xBB\xBF");
 }
@@ -1457,7 +1463,7 @@ function ファイル編集(string $file, callable $func, ...$arg) :bool{
 
     $contents = $func($contents, ...$arg);
 
-    if($contents === false){
+    if($contents === false || $contents === null){
         return false;
     }
 
