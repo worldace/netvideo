@@ -1827,7 +1827,7 @@ function fromphp($value, string $name = 'fromphp') :string{
     $json  = json_encode($value, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
     $valid = preg_match("/^[a-zA-Z_\$\x7f-\xff][a-zA-Z0-9_\$\x7f-\xff]*/", $name);
 
-    return ($json !== false and $valid)  ?  "<script>$name = $json;</script>\n"  :  "";
+    return ($json !== false and $valid)  ?  "<script>var $name = $json;</script>\n"  :  "";
 }
 
 
