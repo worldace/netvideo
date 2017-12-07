@@ -1297,7 +1297,7 @@ function 配列掃除(array $array) :array{
 
 
 
-function 配列フォーマット(array $array, string $format) :string{
+function arrayf(array $array, string $format) :string{
     $return = '';
 
     foreach($array as $k => $v){
