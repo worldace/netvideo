@@ -53,7 +53,7 @@ class mQuery extends Array{
 
     $parseHTML(html){
         const doc = (new DOMParser).parseFromString(html, 'text/html');
-        return [...doc.head.children, ...doc.body.childNodes];
+        return [...doc.head.children, ...doc.body.childNodes].filter(v => v != null);
     }
 
 
@@ -211,7 +211,7 @@ class mQuery extends Array{
 
         if(mode === 'clone'){
             for(const position of target){
-                selection.push( position.cloneNode(true) );
+                selection.push( this.$cloneElement(position) );
             }
         }
         else if(mode === 'remove'){
@@ -222,35 +222,35 @@ class mQuery extends Array{
         else if(mode === 'prev' || mode === '1'){
             for(const position of target){
                 for(let i = 0; i < content.length; i++){
-                    selection.push( position.parentNode.insertBefore(content[i].cloneNode(true), position) );
+                    selection.push( position.parentNode.insertBefore(this.$cloneElement(content[i]), position) );
                 }
             }
         }
         else if(mode === 'firstchild' || mode === '-1'){
             for(const position of Array.from(target).reverse()){
                 for(let i = content.length - 1; i >= 0; i--){
-                    selection.unshift( position.insertBefore(content[i].cloneNode(true), position.firstChild) );
+                    selection.unshift( position.insertBefore(this.$cloneElement(content[i]), position.firstChild) );
                 }
             }
         }
         else if(mode === 'lastchild' || mode === '-2'){
             for(const position of target){
                 for(let i = 0; i < content.length; i++){
-                    selection.push( position.appendChild(content[i].cloneNode(true)) );
+                    selection.push( position.appendChild(this.$cloneElement(content[i])) );
                 }
             }
         }
         else if(mode === 'next' || mode === '2'){
             for(const position of Array.from(target).reverse()){
                 for(let i = content.length - 1; i >= 0; i--){
-                    selection.unshift( position.parentNode.insertBefore(content[i].cloneNode(true), position.nextSibling) );
+                    selection.unshift( position.parentNode.insertBefore(this.$cloneElement(content[i]), position.nextSibling) );
                 }
             }
         }
         else{ // replace
             for(const position of target){
                 for(let i = 0; i < content.length; i++){
-                    selection.push( position.parentNode.replaceChild(content[i].cloneNode(true), position) );
+                    selection.push( position.parentNode.replaceChild(this.$cloneElement(content[i]), position) );
                 }
             }
         }
@@ -259,12 +259,12 @@ class mQuery extends Array{
     }
 
 
-    $cloneNode(element){
+    $cloneElement(element){
         if(element.nodeType !== 1){
             return;
         }
         const clone      = element.cloneNode(true);
-        const cloneAll   = [clone, ...clone.querySelectorAll("*")]
+        const cloneAll   = [clone, ...clone.querySelectorAll("*")];
         const elementAll = [element, ...element.querySelectorAll("*")];
         for(let i = 0; i < elementAll.length; i++){
             if(elementAll[i] == null || !elementAll[i].mqEvent){
