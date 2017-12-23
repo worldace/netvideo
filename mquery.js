@@ -261,7 +261,7 @@ class mQuery extends Array{
 
     $cloneElement(element){
         if(element.nodeType !== 1){
-            return;
+            return element.cloneNode(true);
         }
         const clone      = element.cloneNode(true);
         const cloneAll   = [clone, ...clone.querySelectorAll("*")];
