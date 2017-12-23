@@ -53,14 +53,7 @@ class mQuery extends Array{
 
     $parseHTML(html){
         const doc = (new DOMParser).parseFromString(html, 'text/html');
-        const box = [];
-        for(const v of [...doc.head.children, ...doc.body.childNodes]){
-            if(v == null){
-                continue;
-            }
-            box.push(document.importNode(v, true));
-        }
-        return box;
+        return [...doc.head.children, ...doc.body.childNodes];
     }
 
 
@@ -263,6 +256,27 @@ class mQuery extends Array{
         }
 
         return selection;
+    }
+
+
+    $cloneNode(element){
+        if(element.nodeType !== 1){
+            return;
+        }
+        const clone      = element.cloneNode(true);
+        const cloneAll   = [clone, ...clone.querySelectorAll("*")]
+        const elementAll = [element, ...element.querySelectorAll("*")];
+        for(let i = 0; i < elementAll.length; i++){
+            if(elementAll[i] == null || !elementAll[i].mqEvent){
+                continue;
+            }
+            cloneAll[i].mqEvent = {};
+            for(let name in elementAll[i].mqEvent){
+                cloneAll[i].mqEvent[name] = elementAll[i].mqEvent[name];
+                cloneAll[i].addEventListener(...elementAll[i].mqEvent[name]);
+            }
+        }
+        return clone;
     }
 
 
