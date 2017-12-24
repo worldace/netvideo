@@ -27,24 +27,27 @@ class mQuery extends Array{
 
         if(type === 'string'){
             try{
-                content = this.context.querySelectorAll(content.trim());
+                content = Array.from(this.context.querySelectorAll(content.trim()));
             }
             catch(e){
-                content = this.$parseHTML(content.trim());
+                content = this.$parseHTML(content);
             }
         }
-        else if(type === 'array' || content instanceof NodeList || content instanceof HTMLCollection || content instanceof Set){
+        else if(type === 'array'){
             //content = content
         }
-        else if(type === 'function'){ //モジュールはDOM構築後に実行されるので下記は常に偽となる
-            this.context.readyState === 'loading' ? this.context.addEventListener('DOMContentLoaded', content) : content();
-            content = [];
+        else if(type === 'nodelist' || type === 'htmlcollection' || type === 'set'){
+            content = Array.from(content);
         }
-        else if(type === 'null' || type === 'undefined'){
-            content = [];
-        }
-        else{ //HTMLElement, Document, ...
+        else if(type === 'window' || type === 'htmldocument' || type === 'htmlelement'){
             content = [content];
+        }
+        else if(type === 'function'){
+            this.context.readyState === 'loading' ? this.context.addEventListener('DOMContentLoaded', content) : content(); //モジュールなので常に偽となる
+            content = [];
+        }
+        else{
+            content = [];
         }
 
         return content;
@@ -264,10 +267,10 @@ class mQuery extends Array{
             return element.cloneNode(true);
         }
         const clone      = element.cloneNode(true);
-        const cloneAll   = [clone, ...clone.querySelectorAll("*")];
-        const elementAll = [element, ...element.querySelectorAll("*")];
+        const cloneAll   = Array.from(clone.querySelectorAll("*")).unshift(clone);
+        const elementAll = Array.from(element.querySelectorAll("*")).unshift(element);
         for(let i = 0; i < elementAll.length; i++){
-            if(elementAll[i] == null || !elementAll[i].mqEvent){
+            if(!elementAll[i].mqEvent){
                 continue;
             }
             cloneAll[i].mqEvent = {};
