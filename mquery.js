@@ -34,7 +34,9 @@ class mQuery extends Array{
             }
         }
         else if(type === 'array'){
-            //content = content
+            if(!(content instanceof mQuery)){
+                content = content.filter(v => v instanceof Node);
+            }
         }
         else if(type === 'nodelist' || type === 'htmlcollection' || type === 'set'){
             content = Array.from(content);
