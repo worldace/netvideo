@@ -39,7 +39,7 @@ class mQuery extends Array{
         else if(type === 'nodelist' || type === 'htmlcollection' || type === 'set'){
             content = Array.from(content);
         }
-        else if(type === 'window' || type === 'htmldocument' || type === 'htmlelement'){
+        else if(type === 'window' || type === 'htmldocument'){
             content = [content];
         }
         else if(type === 'function'){
@@ -47,7 +47,7 @@ class mQuery extends Array{
             content = [];
         }
         else{
-            content = [];
+            content = (content instanceof Element) ? [content] : [];
         }
 
         return content;
