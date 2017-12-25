@@ -574,10 +574,10 @@ class mQuery extends Array{
             if(!('addEventListener' in v)){
                 continue;
             }
-            if(name.includes('.') && this.$data(v, `mquery.event.${name}`)){ //名前付きは重複登録禁止
+            if(name.includes('.') && $.hasData(v, `mquery.event.${name}`)){ //名前付きは重複登録禁止
                 throw `mQuery.on('${name}') event is already registered.`;
             }
-            this.$data(v, `mquery.event.${name}`, args);
+            $.data(v, `mquery.event.${name}`, args);
             v.addEventListener(...args);
         }
         return this;
@@ -601,8 +601,8 @@ class mQuery extends Array{
             if(!('removeEventListener' in v)){
                 continue;
             }
-            v.removeEventListener(...this.$data(v, `mquery.event.${name}`));
-            this.$removeData(v, `mquery.event.${name}`);
+            v.removeEventListener(...$.data(v, `mquery.event.${name}`));
+            $.removeData(v, `mquery.event.${name}`);
         }
         return this;
     }
@@ -691,53 +691,16 @@ class mQuery extends Array{
 
     $show(v){
         if(v.style.display === 'none'){
-            v.style.display = this.$data(v, 'mquery.display') || '';
+            v.style.display = $.data(v, 'mquery.display') || '';
         }
     }
 
 
     $hide(v){
         if(v.style.display !== 'none'){
-            this.$data(v, 'mquery.display', window.getComputedStyle(v)['display']);
+            $.data(v, 'mquery.display', window.getComputedStyle(v)['display']);
             v.style.display = 'none';
         }
-    }
-
-
-    $data(object, prop, value){
-        const props = prop.split('.');
-        prop = props.pop();
-
-        if(value === undefined){
-            for(const v of props){
-                if(!(v in object)){
-                    return;
-                }
-                object = object[v];
-            }
-            return object[prop];
-        }
-        for(const v of props){
-            if(!(v in object)){
-                object[v] = {};
-            }
-            object = object[v];
-        }
-        object[prop] = value;
-    }
-
-
-    $removeData(object, prop){
-        const props = prop.split('.');
-        prop = props.pop();
-
-        for(const v of props){
-            if(!(v in object)){
-                return;
-            }
-            object = object[v];
-        }
-        delete object[prop];
     }
 
 
@@ -817,6 +780,57 @@ $.geo = function(){
         scrollX       : window.scrollX,
         scrollY       : window.scrollY,
     };
+};
+
+
+$.data = function(object, prop, value){
+    const props = prop.split('.');
+    prop = props.pop();
+
+    if(value === undefined){ // 取得動作
+        for(const v of props){
+            if(!(v in object)){
+                return;
+            }
+            object = object[v];
+        }
+        return object[prop];
+    }
+    else{ // 設定動作
+        for(const v of props){
+            if(!(v in object)){
+                object[v] = {};
+            }
+            object = object[v];
+        }
+        object[prop] = value;
+    }
+};
+
+
+$.removeData = function(object, prop){
+    const props = prop.split('.');
+    prop = props.pop();
+
+    for(const v of props){
+        if(!(v in object)){
+            return;
+        }
+        object = object[v];
+    }
+    delete object[prop];
+};
+
+
+$.hasData = function(object, prop){
+
+    for(const v of prop.split('.')){
+        if(!(v in object)){
+            return false;
+        }
+        object = object[v];
+    }
+    return true;
 };
 
 
