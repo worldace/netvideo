@@ -726,6 +726,20 @@ class mQuery extends Array{
     }
 
 
+    $removeData(object, prop){
+        const props = prop.split('.');
+        prop = props.pop();
+
+        for(const v of props){
+            if(!(v in object)){
+                return;
+            }
+            object = object[v];
+        }
+        delete object[prop];
+    }
+
+
     $toCamelCase(str = ''){
         return str.replace(/-([a-z])/g, m => `${m[1].toUpperCase()}`);
     }
