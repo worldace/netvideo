@@ -269,16 +269,18 @@ class mQuery extends Array{
             return element.cloneNode(true);
         }
         const clone      = element.cloneNode(true);
-        const cloneAll   = Array.from(clone.querySelectorAll("*")).unshift(clone);
-        const elementAll = Array.from(element.querySelectorAll("*")).unshift(element);
+        const cloneAll   = Array.from(clone.querySelectorAll("*")).concat(clone);
+        const elementAll = Array.from(element.querySelectorAll("*")).concat(element);
         for(let i = 0; i < elementAll.length; i++){
-            if(!elementAll[i].mqEvent){
+            if(!('mquery' in elementAll[i])){
                 continue;
             }
-            cloneAll[i].mqEvent = {};
-            for(let name in elementAll[i].mqEvent){
-                cloneAll[i].mqEvent[name] = elementAll[i].mqEvent[name];
-                cloneAll[i].addEventListener(...elementAll[i].mqEvent[name]);
+            cloneAll[i].mquery = elementAll[i].mquery;
+            if(!('event' in elementAll[i].mquery)){
+                continue;
+            }
+            for(let name in elementAll[i].mquery.event){
+                cloneAll[i].addEventListener(...elementAll[i].mquery.event[name]);
             }
         }
         return clone;
@@ -572,11 +574,10 @@ class mQuery extends Array{
             if(!('addEventListener' in v)){
                 continue;
             }
-            v.mqEvent = ('mqEvent' in v) ? v.mqEvent : {};
-            if(name in v.mqEvent && name.includes('.')){ //名前付きは重複登録禁止
+            if(name.includes('.') && this.$data(v, `mquery.event.${name}`)){ //名前付きは重複登録禁止
                 throw `mQuery.on('${name}') event is already registered.`;
             }
-            v.mqEvent[name] = args;
+            this.$data(v, `mquery.event.${name}`, args);
             v.addEventListener(...args);
         }
         return this;
@@ -600,8 +601,8 @@ class mQuery extends Array{
             if(!('removeEventListener' in v)){
                 continue;
             }
-            v.removeEventListener(...(v.mqEvent[name]));
-            delete v.mqEvent[name];
+            v.removeEventListener(...this.$data(v, `mquery.event.${name}`));
+            this.$removeData(v, `mquery.event.${name}`);
         }
         return this;
     }
