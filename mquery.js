@@ -385,25 +385,6 @@ class mQuery extends Array{
     }
 
 
-    data(content){
-        if(content !== undefined){ //データを保存
-            return this.$each(v => v.dataset.mquery = JSON.stringify(content));
-        }
-        //データを取得
-        try{
-            return this.$exists('dataset') ? JSON.parse(this[0].dataset.mquery) : undefined;
-        }
-        catch(e){
-            return this[0].dataset.mquery;
-        }
-    }
-
-
-    removeData(){
-        return this.$each(v => delete v.dataset.mquery);
-    }
-
-
     geo(more){
         if(!this.$exists('getBoundingClientRect')){
             return {};
@@ -474,11 +455,6 @@ class mQuery extends Array{
     }
 
 
-    parentsUntil(selector){
-        return this.$setCollection(v => this.$traverseFamilyUntil(v, 'parentNode', selector));
-    }
-
-
     closest(selector){
         return selector ? this.$setCollection(v => [v.closest(selector)]) : this.parent();
     }
@@ -489,7 +465,7 @@ class mQuery extends Array{
     }
 
 
-   offsetParent(){
+    offsetParent(){
         return this.$setCollection(v => [v.offsetParent]);
     }
 
@@ -504,11 +480,6 @@ class mQuery extends Array{
     }
 
 
-    prevUntil(selector){
-        return this.$setCollection(v => this.$traverseFamilyUntil(v, 'previousElementSibling', selector));
-    }
-
-
     next(selector){
         return this.$setCollection(v => this.$traverseFamily(v, 'nextElementSibling', selector, true));
     }
@@ -516,11 +487,6 @@ class mQuery extends Array{
 
     nextAll(selector){
         return this.$setCollection(v => this.$traverseFamily(v, 'nextElementSibling', selector));
-    }
-
-
-    nextUntil(selector){
-        return this.$setCollection(v => this.$traverseFamilyUntil(v, 'nextElementSibling', selector));
     }
 
 
@@ -538,19 +504,6 @@ class mQuery extends Array{
                 yield v;
             }
             if(alone){
-                break;
-            }
-        }
-    }
-
-
-    * $traverseFamilyUntil(startElement, prop, selector){ //jQは指定セレクタ手前まで選択で動作が違う
-        for(let v = startElement[prop]; v; v = v[prop]){
-            if(v.nodeType !== 1){
-                continue;
-            }
-            yield v;
-            if(selector && v.matches(selector)){
                 break;
             }
         }
@@ -737,14 +690,14 @@ class mQuery extends Array{
 
     $show(v){
         if(v.style.display === 'none'){
-            v.style.display = v.mqDisplay || '';
+            v.style.display = this.$data(v, 'mquery.display') || '';
         }
     }
 
 
     $hide(v){
         if(v.style.display !== 'none'){
-            v.mqDisplay = window.getComputedStyle(v)['display'];
+            this.$data(v, 'mquery.display', window.getComputedStyle(v)['display']);
             v.style.display = 'none';
         }
     }
