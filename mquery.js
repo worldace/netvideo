@@ -33,13 +33,13 @@ class mQuery extends Array{
                 content = this.$parseHTML(content);
             }
         }
+        else if(type === 'nodelist' || type === 'htmlcollection' || type === 'set'){
+            content = Array.from(content);
+        }
         else if(type === 'array'){
             if(!(content instanceof mQuery)){
                 content = content.filter(v => v instanceof Node);
             }
-        }
-        else if(type === 'nodelist' || type === 'htmlcollection' || type === 'set'){
-            content = Array.from(content);
         }
         else if(type === 'window' || type === 'htmldocument' || content instanceof Element){
             content = [content];
@@ -747,6 +747,29 @@ class mQuery extends Array{
             v.mqDisplay = window.getComputedStyle(v)['display'];
             v.style.display = 'none';
         }
+    }
+
+
+    $data(object, prop, value){
+        const props = prop.split('.');
+        prop = props.pop();
+
+        if(value === undefined){
+            for(const v of props){
+                if(!(v in object)){
+                    return;
+                }
+                object = object[v];
+            }
+            return object[prop];
+        }
+        for(const v of props){
+            if(!(v in object)){
+                object[v] = {};
+            }
+            object = object[v];
+        }
+        object[prop] = value;
     }
 
 
