@@ -549,15 +549,13 @@ class mQuery extends Array{
             option  = {};
         }
 
-        name = name.toLowerCase();
-
         const args = [];
-        args[0] = name.replace(/\..*/, '');
+        args[0] = name.replace(/\-.*/, '').toLowerCase();
         args[1] = function(e){
             if(option.find && !e.target.matches(option.find)){ // デリゲート
                 return;
             }
-            if('name' in e && e.name.includes('.') && e.name !== name){ // trigger()から呼ばれて名前付きの場合
+            if('name' in e && e.name.includes('-') && e.name !== name){ // trigger()から呼ばれて名前付きの場合
                 return;
             }
             e.data = ('data' in e) ? e.data : option.data;
@@ -574,10 +572,10 @@ class mQuery extends Array{
             if(!('addEventListener' in v)){
                 continue;
             }
-            if(name.includes('.') && $.hasData(v, `mquery/event/${name}`)){ //名前付きは重複登録禁止
+            if(name.includes('-') && $.hasData(v, `mquery.event.${name}`)){ //名前付きは重複登録禁止
                 throw `mQuery.on('${name}') event is already registered.`;
             }
-            $.data(v, `mquery/event/${name}`, args);
+            $.data(v, `mquery.event.${name}`, args);
             v.addEventListener(...args);
         }
         return this;
@@ -595,22 +593,18 @@ class mQuery extends Array{
 
 
     off(name){
-        name = name.toLowerCase();
-
         for(const v of this){
             if(!('removeEventListener' in v)){
                 continue;
             }
-            v.removeEventListener(...$.data(v, `mquery/event/${name}`));
-            $.removeData(v, `mquery/event/${name}`);
+            v.removeEventListener(...$.data(v, `mquery.event.${name}`));
+            $.removeData(v, `mquery.event.${name}`);
         }
         return this;
     }
 
 
     trigger(name, option = {}){
-        name = name.toLowerCase();
-
         const bubbles    = ('bubbles'    in option) ? option.bubbles    : true;
         const cancelable = ('cancelable' in option) ? option.cancelable : true;
         const composed   = ('composed'   in option) ? option.composed   : false;
@@ -622,7 +616,7 @@ class mQuery extends Array{
             if(!('dispatchEvent' in v)){
                 continue;
             }
-            const event = new Event(name.replace(/\..*/, ''), {bubbles, cancelable, composed});
+            const event = new Event(name.replace(/\-.*/, '').toLowerCase(), {bubbles, cancelable, composed});
             event.name = name;
             v.dispatchEvent(Object.assign(event, option));
         }
@@ -691,14 +685,14 @@ class mQuery extends Array{
 
     $show(v){
         if(v.style.display === 'none'){
-            v.style.display = $.data(v, 'mquery/display') || '';
+            v.style.display = $.data(v, 'mquery.display') || '';
         }
     }
 
 
     $hide(v){
         if(v.style.display !== 'none'){
-            $.data(v, 'mquery/display', window.getComputedStyle(v)['display']);
+            $.data(v, 'mquery.display', window.getComputedStyle(v)['display']);
             v.style.display = 'none';
         }
     }
@@ -784,7 +778,7 @@ $.geo = function(){
 
 
 $.data = function(object, prop, value){
-    const props = prop.split('/');
+    const props = prop.split('.');
     prop = props.pop();
 
     if(value === undefined){ // 取得動作
@@ -809,7 +803,7 @@ $.data = function(object, prop, value){
 
 
 $.removeData = function(object, prop){
-    const props = prop.split('/');
+    const props = prop.split('.');
     prop = props.pop();
 
     for(const v of props){
@@ -823,7 +817,7 @@ $.removeData = function(object, prop){
 
 
 $.hasData = function(object, prop){
-    for(const v of prop.split('/')){
+    for(const v of prop.split('.')){
         if(!(v in object)){
             return false;
         }
