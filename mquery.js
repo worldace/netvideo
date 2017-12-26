@@ -325,19 +325,40 @@ class mQuery extends Array{
 
 
     css(name, value){
-        if(value !== undefined){ //CSSを1つ設定
+        if(value !== undefined){ // CSSを1つ設定
             name = this.$toChainCase(name);
             return this.$each(v => v.style.setProperty(name, value));
         }
-        else if($.type(name) === 'string'){ //CSSを1つ取得
-            name = this.$toChainCase(name);
-            return this.$exists('style') ? window.getComputedStyle(this[0])[name] : undefined;
+        else if($.type(name) === 'string'){
+            if(name.includes(':')){ // CSSを複数設定(再帰)
+                this.$parseCSS(name).forEach((v, k) => this.css(k, v));
+                return this;
+            }
+            else{ // CSSを1つ取得
+                name = this.$toChainCase(name);
+                return this.$exists('style') ? window.getComputedStyle(this[0])[name] : undefined;
+            }
         }
         else if($.type(name) === 'object'){ //CSSを複数設定(再帰)
             Object.keys(name).forEach(k => this.css(k, name[k]));
         }
 
         return this;
+    }
+
+
+    $parseCSS(str){
+        str = str.trim().replace("\r", "").replace(/\/\*\/?(\n|[^\/]|[^*]\/)*\*\//mg, ''); // コメント除去
+        const css = new Map;
+        for(let v of str.split("\n")){
+            v = v.trim().replace(/;$/, '');
+            const name  = v.substring(0,v.indexOf(':')).trim();
+            const value = v.substring(v.indexOf(':')+1).trim();
+            if(name && value){
+                css.set(name, value);
+            }
+        }
+        return css;
     }
 
 
@@ -575,8 +596,8 @@ class mQuery extends Array{
             if(name.includes('-') && $.hasData(v, `mquery.event.${name}`)){ //名前付きは重複登録禁止
                 throw `mQuery.on('${name}') event is already registered.`;
             }
-            $.data(v, `mquery.event.${name}`, args);
             v.addEventListener(...args);
+            $.data(v, `mquery.event.${name}`, args);
         }
         return this;
     }
