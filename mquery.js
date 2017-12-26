@@ -327,12 +327,11 @@ class mQuery extends Array{
     css(name, value){
         if(value !== undefined){ // CSSを1つ設定
             name = this.$toChainCase(name);
-            return this.$each(v => v.style.setProperty(name, value));
+            return this.$each(v => v.style.cssText += `${name}:${value};`);
         }
         else if($.type(name) === 'string'){
-            if(name.includes(':')){ // CSSを複数設定(再帰)
-                this.$parseCSS(name).forEach((v, k) => this.css(k, v));
-                return this;
+            if(name.includes(':')){ // CSSを複数設定
+                return this.$each(v => v.style.cssText += name);
             }
             else{ // CSSを1つ取得
                 name = this.$toChainCase(name);
@@ -344,21 +343,6 @@ class mQuery extends Array{
         }
 
         return this;
-    }
-
-
-    $parseCSS(str){
-        str = str.trim().replace("\r", "").replace(/\/\*\/?(\n|[^\/]|[^*]\/)*\*\//mg, ''); // コメント除去
-        const css = new Map;
-        for(let v of str.split("\n")){
-            v = v.trim().replace(/;$/, '');
-            const name  = v.substring(0,v.indexOf(':')).trim();
-            const value = v.substring(v.indexOf(':')+1).trim();
-            if(name && value){
-                css.set(name, value);
-            }
-        }
-        return css;
     }
 
 
