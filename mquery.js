@@ -349,7 +349,7 @@ class mQuery extends Array{
 
 
     removeCSS(name){
-        return this.$each(v => v.style.removeProperty(name));
+        return (name !== undefined)  ?  this.$each(v => v.style.removeProperty(name))  :  this.$each(v => v.style.cssText = '');
     }
 
 
