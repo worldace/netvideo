@@ -324,17 +324,19 @@ class mQuery extends Array{
     }
 
 
-    css(name, value){
+    css(name, value, priority = ''){
         if(value !== undefined){ // CSSを1つ設定
-            name = this.$toChainCase(name);
-            return this.$each(v => v.style.cssText += `${name}:${value};`);
+            if(value.match(/\!important/i)){
+                priority = 'important';
+                value    = value.replace(/\!important/i, '').trim();
+            }
+            return this.$each(v => v.style.setProperty(name, value, priority));
         }
         else if($.type(name) === 'string'){
             if(name.includes(':')){ // CSSを複数設定
                 return this.$each(v => v.style.cssText += name);
             }
             else{ // CSSを1つ取得
-                name = this.$toChainCase(name);
                 return this.$exists('style') ? window.getComputedStyle(this[0])[name] : undefined;
             }
         }
