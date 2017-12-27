@@ -280,7 +280,7 @@ class mQuery extends Array{
                 continue;
             }
             for(let name in elementAll[i].mquery.event){
-                cloneAll[i].addEventListener(...elementAll[i].mquery.event[name]);
+                elementAll[i].mquery.event[name].forEach(args => cloneAll[i].addEventListener(...args));
             }
         }
         return clone;
@@ -579,11 +579,16 @@ class mQuery extends Array{
             if(!('addEventListener' in v)){
                 continue;
             }
-            if(name.includes('-') && $.hasData(v, `mquery.event.${name}`)){ //名前付きは重複登録禁止
-                throw `mQuery.on('${name}') event is already registered.`;
+            if($.hasData(v, `mquery.event.${name}`)){
+                if(name.includes('-')){ //名前付きは重複登録禁止
+                    throw `mQuery.on('${name}') event is already registered.`;
+                }
+                v.mquery.event[name].push(args);
+            }
+            else{
+                $.data(v, `mquery.event.${name}`, [args]);
             }
             v.addEventListener(...args);
-            $.data(v, `mquery.event.${name}`, args);
         }
         return this;
     }
@@ -604,7 +609,7 @@ class mQuery extends Array{
             if(!('removeEventListener' in v)){
                 continue;
             }
-            v.removeEventListener(...$.data(v, `mquery.event.${name}`));
+            $.data(v, `mquery.event.${name}`).forEach(args => v.removeEventListener(...args));
             $.removeData(v, `mquery.event.${name}`);
         }
         return this;
