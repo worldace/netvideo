@@ -617,12 +617,25 @@ class mQuery extends Array{
 
 
     off(name){
-        for(const v of this){
-            if(!('removeEventListener' in v)){
-                continue;
+        if(name !== undefined){ // イベントを1つ解除
+            for(const v of this){
+                if(!$.hasData(v, `mquery.event.${name}`)){
+                    continue;
+                }
+                $.data(v, `mquery.event.${name}`).forEach(args => v.removeEventListener(...args));
+                $.removeData(v, `mquery.event.${name}`);
             }
-            $.data(v, `mquery.event.${name}`).forEach(args => v.removeEventListener(...args));
-            $.removeData(v, `mquery.event.${name}`);
+        }
+        else{ // イベントをすべて解除
+            for(const v of this){
+                if(!$.hasData(v, `mquery.event`)){
+                    continue;
+                }
+                for(const name in v.mquery.event){
+                    $.data(v, `mquery.event.${name}`).forEach(args => v.removeEventListener(...args));
+                    $.removeData(v, `mquery.event.${name}`);
+                }
+            }
         }
         return this;
     }
