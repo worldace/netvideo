@@ -693,14 +693,20 @@ class mQuery extends Array{
             }
 
             if(element.type === 'radio' || element.type === 'checkbox'){
-                this[0].querySelector(`[name='${k}'][value='${v}']`).checked = true;
+                const ckecked = this[0].querySelector(`[name='${k}'][value='${v}']`);
+                if(chekced){
+                    ckecked.ckecked = true;
+                }
             }
             else if(element.tagName === 'SELECT'){
                 if(!select.includes(element)){ //初期化(multiple対策)
                     element.querySelectorAll('option').forEach(v => v.selected = false);
                     select.push(element);
                 }
-                element.querySelector(`[value='${v}']`).selected = true;
+                const selected = element.querySelector(`[value='${v}']`);
+                if(selected){
+                    selected.selrcted = true;
+                }
             }
             else{
                 element.value = v;
