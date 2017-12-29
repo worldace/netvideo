@@ -679,6 +679,38 @@ class mQuery extends Array{
     }
 
 
+    deserialize(str){
+        if(this.name() !== 'form'){
+            return;
+        }
+        this[0].querySelectorAll("input[type='checkbox']").forEach(v => v.checked = false);
+        const select = [];
+
+        for(const [k, v] of new URLSearchParams(str)){
+            const element = this[0].querySelector(`[name='${k}']`);
+            if(!element){
+                continue;
+            }
+
+            if(element.type === 'radio' || element.type === 'checkbox'){
+                this[0].querySelector(`[name='${k}'][value='${v}']`).checked = true;
+            }
+            else if(element.tagName === 'SELECT'){
+                if(!select.includes(element)){ //初期化(multiple対策)
+                    element.querySelectorAll('option').forEach(v => v.selected = false);
+                    select.push(element);
+                }
+                element.querySelector(`[value='${v}']`).selected = true;
+            }
+            else{
+                element.value = v;
+            }
+        }
+
+        return this;
+    }
+
+
     request(addParam = {}){
         if(this.name() !== 'form'){
             return;
