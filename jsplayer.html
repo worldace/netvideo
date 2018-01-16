@@ -305,6 +305,11 @@ $v.entrypoint = function(url, width, height){
     $v.screen.pos = $v.screen.getBoundingClientRect();
     $v.screen.focus();
 
+    if     (document.fullscreenEnabled)      { document.addEventListener("fullscreenchange",       $v.screen.fullscreenEvent); }
+    else if(document.msFullscreenEnabled)    { document.addEventListener("MSFullscreenChange",     $v.screen.fullscreenEvent); }
+    else if(document.webkitFullscreenEnabled){ document.addEventListener("webkitfullscreenchange", $v.screen.fullscreenEvent); }
+    else if(document.mozFullScreenEnabled)   { document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent); }
+
     if(url){
         $v.video.src = url;
     }
@@ -463,12 +468,6 @@ $v.screen.mousemoveEvent = function(){
     }
     $v.screen.mousemoveTimer = window.setTimeout(function(){ $v.screen.style.cursor = "none"; }, 2500);
 };
-
-
-document.addEventListener("fullscreenchange",       $v.screen.fullscreenEvent);
-document.addEventListener("MSFullscreenChange",     $v.screen.fullscreenEvent);
-document.addEventListener("webkitfullscreenchange", $v.screen.fullscreenEvent);
-document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent);
 
 
 
@@ -664,7 +663,7 @@ $v.comment = {};
 
 
 $v.comment.release = function(comments, lane){
-    var vdom  = document.createDocumentFragment();
+    var frag  = document.createDocumentFragment();
     var index = 0;
     for(var i = 0; i < lane.length; i++){
         if(!(index in comments)){
@@ -673,11 +672,11 @@ $v.comment.release = function(comments, lane){
         if(lane[i] === false){
             continue;
         }
-        vdom.appendChild($v.comment.create(comments[index], i));
+        frag.appendChild($v.comment.create(comments[index], i));
         index++;
     }
     if(index){
-        $v.screen.insertBefore(vdom, $v.screen.firstChild);
+        $v.screen.insertBefore(frag, $v.screen.firstChild);
     }
 };
 
