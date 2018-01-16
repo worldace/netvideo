@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
 <meta charset="utf-8">
 <title>jsplayer</title>
 <!--  ■jsplayer http://wp.me/ppmtz-1Cu  -->
+
+
+
+
+
 <style>
 .jsplayer{
     visibility: hidden;
@@ -227,8 +230,7 @@
     opacity: 0.75;
 }
 </style>
-</head>
-<body>
+
 
 
 
@@ -376,9 +378,6 @@ $v.addEventListener('keydown', function(event){
 window.addEventListener('unload', function(event){
     $v.fn.saveLocalStorage("jsplayer", $v.user);
 });
-
-
-
 
 
 
@@ -1303,6 +1302,9 @@ $v.comment.post = function(){
 </script>
 
 
+
+
+
 <script>
 //■ エントリーポイント
 $v.query = $v.fn.deparam(location.search);
@@ -1315,5 +1317,3 @@ $v.query = $v.fn.deparam(location.search);
 $v.entrypoint($v.query.file, 960, 540);
 </script>
 
-</body>
-</html>
