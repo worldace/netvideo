@@ -126,24 +126,24 @@
 	cursor: pointer;
 }
 
-.jsplayer-controller-time-seek,
-.jsplayer-controller-volume-seek{
+.jsplayer-controller-timeSeek,
+.jsplayer-controller-volumeSeek{
     display: inline-block;
     margin: 0 5px;
     padding: 0;
     height: 20px;
 }
 
-.jsplayer-controller-time-seek{
+.jsplayer-controller-timeSeek{
     width: 333px;
 }
 
-.jsplayer-controller-volume-seek{
+.jsplayer-controller-volumeSeek{
     width: 100px;
 }
 
-.jsplayer-controller-time-seekbar,
-.jsplayer-controller-volume-seekbar{
+.jsplayer-controller-timeSeekBar,
+.jsplayer-controller-volumeSeekBar{
     position: relative;
     height: 5px;
     margin: 0 0 8px 0;
@@ -154,7 +154,7 @@
     top: 7px;
 }
 
-.jsplayer-controller-time-seekbar{
+.jsplayer-controller-timeSeekBar{
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAICAIAAABcT7kVAAAAFUlEQVQI12N0WX+DgYGBiYGBgSQKAGI2AdswIf1pAAAAAElFTkSuQmCC");
     background-repeat: no-repeat;
     background-position: 0;
@@ -241,15 +241,15 @@
     ><div class="jsplayer-controller-wrap"
       ><img class="jsplayer-controller-playButton" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNTc2IDkyN2wtMTMyOCA3MzhxLTIzIDEzLTM5LjUgM3QtMTYuNS0zNnYtMTQ3MnEwLTI2IDE2LjUtMzZ0MzkuNSAzbDEzMjggNzM4cTIzIDEzIDIzIDMxdC0yMyAzMXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4="
       ><span class="jsplayer-controller-currentTime">00:00</span
-      ><div class="jsplayer-controller-time-seek"
-        ><div class="jsplayer-controller-time-seekbar"
+      ><div class="jsplayer-controller-timeSeek"
+        ><div class="jsplayer-controller-timeSeekBar"
           ><span class="jsplayer-controller-time-seeker"></span
         ></div
       ></div
       ><span class="jsplayer-controller-totalTime">00:00</span
       ><img class="jsplayer-controller-volumeButton" width="20" height="20" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04MzIgMzUydjEwODhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTMzMy0zMzNoLTI2MnEtMjYgMC00NS0xOXQtMTktNDV2LTM4NHEwLTI2IDE5LTQ1dDQ1LTE5aDI2MmwzMzMtMzMzcTE5LTE5IDQ1LTE5dDQ1IDE5IDE5IDQ1em0zODQgNTQ0cTAgNzYtNDIuNSAxNDEuNXQtMTEyLjUgOTMuNXEtMTAgNS0yNSA1LTI2IDAtNDUtMTguNXQtMTktNDUuNXEwLTIxIDEyLTM1LjV0MjktMjUgMzQtMjMgMjktMzUuNSAxMi01Ny0xMi01Ny0yOS0zNS41LTM0LTIzLTI5LTI1LTEyLTM1LjVxMC0yNyAxOS00NS41dDQ1LTE4LjVxMTUgMCAyNSA1IDcwIDI3IDExMi41IDkzdDQyLjUgMTQyem0yNTYgMHEwIDE1My04NSAyODIuNXQtMjI1IDE4OC41cS0xMyA1LTI1IDUtMjcgMC00Ni0xOXQtMTktNDVxMC0zOSAzOS01OSA1Ni0yOSA3Ni00NCA3NC01NCAxMTUuNS0xMzUuNXQ0MS41LTE3My41LTQxLjUtMTczLjUtMTE1LjUtMTM1LjVxLTIwLTE1LTc2LTQ0LTM5LTIwLTM5LTU5IDAtMjYgMTktNDV0NDUtMTlxMTMgMCAyNiA1IDE0MCA1OSAyMjUgMTg4LjV0ODUgMjgyLjV6bTI1NiAwcTAgMjMwLTEyNyA0MjIuNXQtMzM4IDI4My41cS0xMyA1LTI2IDUtMjYgMC00NS0xOXQtMTktNDVxMC0zNiAzOS01OSA3LTQgMjIuNS0xMC41dDIyLjUtMTAuNXE0Ni0yNSA4Mi01MSAxMjMtOTEgMTkyLTIyN3Q2OS0yODktNjktMjg5LTE5Mi0yMjdxLTM2LTI2LTgyLTUxLTctNC0yMi41LTEwLjV0LTIyLjUtMTAuNXEtMzktMjMtMzktNTkgMC0yNiAxOS00NXQ0NS0xOXExMyAwIDI2IDUgMjExIDkxIDMzOCAyODMuNXQxMjcgNDIyLjV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+"
-      ><div class="jsplayer-controller-volume-seek"
-        ><div class="jsplayer-controller-volume-seekbar"
+      ><div class="jsplayer-controller-volumeSeek"
+        ><div class="jsplayer-controller-volumeSeekBar"
           ><span class="jsplayer-controller-volume-seeker"></span
         ></div
       ></div
@@ -828,11 +828,11 @@ $v.comment.post = function(){
 
 //■ controller
 $v.controller               = $v.querySelector(".jsplayer-controller");
-$v.controller.timeSeek      = $v.querySelector(".jsplayer-controller-time-seek");
-$v.controller.timeSeekbar   = $v.querySelector(".jsplayer-controller-time-seekbar");
+$v.controller.timeSeek      = $v.querySelector(".jsplayer-controller-timeSeek");
+$v.controller.timeSeekBar   = $v.querySelector(".jsplayer-controller-timeSeekBar");
 $v.controller.timeSeeker    = $v.querySelector(".jsplayer-controller-time-seeker")
-$v.controller.volumeSeek    = $v.querySelector(".jsplayer-controller-volume-seek")
-$v.controller.volumeSeekbar = $v.querySelector(".jsplayer-controller-volume-seekbar");
+$v.controller.volumeSeek    = $v.querySelector(".jsplayer-controller-volumeSeek")
+$v.controller.volumeSeekBar = $v.querySelector(".jsplayer-controller-volumeSeekBar");
 $v.controller.volumeSeeker  = $v.querySelector(".jsplayer-controller-volume-seeker");
 $v.controller.currentTime   = $v.querySelector(".jsplayer-controller-currentTime");
 $v.controller.totalTime     = $v.querySelector(".jsplayer-controller-totalTime");
@@ -854,12 +854,12 @@ $v.controller.parts = {
 
 
 $v.controller.setBuffer = function(){
-    var seekbarWidth = $v.controller.timeSeekbar.getBoundingClientRect().width;
+    var seekbarWidth = $v.controller.timeSeekBar.getBoundingClientRect().width;
     var buffer = $v.video.buffered;
 
     if(buffer.length){
-        $v.controller.timeSeekbar.style.backgroundPosition = buffer.start(0) / $v.video.duration * seekbarWidth + "px";
-        $v.controller.timeSeekbar.style.backgroundSize     = buffer.end(buffer.length-1) / $v.video.duration * seekbarWidth + "px";
+        $v.controller.timeSeekBar.style.backgroundPosition = buffer.start(0) / $v.video.duration * seekbarWidth + "px";
+        $v.controller.timeSeekBar.style.backgroundSize     = buffer.end(buffer.length-1) / $v.video.duration * seekbarWidth + "px";
     }
 };
 
