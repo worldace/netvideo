@@ -9,6 +9,7 @@
 
 <style>
 .jsplayer{
+    box-sizing: border-box;
     visibility: hidden;
 }
 
@@ -704,13 +705,13 @@ $v.comment.keyframe = function(width){
     css += "@keyframes " + $v.appName + "normallane{";
     css += "from{transform:translateX(0);}";
     css += "to{transform:translateX(-" + width*5 + "px);}}";
-    document.styleSheets[0].insertRule(css, 0);
-
-    css = "";
     css += "@keyframes " + $v.appName + "fulllane{";
     css += "from{transform:translateX(0);}";
     css += "to{transform:translateX(-" + screen.width*5 + "px);}}";
-    document.styleSheets[0].insertRule(css, 0);
+
+    var style = document.createElement('style');
+    style.innerHTML = css;
+    document.head.appendChild(style);
 };
 
 
