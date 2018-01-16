@@ -377,19 +377,19 @@ window.addEventListener('unload', function(event){
 $v.screen = $v.querySelector(".jsplayer-screen");
 
 
-$v.screen.showOsd = function(str){
+$v.screen.showOSD = function(str){
     var osd = document.createElement("span");
     osd.textContent = str;
     osd.className   = "jsplayer-screen-osd";
     osd.style.fontSize = $v.comment.fontSize + "px";
 
-    $v.screen.clearOsd();
+    $v.screen.clearOSD();
     $v.screen.appendChild(osd);
-    $v.screen.osdTimer = window.setTimeout($v.screen.clearOsd, 3000);
+    $v.screen.osdTimer = window.setTimeout($v.screen.clearOSD, 3000);
 };
 
 
-$v.screen.clearOsd = function(){
+$v.screen.clearOSD = function(){
     var osd = $v.screen.querySelectorAll(".jsplayer-screen-osd");
     for(var i = osd.length-1; i >= 0; i--){
         $v.screen.removeChild(osd[i]);
@@ -580,7 +580,7 @@ $v.video.addEventListener('volumechange', function(){
 
 
 $v.video.addEventListener('ratechange', function(){
-    $v.screen.showOsd("x" + $v.video.playbackRate.toFixed(1));
+    $v.screen.showOSD("x" + $v.video.playbackRate.toFixed(1));
 });
 
 
@@ -600,19 +600,19 @@ $v.video.addEventListener('error', function(event){
 
     switch(error.code){ // http://www.html5.jp/tag/elements/video.html
         case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-            $v.screen.showOsd("動画ファイルが存在しません");
+            $v.screen.showOSD("動画ファイルが存在しません");
             break;
         case error.MEDIA_ERR_DECODE:
-            $v.screen.showOsd("動画ファイルが未対応の形式です");
+            $v.screen.showOSD("動画ファイルが未対応の形式です");
             break;
         case error.MEDIA_ERR_NETWORK:
-            $v.screen.showOsd("動画ファイルのダウンロードが失敗しました");
+            $v.screen.showOSD("動画ファイルのダウンロードが失敗しました");
             break;
         case error.MEDIA_ERR_ABORTED:
-            //$v.screen.showOsd("動画の再生が中止されました");
+            //$v.screen.showOSD("動画の再生が中止されました");
             break;
         default:
-            $v.screen.showOsd("未知のエラーが発生しました");
+            $v.screen.showOSD("未知のエラーが発生しました");
             break;
     }
 });
