@@ -233,7 +233,7 @@
 
 
 
-<div class="jsplayer" id="jsplayer"
+<div class="jsplayer"
   ><div class="jsplayer-screen" tabindex="1"
     ><video class="jsplayer-video" loop></video
   ></div
@@ -270,13 +270,14 @@
 
 
 <script>
-var $v = {};
-
 //■ player
-$v.player = document.getElementById("jsplayer");
+var $v = document.querySelector('.jsplayer');
 
 
-$v.player.entrypoint = function(url, width, height){
+$v.appName = 'jsplayer';
+
+
+$v.entrypoint = function(url, width, height){
     width  = width  || 960;
     height = height || 540;
     $v.screen.style.width  = width + "px";
@@ -291,7 +292,7 @@ $v.player.entrypoint = function(url, width, height){
     $v.user.volume = Number($v.user.volume) || 1;
     $v.controller.setSeeker($v.user.volume, $v.controller.volumeSeeker);
 
-    $v.player.style.visibility = "visible";
+    $v.style.visibility = "visible";
 
     $v.screen.pos = $v.screen.getBoundingClientRect();
     $v.screen.focus();
@@ -300,7 +301,7 @@ $v.player.entrypoint = function(url, width, height){
 };
 
 
-$v.player.addEventListener('keydown', function(event){
+$v.addEventListener('keydown', function(event){
     $v.controller.style.visibility = "visible";
     if(event.target.tagName.match(/input/i)){ return true; }
 
@@ -373,7 +374,7 @@ window.addEventListener('unload', function(event){
 
 
 //■ screen
-$v.screen = $v.player.querySelector(".jsplayer-screen");
+$v.screen = $v.querySelector(".jsplayer-screen");
 
 
 $v.screen.showOsd = function(str){
@@ -457,7 +458,7 @@ document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent);
 
 
 //■ video
-$v.video = $v.player.querySelector(".jsplayer-video");
+$v.video = $v.querySelector(".jsplayer-video");
 
 
 $v.video.fit = function(){
@@ -643,7 +644,7 @@ $v.comment.create = function(data, laneNumber){
 
     comment.style.top = laneNumber * $v.comment.laneHeight + $v.comment.marginTop + "px";
     comment.style.fontSize = $v.comment.fontSize + "px";
-    comment.style.animationName = $v.screen.isFullscreen() ? $v.player.id+"fulllane" : $v.player.id+"normallane";
+    comment.style.animationName = $v.screen.isFullscreen() ? $v.appName+"fulllane" : $v.appName+"normallane";
 
     var delay = data[1] - $v.video.currentTime;
     delay = (delay <= 0) ? 0 : delay.toFixed(3)*1000;
@@ -655,13 +656,13 @@ $v.comment.create = function(data, laneNumber){
 
 $v.comment.keyframe = function(width){
     var css = "";
-    css += "@keyframes " + $v.player.id + "normallane{";
+    css += "@keyframes " + $v.appName + "normallane{";
     css += "from{transform:translateX(0);}";
     css += "to{transform:translateX(-" + width*5 + "px);}}";
     document.styleSheets[0].insertRule(css, 0);
 
     css = "";
-    css += "@keyframes " + $v.player.id + "fulllane{";
+    css += "@keyframes " + $v.appName + "fulllane{";
     css += "from{transform:translateX(0);}";
     css += "to{transform:translateX(-" + screen.width*5 + "px);}}";
     document.styleSheets[0].insertRule(css, 0);
@@ -767,19 +768,19 @@ $v.comment.post = function(){
 
 
 //■ controller
-$v.controller               = $v.player.querySelector(".jsplayer-controller");
-$v.controller.timeSeek      = $v.player.querySelector(".jsplayer-controller-time-seek");
-$v.controller.timeSeekbar   = $v.player.querySelector(".jsplayer-controller-time-seekbar");
-$v.controller.timeSeeker    = $v.player.querySelector(".jsplayer-controller-time-seeker")
-$v.controller.volumeSeek    = $v.player.querySelector(".jsplayer-controller-volume-seek")
-$v.controller.volumeSeekbar = $v.player.querySelector(".jsplayer-controller-volume-seekbar");
-$v.controller.volumeSeeker  = $v.player.querySelector(".jsplayer-controller-volume-seeker");
-$v.controller.currentTime   = $v.player.querySelector(".jsplayer-controller-current-time");
-$v.controller.totalTime     = $v.player.querySelector(".jsplayer-controller-total-time");
-$v.controller.playButton    = $v.player.querySelector(".jsplayer-controller-play-button");
-$v.controller.volumeButton  = $v.player.querySelector(".jsplayer-controller-volume-button");
-$v.controller.commentButton = $v.player.querySelector(".jsplayer-controller-comment-button");
-$v.controller.screenButton  = $v.player.querySelector(".jsplayer-controller-screen-button");
+$v.controller               = $v.querySelector(".jsplayer-controller");
+$v.controller.timeSeek      = $v.querySelector(".jsplayer-controller-time-seek");
+$v.controller.timeSeekbar   = $v.querySelector(".jsplayer-controller-time-seekbar");
+$v.controller.timeSeeker    = $v.querySelector(".jsplayer-controller-time-seeker")
+$v.controller.volumeSeek    = $v.querySelector(".jsplayer-controller-volume-seek")
+$v.controller.volumeSeekbar = $v.querySelector(".jsplayer-controller-volume-seekbar");
+$v.controller.volumeSeeker  = $v.querySelector(".jsplayer-controller-volume-seeker");
+$v.controller.currentTime   = $v.querySelector(".jsplayer-controller-current-time");
+$v.controller.totalTime     = $v.querySelector(".jsplayer-controller-total-time");
+$v.controller.playButton    = $v.querySelector(".jsplayer-controller-play-button");
+$v.controller.volumeButton  = $v.querySelector(".jsplayer-controller-volume-button");
+$v.controller.commentButton = $v.querySelector(".jsplayer-controller-comment-button");
+$v.controller.screenButton  = $v.querySelector(".jsplayer-controller-screen-button");
 
 $v.controller.parts = {
     play:       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNTc2IDkyN2wtMTMyOCA3MzhxLTIzIDEzLTM5LjUgM3QtMTYuNS0zNnYtMTQ3MnEwLTI2IDE2LjUtMzZ0MzkuNSAzbDEzMjggNzM4cTIzIDEzIDIzIDMxdC0yMyAzMXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=",
@@ -873,7 +874,7 @@ $v.controller.intoScreen = function(){
 
 
 $v.controller.outofScreen = function(){
-    $v.player.appendChild($v.controller);
+    $v.appendChild($v.controller);
     $v.controller.style.top  = 0;
     $v.controller.style.left = 0;
     $v.controller.style.visibility = "visible";
@@ -962,11 +963,11 @@ $v.controller.screenButton.addEventListener('click', function(){
 
 
 //■ form
-$v.form            = $v.player.querySelector(".jsplayer-form");
-$v.form.input      = $v.player.querySelector(".jsplayer-form-input");
-$v.form.button     = $v.player.querySelector(".jsplayer-form-button");
-$v.form.hiddenId   = $v.player.querySelector(".jsplayer-form-hidden-id");
-$v.form.hiddenTime = $v.player.querySelector(".jsplayer-form-hidden-time");
+$v.form            = $v.querySelector(".jsplayer-form");
+$v.form.input      = $v.querySelector(".jsplayer-form-input");
+$v.form.button     = $v.querySelector(".jsplayer-form-button");
+$v.form.hiddenId   = $v.querySelector(".jsplayer-form-hidden-id");
+$v.form.hiddenTime = $v.querySelector(".jsplayer-form-hidden-time");
 
 
 $v.form.addEventListener('submit', function(event){
@@ -1244,7 +1245,7 @@ $v.query = $v.func.deparam(location.search);
 //$v.query.group_id = ""; //ひま動のgroup_id
 //$v.query.key      = ""; //ひま動のkey
 
-$v.player.entrypoint($v.query.file, 960, 540);
+$v.entrypoint($v.query.file, 960, 540);
 </script>
 
 </body>
