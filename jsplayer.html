@@ -310,6 +310,10 @@ $v.entrypoint = function(url, width, height){
     else if(document.webkitFullscreenEnabled){ document.addEventListener("webkitfullscreenchange", $v.screen.fullscreenEvent); }
     else if(document.mozFullScreenEnabled)   { document.addEventListener("mozfullscreenchange",    $v.screen.fullscreenEvent); }
 
+    window.addEventListener('unload', function(event){
+        $v.fn.saveLocalStorage("jsplayer", $v.user);
+    });
+
     if(url){
         $v.video.src = url;
     }
@@ -381,9 +385,6 @@ $v.addEventListener('keydown', function(event){
 });
 
 
-window.addEventListener('unload', function(event){
-    $v.fn.saveLocalStorage("jsplayer", $v.user);
-});
 
 
 
