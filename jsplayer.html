@@ -288,7 +288,7 @@ $v.entrypoint = function(url, width, height){
     $v.comment.keyframe(width);
     $v.comment.setting(height);
 
-    $v.user = $v.func.loadObject("jsplayer") || {};
+    $v.user = $v.fn.loadLocalStorage("jsplayer") || {};
     $v.user.volume = Number($v.user.volume) || 1;
     $v.controller.setSeeker($v.user.volume, $v.controller.volumeSeeker);
 
@@ -297,13 +297,17 @@ $v.entrypoint = function(url, width, height){
     $v.screen.pos = $v.screen.getBoundingClientRect();
     $v.screen.focus();
 
-    if(url){ $v.video.src = url; }
+    if(url){
+        $v.video.src = url;
+    }
 };
 
 
 $v.addEventListener('keydown', function(event){
     $v.controller.style.visibility = "visible";
-    if(event.target.tagName.match(/input/i)){ return true; }
+    if(event.target.tagName.match(/input/i)){
+        return true;
+    }
 
     if(event.which == 32){ //Space
         $v.form.input.focus();
@@ -365,7 +369,7 @@ $v.addEventListener('keydown', function(event){
 
 
 window.addEventListener('unload', function(event){
-    $v.func.saveObject("jsplayer", $v.user);
+    $v.fn.saveLocalStorage("jsplayer", $v.user);
 });
 
 
@@ -394,7 +398,9 @@ $v.screen.clearOSD = function(){
     for(var i = osd.length-1; i >= 0; i--){
         $v.screen.removeChild(osd[i]);
     }
-    if($v.screen.osdTimer){ window.clearTimeout($v.screen.osdTimer); }
+    if($v.screen.osdTimer){
+        window.clearTimeout($v.screen.osdTimer);
+    }
 };
 
 
@@ -432,7 +438,9 @@ $v.screen.fullscreenEvent = function(){
         $v.screen.pos = $v.screen.getBoundingClientRect();
         $v.screen.removeEventListener('click', $v.controller.toggle);
         $v.screen.removeEventListener('mousemove', $v.screen.mousemoveEvent);
-        if($v.screen.mousemoveTimer){ window.clearTimeout($v.screen.mousemoveTimer); }
+        if($v.screen.mousemoveTimer){
+            window.clearTimeout($v.screen.mousemoveTimer);
+        }
         $v.screen.style.cursor = "auto";
         $v.controller.outofScreen();
     }
@@ -444,7 +452,9 @@ $v.screen.fullscreenEvent = function(){
 
 $v.screen.mousemoveEvent = function(){
     $v.screen.style.cursor = "auto";
-    if($v.screen.mousemoveTimer){ window.clearTimeout($v.screen.mousemoveTimer); }
+    if($v.screen.mousemoveTimer){
+        window.clearTimeout($v.screen.mousemoveTimer);
+    }
     $v.screen.mousemoveTimer = window.setTimeout(function(){ $v.screen.style.cursor = "none"; }, 2500);
 };
 
@@ -462,8 +472,10 @@ $v.video = $v.querySelector(".jsplayer-video");
 
 
 $v.video.fit = function(){
-    if(!$v.screen.pos.width || !$v.video.videoWidth){ return; }
-    var pos = $v.func.contentFit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+    if(!$v.screen.pos.width || !$v.video.videoWidth){
+        return;
+    }
+    var pos = $v.fn.contentFit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
 
     $v.video.style.width  = pos.w + "px";
     $v.video.style.height = pos.h + "px";
@@ -473,34 +485,52 @@ $v.video.fit = function(){
 
 
 $v.video.setTime = function(sec){
-    if(!$v.video.duration){ return; }
-    if(sec < 1){ sec = 0; }
-    if(sec > $v.video.duration){ sec = $v.video.duration; }
+    if(!$v.video.duration){
+        return;
+    }
+    if(sec < 1){
+        sec = 0;
+    }
+    if(sec > $v.video.duration){
+        sec = $v.video.duration;
+    }
     $v.video.currentTime = sec;
 };
 
 
 $v.video.setVolume = function(volume){
     volume = volume.toFixed(1);
-    if(volume >= 1){ volume = 1; }
-    if(volume <= 0){ volume = 0; }
+    if(volume >= 1){
+        volume = 1;
+    }
+    if(volume <= 0){
+        volume = 0;
+    }
     $v.video.volume = volume;
     $v.video.muted  = false;
 };
 
 
 $v.video.setSpeed = function(speed){
-    if(!$v.video.duration){ return; }
+    if(!$v.video.duration){
+        return;
+    }
     speed = speed.toFixed(1);
-    if(speed >= 2){ speed = 2; }
-    if(speed <= 0.5){ speed = 0.5; }
+    if(speed >= 2){
+        speed = 2;
+    }
+    if(speed <= 0.5){
+        speed = 0.5;
+    }
     $v.video.playbackRate = speed;
 };
 
 
 $v.video.isSeekable = function(sec){
     for(var i = 0; i < $v.video.seekable.length; i++){
-        if(sec >= $v.video.seekable.start(i) && sec <= $v.video.seekable.end(i)){ return true; }
+        if(sec >= $v.video.seekable.start(i) && sec <= $v.video.seekable.end(i)){
+            return true;
+        }
     }
     return false;
 };
@@ -526,7 +556,9 @@ $v.video.addEventListener('canplaythrough', function(){
 
 $v.video.addEventListener('timeupdate', function(){
     var sec = Math.floor($v.video.currentTime);
-    if(sec === $v.video.prevSec){ return; }
+    if(sec === $v.video.prevSec){
+        return;
+    }
     $v.video.prevSec = sec;
 
     if(!$v.controller.timeSeeker.isDragging){
@@ -585,7 +617,9 @@ $v.video.addEventListener('ratechange', function(){
 
 
 $v.video.addEventListener('click', function(event){
-    if(!$v.video.currentTime){ $v.video.play(); }
+    if(!$v.video.currentTime){
+        $v.video.play();
+    }
     event.preventDefault();
 });
 
@@ -609,7 +643,7 @@ $v.video.addEventListener('error', function(event){
             $v.screen.showOSD("動画ファイルのダウンロードが失敗しました");
             break;
         case error.MEDIA_ERR_ABORTED:
-            //$v.screen.showOSD("動画の再生が中止されました");
+            $v.screen.showOSD("動画の再生が中止されました");
             break;
         default:
             $v.screen.showOSD("未知のエラーが発生しました");
@@ -627,20 +661,26 @@ $v.comment.release = function(comments, lane){
     var vdom  = document.createDocumentFragment();
     var index = 0;
     for(var i = 0; i < lane.length; i++){
-        if(!(index in comments)){ break; }
-        if(lane[i] === false){ continue; }
+        if(!(index in comments)){
+            break;
+        }
+        if(lane[i] === false){
+            continue;
+        }
         vdom.appendChild($v.comment.create(comments[index], i));
         index++;
     }
-    if(index){ $v.screen.insertBefore(vdom, $v.screen.firstChild); }
+    if(index){
+        $v.screen.insertBefore(vdom, $v.screen.firstChild);
+    }
 };
 
 
 $v.comment.create = function(data, laneNumber){
     var comment = document.createElement("span");
     comment.textContent = data[0];
-    comment.className = "jsplayer-comment";
-    comment.setAttribute("data-lane", laneNumber);
+    comment.className   = "jsplayer-comment";
+    comment.laneNumber  = laneNumber;
 
     comment.style.top = laneNumber * $v.comment.laneHeight + $v.comment.marginTop + "px";
     comment.style.fontSize = $v.comment.fontSize + "px";
@@ -687,13 +727,19 @@ $v.comment.setting = function(height){
 
 $v.comment.laneCheck = function(){
     var lane = Array($v.comment.laneCount);
-    for(var i = 0; i < lane.length; i++){ lane[i] = true; }
+    for(var i = 0; i < lane.length; i++){
+        lane[i] = true;
+    }
  
     var comments = $v.screen.querySelectorAll(".jsplayer-comment");
     for(var i = comments.length-1; i >= 0; i--){
         comments[i].pos = comments[i].getBoundingClientRect();
-        if(comments[i].pos.right > $v.screen.pos.right-30){ lane[comments[i].getAttribute("data-lane")] = false; }
-        if(comments[i].pos.right < $v.screen.pos.left)    { $v.screen.removeChild(comments[i]); }
+        if(comments[i].pos.right > $v.screen.pos.right-30){
+            lane[comments[i].laneNumber] = false;
+        }
+        if(comments[i].pos.right < $v.screen.pos.left){
+            $v.screen.removeChild(comments[i]);
+        }
     }
     return lane;
 };
@@ -728,9 +774,11 @@ $v.comment.get = function(){
     var sec  = Math.floor($v.video.duration);
 
     $v.comment.list = Array(sec+1); //動画時間+1の箱を作る [[],[],[],[]...]
-    for(var i = 0; i < $v.comment.list.length; i++){ $v.comment.list[i] = []; }
+    for(var i = 0; i < $v.comment.list.length; i++){
+        $v.comment.list[i] = [];
+    }
 
-    var url = "?" + $v.func.param({
+    var url = "?" + $v.fn.param({
         "action"   : "commentget",
         "id"       : $v.form.hiddenId.value,
         "登録時間" : $v.form.hiddenTime.value,
@@ -738,13 +786,22 @@ $v.comment.get = function(){
         "nocache"  : Date.now()
     });
 
-    $v.func.get(url, function(xhr){
-        try{ var comments = JSON.parse(xhr.responseText); } catch(e){ return; }
+    $v.fn.get(url, function(xhr){
+        try{
+            var comments = JSON.parse(xhr.responseText);
+        }
+        catch(e){
+            return;
+        }
 
         for(var i = 0; i < comments.length; i++){
-            if(comments[i].本文 == null){ continue; }
+            if(comments[i].本文 == null){
+                continue;
+            }
             var index = Math.floor(comments[i].位置/100);
-            if(index in $v.comment.list){ $v.comment.list[index].push([comments[i].本文.substring(0,64), comments[i].位置/100]); }
+            if(index in $v.comment.list){
+                $v.comment.list[index].push([comments[i].本文.substring(0,64), comments[i].位置/100]);
+            }
         }
     });
 };
@@ -754,7 +811,9 @@ $v.comment.post = function(){
     var sec  = $v.video.currentTime;
     var text = $v.form.input.value.trim();
 
-    if(text == "" || text.length > 64){ return; }
+    if(text == "" || text.length > 64){
+        return;
+    }
 
     $v.comment.list[Math.floor(sec+1)].unshift([text, sec+1, Math.floor(Date.now()/1000)]);
     $v.form.input.value = "";
@@ -762,7 +821,7 @@ $v.comment.post = function(){
     var formdata = new FormData($v.form);
     formdata.append("本文", text);
     formdata.append("位置", sec.toFixed(2)*100);
-    $v.func.post('?action=commentpost', formdata);
+    $v.fn.post('?action=commentpost', formdata);
 };
 
 
@@ -809,8 +868,12 @@ $v.controller.setTime = function(time, where){
     var min = Math.floor(time / 60);
     var sec = Math.floor(time - min * 60);
 
-    if(min < 10){ min = '0' + min; }
-    if(sec < 10){ sec = '0' + sec; }
+    if(min < 10){
+        min = '0' + min;
+    }
+    if(sec < 10){
+        sec = '0' + sec;
+    }
 
     where.textContent = min + ":" + sec;
 };
@@ -825,8 +888,12 @@ $v.controller.setSeeker = function(percent, seeker){
 
     var pos = (percent <= 1) ? seekbarWidth*percent : percent-seekbar.pos.left; //percentは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
 
-    if(pos < 0){ pos = 0; }
-    if(pos > seekbarWidth){ pos = seekbarWidth; }
+    if(pos < 0){
+        pos = 0;
+    }
+    if(pos > seekbarWidth){
+        pos = seekbarWidth;
+    }
 
     seeker.style.left = pos + "px";
     return pos/seekbarWidth;
@@ -836,7 +903,9 @@ $v.controller.setSeeker = function(percent, seeker){
 $v.controller.timeSeeker.mousemoveEvent = function(event, seekend){
     var percent = $v.controller.setSeeker(event.clientX, $v.controller.timeSeeker);
     $v.controller.setTime($v.video.duration*percent, $v.controller.currentTime);
-    if(seekend){ $v.video.currentTime = $v.video.duration * percent; }
+    if(seekend){
+        $v.video.currentTime = $v.video.duration * percent;
+    }
 };
 
 
@@ -846,7 +915,9 @@ $v.controller.volumeSeeker.mousemoveEvent = function(event){
 
 
 $v.controller.toggle = function(event){
-    if($v.controller.timeSeeker.isDragging){ return; }
+    if($v.controller.timeSeeker.isDragging){
+        return;
+    }
 
     if($v.controller.style.visibility == "hidden"){
         event.preventDefault();
@@ -887,7 +958,9 @@ $v.controller.playButton.addEventListener('click', function(){
 
 
 $v.controller.timeSeek.addEventListener('click', function(event){
-    if(!$v.video.duration){ return; }
+    if(!$v.video.duration){
+        return;
+    }
     var percent = $v.controller.setSeeker(event.clientX, $v.controller.timeSeeker);
     $v.video.currentTime = $v.video.duration * percent;
 
@@ -987,20 +1060,20 @@ $v.form.input.addEventListener('focus', function(event){
 
 
 //■ function
-$v.func = {};
+$v.fn = {};
 
 
-$v.func.get = function(url, success){
-    $v.func.ajax(url, {method:"GET", success:success});
+$v.fn.get = function(url, success){
+    $v.fn.ajax(url, {method:"GET", success:success});
 };
 
 
-$v.func.post = function(url, data, success){
-    $v.func.ajax(url, {method:"POST", data:data, success:success});
+$v.fn.post = function(url, data, success){
+    $v.fn.ajax(url, {method:"POST", data:data, success:success});
 };
 
 
-$v.func.ajax = function(url, option){ //method, data, timeout, credential, header, success, error, complete
+$v.fn.ajax = function(url, option){ //method, data, timeout, credential, header, success, error, complete
     option = option || {};
     option.method  = option.method  || "GET";
     option.timeout = option.timeout || 60;
@@ -1009,8 +1082,12 @@ $v.func.ajax = function(url, option){ //method, data, timeout, credential, heade
     var xhr  = new XMLHttpRequest();
     xhr.open(option.method, url);
 
-    if(option.timeout >= 0){ xhr.timeout = option.timeout * 1000; }
-    if(option.credential){ xhr.withCredentials = true; }
+    if(option.timeout >= 0){
+        xhr.timeout = option.timeout * 1000;
+    }
+    if(option.credential){
+        xhr.withCredentials = true;
+    }
     if(option.method.match(/^POST$/i)){
         if(option.data instanceof FormData){
             body = option.data;
@@ -1029,29 +1106,37 @@ $v.func.ajax = function(url, option){ //method, data, timeout, credential, heade
     }
     xhr.addEventListener('loadend', function(){
         if(xhr.status >= 200 && xhr.status < 300 || xhr.status == 304){
-            if(typeof option.success === "function"){ option.success(xhr); }
+            if(typeof option.success === "function"){
+                option.success(xhr);
+            }
         }
         else{
-            if(typeof option.error === "function"){ option.error(xhr); }
+            if(typeof option.error === "function"){
+                option.error(xhr);
+            }
         }
-        if(typeof option.complete === "function"){ option.complete(xhr); }
+        if(typeof option.complete === "function"){
+            option.complete(xhr);
+        }
     });
 
     xhr.send(body);
 };
 
 
-$v.func.param = function(param){
+$v.fn.param = function(param){
     var str = "";
     for(var key in param){
-        if(!param.hasOwnProperty(key)){ continue; }
+        if(!param.hasOwnProperty(key)){
+            continue;
+        }
         str += encodeURIComponent(key) + "=" + encodeURIComponent(param[key]) + "&";
     }
     return str;
 };
 
 
-$v.func.deparam = function(str){
+$v.fn.deparam = function(str){
     if(str == null){ return {}; }
     str = String(str);
     str = str.replace(/^\?/, "");
@@ -1061,44 +1146,34 @@ $v.func.deparam = function(str){
     for(var i = 0; i < namevalue.length; i++){
         var name  = namevalue[i].split('=')[0] || "";
         var value = namevalue[i].split('=')[1] || "";
-        if(name == ""){ continue; }
+        if(name == ""){
+            continue;
+        }
         result[decodeURIComponent(name)] = decodeURIComponent(value);
     }
     return result;
 };
 
 
-$v.func.saveObject = function(name, value){
-    try{ window.localStorage.setItem(name, JSON.stringify(value)); } catch(e){}
-};
-
-
-$v.func.loadObject = function(name){
-    try{ return JSON.parse(window.localStorage.getItem(name)); } catch(e){}
-};
-
-
-$v.func.objectExtend = function(){
-    if(!arguments.length){ return; }
-    if(arguments.lenth == 1){ return arguments[0]; }
-    var destination = Array.prototype.shift.call(arguments);
-    for (var i = 0; i < arguments.length; i++) {
-        var source = arguments[i];
-        for(var property in source){
-            if(source[property] && source[property].constructor && source[property].constructor === Object){
-                destination[property] = destination[property] || {};
-                $v.func.objectExtend(destination[property], source[property]);
-            }
-            else{
-                destination[property] = source[property];
-            }
-        }
+$v.fn.saveLocalStorage = function(name, value){
+    try{
+        window.localStorage.setItem(name, JSON.stringify(value));
     }
-    return destination;
+    catch(e){
+    }
 };
 
 
-$v.func.contentFit = function(screenW, screenH, objectW, objectH){
+$v.fn.loadLocalStorage = function(name){
+    try{
+        return JSON.parse(window.localStorage.getItem(name));
+    }
+    catch(e){
+    }
+};
+
+
+$v.fn.contentFit = function(screenW, screenH, objectW, objectH){
     var scale = (objectW/objectH > screenW/screenH) ? screenW/objectW : screenH/objectH;
     return {
         w: Math.floor(objectW * scale),
@@ -1109,38 +1184,7 @@ $v.func.contentFit = function(screenW, screenH, objectW, objectH){
 };
 
 
-$v.func.getForm = function(form){ //value属性必須、Multipla非対応、配列非対応、jQuery.serializeArray()参考
-    var data = {};
-    var elements = form.querySelectorAll("[name]");
-    for(var i = 0; i < elements.length; i++){
-        if(elements[i].value == null || elements[i].disabled === true || elements[i].type.match(/^submit$/i)){ continue; }
-        if(elements[i].type.match(/^radio$/i) && elements[i].checked === false){ continue; }
-        data[elements[i].name] = elements[i].type.match(/^checkbox$/i) ? elements[i].checked : String(elements[i].value).trim();
-    }
-    return data;
-};
-
-
-$v.func.setForm = function(form, data){
-    var elements = form.querySelectorAll("[name]");
-    for(var i = 0; i < elements.length; i++){
-        if(!(elements[i].name in data) || elements[i].disabled === true || elements[i].type.match(/^submit$/i)){ continue; }
-        if(elements[i].type.match(/^checkbox$/i)){
-            elements[i].checked = Boolean(data[elements[i].name]);
-        }
-        else if(elements[i].type.match(/^radio$/i)){
-            if(elements[i].value === data[elements[i].name]){
-                elements[i].checked = true;
-            }
-        }
-        else{
-            elements[i].value = String(data[elements[i].name]);
-        }
-    }
-};
-
-
-$v.func.type = function(target){
+$v.fn.type = function(target){
     return Object.prototype.toString.call(target).replace(/^\[object (.+)\]$/, '$1').toLowerCase();
 };
 
@@ -1152,27 +1196,37 @@ $v.comment.get = function(){
     var sec  = Math.floor($v.video.duration);
 
     $v.comment.list = Array(sec+1); //動画時間+1の箱を作る [[],[],[],[]...]
-    for(var i = 0; i < $v.comment.list.length; i++){ $v.comment.list[i] = []; }
+    for(var i = 0; i < $v.comment.list.length; i++){
+        $v.comment.list[i] = [];
+    }
 
-    if(!$v.query.himado){ return; }
+    if(!$v.query.himado){
+        return;
+    }
 
-    var api1 = "https://query.yahooapis.com/v1/public/yql?" + $v.func.param({
+    var api1 = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
         "format"   : "json",
         "q"        : "SELECT * FROM html WHERE url = 'http://himado.in/" + $v.query.himado + "' and xpath='//input[@type=\"hidden\"]'"
     });
 
-    $v.func.ajax(api1, {success:function(xhr){
+    $v.fn.ajax(api1, {success:function(xhr){
         try{
             var input = JSON.parse(xhr.responseText).query.results.input;
         }
         catch(e){
             input = [];
         }
+
         for(var i = 0; i < input.length; i++){
-            if(input[i].name == "group_id"){ var group_id = input[i].value; }
-            if(input[i].name == "key"){ var key = input[i].value; }
+            if(input[i].name == "group_id"){
+                var group_id = input[i].value;
+            }
+            if(input[i].name == "key"){
+                var key = input[i].value;
+            }
         }
-        var url = "http://himado.in/?" + $v.func.param({
+
+        var url = "http://himado.in/?" + $v.fn.param({
             "mode"     : "comment",
             "format"   : "nico",
             "limit"    : 10000,
@@ -1182,12 +1236,12 @@ $v.comment.get = function(){
             "nocache"  : Date.now()
         });
 
-        var api2 = "https://query.yahooapis.com/v1/public/yql?" + $v.func.param({
+        var api2 = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
             "format"   : "json",
             "q"        : "SELECT * FROM xml WHERE url = '" + url + "'"
         });
 
-        $v.func.ajax(api2, {success:function(xhr){
+        $v.fn.ajax(api2, {success:function(xhr){
             try{
                 var comments = JSON.parse(xhr.responseText).query.results.packet.chat;
                 console.log(comments.length + "件のコメント取得");
@@ -1197,12 +1251,16 @@ $v.comment.get = function(){
                 return;
             }
             for(var i = comments.length-1; i >= 0; i--){
-                if(comments[i].content == null){ continue; }
+                if(comments[i].content == null){
+                    continue;
+                }
                 var index = Math.floor(comments[i].vpos/100);
-                if(index in $v.comment.list){ $v.comment.list[index].push([comments[i].content.substring(0,64), comments[i].vpos/100]); }
+                if(index in $v.comment.list){
+                    $v.comment.list[index].push([comments[i].content.substring(0,64), comments[i].vpos/100]);
+                }
             }
-        }, error:function(){ console.log("API2に接続失敗"); }});
-    }, error:function(){ console.log("API1に接続失敗"); }});
+        }, error: function(){ console.log("API2に接続失敗"); }});
+    }, error: function(){ console.log("API1に接続失敗"); }});
 };
 
 
@@ -1210,14 +1268,18 @@ $v.comment.post = function(){
     var sec  = $v.video.currentTime;
     var text = $v.form.input.value.trim();
 
-    if(text == "" || text.length > 64){ return; }
+    if(text == "" || text.length > 64){
+        return;
+    }
 
     $v.comment.list[Math.floor(sec+1)].unshift([text, sec+1, Math.floor(Date.now()/1000)]);
     $v.form.input.value = "";
 
-    if(!$v.query.himado){ return; }
+    if(!$v.query.himado){
+        return;
+    }
 
-    var postdata = $v.func.param({
+    var postdata = $v.fn.param({
         "mode"    : "comment",
         "id"      : $v.query.himado,
         "vpos"    : sec.toFixed(2)*100,
@@ -1225,20 +1287,20 @@ $v.comment.post = function(){
         "adddate" : Math.floor(Date.now()/1000)
     });
 
-    var api = "https://query.yahooapis.com/v1/public/yql?" + $v.func.param({
+    var api = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
         "format"   : "json",
         "env"      : "store://datatables.org/alltableswithkeys",
         "q"        : "SELECT * FROM htmlpost WHERE url = 'http://himado.in/' AND postdata='" + postdata + "' AND xpath='//p'"
     });
 
-    $v.func.get(api);
+    $v.fn.get(api);
 };
 </script>
 
 
 <script>
 //■ エントリーポイント
-$v.query = $v.func.deparam(location.search);
+$v.query = $v.fn.deparam(location.search);
 
 //$v.query.file     = ""; //動画ファイルのURL (必須)
 //$v.query.himado   = ""; //ひま動のID
