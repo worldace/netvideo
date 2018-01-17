@@ -296,7 +296,7 @@ $v.entrypoint = function(url, width, height){
     $v.comment.keyframe(width);
     $v.comment.setting(height);
 
-    if(navigator.userAgent.indexOf('Edge/' >= 0)){ //Edge(Fall Creators)でコメントが表示されないバグ対策
+    if(navigator.userAgent && navigator.userAgent.indexOf('Edge/') >= 0){ //Edge(Fall Creators)でコメントが表示されないバグ対策
         var style = document.createElement('style');
         style.innerHTML = '.jsplayer-comment{opacity:1;}';
         document.head.appendChild(style);
