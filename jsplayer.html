@@ -885,12 +885,12 @@ $v.controller.setTime = function(time, where){
 };
 
 
-$v.controller.setSeek = function(percent, seeker){
-    var seekbar = seeker.parentNode;
+$v.controller.setSeek = function(percent, pointer){
+    var seekbar = pointer.parentNode;
 
-    seeker.pos  = seeker.getBoundingClientRect();
+    pointer.pos  = pointer.getBoundingClientRect();
     seekbar.pos = seekbar.getBoundingClientRect();
-    var seekbarWidth = seekbar.pos.width - seeker.pos.width;
+    var seekbarWidth = seekbar.pos.width - pointer.pos.width;
 
     var pos = (percent <= 1) ? seekbarWidth*percent : percent-seekbar.pos.left; //percentは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
 
@@ -901,7 +901,7 @@ $v.controller.setSeek = function(percent, seeker){
         pos = seekbarWidth;
     }
 
-    seeker.style.left = pos + "px";
+    pointer.style.left = pos + "px";
     return pos/seekbarWidth;
 };
 
