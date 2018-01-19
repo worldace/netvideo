@@ -635,7 +635,6 @@ $v.screen.toggleFullscreen = function(){
 
 
 $v.screen.fullscreenEvent = function(){
-
     if($v.screen.isFullscreen()){
         $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
         $v.screen.addEventListener('click', $v.controller.toggle);
@@ -890,7 +889,7 @@ $v.thumbnail.show = function(event){
     }
 
     var width = $v.controller.timeSeekBar.pos.width - $v.controller.timeSeekPointer.Width;
-    var pos   = event.clientX - $v.controller.timeSeekBar.pos.left; //timeは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
+    var pos   = event.clientX - $v.controller.timeSeekBar.pos.left;
     var time  = pos / width * $v.video.duration;
     $v.thumbnail.video.addEventListener('seeked', function handler(){
         $v.thumbnail.video.style.left    = event.clientX - 96 + 'px';
@@ -1182,8 +1181,8 @@ $v.controller.outofScreen = function(){
 
 
 $v.controller.timeSeekPointer.setPosition = function(time){
-    var width   = $v.controller.timeSeekBar.pos.width - $v.controller.timeSeekPointer.Width;
-    var pos     = (time <= 1)  ?  width * time  :  time - $v.controller.timeSeekBar.pos.left; //timeは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
+    var width = $v.controller.timeSeekBar.pos.width - $v.controller.timeSeekPointer.Width;
+    var pos   = (time <= 1)  ?  width * time  :  time - $v.controller.timeSeekBar.pos.left; //timeは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
 
     if(pos < 0){
         pos = 0;
@@ -1198,8 +1197,8 @@ $v.controller.timeSeekPointer.setPosition = function(time){
 
 
 $v.controller.volumeSeekPointer.setPosition = function(vol){
-    var width   = $v.controller.volumeSeekBar.pos.width - $v.controller.volumeSeekPointer.Width;
-    var pos     = (vol <= 1)  ?  width * vol  :  vol - $v.controller.volumeSeekBar.pos.left; //volは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
+    var width = $v.controller.volumeSeekBar.pos.width - $v.controller.volumeSeekPointer.Width;
+    var pos   = (vol <= 1)  ?  width * vol  :  vol - $v.controller.volumeSeekBar.pos.left; //volは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
 
     if(pos < 0){
         pos = 0;
