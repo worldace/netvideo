@@ -310,7 +310,7 @@ $v.entrypoint = function(url, width, height){
 
     $v.user = $v.fn.loadLocalStorage("jsplayer") || {};
     $v.user.volume = Number($v.user.volume) || 1;
-    $v.controller.setSeek($v.user.volume, $v.controller.volumeSeekPointer);
+    $v.controller.volumeSeekPointer.setPosition($v.user.volume);
 
     $v.style.visibility = "visible";
 
@@ -761,7 +761,7 @@ $v.video.addEventListener('timeupdate', function(){
     $v.video.prevSec = sec;
 
     if(!$v.controller.timeSeekPointer.isDragging){
-        $v.controller.setSeek($v.video.currentTime/$v.video.duration, $v.controller.timeSeekPointer);
+        $v.controller.timeSeekPointer.setPosition($v.video.currentTime/$v.video.duration);
         $v.controller.setTime(sec, $v.controller.currentTime);
     }
     if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on !== false){
@@ -800,11 +800,11 @@ $v.video.addEventListener('ended', function(){
 $v.video.addEventListener('volumechange', function(){
     if(!$v.video.volume || $v.video.muted){
         $v.controller.volumeButton.setAttribute("src", $v.controller.parts.mute);
-        $v.controller.setSeek(0, $v.controller.volumeSeekPointer);
+        $v.controller.volumeSeekPointer.setPosition(0);
     }
     else{
         $v.controller.volumeButton.setAttribute("src", $v.controller.parts.volume);
-        $v.controller.setSeek($v.video.volume, $v.controller.volumeSeekPointer);
+        $v.controller.volumeSeekPointer.setPosition($v.video.volume);
         $v.user.volume = $v.video.volume;
     }
 });
@@ -877,11 +877,15 @@ $v.thumbnail.show = function(event){
         $v.thumbnail.video.style.display = 'none';
         return;
     }
-    var pos  = $v.controller.timeSeekBar.getBoundingClientRect();
-    var time = (event.clientX - pos.left) / pos.width * $v.video.duration;
+
+    var pointer = $v.controller.timeSeekPointer.getBoundingClientRect();
+    var seekbar = $v.controller.timeSeekBar.getBoundingClientRect();
+    var width   = seekbar.width - pointer.width;
+    var pos     = event.clientX - seekbar.left; //timeは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
+    var time    = pos / width * $v.video.duration;
     $v.thumbnail.video.addEventListener('seeked', function handler(){
         $v.thumbnail.video.style.left    = event.clientX - 96 + 'px';
-        $v.thumbnail.video.style.top     = pos.top - 130 + 'px'; //フルスクリーン時と通常時で変化させる必要がある(またはサムネタグの位置を変える必要がある)
+        $v.thumbnail.video.style.top     = seekbar.top - 130 + 'px'; //フルスクリーン時と通常時で変化させる必要がある(またはサムネタグの位置を変える必要がある)
         $v.thumbnail.video.style.display = 'block';
         $v.thumbnail.video.removeEventListener('seeked', handler);
     });
@@ -1124,26 +1128,6 @@ $v.controller.setTime = function(time, where){
 };
 
 
-$v.controller.setSeek = function(percent, pointer){
-    var seekbar = pointer.parentNode;
-
-    pointer.pos  = pointer.getBoundingClientRect();
-    seekbar.pos = seekbar.getBoundingClientRect();
-
-    var pos = (percent <= 1) ? seekbar.pos.width * percent  :  percent - seekbar.pos.left; //percentは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
-
-    if(pos < 0){
-        pos = 0;
-    }
-    if(pos > seekbar.pos.width - pointer.pos.width){
-        pos = seekbar.pos.width - pointer.pos.width;
-    }
-
-    pointer.style.left = pos + "px";
-    return pos / seekbar.pos.width;
-};
-
-
 $v.controller.toggle = function(event){
     if($v.controller.timeSeekPointer.isDragging){
         return;
@@ -1182,8 +1166,44 @@ $v.controller.outofScreen = function(){
 };
 
 
+$v.controller.timeSeekPointer.setPosition = function(time){
+    var pointer = $v.controller.timeSeekPointer.getBoundingClientRect();
+    var seekbar = $v.controller.timeSeekBar.getBoundingClientRect();
+    var width   = seekbar.width - pointer.width;
+    var pos     = (time <= 1)  ?  width * time  :  time - seekbar.left; //timeは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
+
+    if(pos < 0){
+        pos = 0;
+    }
+    if(pos > width){
+        pos = width;
+    }
+
+    $v.controller.timeSeekPointer.style.left = pos + "px";
+    return pos / width;
+};
+
+
+$v.controller.volumeSeekPointer.setPosition = function(vol){
+    var pointer = $v.controller.volumeSeekPointer.getBoundingClientRect();
+    var seekbar = $v.controller.volumeSeekBar.getBoundingClientRect();
+    var width   = seekbar.width - pointer.width;
+    var pos     = (vol <= 1)  ?  width * vol  :  vol - seekbar.left; //volは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
+
+    if(pos < 0){
+        pos = 0;
+    }
+    if(pos > width){
+        pos = width;
+    }
+
+    $v.controller.volumeSeekPointer.style.left = pos + "px";
+    return pos / width;
+};
+
+
 $v.controller.timeSeekPointer.mousemoveEvent = function(event, seekend){
-    var percent = $v.controller.setSeek(event.clientX, $v.controller.timeSeekPointer);
+    var percent = $v.controller.timeSeekPointer.setPosition(event.clientX);
     $v.controller.setTime($v.video.duration*percent, $v.controller.currentTime);
     if(seekend){
         $v.video.currentTime = $v.video.duration * percent;
@@ -1192,7 +1212,7 @@ $v.controller.timeSeekPointer.mousemoveEvent = function(event, seekend){
 
 
 $v.controller.volumeSeekPointer.mousemoveEvent = function(event){
-    $v.video.volume = $v.controller.setSeek(event.clientX, $v.controller.volumeSeekPointer);
+    $v.video.volume = $v.controller.volumeSeekPointer.setPosition(event.clientX);
 };
 
 
@@ -1219,7 +1239,7 @@ $v.controller.timeSeek.addEventListener('click', function(event){
     if(!$v.video.duration){
         return;
     }
-    var percent = $v.controller.setSeek(event.clientX, $v.controller.timeSeekPointer);
+    var percent = $v.controller.timeSeekPointer.setPosition(event.clientX);
     $v.video.currentTime = $v.video.duration * percent;
 
 });
@@ -1245,7 +1265,7 @@ $v.controller.timeSeekPointer.addEventListener('mousedown', function(event){
 
 $v.controller.volumeSeek.addEventListener('click', function(event){
     $v.video.muted = false;
-    $v.video.volume = $v.controller.setSeek(event.clientX, $v.controller.volumeSeekPointer);
+    $v.video.volume = $v.controller.volumeSeekPointer.setPosition(event.clientX);
 });
 
 
