@@ -230,6 +230,12 @@
     animation-duration: 17s;
     opacity: 0.75;
 }
+
+.jsplayer-thumbnail{
+    display: none;
+    position: absolute;
+    border: solid 1px #47494f;
+}
 </style>
 
 
@@ -558,6 +564,8 @@ $v.video.addEventListener('loadedmetadata', function(){
 
     $v.video.volume = $v.user.volume;
     $v.video.fit();
+
+    $v.thumbnail.create();
 });
 
 
@@ -662,6 +670,45 @@ $v.video.addEventListener('error', function(event){
             break;
     }
 });
+
+
+//■ thumbnail
+$v.thumbnail = {};
+
+
+$v.thumbnail.create = function(){
+    $v.thumbnail.video = $v.video.cloneNode(true);
+    $v.thumbnail.video.pause();
+    $v.thumbnail.video.muted  = true;
+    $v.thumbnail.video.className = 'jsplayer-thumbnail';
+    $v.thumbnail.video.style.width  = 192 + 'px';
+    $v.thumbnail.video.style.height = 108 + 'px';
+    document.body.appendChild($v.thumbnail.video);
+};
+
+
+$v.thumbnail.show = function(event){
+    if(!$v.thumbnail.video){
+        return;
+    }
+    $v.thumbnail.video.style.display = 'none';
+    var pos  = $v.controller.timeSeek.getBoundingClientRect();
+    var time = (event.clientX - pos.left) / pos.width * $v.video.duration;
+    $v.thumbnail.video.style.left    = event.clientX - 96 + 'px';
+    $v.thumbnail.video.style.top     = pos.top - 120 + 'px';
+    $v.thumbnail.video.currentTime   = parseInt(time, 10);
+    $v.thumbnail.video.style.display = 'block';
+    console.dir($v.thumbnail.video);
+};
+
+
+$v.thumbnail.hide = function(){
+    if(!$v.thumbnail.video){
+        return;
+    }
+    $v.thumbnail.video.style.display = 'none';
+};
+
 
 
 
@@ -966,6 +1013,12 @@ $v.controller.volumeSeekPointer.mousemoveEvent = function(event){
 $v.controller.playButton.addEventListener('click', function(){
     $v.video.paused ? $v.video.play() : $v.video.pause();
 });
+
+
+$v.controller.timeSeek.addEventListener('mousemove', $v.thumbnail.show);
+
+
+$v.controller.timeSeek.addEventListener('mouseleave', $v.thumbnail.hide);
 
 
 $v.controller.timeSeek.addEventListener('click', function(event){
