@@ -309,13 +309,16 @@ $v.entrypoint = function(url, width, height){
         document.head.appendChild(style);
     }
 
+    $v.screen.pos = $v.screen.getBoundingClientRect();
+    $v.controller.volumeSeekPointer.Width = $v.controller.volumeSeekPointer.getBoundingClientRect().width;
+    $v.controller.timeSeekPointer.Width   = $v.controller.timeSeekPointer.getBoundingClientRect().width;
+
     $v.user = $v.fn.loadLocalStorage("jsplayer") || {};
     $v.user.volume = Number($v.user.volume) || 1;
     $v.controller.volumeSeekPointer.setPosition($v.user.volume);
 
     $v.style.visibility = "visible";
 
-    $v.screen.pos = $v.screen.getBoundingClientRect();
     $v.screen.focus();
 
     if     (document.fullscreenEnabled)      { document.addEventListener("fullscreenchange",       $v.screen.fullscreenEvent); }
@@ -879,9 +882,8 @@ $v.thumbnail.show = function(event){
         return;
     }
 
-    var pointer = $v.controller.timeSeekPointer.getBoundingClientRect();
     var seekbar = $v.controller.timeSeekBar.getBoundingClientRect();
-    var width   = seekbar.width - pointer.width;
+    var width   = seekbar.width - $v.controller.timeSeekPointer.Width;
     var pos     = event.clientX - seekbar.left; //timeは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
     var time    = pos / width * $v.video.duration;
     $v.thumbnail.video.addEventListener('seeked', function handler(){
@@ -1174,9 +1176,8 @@ $v.controller.outofScreen = function(){
 
 
 $v.controller.timeSeekPointer.setPosition = function(time){
-    var pointer = $v.controller.timeSeekPointer.getBoundingClientRect();
     var seekbar = $v.controller.timeSeekBar.getBoundingClientRect();
-    var width   = seekbar.width - pointer.width;
+    var width   = seekbar.width - $v.controller.timeSeekPointer.Width;
     var pos     = (time <= 1)  ?  width * time  :  time - seekbar.left; //timeは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
 
     if(pos < 0){
@@ -1192,9 +1193,8 @@ $v.controller.timeSeekPointer.setPosition = function(time){
 
 
 $v.controller.volumeSeekPointer.setPosition = function(vol){
-    var pointer = $v.controller.volumeSeekPointer.getBoundingClientRect();
     var seekbar = $v.controller.volumeSeekBar.getBoundingClientRect();
-    var width   = seekbar.width - pointer.width;
+    var width   = seekbar.width - $v.controller.volumeSeekPointer.Width;
     var pos     = (vol <= 1)  ?  width * vol  :  vol - seekbar.left; //volは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
 
     if(pos < 0){
