@@ -235,6 +235,7 @@
     display: none;
     position: absolute;
     border: solid 1px #47494f;
+    z-index: 20;
 }
 </style>
 
@@ -889,7 +890,13 @@ $v.thumbnail.show = function(event){
         $v.thumbnail.video.style.display = 'block';
         $v.thumbnail.video.removeEventListener('seeked', handler);
     });
-    $v.thumbnail.video.currentTime = time;
+    
+    if($v.thumbnail.video.fastSeek){
+        $v.thumbnail.video.fastSeek(time);
+    }
+    else{
+        $v.thumbnail.video.currentTime = time;
+    }
 };
 
 
