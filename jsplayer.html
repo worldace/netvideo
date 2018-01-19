@@ -692,13 +692,12 @@ $v.thumbnail.show = function(event){
         return;
     }
     $v.thumbnail.video.style.display = 'none';
-    var pos  = $v.controller.timeSeek.getBoundingClientRect();
+    var pos  = $v.controller.timeSeekBar.getBoundingClientRect();
     var time = (event.clientX - pos.left) / pos.width * $v.video.duration;
     $v.thumbnail.video.style.left    = event.clientX - 96 + 'px';
     $v.thumbnail.video.style.top     = pos.top - 120 + 'px';
-    $v.thumbnail.video.currentTime   = parseInt(time, 10);
     $v.thumbnail.video.style.display = 'block';
-    console.dir($v.thumbnail.video);
+    $v.thumbnail.video.currentTime   = time;
 };
 
 
@@ -942,19 +941,18 @@ $v.controller.setSeek = function(percent, pointer){
 
     pointer.pos  = pointer.getBoundingClientRect();
     seekbar.pos = seekbar.getBoundingClientRect();
-    var seekbarWidth = seekbar.pos.width - pointer.pos.width;
 
-    var pos = (percent <= 1) ? seekbarWidth*percent : percent-seekbar.pos.left; //percentは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
+    var pos = (percent <= 1) ? seekbar.pos.width * percent  :  percent - seekbar.pos.left; //percentは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
 
     if(pos < 0){
         pos = 0;
     }
-    if(pos > seekbarWidth){
-        pos = seekbarWidth;
+    if(pos > seekbar.pos.width - pointer.pos.width){
+        pos = seekbar.pos.width - pointer.pos.width;
     }
 
     pointer.style.left = pos + "px";
-    return pos/seekbarWidth;
+    return pos / seekbar.pos.width;
 };
 
 
