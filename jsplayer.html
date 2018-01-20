@@ -698,7 +698,7 @@ $v.thumbnail.create = function(){
     $v.thumbnail.video.muted  = true;
     $v.thumbnail.video.className = 'jsplayer-thumbnail';
     $v.thumbnail.video.style.width  = 192 + 'px';
-    $v.thumbnail.video.style.height = 108 + 'px'; //ここは動的に計算すべし
+    $v.thumbnail.video.style.height = 192 * $v.video.videoHeight / $v.video.videoWidth + 'px';
 
     $v.controller.timeSeek.addEventListener('mousemove', $v.fn.throttle(300, false, $v.thumbnail.show, false));
     $v.controller.timeSeek.addEventListener('mouseenter', function (){
