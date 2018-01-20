@@ -684,7 +684,8 @@ $v.video.addEventListener('error', function(event){
 //■ thumbnail
 $v.thumbnail = {};
 
-
+$v.thumbnail.width = 192;
+$v.thumbnail.height = 0;
 $v.thumbnail.mouseenter = false;
 
 
@@ -697,8 +698,9 @@ $v.thumbnail.create = function(){
     $v.thumbnail.video.pause();
     $v.thumbnail.video.muted  = true;
     $v.thumbnail.video.className = 'jsplayer-thumbnail';
-    $v.thumbnail.video.style.width  = 192 + 'px';
-    $v.thumbnail.video.style.height = 192 * $v.video.videoHeight / $v.video.videoWidth + 'px';
+    $v.thumbnail.height             = $v.thumbnail.width * $v.video.videoHeight / $v.video.videoWidth;
+    $v.thumbnail.video.style.width  = $v.thumbnail.width + 'px';
+    $v.thumbnail.video.style.height = $v.thumbnail.height + 'px';
 
     $v.controller.timeSeek.addEventListener('mousemove', $v.fn.throttle(300, false, $v.thumbnail.show, false));
     $v.controller.timeSeek.addEventListener('mouseenter', function (){
@@ -709,7 +711,7 @@ $v.thumbnail.create = function(){
         $v.thumbnail.mouseenter = false;
     });
 
-    $v.screen.appendChild($v.thumbnail.video); //挿入場所は変更する必要がある
+    $v.controller.timeSeekBar.appendChild($v.thumbnail.video);
 };
 
 
@@ -725,9 +727,10 @@ $v.thumbnail.show = function(event){
     var width = $v.controller.timeSeekBar.pos.width - $v.controller.timeSeekPointer.Width;
     var pos   = event.clientX - $v.controller.timeSeekBar.pos.left;
     var time  = pos / width * $v.video.duration;
+
     $v.thumbnail.video.addEventListener('seeked', function handler(){
-        $v.thumbnail.video.style.left    = event.clientX - 96 + 'px';
-        $v.thumbnail.video.style.top     = $v.controller.timeSeekBar.pos.top - 130 + 'px'; //フルスクリーン時と通常時で変化させる必要がある(またはサムネタグの位置を変える必要がある)
+        $v.thumbnail.video.style.left    = pos - ($v.thumbnail.width / 2) + 'px';
+        $v.thumbnail.video.style.top     = - $v.thumbnail.height - 13 + 'px';
         $v.thumbnail.video.style.display = 'block';
         $v.thumbnail.video.removeEventListener('seeked', handler);
     });
