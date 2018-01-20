@@ -404,186 +404,6 @@ $v.addEventListener('keydown', function(event){
 
 
 
-//■ function
-$v.fn = {};
-
-
-$v.fn.get = function(url, success){
-    $v.fn.ajax(url, {method:"GET", success:success});
-};
-
-
-$v.fn.post = function(url, data, success){
-    $v.fn.ajax(url, {method:"POST", data:data, success:success});
-};
-
-
-$v.fn.ajax = function(url, option){ //method, data, timeout, credential, header, success, error, complete
-    option = option || {};
-    option.method  = option.method  || "GET";
-    option.timeout = option.timeout || 60;
-
-    var body = "";
-    var xhr  = new XMLHttpRequest();
-    xhr.open(option.method, url);
-
-    if(option.timeout >= 0){
-        xhr.timeout = option.timeout * 1000;
-    }
-    if(option.credential){
-        xhr.withCredentials = true;
-    }
-    if(option.method.match(/^POST$/i)){
-        if(option.data instanceof FormData){
-            body = option.data;
-        }
-        else{
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-            for(var key in option.data){
-                body += encodeURIComponent(key) + "=" + encodeURIComponent(option.data[key]) + "&";
-            }
-        }
-    }
-    if(option.header){
-        for(var key in option.header){
-            xhr.setRequestHeader(key, option.header[key]);
-        }
-    }
-    xhr.addEventListener('loadend', function(){
-        if(xhr.status >= 200 && xhr.status < 300 || xhr.status == 304){
-            if(typeof option.success === "function"){
-                option.success(xhr);
-            }
-        }
-        else{
-            if(typeof option.error === "function"){
-                option.error(xhr);
-            }
-        }
-        if(typeof option.complete === "function"){
-            option.complete(xhr);
-        }
-    });
-
-    xhr.send(body);
-};
-
-
-$v.fn.param = function(param){
-    var str = "";
-    for(var key in param){
-        if(!param.hasOwnProperty(key)){
-            continue;
-        }
-        str += encodeURIComponent(key) + "=" + encodeURIComponent(param[key]) + "&";
-    }
-    return str;
-};
-
-
-$v.fn.deparam = function(str){
-    if(str == null){ return {}; }
-    str = String(str);
-    str = str.replace(/^\?/, "");
-    str = str.replace(/#.*/, "");
-    var result = {};
-    var namevalue = str.split('&');
-    for(var i = 0; i < namevalue.length; i++){
-        var name  = namevalue[i].split('=')[0] || "";
-        var value = namevalue[i].split('=')[1] || "";
-        if(name == ""){
-            continue;
-        }
-        result[decodeURIComponent(name)] = decodeURIComponent(value);
-    }
-    return result;
-};
-
-
-$v.fn.saveLocalStorage = function(name, value){
-    try{
-        window.localStorage.setItem(name, JSON.stringify(value));
-    }
-    catch(e){
-    }
-};
-
-
-$v.fn.loadLocalStorage = function(name){
-    try{
-        return JSON.parse(window.localStorage.getItem(name));
-    }
-    catch(e){
-    }
-};
-
-
-$v.fn.contentFit = function(screenW, screenH, objectW, objectH){
-    var scale = (objectW/objectH > screenW/screenH) ? screenW/objectW : screenH/objectH;
-    return {
-        w: Math.floor(objectW * scale),
-        h: Math.floor(objectH * scale),
-        x: Math.floor((screenW / 2) - (objectW * scale / 2)),
-        y: Math.floor((screenH / 2) - (objectH * scale / 2)),
-    };
-};
-
-
-$v.fn.throttle = function(delay, noTrailing, callback, debounceMode){
-    // https://github.com/niksy/throttle-debounce
-    //delay: 間引く間隔(ms)
-    //noTrailing: false(初期値)なら連続処理の終了時に関数を実行する。trueなら実行しない
-    //callback: 関数
-    //debounceMode: true:連続処理の開始時に1度だけ実行、false:連続処理の終了時に1度だけ実行
-
-	var timeoutID;
-	var lastExec = 0;
-
-	if (typeof noTrailing !== 'boolean'){
-		debounceMode = callback;
-		callback = noTrailing;
-		noTrailing = undefined;
-	}
-
-	function wrapper(){
-		var self = this;
-		var elapsed = Number(new Date()) - lastExec;
-		var args = arguments;
-
-		function exec(){
-			lastExec = Number(new Date());
-			callback.apply(self, args);
-		}
-
-		function clear(){
-			timeoutID = undefined;
-		}
-
-		if(debounceMode && !timeoutID){
-			exec();
-        }
-
-		if(timeoutID){
-			clearTimeout(timeoutID);
-		}
-
-		if(debounceMode === undefined && elapsed > delay){
-			exec();
-		}
-        else if(noTrailing !== true){
-			timeoutID = setTimeout(debounceMode ? clear : exec, debounceMode === undefined ? delay - elapsed : delay);
-		}
-	}
-	return wrapper;
-};
-
-
-$v.fn.type = function(target){
-    return Object.prototype.toString.call(target).replace(/^\[object (.+)\]$/, '$1').toLowerCase();
-};
-
-
-
 
 //■ screen
 $v.screen = $v.querySelector(".jsplayer-screen");
@@ -869,13 +689,26 @@ $v.thumbnail.mouseenter = false;
 
 
 $v.thumbnail.create = function(){
-    //タッチデバイスで無効にする'ontouchstart' in document
+    if('ontouchstart' in document){
+        return;
+    }
+
     $v.thumbnail.video = $v.video.cloneNode(true);
     $v.thumbnail.video.pause();
     $v.thumbnail.video.muted  = true;
     $v.thumbnail.video.className = 'jsplayer-thumbnail';
     $v.thumbnail.video.style.width  = 192 + 'px';
     $v.thumbnail.video.style.height = 108 + 'px'; //ここは動的に計算すべし
+
+    $v.controller.timeSeek.addEventListener('mousemove', $v.fn.throttle(300, false, $v.thumbnail.show, false));
+    $v.controller.timeSeek.addEventListener('mouseenter', function (){
+        $v.thumbnail.mouseenter = true;
+    });
+    $v.controller.timeSeek.addEventListener('mouseleave', function (){
+        $v.thumbnail.hide();
+        $v.thumbnail.mouseenter = false;
+    });
+
     $v.screen.appendChild($v.thumbnail.video); //挿入場所は変更する必要がある
 };
 
@@ -1232,20 +1065,6 @@ $v.controller.playButton.addEventListener('click', function(){
 });
 
 
-$v.controller.timeSeek.addEventListener('mousemove', $v.fn.throttle(300, false, $v.thumbnail.show, false));
-
-
-$v.controller.timeSeek.addEventListener('mouseenter', function (){
-    $v.thumbnail.mouseenter = true;
-});
-
-
-$v.controller.timeSeek.addEventListener('mouseleave', function (){
-    $v.thumbnail.hide();
-    $v.thumbnail.mouseenter = false;
-});
-
-
 $v.controller.timeSeek.addEventListener('click', function(event){
     if(!$v.video.duration){
         return;
@@ -1348,6 +1167,188 @@ $v.form.addEventListener('submit', function(event){
 $v.form.input.addEventListener('focus', function(event){
     $v.video.pause();
 });
+
+
+
+
+//■ function
+$v.fn = {};
+
+
+$v.fn.get = function(url, success){
+    $v.fn.ajax(url, {method:"GET", success:success});
+};
+
+
+$v.fn.post = function(url, data, success){
+    $v.fn.ajax(url, {method:"POST", data:data, success:success});
+};
+
+
+$v.fn.ajax = function(url, option){ //method, data, timeout, credential, header, success, error, complete
+    option = option || {};
+    option.method  = option.method  || "GET";
+    option.timeout = option.timeout || 60;
+
+    var body = "";
+    var xhr  = new XMLHttpRequest();
+    xhr.open(option.method, url);
+
+    if(option.timeout >= 0){
+        xhr.timeout = option.timeout * 1000;
+    }
+    if(option.credential){
+        xhr.withCredentials = true;
+    }
+    if(option.method.match(/^POST$/i)){
+        if(option.data instanceof FormData){
+            body = option.data;
+        }
+        else{
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            for(var key in option.data){
+                body += encodeURIComponent(key) + "=" + encodeURIComponent(option.data[key]) + "&";
+            }
+        }
+    }
+    if(option.header){
+        for(var key in option.header){
+            xhr.setRequestHeader(key, option.header[key]);
+        }
+    }
+    xhr.addEventListener('loadend', function(){
+        if(xhr.status >= 200 && xhr.status < 300 || xhr.status == 304){
+            if(typeof option.success === "function"){
+                option.success(xhr);
+            }
+        }
+        else{
+            if(typeof option.error === "function"){
+                option.error(xhr);
+            }
+        }
+        if(typeof option.complete === "function"){
+            option.complete(xhr);
+        }
+    });
+
+    xhr.send(body);
+};
+
+
+$v.fn.param = function(param){
+    var str = "";
+    for(var key in param){
+        if(!param.hasOwnProperty(key)){
+            continue;
+        }
+        str += encodeURIComponent(key) + "=" + encodeURIComponent(param[key]) + "&";
+    }
+    return str;
+};
+
+
+$v.fn.deparam = function(str){
+    if(str == null){ return {}; }
+    str = String(str);
+    str = str.replace(/^\?/, "");
+    str = str.replace(/#.*/, "");
+    var result = {};
+    var namevalue = str.split('&');
+    for(var i = 0; i < namevalue.length; i++){
+        var name  = namevalue[i].split('=')[0] || "";
+        var value = namevalue[i].split('=')[1] || "";
+        if(name == ""){
+            continue;
+        }
+        result[decodeURIComponent(name)] = decodeURIComponent(value);
+    }
+    return result;
+};
+
+
+$v.fn.saveLocalStorage = function(name, value){
+    try{
+        window.localStorage.setItem(name, JSON.stringify(value));
+    }
+    catch(e){
+    }
+};
+
+
+$v.fn.loadLocalStorage = function(name){
+    try{
+        return JSON.parse(window.localStorage.getItem(name));
+    }
+    catch(e){
+    }
+};
+
+
+$v.fn.contentFit = function(screenW, screenH, objectW, objectH){
+    var scale = (objectW/objectH > screenW/screenH) ? screenW/objectW : screenH/objectH;
+    return {
+        w: Math.floor(objectW * scale),
+        h: Math.floor(objectH * scale),
+        x: Math.floor((screenW / 2) - (objectW * scale / 2)),
+        y: Math.floor((screenH / 2) - (objectH * scale / 2)),
+    };
+};
+
+
+$v.fn.throttle = function(delay, noTrailing, callback, debounceMode){
+    // https://github.com/niksy/throttle-debounce
+    //delay: 間引く間隔(ms)
+    //noTrailing: false(初期値)なら連続処理の終了時に関数を実行する。trueなら実行しない
+    //callback: 関数
+    //debounceMode: true:連続処理の開始時に1度だけ実行、false:連続処理の終了時に1度だけ実行
+
+	var timeoutID;
+	var lastExec = 0;
+
+	if (typeof noTrailing !== 'boolean'){
+		debounceMode = callback;
+		callback = noTrailing;
+		noTrailing = undefined;
+	}
+
+	function wrapper(){
+		var self = this;
+		var elapsed = Number(new Date()) - lastExec;
+		var args = arguments;
+
+		function exec(){
+			lastExec = Number(new Date());
+			callback.apply(self, args);
+		}
+
+		function clear(){
+			timeoutID = undefined;
+		}
+
+		if(debounceMode && !timeoutID){
+			exec();
+        }
+
+		if(timeoutID){
+			clearTimeout(timeoutID);
+		}
+
+		if(debounceMode === undefined && elapsed > delay){
+			exec();
+		}
+        else if(noTrailing !== true){
+			timeoutID = setTimeout(debounceMode ? clear : exec, debounceMode === undefined ? delay - elapsed : delay);
+		}
+	}
+	return wrapper;
+};
+
+
+$v.fn.type = function(target){
+    return Object.prototype.toString.call(target).replace(/^\[object (.+)\]$/, '$1').toLowerCase();
+};
+
 
 
 
