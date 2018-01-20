@@ -869,13 +869,14 @@ $v.thumbnail.mouseenter = false;
 
 
 $v.thumbnail.create = function(){
+    //タッチデバイスで無効にする'ontouchstart' in document
     $v.thumbnail.video = $v.video.cloneNode(true);
     $v.thumbnail.video.pause();
     $v.thumbnail.video.muted  = true;
     $v.thumbnail.video.className = 'jsplayer-thumbnail';
     $v.thumbnail.video.style.width  = 192 + 'px';
-    $v.thumbnail.video.style.height = 108 + 'px';
-    $v.screen.appendChild($v.thumbnail.video);
+    $v.thumbnail.video.style.height = 108 + 'px'; //ここは動的に計算すべし
+    $v.screen.appendChild($v.thumbnail.video); //挿入場所は変更する必要がある
 };
 
 
@@ -1256,12 +1257,17 @@ $v.controller.timeSeek.addEventListener('click', function(event){
 
 
 $v.controller.timeSeek.addEventListener('wheel', function(event){
+    if(!$v.video.duration){
+        return;
+    }
     (event.deltaY > 0) ? $v.video.setTime($v.video.currentTime+15) : $v.video.setTime($v.video.currentTime-15);
 });
 
 
 $v.controller.timeSeekPointer.addEventListener('mousedown', function(event){
-    if(!$v.video.duration){ return; }
+    if(!$v.video.duration){
+        return;
+    }
     $v.controller.timeSeekPointer.isDragging = true;
     document.addEventListener('mousemove', $v.controller.timeSeekPointer.mousemoveEvent);
     document.addEventListener('mouseup', function mouseupEvent(event){
