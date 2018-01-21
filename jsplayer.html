@@ -9,7 +9,6 @@
 
 <style>
 .jsplayer{
-    box-sizing: border-box;
     visibility: hidden;
 }
 
@@ -235,7 +234,7 @@
     display: none;
     position: absolute;
     border: solid 1px #47494f;
-    z-index: 20;
+    z-index: 3;
 }
 </style>
 
@@ -684,8 +683,8 @@ $v.video.addEventListener('error', function(event){
 //■ thumbnail
 $v.thumbnail = {};
 
-$v.thumbnail.width = 192;
-$v.thumbnail.height = 0;
+$v.thumbnail.width  = 192;
+$v.thumbnail.height = 0; //後から計算する
 $v.thumbnail.mouseenter = false;
 
 
@@ -694,11 +693,12 @@ $v.thumbnail.create = function(){
         return;
     }
 
+    $v.thumbnail.height = $v.thumbnail.width * $v.video.videoHeight / $v.video.videoWidth;
+
     $v.thumbnail.video = $v.video.cloneNode(true);
     $v.thumbnail.video.pause();
-    $v.thumbnail.video.muted  = true;
-    $v.thumbnail.video.className = 'jsplayer-thumbnail';
-    $v.thumbnail.height             = $v.thumbnail.width * $v.video.videoHeight / $v.video.videoWidth;
+    $v.thumbnail.video.muted        = true;
+    $v.thumbnail.video.className    = 'jsplayer-thumbnail';
     $v.thumbnail.video.style.width  = $v.thumbnail.width + 'px';
     $v.thumbnail.video.style.height = $v.thumbnail.height + 'px';
 
