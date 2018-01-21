@@ -336,6 +336,7 @@ $v.entrypoint = function(url){
         document.head.appendChild(style);
     }
 
+    //位置情報をキャッシュ(後から変わることは考えていない)
     $v.screen.pos                         = $v.screen.getBoundingClientRect();
     $v.controller.timeSeekBar.pos         = $v.controller.timeSeekBar.getBoundingClientRect();
     $v.controller.volumeSeekBar.pos       = $v.controller.volumeSeekBar.getBoundingClientRect();
@@ -379,18 +380,6 @@ $v.addEventListener('keydown', function(event){
     }
     else if(event.which == 13){ //Enter
         $v.video.paused ? $v.video.play() : $v.video.pause();
-    }
-    else if(event.which == 39 && event.ctrlKey){ //Ctrl+→
-        $v.video.setTime($v.video.currentTime + 30);
-    }
-    else if(event.which == 39 && event.shiftKey){ //Shift+→
-        $v.video.setTime($v.video.currentTime + 30);
-    }
-    else if(event.which == 37 && event.ctrlKey){ //Ctrl+←
-        $v.video.setTime($v.video.currentTime - 30);
-    }
-    else if(event.which == 37 && event.shiftKey){ //Shift+←
-        $v.video.setTime($v.video.currentTime - 30);
     }
     else if(event.which == 39){ //→
         $v.video.setTime($v.video.currentTime + 15);
