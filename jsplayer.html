@@ -17,9 +17,9 @@
 }
 
 .jsplayer-screen{
+    width: 960px;
+    height: 540px;
     background-color: #000;
-    width: 640px;
-    height: 360px;
     overflow: hidden;
     white-space : nowrap;
     cursor: default;
@@ -78,7 +78,7 @@
 
 .jsplayer-controller{
     display: block;
-    width: 640px;
+    width: 960px;
     height: 55px;
     line-height: 1;
     color: white;
@@ -320,11 +320,10 @@
 var $v = document.querySelector('.jsplayer');
 
 
-$v.entrypoint = function(url, width, height){
-    width  = width  || 960;
-    height = height || 540;
-    $v.screen.style.width  = width + "px";
-    $v.screen.style.height = height + "px";
+$v.entrypoint = function(url){
+    var width  = $v.fn.csslen($v.screen, 'width');
+    var height = $v.fn.csslen($v.screen, 'height');
+
     $v.controller.style.width = width + "px";
     $v.controller.timeSeek.style.width = width - 307 + "px";
 
@@ -732,9 +731,11 @@ $v.thumbnail.create = function(){
     $v.thumbnail.video.style.height = $v.thumbnail.height + 'px';
 
     $v.controller.timeSeek.addEventListener('mousemove', $v.fn.throttle(300, false, $v.thumbnail.show, false));
+
     $v.controller.timeSeek.addEventListener('mouseenter', function (){
         $v.thumbnail.mouseenter = true;
     });
+
     $v.controller.timeSeek.addEventListener('mouseleave', function (){
         $v.thumbnail.hide();
         $v.thumbnail.mouseenter = false;
@@ -1318,7 +1319,6 @@ $v.fn.contentFit = function(screenW, screenH, objectW, objectH){
 
 
 $v.fn.throttle = function(delay, noTrailing, callback, debounceMode){
-    // https://github.com/niksy/throttle-debounce
     //delay: 間引く間隔(ms)
     //noTrailing: false(初期値)なら連続処理の終了時に関数を実行する。trueなら実行しない
     //callback: 関数
@@ -1364,6 +1364,11 @@ $v.fn.throttle = function(delay, noTrailing, callback, debounceMode){
 	}
 	return wrapper;
 };
+
+
+$v.fn.csslen = function(element, prop){
+    return window.parseInt(window.getComputedStyle(element)[prop], 10) || 0;
+}
 
 
 $v.fn.type = function(target){
@@ -1492,6 +1497,6 @@ $v.query = $v.fn.deparam(location.search);
 //$v.query.group_id = ""; //ひま動のgroup_id
 //$v.query.key      = ""; //ひま動のkey
 
-$v.entrypoint($v.query.file, 960, 540);
+$v.entrypoint($v.query.file);
 </script>
 
