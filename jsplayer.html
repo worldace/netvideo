@@ -320,9 +320,6 @@
 var $v = document.querySelector('.jsplayer');
 
 
-$v.appName = 'jsplayer';
-
-
 $v.entrypoint = function(url, width, height){
     width  = width  || 960;
     height = height || 540;
@@ -817,7 +814,7 @@ $v.comment.create = function(data, laneNumber){
 
     comment.style.top = laneNumber * $v.comment.laneHeight + $v.comment.marginTop + "px";
     comment.style.fontSize = $v.comment.fontSize + "px";
-    comment.style.animationName = $v.screen.isFullscreen() ? $v.appName+"fulllane" : $v.appName+"normallane";
+    comment.style.animationName = $v.screen.isFullscreen() ? "jsplayer-fullscreen-lane" : "jsplayer-normal-lane";
 
     var delay = data[1] - $v.video.currentTime;
     delay = (delay <= 0) ? 0 : delay.toFixed(3)*1000;
@@ -829,10 +826,10 @@ $v.comment.create = function(data, laneNumber){
 
 $v.comment.keyframe = function(width){
     var css = "";
-    css += "@keyframes " + $v.appName + "normallane{";
+    css += "@keyframes jsplayer-normal-lane{";
     css += "from{transform:translateX(0);}";
     css += "to{transform:translateX(-" + width*5 + "px);}}";
-    css += "@keyframes " + $v.appName + "fulllane{";
+    css += "@keyframes jsplayer-fullscreen-lane{";
     css += "from{transform:translateX(0);}";
     css += "to{transform:translateX(-" + screen.width*5 + "px);}}";
 
