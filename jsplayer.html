@@ -1005,106 +1005,8 @@ $v.controller.outofScreen = function(){
 };
 
 
-$v.controller.timeSeekPointer.setPosition = function(time){
-    var width = $v.controller.timeSeekBar.pos.width - $v.controller.timeSeekPointer.Width;
-    var pos   = (time <= 1)  ?  width * time  :  time - $v.controller.timeSeekBar.pos.left; //timeは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
-    pos = $v.fn.minmax(0, pos, width);
-
-    $v.controller.timeSeekPointer.style.left = pos + "px";
-    return pos / width;
-};
-
-
-$v.controller.volumeSeekPointer.setPosition = function(vol){
-    var width = $v.controller.volumeSeekBar.pos.width - $v.controller.volumeSeekPointer.Width;
-    var pos   = (vol <= 1)  ?  width * vol  :  vol - $v.controller.volumeSeekBar.pos.left; //volは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
-    pos = $v.fn.minmax(0, pos, width);
-
-    $v.controller.volumeSeekPointer.style.left = pos + "px";
-    return pos / width;
-};
-
-
-$v.controller.timeSeekPointer.mousemoveEvent = function(event, seekend){
-    var percent = $v.controller.timeSeekPointer.setPosition(event.clientX);
-    $v.controller.setTime($v.video.duration*percent, $v.controller.currentTime);
-    if(seekend){
-        $v.video.currentTime = $v.video.duration * percent;
-    }
-};
-
-
-$v.controller.volumeSeekPointer.mousemoveEvent = function(event){
-    $v.video.volume = $v.controller.volumeSeekPointer.setPosition(event.clientX);
-};
-
-
 $v.controller.playButton.addEventListener('click', function(){
     $v.video.paused ? $v.video.play() : $v.video.pause();
-});
-
-
-$v.controller.timeSeek.addEventListener('click', function(event){
-    if(!$v.video.duration){
-        return;
-    }
-    var percent = $v.controller.timeSeekPointer.setPosition(event.clientX);
-    $v.video.currentTime = $v.video.duration * percent;
-
-});
-
-
-$v.controller.timeSeek.addEventListener('wheel', function(event){
-    if(!$v.video.duration){
-        return;
-    }
-    (event.deltaY > 0) ? $v.video.setTime($v.video.currentTime+15) : $v.video.setTime($v.video.currentTime-15);
-});
-
-
-$v.controller.timeSeekPointer.addEventListener('mousedown', function(event){
-    if(!$v.video.duration){
-        return;
-    }
-    $v.controller.timeSeekPointer.isDragging = true;
-    document.addEventListener('mousemove', $v.controller.timeSeekPointer.mousemoveEvent);
-    document.addEventListener('mouseup', function mouseupEvent(event){
-        $v.controller.timeSeekPointer.mousemoveEvent(event, true);
-        document.removeEventListener('mousemove', $v.controller.timeSeekPointer.mousemoveEvent);
-        document.removeEventListener('mouseup',  mouseupEvent);
-        $v.controller.timeSeekPointer.isDragging = false;
-    });
-});
-
-
-$v.controller.volumeSeek.addEventListener('click', function(event){
-    $v.video.muted = false;
-    $v.video.volume = $v.controller.volumeSeekPointer.setPosition(event.clientX);
-});
-
-
-$v.controller.volumeSeek.addEventListener('wheel', function(event){
-    (event.deltaY < 0) ? $v.video.setVolume($v.video.volume+0.1) : $v.video.setVolume($v.video.volume-0.1);
-});
-
-
-$v.controller.volumeSeekPointer.addEventListener('mousedown', function(event){
-    document.addEventListener('mousemove', $v.controller.volumeSeekPointer.mousemoveEvent);
-    document.addEventListener('mouseup', function mouseupEvent(event){
-        document.removeEventListener('mousemove', $v.controller.volumeSeekPointer.mousemoveEvent);
-        document.removeEventListener('mouseup', mouseupEvent);
-    });
-});
-
-
-$v.controller.volumeButton.addEventListener('click', function(){
-    if($v.video.muted){
-        $v.video.muted = false;
-        $v.video.volume = 0.5;
-    }
-    else{
-        $v.video.volume = $v.video.volume ? 0 : 0.5;
-    }
 });
 
 
@@ -1123,6 +1025,104 @@ $v.controller.commentButton.addEventListener('click', function(){
 
 $v.controller.fullscreenButton.addEventListener('click', function(){
     $v.screen.toggleFullscreen();
+});
+
+
+$v.controller.timeSeekPointer.setPosition = function(time){
+    var width = $v.controller.timeSeekBar.pos.width - $v.controller.timeSeekPointer.Width;
+    var pos   = (time <= 1)  ?  width * time  :  time - $v.controller.timeSeekBar.pos.left; //timeは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
+    pos = $v.fn.minmax(0, pos, width);
+
+    $v.controller.timeSeekPointer.style.left = pos + "px";
+    return pos / width;
+};
+
+
+$v.controller.timeSeek.addEventListener('click', function(event){
+    if(!$v.video.duration){
+        return;
+    }
+    var percent = $v.controller.timeSeekPointer.setPosition(event.clientX);
+    $v.video.currentTime = $v.video.duration * percent;
+
+});
+
+
+$v.controller.timeSeekPointer.addEventListener('mousedown', function(event){
+    if(!$v.video.duration){
+        return;
+    }
+    $v.controller.timeSeekPointer.isDragging = true;
+    document.addEventListener('mousemove', $v.controller.timeSeekPointer.mousemoveEvent);
+    document.addEventListener('mouseup', function mouseupEvent(event){
+        $v.controller.timeSeekPointer.mousemoveEvent(event, true);
+        document.removeEventListener('mousemove', $v.controller.timeSeekPointer.mousemoveEvent);
+        document.removeEventListener('mouseup',  mouseupEvent);
+        $v.controller.timeSeekPointer.isDragging = false;
+    });
+});
+
+
+$v.controller.timeSeekPointer.mousemoveEvent = function(event, seekend){
+    var percent = $v.controller.timeSeekPointer.setPosition(event.clientX);
+    $v.controller.setTime($v.video.duration*percent, $v.controller.currentTime);
+    if(seekend){
+        $v.video.currentTime = $v.video.duration * percent;
+    }
+};
+
+
+$v.controller.timeSeek.addEventListener('wheel', function(event){
+    if(!$v.video.duration){
+        return;
+    }
+    (event.deltaY > 0) ? $v.video.setTime($v.video.currentTime+15) : $v.video.setTime($v.video.currentTime-15);
+});
+
+
+$v.controller.volumeSeekPointer.setPosition = function(vol){
+    var width = $v.controller.volumeSeekBar.pos.width - $v.controller.volumeSeekPointer.Width;
+    var pos   = (vol <= 1)  ?  width * vol  :  vol - $v.controller.volumeSeekBar.pos.left; //volは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
+    pos = $v.fn.minmax(0, pos, width);
+
+    $v.controller.volumeSeekPointer.style.left = pos + "px";
+    return pos / width;
+};
+
+
+$v.controller.volumeSeek.addEventListener('click', function(event){
+    $v.video.muted = false;
+    $v.video.volume = $v.controller.volumeSeekPointer.setPosition(event.clientX);
+});
+
+
+$v.controller.volumeSeekPointer.addEventListener('mousedown', function(event){
+    document.addEventListener('mousemove', $v.controller.volumeSeekPointer.mousemoveEvent);
+    document.addEventListener('mouseup', function mouseupEvent(event){
+        document.removeEventListener('mousemove', $v.controller.volumeSeekPointer.mousemoveEvent);
+        document.removeEventListener('mouseup', mouseupEvent);
+    });
+});
+
+
+$v.controller.volumeSeekPointer.mousemoveEvent = function(event){
+    $v.video.volume = $v.controller.volumeSeekPointer.setPosition(event.clientX);
+};
+
+
+$v.controller.volumeSeek.addEventListener('wheel', function(event){
+    (event.deltaY < 0) ? $v.video.setVolume($v.video.volume+0.1) : $v.video.setVolume($v.video.volume-0.1);
+});
+
+
+$v.controller.volumeButton.addEventListener('click', function(){
+    if($v.video.muted){
+        $v.video.muted = false;
+        $v.video.volume = 0.5;
+    }
+    else{
+        $v.video.volume = $v.video.volume ? 0 : 0.5;
+    }
 });
 
 
