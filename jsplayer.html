@@ -531,25 +531,12 @@ $v.video.setTime = function(sec){
     if(!$v.video.duration){
         return;
     }
-    if(sec < 1){
-        sec = 0;
-    }
-    if(sec > $v.video.duration){
-        sec = $v.video.duration;
-    }
-    $v.video.currentTime = sec;
+    $v.video.currentTime = $v.fn.minmax(0, sec, $v.video.duration);
 };
 
 
 $v.video.setVolume = function(volume){
-    volume = volume.toFixed(1);
-    if(volume >= 1){
-        volume = 1;
-    }
-    if(volume <= 0){
-        volume = 0;
-    }
-    $v.video.volume = volume;
+    $v.video.volume = $v.fn.minmax(0, volume.toFixed(1), 1);
     $v.video.muted  = false;
 };
 
@@ -558,14 +545,7 @@ $v.video.setSpeed = function(speed){
     if(!$v.video.duration){
         return;
     }
-    speed = speed.toFixed(1);
-    if(speed >= 3){
-        speed = 3;
-    }
-    if(speed <= 0.5){
-        speed = 0.5;
-    }
-    $v.video.playbackRate = speed;
+    $v.video.playbackRate = $v.fn.minmax(0.5, speed.toFixed(1), 3);
 };
 
 
@@ -1028,13 +1008,7 @@ $v.controller.outofScreen = function(){
 $v.controller.timeSeekPointer.setPosition = function(time){
     var width = $v.controller.timeSeekBar.pos.width - $v.controller.timeSeekPointer.Width;
     var pos   = (time <= 1)  ?  width * time  :  time - $v.controller.timeSeekBar.pos.left; //timeは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
-
-    if(pos < 0){
-        pos = 0;
-    }
-    if(pos > width){
-        pos = width;
-    }
+    pos = $v.fn.minmax(0, pos, width);
 
     $v.controller.timeSeekPointer.style.left = pos + "px";
     return pos / width;
@@ -1044,13 +1018,7 @@ $v.controller.timeSeekPointer.setPosition = function(time){
 $v.controller.volumeSeekPointer.setPosition = function(vol){
     var width = $v.controller.volumeSeekBar.pos.width - $v.controller.volumeSeekPointer.Width;
     var pos   = (vol <= 1)  ?  width * vol  :  vol - $v.controller.volumeSeekBar.pos.left; //volは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
-
-    if(pos < 0){
-        pos = 0;
-    }
-    if(pos > width){
-        pos = width;
-    }
+    pos = $v.fn.minmax(0, pos, width);
 
     $v.controller.volumeSeekPointer.style.left = pos + "px";
     return pos / width;
@@ -1260,11 +1228,14 @@ $v.fn.param = function(param){
 
 
 $v.fn.deparam = function(str){
-    if(str == null){ return {}; }
+    var result = {};
+
+    if(str == null){
+        return result;
+    }
     str = String(str);
     str = str.replace(/^\?/, "");
     str = str.replace(/#.*/, "");
-    var result = {};
     var namevalue = str.split('&');
     for(var i = 0; i < namevalue.length; i++){
         var name  = namevalue[i].split('=')[0] || "";
@@ -1357,7 +1328,20 @@ $v.fn.throttle = function(delay, noTrailing, callback, debounceMode){
 
 $v.fn.csslen = function(element, prop){
     return window.parseInt(window.getComputedStyle(element)[prop], 10) || 0;
-}
+};
+
+
+$v.fn.minmax = function(min, val, max){
+    if(val < min){
+        return min;
+    }
+    else if(val > max){
+        return max;
+    }
+    else{
+        return val;
+    }
+};
 
 
 $v.fn.type = function(target){
@@ -1481,6 +1465,7 @@ $v.comment.post = function(){
 //■ エントリーポイント
 $v.query = $v.fn.deparam(location.search);
 
+//■設定
 //$v.query.file     = ""; //動画ファイルのURL (必須)
 //$v.query.himado   = ""; //ひま動のID
 //$v.query.group_id = ""; //ひま動のgroup_id
