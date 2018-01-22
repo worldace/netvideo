@@ -277,8 +277,6 @@
 
 
 
-
-
 <div class="jsplayer"
   ><div class="jsplayer-screen" tabindex="1"
     ><video class="jsplayer-video" loop></video
@@ -313,35 +311,29 @@
 
 
 
-
-
 <script>
 //■ player
 var $v = document.querySelector('.jsplayer');
 
 
 $v.entrypoint = function(url){
-    var width  = $v.fn.csslen($v.screen, 'width');
-    var height = $v.fn.csslen($v.screen, 'height');
+    $v.screen.Width                       = $v.fn.csslen($v.screen, 'width');
+    $v.screen.Height                      = $v.fn.csslen($v.screen, 'height');
+    $v.controller.timeSeekBar.Width       = $v.fn.csslen($v.controller.timeSeekBar, 'width');
+    $v.controller.volumeSeekPointer.Width = $v.fn.csslen($v.controller.volumeSeekPointer, 'width');
+    $v.controller.timeSeekPointer.Width   = $v.fn.csslen($v.controller.timeSeekPointer, 'width');
 
-    $v.controller.style.width = width + "px";
-    $v.controller.timeSeek.style.width = width - 307 + "px";
+    $v.controller.style.width = $v.screen.Width + "px";
+    $v.controller.timeSeek.style.width = $v.screen.Width - 307 + "px";
 
-    $v.comment.keyframe(width);
-    $v.comment.setting(height);
+    $v.comment.keyframe($v.screen.Width);
+    $v.comment.setting($v.screen.Height);
 
     if(navigator.userAgent && navigator.userAgent.indexOf('Edge/') >= 0){ //Edge(Fall Creators)でコメントが表示されないバグ対策
         var style = document.createElement('style');
         style.innerHTML = '.jsplayer-comment{opacity:1;}';
         document.head.appendChild(style);
     }
-
-    //位置情報をキャッシュ(後から変わることは考えていない)
-    $v.screen.pos                         = $v.screen.getBoundingClientRect();
-    $v.controller.timeSeekBar.pos         = $v.controller.timeSeekBar.getBoundingClientRect();
-    $v.controller.volumeSeekBar.pos       = $v.controller.volumeSeekBar.getBoundingClientRect();
-    $v.controller.volumeSeekPointer.Width = $v.controller.volumeSeekPointer.getBoundingClientRect().width;
-    $v.controller.timeSeekPointer.Width   = $v.controller.timeSeekPointer.getBoundingClientRect().width;
 
     $v.user = $v.fn.loadLocalStorage("jsplayer") || {};
     $v.user.volume = Number($v.user.volume) || 1;
@@ -472,14 +464,12 @@ $v.screen.toggleFullscreen = function(){
 
 $v.screen.fullscreenEvent = function(){
     if($v.screen.isFullscreen()){
-        $v.screen.pos = {left:0, top:0, right:screen.width, bottom:screen.height, width:screen.width, height:screen.height}; //IE11で正常に取得できないので手動設定
         $v.screen.addEventListener('click', $v.controller.toggle);
         $v.screen.addEventListener('mousemove', $v.screen.mousemoveEvent);
         $v.screen.style.cursor = "none";
         $v.controller.intoScreen();
     }
     else{
-        $v.screen.pos = $v.screen.getBoundingClientRect();
         $v.screen.removeEventListener('click', $v.controller.toggle);
         $v.screen.removeEventListener('mousemove', $v.screen.mousemoveEvent);
         if($v.screen.mousemoveTimer){
@@ -489,11 +479,8 @@ $v.screen.fullscreenEvent = function(){
         $v.controller.outofScreen();
     }
 
-    $v.controller.timeSeekBar.pos   = $v.controller.timeSeekBar.getBoundingClientRect();
-    $v.controller.volumeSeekBar.pos = $v.controller.volumeSeekBar.getBoundingClientRect();
-
     $v.video.fit();
-    $v.comment.setting($v.screen.pos.height);
+    $v.comment.setting($v.screen.Height);
     $v.comment.clear();
     $v.screen.focus();
 };
@@ -515,10 +502,10 @@ $v.video = $v.querySelector(".jsplayer-video");
 
 
 $v.video.fit = function(){
-    if(!$v.screen.pos.width || !$v.video.videoWidth){
+    if(!$v.screen.Width || !$v.video.videoWidth){
         return;
     }
-    var pos = $v.fn.contentFit($v.screen.pos.width, $v.screen.pos.height, $v.video.videoWidth, $v.video.videoHeight);
+    var pos = $v.fn.contentFit($v.screen.Width, $v.screen.Height, $v.video.videoWidth, $v.video.videoHeight);
 
     $v.video.style.width  = pos.w + "px";
     $v.video.style.height = pos.h + "px";
@@ -538,6 +525,7 @@ $v.video.setTime = function(sec){
 $v.video.setVolume = function(volume){
     $v.video.volume = $v.fn.minmax(0, volume.toFixed(1), 1);
     $v.video.muted  = false;
+    return $v.video.volume;
 };
 
 
@@ -723,8 +711,9 @@ $v.thumbnail.show = function(event){
         return;
     }
 
-    var width = $v.controller.timeSeekBar.pos.width - $v.controller.timeSeekPointer.Width;
-    var pos   = event.clientX - $v.controller.timeSeekBar.pos.left;
+    var bar   = $v.controller.timeSeekBar.getBoundingClientRect();
+    var width = bar.width - $v.controller.timeSeekPointer.Width;
+    var pos   = event.clientX - bar.left;
     var time  = pos / width * $v.video.duration;
 
     $v.thumbnail.video.addEventListener('seeked', function handler(){
@@ -830,14 +819,16 @@ $v.comment.laneCheck = function(){
     for(var i = 0; i < lane.length; i++){
         lane[i] = true;
     }
- 
+
+    var screen   = $v.screen.getBoundingClientRect();
     var comments = $v.screen.querySelectorAll(".jsplayer-comment");
+
     for(var i = comments.length-1; i >= 0; i--){
         comments[i].pos = comments[i].getBoundingClientRect();
-        if(comments[i].pos.right > $v.screen.pos.right-30){
+        if(comments[i].pos.right > screen.right-30){
             lane[comments[i].laneNumber] = false;
         }
-        if(comments[i].pos.right < $v.screen.pos.left){
+        if(comments[i].pos.right < screen.left){
             $v.screen.removeChild(comments[i]);
         }
     }
@@ -942,7 +933,7 @@ $v.controller.fullscreenButton  = $v.querySelector(".jsplayer-controller-fullscr
 
 
 $v.controller.setBuffer = function(){
-    var seekbarWidth = $v.controller.timeSeekBar.pos.width;
+    var seekbarWidth = $v.controller.timeSeekBar.Width;
     var buffer = $v.video.buffered;
 
     if(buffer.length){
@@ -1029,8 +1020,9 @@ $v.controller.fullscreenButton.addEventListener('click', function(){
 
 
 $v.controller.timeSeekPointer.setPosition = function(time){
-    var width = $v.controller.timeSeekBar.pos.width - $v.controller.timeSeekPointer.Width;
-    var pos   = (time <= 1)  ?  width * time  :  time - $v.controller.timeSeekBar.pos.left; //timeは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
+    var bar   = $v.controller.timeSeekBar.getBoundingClientRect();
+    var width = bar.width - $v.controller.timeSeekPointer.Width;
+    var pos   = (time <= 1)  ?  width * time  :  time - bar.left; //timeは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
     pos = $v.fn.minmax(0, pos, width);
 
     $v.controller.timeSeekPointer.style.left = pos + "px";
@@ -1081,8 +1073,9 @@ $v.controller.timeSeek.addEventListener('wheel', function(event){
 
 
 $v.controller.volumeSeekPointer.setPosition = function(vol){
-    var width = $v.controller.volumeSeekBar.pos.width - $v.controller.volumeSeekPointer.Width;
-    var pos   = (vol <= 1)  ?  width * vol  :  vol - $v.controller.volumeSeekBar.pos.left; //volは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
+    var bar   = $v.controller.volumeSeekBar.getBoundingClientRect();
+    var width = bar.width - $v.controller.volumeSeekPointer.Width;
+    var pos   = (vol <= 1)  ?  width * vol  :  vol - bar.left; //volは「割合の時(0-1)」or「クリックされた位置の時」の2パターンある
     pos = $v.fn.minmax(0, pos, width);
 
     $v.controller.volumeSeekPointer.style.left = pos + "px";
