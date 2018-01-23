@@ -319,12 +319,13 @@ var $v = document.querySelector('.jsplayer');
 $v.entrypoint = function(url){
     $v.screen.Width                       = $v.fn.csslen($v.screen, 'width');
     $v.screen.Height                      = $v.fn.csslen($v.screen, 'height');
-    $v.controller.timeSeekBar.Width       = $v.fn.csslen($v.controller.timeSeekBar, 'width');
-    $v.controller.volumeSeekPointer.Width = $v.fn.csslen($v.controller.volumeSeekPointer, 'width');
-    $v.controller.timeSeekPointer.Width   = $v.fn.csslen($v.controller.timeSeekPointer, 'width');
 
     $v.controller.style.width = $v.screen.Width + "px";
     $v.controller.timeSeek.style.width = $v.screen.Width - 307 + "px";
+
+    $v.controller.timeSeekBar.Width       = $v.fn.csslen($v.controller.timeSeekBar, 'width');
+    $v.controller.volumeSeekPointer.Width = $v.fn.csslen($v.controller.volumeSeekPointer, 'width');
+    $v.controller.timeSeekPointer.Width   = $v.fn.csslen($v.controller.timeSeekPointer, 'width');
 
     $v.comment.keyframe($v.screen.Width);
     $v.comment.setting($v.screen.Height);
@@ -933,12 +934,11 @@ $v.controller.fullscreenButton  = $v.querySelector(".jsplayer-controller-fullscr
 
 
 $v.controller.setBuffer = function(){
-    var seekbarWidth = $v.controller.timeSeekBar.Width;
     var buffer = $v.video.buffered;
 
     if(buffer.length){
-        $v.controller.timeSeekBar.style.backgroundPosition = buffer.start(0) / $v.video.duration * seekbarWidth + "px";
-        $v.controller.timeSeekBar.style.backgroundSize     = buffer.end(buffer.length-1) / $v.video.duration * seekbarWidth + "px";
+        $v.controller.timeSeekBar.style.backgroundPosition = buffer.start(0) / $v.video.duration * $v.controller.timeSeekBar.Width + "px";
+        $v.controller.timeSeekBar.style.backgroundSize     = buffer.end(buffer.length-1) / $v.video.duration * $v.controller.timeSeekBar.Width + "px";
     }
 };
 
