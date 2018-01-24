@@ -317,8 +317,8 @@ var $v = document.querySelector('.jsplayer');
 
 
 $v.entrypoint = function(url){
-    $v.screen.Width                       = $v.fn.csslen($v.screen, 'width');
-    $v.screen.Height                      = $v.fn.csslen($v.screen, 'height');
+    $v.screen.Width  = $v.fn.csslen($v.screen, 'width');
+    $v.screen.Height = $v.fn.csslen($v.screen, 'height');
 
     $v.controller.style.width = $v.screen.Width + "px";
     $v.controller.timeSeek.style.width = $v.screen.Width - 307 + "px";
@@ -465,12 +465,16 @@ $v.screen.toggleFullscreen = function(){
 
 $v.screen.fullscreenEvent = function(){
     if($v.screen.isFullscreen()){
+        $v.screen.Width  = screen.width;
+        $v.screen.Height = screen.height;
         $v.screen.addEventListener('click', $v.controller.toggle);
         $v.screen.addEventListener('mousemove', $v.screen.mousemoveEvent);
         $v.screen.style.cursor = "none";
         $v.controller.intoScreen();
     }
     else{
+        $v.screen.Width  = $v.fn.csslen($v.screen, 'width');
+        $v.screen.Height = $v.fn.csslen($v.screen, 'height');
         $v.screen.removeEventListener('click', $v.controller.toggle);
         $v.screen.removeEventListener('mousemove', $v.screen.mousemoveEvent);
         if($v.screen.mousemoveTimer){
