@@ -91,8 +91,15 @@
     -webkit-user-select: none;
     user-select: none;
 	cursor: default;
-    position: relative;
     line-height: 1;
+}
+
+.jsplayer-controller[data-inScreen]{
+    position: absolute; /* absoluteの中央揃え。width,left,rightがauto以外 かつ margin-left,margin-rightがautoの時は中央揃え */
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    bottom: 0;
 }
 
 .jsplayer-controller-wrap{
@@ -975,17 +982,14 @@ $v.controller.toggle = function(event){
 
 $v.controller.intoScreen = function(){
     $v.screen.appendChild($v.controller);
-    var controller = $v.controller.getBoundingClientRect();
-    $v.controller.style.top  = screen.height - controller.height + "px";
-    $v.controller.style.left = (screen.width/2) - (controller.width/2) + "px";
+    $v.controller.setAttribute("data-inScreen", true);
     $v.controller.style.visibility = "hidden";
 };
 
 
 $v.controller.outofScreen = function(){
     $v.appendChild($v.controller);
-    $v.controller.style.top  = 0;
-    $v.controller.style.left = 0;
+    $v.controller.removeAttribute("data-inScreen");
     $v.controller.style.visibility = "visible";
 };
 
