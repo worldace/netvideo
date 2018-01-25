@@ -19,6 +19,7 @@
 .jsplayer-video{
     position: absolute;
 }
+
 .jsplayer-screen{
     width: 960px;
     height: 540px;
@@ -80,11 +81,8 @@
 }
 
 .jsplayer-controller{
-    display: block;
     width: 960px;
-    line-height: 1;
     color: white;
-    text-decoration: none;
     background: #47494f;
     border-color: #2f3034 #2f3034 #232427;
     background-image: linear-gradient(to bottom, #555, #333 66%, #000);
@@ -93,6 +91,8 @@
     -webkit-user-select: none;
     user-select: none;
 	cursor: default;
+    position: relative;
+    line-height: 1;
 }
 
 .jsplayer-controller-wrap{
