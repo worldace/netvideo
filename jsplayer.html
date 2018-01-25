@@ -1098,7 +1098,7 @@ $v.controller.volumeSeekPointer.mousemoveEvent = function(event){
 
 
 $v.controller.volumeSeek.addEventListener('wheel', function(event){
-    (event.deltaY < 0) ? $v.video.setVolume($v.video.volume+0.1) : $v.video.setVolume($v.video.volume-0.1);
+    (event.deltaY > 0) ? $v.video.setVolume($v.video.volume+0.1) : $v.video.setVolume($v.video.volume-0.1);
 });
 
 
