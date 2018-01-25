@@ -12,17 +12,19 @@
     visibility: hidden;
 }
 
+.jsplayer *{
+    box-sizing: border-box;
+}
+
 .jsplayer-video{
     position: absolute;
 }
-
 .jsplayer-screen{
     width: 960px;
     height: 540px;
     background-color: #000;
     overflow: hidden;
     white-space : nowrap;
-    cursor: default;
     -ms-user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
@@ -79,45 +81,34 @@
 .jsplayer-controller{
     display: block;
     width: 960px;
-    height: 55px;
     line-height: 1;
     color: white;
     text-decoration: none;
     background: #47494f;
     border-color: #2f3034 #2f3034 #232427;
     background-image: linear-gradient(to bottom, #555, #333 66%, #000);
-    cursor: default;
     -ms-user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
     user-select: none;
-    position:relative;
-    visibility:visible;
 }
 
 .jsplayer-controller-wrap{
-    padding: 0 6px;
-    position:absolute;
-    top: 5px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 4px;
 }
 
 .jsplayer-controller-currentTime,
 .jsplayer-controller-totalTime{
     font-family: Arial, sans-serif;
     font-size: 12px;
-    vertical-align: 6px;
-    padding: 0;
-    display: inline-block;
-    width: 35px;
+    text-align: center;
+    width: 40px;
+    overflow: hidden;
 }
 
-.jsplayer-controller-currentTime{
-    text-align: right;
-}
-
-.jsplayer-controller-totalTime{
-    text-align: left;
-}
 
 .jsplayer-controller-playButton,
 .jsplayer-controller-volumeButton,
@@ -175,7 +166,7 @@
 }
 
 .jsplayer-controller-timeSeek{
-    width: 333px;
+    flex-grow: 1;
 }
 
 .jsplayer-controller-volumeSeek{
@@ -218,8 +209,8 @@
 
 .jsplayer-form{
     width: 100%;
-    position: absolute;
-    top:29px;
+    margin: 0;
+    padding: 0;
 }
 
 .jsplayer-form-input{
@@ -231,7 +222,6 @@
     padding:4px 6px 3px 12px;
     vertical-align:middle;
     ime-mode: active;
-    box-sizing: border-box;
 }
 
 .jsplayer-form-button{
@@ -250,7 +240,6 @@
     vertical-align: middle;
     font-family: 'MS PGothic', Meiryo, sans-serif;
 	cursor: pointer;
-    box-sizing: border-box;
 }
 
 .jsplayer-comment{
@@ -321,7 +310,6 @@ $v.entrypoint = function(url){
     $v.screen.Height = $v.fn.csslen($v.screen, 'height');
 
     $v.controller.style.width = $v.screen.Width + "px";
-    $v.controller.timeSeek.style.width = $v.screen.Width - 307 + "px";
 
     $v.controller.timeSeekBar.Width       = $v.fn.csslen($v.controller.timeSeekBar, 'width');
     $v.controller.volumeSeekPointer.Width = $v.fn.csslen($v.controller.volumeSeekPointer, 'width');
