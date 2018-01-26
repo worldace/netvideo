@@ -671,8 +671,6 @@ $v.video.addEventListener('error', function(event){
 //■ thumbnail
 $v.thumbnail = {};
 
-$v.thumbnail.width  = 192;
-$v.thumbnail.height = 0; //後から計算する
 $v.thumbnail.mouseenter = false;
 
 
@@ -681,16 +679,21 @@ $v.thumbnail.create = function(){
         return;
     }
 
-    $v.thumbnail.height = $v.thumbnail.width * $v.video.videoHeight / $v.video.videoWidth;
+    var width  = 192;
+    var height = width * $v.video.videoHeight / $v.video.videoWidth;
 
     $v.thumbnail.video = $v.video.cloneNode(true);
     $v.thumbnail.video.pause();
     $v.thumbnail.video.muted        = true;
     $v.thumbnail.video.className    = 'jsplayer-thumbnail';
-    $v.thumbnail.video.style.width  = $v.thumbnail.width + 'px';
-    $v.thumbnail.video.style.height = $v.thumbnail.height + 'px';
+    $v.thumbnail.video.style.width  = width  + 'px';
+    $v.thumbnail.video.style.height = height + 'px';
 
-    $v.controller.timeSeek.addEventListener('mousemove', $v.fn.throttle(300, false, $v.thumbnail.show, false));
+    $v.controller.timeSeek.addEventListener('mousemove', {
+        handleEvent: $v.fn.throttle(300, false, $v.thumbnail.show, false),
+        width : width,
+        height: height
+    });
 
     $v.controller.timeSeek.addEventListener('mouseenter', function (){
         $v.thumbnail.mouseenter = true;
@@ -714,18 +717,20 @@ $v.thumbnail.show = function(event){
         return;
     }
 
-    var bar   = $v.controller.timeSeekBar.getBoundingClientRect();
-    var width = bar.width - $v.controller.timeSeekPointer.Width;
-    var pos   = event.clientX - bar.left;
-    var time  = pos / width * $v.video.duration;
+    var thumbnail_width  = this.width;
+    var thumbnail_height = this.height;
+
+    var bar = $v.controller.timeSeekBar.getBoundingClientRect();
+    var pos = event.clientX - bar.left;
 
     $v.thumbnail.video.addEventListener('seeked', function handler(){
-        $v.thumbnail.video.style.left    = pos - ($v.thumbnail.width / 2) + 'px';
-        $v.thumbnail.video.style.top     = - $v.thumbnail.height - 13 + 'px';
+        $v.thumbnail.video.style.left    = pos - (thumbnail_width / 2) + 'px';
+        $v.thumbnail.video.style.top     = - thumbnail_height - 11 + 'px';
         $v.thumbnail.video.style.display = 'block';
         $v.thumbnail.video.removeEventListener('seeked', handler);
     });
-    
+
+    var time  = pos / ($v.controller.timeSeekBar.Width - $v.controller.timeSeekPointer.Width) * $v.video.duration;
     if($v.thumbnail.video.fastSeek){
         $v.thumbnail.video.fastSeek(time);
     }
