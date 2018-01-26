@@ -751,6 +751,46 @@ $v.thumbnail.hide = function(){
 $v.comment = {};
 
 
+$v.comment.create = function(data, laneNumber){
+    var comment = document.createElement("span");
+    comment.textContent = data[0];
+    comment.className   = "jsplayer-comment";
+    comment.laneNumber  = laneNumber;
+
+    comment.style.top = laneNumber * $v.comment.laneHeight + $v.comment.marginTop + "px";
+    comment.style.fontSize = $v.comment.fontSize + "px";
+    comment.style.animationName = $v.screen.isFullscreen() ? "jsplayer-fullscreen-lane" : "jsplayer-normal-lane";
+
+    var delay = data[1] - $v.video.currentTime;
+    delay = (delay <= 0) ? 0 : delay.toFixed(3)*1000;
+    comment.style.animationDelay = delay + "ms";
+
+    return comment;
+};
+
+
+$v.comment.laneCheck = function(){
+    var lane = Array($v.comment.laneCount);
+    for(var i = 0; i < lane.length; i++){
+        lane[i] = true;
+    }
+
+    var screen   = $v.screen.getBoundingClientRect();
+    var comments = $v.screen.querySelectorAll(".jsplayer-comment");
+
+    for(var i = comments.length-1; i >= 0; i--){
+        comments[i].pos = comments[i].getBoundingClientRect();
+        if(comments[i].pos.right > screen.right-30){
+            lane[comments[i].laneNumber] = false;
+        }
+        if(comments[i].pos.right < screen.left){
+            $v.screen.removeChild(comments[i]);
+        }
+    }
+    return lane;
+};
+
+
 $v.comment.release = function(comments, lane){
     var frag  = document.createDocumentFragment();
     var index = 0;
@@ -767,24 +807,6 @@ $v.comment.release = function(comments, lane){
     if(index){
         $v.screen.insertBefore(frag, $v.screen.firstChild);
     }
-};
-
-
-$v.comment.create = function(data, laneNumber){
-    var comment = document.createElement("span");
-    comment.textContent = data[0];
-    comment.className   = "jsplayer-comment";
-    comment.laneNumber  = laneNumber;
-
-    comment.style.top = laneNumber * $v.comment.laneHeight + $v.comment.marginTop + "px";
-    comment.style.fontSize = $v.comment.fontSize + "px";
-    comment.style.animationName = $v.screen.isFullscreen() ? "jsplayer-fullscreen-lane" : "jsplayer-normal-lane";
-
-    var delay = data[1] - $v.video.currentTime;
-    delay = (delay <= 0) ? 0 : delay.toFixed(3)*1000;
-    comment.style.animationDelay = delay + "ms";
-
-    return comment;
 };
 
 
@@ -816,28 +838,6 @@ $v.comment.setting = function(height){
         $v.comment.fontSize   = 25;
         $v.comment.marginTop  = 5;
     }
-};
-
-
-$v.comment.laneCheck = function(){
-    var lane = Array($v.comment.laneCount);
-    for(var i = 0; i < lane.length; i++){
-        lane[i] = true;
-    }
-
-    var screen   = $v.screen.getBoundingClientRect();
-    var comments = $v.screen.querySelectorAll(".jsplayer-comment");
-
-    for(var i = comments.length-1; i >= 0; i--){
-        comments[i].pos = comments[i].getBoundingClientRect();
-        if(comments[i].pos.right > screen.right-30){
-            lane[comments[i].laneNumber] = false;
-        }
-        if(comments[i].pos.right < screen.left){
-            $v.screen.removeChild(comments[i]);
-        }
-    }
-    return lane;
 };
 
 
@@ -1352,12 +1352,12 @@ $v.comment.get = function(){
 
 
     function yql1(){
-        var yql1 = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
+        var url = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
             format : "json",
             q      : "SELECT * FROM html WHERE url = 'http://himado.in/" + $v.query.himado + "' and xpath='//input[@type=\"hidden\"]'"
         });
 
-        $v.fn.ajax(yql1, {success: yql1_success, error: yql_error});
+        $v.fn.ajax(url, {success: yql1_success, error: yql_error});
     }
 
 
@@ -1392,12 +1392,12 @@ $v.comment.get = function(){
             nocache  : Date.now()
         });
 
-        var yql2 = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
+        var url = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
             format : "json",
             q      : "SELECT * FROM xml WHERE url = '" + himado_url + "'"
         });
 
-        $v.fn.ajax(yql2, {success: yql2_success, error: yql_error});
+        $v.fn.ajax(url, {success: yql2_success, error: yql_error});
     }
 
     function yql2_success(xhr){
