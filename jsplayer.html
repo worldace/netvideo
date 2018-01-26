@@ -94,11 +94,12 @@
     line-height: 1;
 }
 
-.jsplayer-controller[data-inScreen]{
+.jsplayer-screen > .jsplayer-controller{
     position: absolute; /* absoluteの中央揃え。width,left,rightがauto以外 かつ margin-left,margin-rightがautoの時は中央揃え */
     left: 0;
     right: 0;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
     bottom: 0;
 }
 
@@ -960,7 +961,7 @@ $v.controller.setTime = function(time, where){
 
 
 $v.controller.toggle = function(event){
-    if($v.controller.timeSeekPointer.isDragging){
+    if($v.controller.timeSeekPointer.isDragging){ //volumeも加える
         return;
     }
 
@@ -982,14 +983,12 @@ $v.controller.toggle = function(event){
 
 $v.controller.intoScreen = function(){
     $v.screen.appendChild($v.controller);
-    $v.controller.setAttribute("data-inScreen", true);
     $v.controller.style.visibility = "hidden";
 };
 
 
 $v.controller.outofScreen = function(){
     $v.appendChild($v.controller);
-    $v.controller.removeAttribute("data-inScreen");
     $v.controller.style.visibility = "visible";
 };
 
