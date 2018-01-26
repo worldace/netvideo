@@ -1348,12 +1348,17 @@ $v.comment.get = function(){
         return;
     }
 
-    var yql1 = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
-        format : "json",
-        q      : "SELECT * FROM html WHERE url = 'http://himado.in/" + $v.query.himado + "' and xpath='//input[@type=\"hidden\"]'"
-    });
+    ($v.query.group_id && $v.query.key) ? yql2($v.query.group_id, $v.query.key) : yql1();
 
-    $v.fn.ajax(yql1, {success: yql1_success, error: yql_error});
+
+    function yql1(){
+        var yql1 = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
+            format : "json",
+            q      : "SELECT * FROM html WHERE url = 'http://himado.in/" + $v.query.himado + "' and xpath='//input[@type=\"hidden\"]'"
+        });
+
+        $v.fn.ajax(yql1, {success: yql1_success, error: yql_error});
+    }
 
 
     function yql1_success(xhr){
@@ -1373,13 +1378,17 @@ $v.comment.get = function(){
             }
         }
 
+        yql2(group_id, key);
+    }
+
+    function yql2(group_id, key){
         var himado_url = "http://himado.in/?" + $v.fn.param({
             mode     : "comment",
             format   : "nico",
             limit    : 10000,
             id       : $v.query.himado,
-            group_id : $v.query.group_id || group_id || "",
-            key      : $v.query.key || key || "",
+            group_id : group_id || "",
+            key      : key || "",
             nocache  : Date.now()
         });
 
