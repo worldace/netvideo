@@ -1347,8 +1347,8 @@ $v.comment.get = function(){
     }
 
     var api1 = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
-        "format"   : "json",
-        "q"        : "SELECT * FROM html WHERE url = 'http://himado.in/" + $v.query.himado + "' and xpath='//input[@type=\"hidden\"]'"
+        format : "json",
+        q      : "SELECT * FROM html WHERE url = 'http://himado.in/" + $v.query.himado + "' and xpath='//input[@type=\"hidden\"]'"
     });
 
     $v.fn.ajax(api1, {success:function(xhr){
@@ -1356,7 +1356,7 @@ $v.comment.get = function(){
             var input = JSON.parse(xhr.responseText).query.results.input;
         }
         catch(e){
-            input = [];
+            var input = [];
         }
 
         for(var i = 0; i < input.length; i++){
@@ -1369,18 +1369,18 @@ $v.comment.get = function(){
         }
 
         var url = "http://himado.in/?" + $v.fn.param({
-            "mode"     : "comment",
-            "format"   : "nico",
-            "limit"    : 10000,
-            "id"       : $v.query.himado,
-            "group_id" : $v.query.group_id || group_id || "",
-            "key"      : $v.query.key || key || "",
-            "nocache"  : Date.now()
+            mode     : "comment",
+            format   : "nico",
+            limit    : 10000,
+            id       : $v.query.himado,
+            group_id : $v.query.group_id || group_id || "",
+            key      : $v.query.key || key || "",
+            nocache  : Date.now()
         });
 
         var api2 = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
-            "format"   : "json",
-            "q"        : "SELECT * FROM xml WHERE url = '" + url + "'"
+            format : "json",
+            q      : "SELECT * FROM xml WHERE url = '" + url + "'"
         });
 
         $v.fn.ajax(api2, {success:function(xhr){
@@ -1422,17 +1422,17 @@ $v.comment.post = function(){
     }
 
     var postdata = $v.fn.param({
-        "mode"    : "comment",
-        "id"      : $v.query.himado,
-        "vpos"    : sec.toFixed(2)*100,
-        "comment" : text,
-        "adddate" : Math.floor(Date.now()/1000)
+        mode    : "comment",
+        id      : $v.query.himado,
+        vpos    : sec.toFixed(2)*100,
+        comment : text,
+        adddate : Math.floor(Date.now()/1000)
     });
 
     var api = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
-        "format"   : "json",
-        "env"      : "store://datatables.org/alltableswithkeys",
-        "q"        : "SELECT * FROM htmlpost WHERE url = 'http://himado.in/' AND postdata='" + postdata + "' AND xpath='//p'"
+        format : "json",
+        env    : "store://datatables.org/alltableswithkeys",
+        q      : "SELECT * FROM htmlpost WHERE url = 'http://himado.in/' AND postdata='" + postdata + "' AND xpath='//p'"
     });
 
     $v.fn.get(api);
