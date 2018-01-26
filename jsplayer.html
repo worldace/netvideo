@@ -328,7 +328,7 @@ $v.entrypoint = function(url){
     $v.comment.keyframe($v.screen.Width);
     $v.comment.setting($v.screen.Height);
 
-    if(navigator.userAgent && navigator.userAgent.indexOf('Edge/') >= 0){ //Edge(Fall Creators)でコメントが表示されないバグ対策
+    if(String(navigator.userAgent).indexOf('Edge/') >= 0){ //Edge(Fall Creators)でコメントが表示されないバグ対策
         var style = document.createElement('style');
         style.innerHTML = '.jsplayer-comment{opacity:1;}';
         document.head.appendChild(style);
@@ -441,7 +441,7 @@ $v.screen.clearOSD = function(){
 
 $v.screen.isFullscreen = function(){
     var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-    return (element && element.className == $v.screen.className) ? true : false;
+    return element === $v.screen;
 };
 
 
@@ -1326,8 +1326,8 @@ $v.fn.minmax = function(min, val, max){
 };
 
 
-$v.fn.type = function(target){
-    return Object.prototype.toString.call(target).replace(/^\[object (.+)\]$/, '$1').toLowerCase();
+$v.fn.type = function(x){
+    return Object.prototype.toString.call(x).slice(8, -1).toLowerCase();
 };
 
 
