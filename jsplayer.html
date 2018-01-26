@@ -1346,12 +1346,15 @@ $v.comment.get = function(){
         return;
     }
 
-    var api1 = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
+    var yql1 = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
         format : "json",
         q      : "SELECT * FROM html WHERE url = 'http://himado.in/" + $v.query.himado + "' and xpath='//input[@type=\"hidden\"]'"
     });
 
-    $v.fn.ajax(api1, {success:function(xhr){
+    $v.fn.ajax(yql1, {success: yql1_success, error: yql_error});
+
+
+    function yql1_success(xhr){
         try{
             var input = JSON.parse(xhr.responseText).query.results.input;
         }
@@ -1368,7 +1371,7 @@ $v.comment.get = function(){
             }
         }
 
-        var url = "http://himado.in/?" + $v.fn.param({
+        var himado_url = "http://himado.in/?" + $v.fn.param({
             mode     : "comment",
             format   : "nico",
             limit    : 10000,
@@ -1378,31 +1381,37 @@ $v.comment.get = function(){
             nocache  : Date.now()
         });
 
-        var api2 = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
+        var yql2 = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
             format : "json",
-            q      : "SELECT * FROM xml WHERE url = '" + url + "'"
+            q      : "SELECT * FROM xml WHERE url = '" + himado_url + "'"
         });
 
-        $v.fn.ajax(api2, {success:function(xhr){
-            try{
-                var comments = JSON.parse(xhr.responseText).query.results.packet.chat;
-                console.log(comments.length + "件のコメント取得");
+        $v.fn.ajax(yql2, {success: yql2_success, error: yql_error});
+    }
+
+    function yql2_success(xhr){
+        try{
+            var comments = JSON.parse(xhr.responseText).query.results.packet.chat;
+        }
+        catch(e){
+            console.log("YQL2においてコメントが取得できません");
+            return;
+        }
+        for(var i = comments.length-1; i >= 0; i--){
+            if(comments[i].content == null){
+                continue;
             }
-            catch(e){
-                console.log("API2においてコメントが取得できません");
-                return;
+            var index = Math.floor(comments[i].vpos/100);
+            if(index in $v.comment.list){
+                $v.comment.list[index].push([comments[i].content.substring(0,64), comments[i].vpos/100]);
             }
-            for(var i = comments.length-1; i >= 0; i--){
-                if(comments[i].content == null){
-                    continue;
-                }
-                var index = Math.floor(comments[i].vpos/100);
-                if(index in $v.comment.list){
-                    $v.comment.list[index].push([comments[i].content.substring(0,64), comments[i].vpos/100]);
-                }
-            }
-        }, error: function(){ console.log("API2に接続失敗"); }});
-    }, error: function(){ console.log("API1に接続失敗"); }});
+        }
+        console.log(comments.length + "件のコメント取得");
+    }
+
+    function yql_error(xhr){
+        console.log("YQLに接続失敗");
+    }
 };
 
 
@@ -1429,13 +1438,13 @@ $v.comment.post = function(){
         adddate : Math.floor(Date.now()/1000)
     });
 
-    var api = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
+    var yql = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
         format : "json",
         env    : "store://datatables.org/alltableswithkeys",
         q      : "SELECT * FROM htmlpost WHERE url = 'http://himado.in/' AND postdata='" + postdata + "' AND xpath='//p'"
     });
 
-    $v.fn.get(api);
+    $v.fn.get(yql);
 };
 </script>
 
