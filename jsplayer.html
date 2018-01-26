@@ -717,15 +717,15 @@ $v.thumbnail.show = function(event){
         return;
     }
 
-    var thumbnail_width  = this.width;
-    var thumbnail_height = this.height;
-
     var bar = $v.controller.timeSeekBar.getBoundingClientRect();
     var pos = event.clientX - bar.left;
 
+    var thumbnail_left = pos - this.width;
+    var thumbnail_top  = - this.height - 11;
+
     $v.thumbnail.video.addEventListener('seeked', function handler(){
-        $v.thumbnail.video.style.left    = pos - (thumbnail_width / 2) + 'px';
-        $v.thumbnail.video.style.top     = - thumbnail_height - 11 + 'px';
+        $v.thumbnail.video.style.left    = thumbnail_left + 'px';
+        $v.thumbnail.video.style.top     = thumbnail_top  + 'px';
         $v.thumbnail.video.style.display = 'block';
         $v.thumbnail.video.removeEventListener('seeked', handler);
     });
