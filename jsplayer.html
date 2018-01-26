@@ -465,7 +465,7 @@ $v.screen.fullscreenEvent = function(){
     if($v.screen.isFullscreen()){
         $v.screen.Width  = screen.width;
         $v.screen.Height = screen.height;
-        $v.screen.addEventListener('click', $v.controller.toggle);
+        $v.screen.addEventListener('mousedown', $v.controller.toggle);
         $v.screen.addEventListener('mousemove', $v.screen.mousemoveEvent);
         $v.screen.style.cursor = "none";
         $v.controller.intoScreen();
@@ -473,7 +473,7 @@ $v.screen.fullscreenEvent = function(){
     else{
         $v.screen.Width  = $v.fn.csslen($v.screen, 'width');
         $v.screen.Height = $v.fn.csslen($v.screen, 'height');
-        $v.screen.removeEventListener('click', $v.controller.toggle);
+        $v.screen.removeEventListener('mousedown', $v.controller.toggle);
         $v.screen.removeEventListener('mousemove', $v.screen.mousemoveEvent);
         if($v.screen.mousemoveTimer){
             window.clearTimeout($v.screen.mousemoveTimer);
@@ -961,20 +961,12 @@ $v.controller.setTime = function(time, where){
 
 
 $v.controller.toggle = function(event){
-    if($v.controller.timeSeekPointer.isDragging){ //volumeも加える
-        return;
-    }
-
     if($v.controller.style.visibility == "hidden"){
-        event.preventDefault();
         $v.controller.style.visibility = "visible";
     }
     else{
-        var controller = $v.controller.getBoundingClientRect();
-        if(controller.left <= event.clientX && controller.right >= event.clientX){
-            if(controller.top <= event.clientY && controller.bottom >= event.clientY){
-                return;
-            }
+        if($v.controller.contains(event.target)){
+            return;
         }
         $v.controller.style.visibility = "hidden";
     }
