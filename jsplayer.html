@@ -581,9 +581,7 @@ $v.video.addEventListener('timeupdate', function(){
         $v.controller.setTime(sec, $v.controller.currentTime);
     }
     if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on !== false){
-        window.requestAnimationFrame(function(){
-            $v.comment.release($v.comment.list[sec], $v.comment.laneCheck());
-        });
+        $v.comment.release($v.comment.list[sec], $v.comment.laneCheck());
     }
 });
 
