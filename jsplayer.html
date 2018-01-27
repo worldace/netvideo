@@ -426,9 +426,11 @@ $v.screen.showOSD = function(str){
 
 
 $v.screen.clearOSD = function(){
-    var osd = $v.screen.querySelectorAll(".jsplayer-screen-osd");
+    var osd = $v.screen.children;
     for(var i = osd.length-1; i >= 0; i--){
-        $v.screen.removeChild(osd[i]);
+        if(osd[i].className === 'jsplayer-screen-osd'){
+            $v.screen.removeChild(osd[i]);
+        }
     }
     if($v.screen.osdTimer){
         window.clearTimeout($v.screen.osdTimer);
@@ -776,9 +778,12 @@ $v.comment.laneCheck = function(){
     }
 
     var screen   = $v.screen.getBoundingClientRect();
-    var comments = $v.screen.querySelectorAll(".jsplayer-comment");
+    var comments = $v.screen.children;
 
     for(var i = comments.length-1; i >= 0; i--){
+        if(comments[i].className !== 'jsplayer-comment'){
+            continue;
+        }
         comments[i].pos = comments[i].getBoundingClientRect();
         if(comments[i].pos.right > screen.right-30){
             lane[comments[i].laneNumber] = false;
@@ -842,25 +847,31 @@ $v.comment.setting = function(height){
 
 
 $v.comment.clear = function(){
-    var comments = $v.screen.querySelectorAll(".jsplayer-comment");
+    var comments = $v.screen.children;
     for(var i = comments.length-1; i >= 0; i--){
-        $v.screen.removeChild(comments[i]);
+        if(comments[i].className === 'jsplayer-comment'){
+            $v.screen.removeChild(comments[i]);
+        }
     }
 };
 
 
 $v.comment.pause = function(){
-    var comments = $v.screen.querySelectorAll(".jsplayer-comment");
+    var comments = $v.screen.children;
     for(var i = 0; i < comments.length; i++){
-        comments[i].style.animationPlayState = "paused";
+        if(comments[i].className === 'jsplayer-comment'){
+            comments[i].style.animationPlayState = "paused";
+        }
     }
 };
 
 
 $v.comment.run = function(){
-    var comments = $v.screen.querySelectorAll(".jsplayer-comment");
+    var comments = $v.screen.children;
     for(var i = 0; i < comments.length; i++){
-        comments[i].style.animationPlayState = "running";
+        if(comments[i].className === 'jsplayer-comment'){
+            comments[i].style.animationPlayState = "running";
+        }
     }
 };
 
