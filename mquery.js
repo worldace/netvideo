@@ -399,8 +399,8 @@ class mQuery extends Array{
             return {};
         }
         const rect = this[0].getBoundingClientRect();
-        rect.x += rect.scrollX = window.scrollX;
-        rect.y += rect.scrollY = window.scrollY;
+        rect.x += rect.scrollX = window.scrollX; //html.clientLeft を引く https://jsperf.com/offset-vs-getboundingclientrect/20
+        rect.y += rect.scrollY = window.scrollY; //html.clientTop  を引く http://n-yagi.0r2.net/script/2009/06/post_14.html
 
         if(more){
             const paddingWidth  = this.$gcs('padding-left') + this.$gcs('padding-right');

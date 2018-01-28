@@ -1348,6 +1348,10 @@ $v.fn.type = function(x){
 
 //■ jsplayer.html特有のコード
 $v.comment.get = function(){
+    if(Array.isArray($v.comment.list)){
+        return;
+    }
+
     var sec  = Math.floor($v.video.duration);
 
     $v.comment.list = Array(sec+1); //動画時間+1の箱を作る [[],[],[],[]...]
@@ -1438,14 +1442,20 @@ $v.comment.get = function(){
 
 
 $v.comment.post = function(){
-    var sec  = $v.video.currentTime;
+    var time = $v.video.currentTime;
+    var sec  = Math.floor(time);
     var text = $v.form.input.value.trim();
+
 
     if(text == "" || text.length > 64){
         return;
     }
 
-    $v.comment.list[Math.floor(sec+1)].unshift([text, sec+1, Math.floor(Date.now()/1000)]);
+    if(!Array.isArray($v.comment.list[sec+1])){
+        $v.comment.list[sec+1] = [];
+    }
+
+    $v.comment.list[sec+1].unshift([text, time+1, Math.floor(Date.now()/1000)]);
     $v.form.input.value = "";
 
     if(!$v.query.himado){
@@ -1455,7 +1465,7 @@ $v.comment.post = function(){
     var postdata = $v.fn.param({
         mode    : "comment",
         id      : $v.query.himado,
-        vpos    : sec.toFixed(2)*100,
+        vpos    : time.toFixed(2)*100,
         comment : text,
         adddate : Math.floor(Date.now()/1000)
     });
@@ -1483,6 +1493,7 @@ $v.query = $v.fn.deparam(location.search);
 //$v.query.himado   = ""; //ひま動のID
 //$v.query.group_id = ""; //ひま動のgroup_id
 //$v.query.key      = ""; //ひま動のkey
+//$v.comment.list   = []; //コメントJSON。インデックス番号が秒数の配列(A)。(A)の各要素は配列(B)。(B)の内容は['本文', 秒数]のような配列(複数可)
 
 $v.entrypoint($v.query.file);
 </script>
