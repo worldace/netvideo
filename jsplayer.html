@@ -1503,7 +1503,7 @@ $v.query = $v.fn.deparam(location.search);
 //$v.query.himado     = ""; //ひま動のID
 //$v.query.group_id   = ""; //ひま動のgroup_id
 //$v.query.key        = ""; //ひま動のkey
-//$v.comment.list     = []; //コメントJSON。インデックス番号が秒(整数型)の配列(A)。(A)の各要素は配列(B)。(B)の内容は['本文', 秒(小数型)]のような配列(複数可)
+//$v.comment.list     = []; //コメントJSON。インデックス番号が秒(整数型)の配列(A)。(A)の各要素は配列(B)もしくはnull。(B)の内容は['本文', 秒(小数型)]のような配列(複数可)
 //$v.comment.post.url = ""; //コメント投稿先URL。POSTで送信され、comment(本文)とvpos(秒)とfile(動画ファイルのURL)の3つのパラメータがある。vposは整数型(小数型の秒を100倍にして小数を切り捨てたもの)
 
 $v.entrypoint($v.query.file);
