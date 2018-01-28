@@ -1458,6 +1458,16 @@ $v.comment.post = function(){
     $v.comment.list[sec+1].unshift([text, time+1, Math.floor(Date.now()/1000)]);
     $v.form.input.value = "";
 
+    if($v.comment.post.url){
+        var postdata = {
+            file    : $v.video.src,
+            vpos    : time.toFixed(2)*100,
+            comment : text,
+        };
+        $v.fn.ajax($v.comment.post.url, {method:'POST', data:postdata});
+        return;
+    }
+
     if(!$v.query.himado){
         return;
     }
@@ -1489,11 +1499,12 @@ $v.comment.post = function(){
 $v.query = $v.fn.deparam(location.search);
 
 //■設定
-//$v.query.file     = ""; //動画ファイルのURL (必須)
-//$v.query.himado   = ""; //ひま動のID
-//$v.query.group_id = ""; //ひま動のgroup_id
-//$v.query.key      = ""; //ひま動のkey
-//$v.comment.list   = []; //コメントJSON。インデックス番号が秒数の配列(A)。(A)の各要素は配列(B)。(B)の内容は['本文', 秒数]のような配列(複数可)
+//$v.query.file       = ""; //動画ファイルのURL (必須)
+//$v.query.himado     = ""; //ひま動のID
+//$v.query.group_id   = ""; //ひま動のgroup_id
+//$v.query.key        = ""; //ひま動のkey
+//$v.comment.list     = []; //コメントJSON。インデックス番号が秒(整数型)の配列(A)。(A)の各要素は配列(B)。(B)の内容は['本文', 秒(小数型)]のような配列(複数可)
+//$v.comment.post.url = ""; //コメント投稿先URL。POSTで送信され、comment(本文)とvpos(秒)とfile(動画ファイルのURL)の3つのパラメータがある。vposは整数型(小数型の秒を100倍にして小数を切り捨てたもの)
 
 $v.entrypoint($v.query.file);
 </script>
