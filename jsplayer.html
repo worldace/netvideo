@@ -281,7 +281,7 @@
   ></div
   ><div class="jsplayer-controller"
     ><div class="jsplayer-controller-wrap"
-      ><span class="jsplayer-controller-playButton"></span
+      ><span class="jsplayer-controller-playButton" data-pause></span
       ><span class="jsplayer-controller-currentTime">00:00</span
       ><div class="jsplayer-controller-timeSeek"
         ><div class="jsplayer-controller-timeSeekBar"
@@ -567,7 +567,7 @@ $v.video.addEventListener('timeupdate', function(){
         $v.controller.timeSeekPointer.setPosition($v.video.currentTime/$v.video.duration);
         $v.controller.setTime(sec, $v.controller.currentTime);
     }
-    if(sec in $v.comment.list && $v.video.paused === false && $v.comment.on !== false){
+    if(sec in $v.comment.list && $v.video.paused === false && !$v.controller.commentButton.hasAttribute("data-off")){
         $v.comment.release($v.comment.list[sec], $v.comment.laneCheck());
     }
 });
@@ -986,19 +986,20 @@ $v.controller.outofScreen = function(){
 
 
 $v.controller.playButton.addEventListener('click', function(){
+    if(!$v.video.duration){
+        return;
+    }
     $v.video.paused ? $v.video.play() : $v.video.pause();
 });
 
 
 $v.controller.commentButton.addEventListener('click', function(){
-    if($v.comment.on){
-        $v.comment.on = false;
-        $v.comment.clear();
-        $v.controller.commentButton.setAttribute("data-off", true);
+    if($v.controller.commentButton.hasAttribute("data-off")){
+        $v.controller.commentButton.removeAttribute("data-off");
     }
     else{
-        $v.comment.on = true;
-        $v.controller.commentButton.removeAttribute("data-off");
+        $v.comment.clear();
+        $v.controller.commentButton.setAttribute("data-off", true);
     }
 });
 
