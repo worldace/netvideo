@@ -49,7 +49,7 @@
 }
 
 .jsplayer-screen:-ms-fullscreen{
-    position: absolute;
+    position: fixed;
     width: 100% !important;
     height: 100% !important;
 	left: 0;
@@ -57,7 +57,7 @@
 }
 
 .jsplayer-screen:-webkit-full-screen{
-    position: absolute;
+    position: fixed;
     width: 100% !important;
     height: 100% !important;
 	left: 0;
@@ -65,7 +65,7 @@
 }
 
 .jsplayer-screen:-moz-full-screen{
-    position: absolute;
+    position: fixed;
     width: 100% !important;
     height: 100% !important;
 	left: 0;
@@ -73,7 +73,7 @@
 }
 
 .jsplayer-screen:fullscreen{
-    position: absolute;
+    position: fixed;
     width: 100% !important;
     height: 100% !important;
 	left: 0;
@@ -1497,12 +1497,19 @@ $v.comment.post = function(){
 <script>
 //■設定
 $v.query = $v.fn.deparam(location.search);
-//$v.query.file       = ""; //動画ファイルのURL (必須)
-//$v.query.himado     = ""; //ひま動のID
-//$v.query.group_id   = ""; //ひま動のgroup_id
-//$v.query.key        = ""; //ひま動のkey
-//$v.comment.post.url = ""; //コメント投稿先URL。コメントはPOSTで送信され、comment(本文)とvpos(秒)とfile(動画ファイルのURL)の3つのパラメータがある。vposは整数型(小数型の秒を100倍にして小数を切り捨てたもの)
-//$v.comment.list     = []; //コメント一覧JSON。インデックス番号が秒(整数型)の配列(A)。(A)の各要素は配列(B)もしくはnull。(B)の内容は['本文', 秒(小数型)]のような配列(複数可)
+
+//□動画ファイルのURL (必須)
+//$v.query.file = "";
+//□ひま動のID
+//$v.query.himado = "";
+//□ひま動のgroup_id
+//$v.query.group_id = "";
+//□ひま動のkey
+//$v.query.key = "";
+//□コメント投稿先URL。コメントはPOSTで送信され、comment(本文)とvpos(秒)とfile(動画ファイルのURL)の3つのパラメータがある。vposは整数型(小数型の秒を100倍にして小数を切り捨てたもの)
+//$v.comment.post.url = "";
+//□コメント一覧JSON。インデックス番号が秒(整数型)の配列(A)。(A)の各要素は配列(B)もしくはnull。(B)の各要素は['本文', 秒(小数型)]のような配列(複数可)
+//$v.comment.list = [];
 
 //■ エントリーポイント
 $v.entrypoint($v.query.file);
