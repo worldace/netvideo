@@ -17,7 +17,9 @@
 }
 
 .jsplayer-video{
-    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .jsplayer-screen{
@@ -481,7 +483,6 @@ $v.screen.fullscreenEvent = function(){
         $v.controller.outofScreen();
     }
 
-    $v.video.fit();
     $v.comment.setting($v.screen.Height);
     $v.comment.clear();
     $v.screen.focus();
@@ -501,19 +502,6 @@ $v.screen.mousemoveEvent = function(){
 
 //■ video
 $v.video = $v.querySelector(".jsplayer-video");
-
-
-$v.video.fit = function(){
-    if(!$v.screen.Width || !$v.video.videoWidth){
-        return;
-    }
-    var pos = $v.fn.contentFit($v.screen.Width, $v.screen.Height, $v.video.videoWidth, $v.video.videoHeight);
-
-    $v.video.style.width  = pos.w + "px";
-    $v.video.style.height = pos.h + "px";
-    $v.video.style.left   = pos.x + "px";
-    $v.video.style.top    = pos.y + "px";
-};
 
 
 $v.video.setTime = function(sec){
@@ -558,7 +546,6 @@ $v.video.addEventListener('loadedmetadata', function(){
     $v.form.button.disabled = false;
 
     $v.video.volume = $v.user.volume;
-    $v.video.fit();
 
     //$v.thumbnail.create();
 });
@@ -1259,17 +1246,6 @@ $v.fn.loadLocalStorage = function(name){
     }
     catch(e){
     }
-};
-
-
-$v.fn.contentFit = function(screenW, screenH, objectW, objectH){
-    var scale = (objectW/objectH > screenW/screenH) ? screenW/objectW : screenH/objectH;
-    return {
-        w: Math.floor(objectW * scale),
-        h: Math.floor(objectH * scale),
-        x: Math.floor((screenW / 2) - (objectW * scale / 2)),
-        y: Math.floor((screenH / 2) - (objectH * scale / 2)),
-    };
 };
 
 
