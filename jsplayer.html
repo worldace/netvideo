@@ -567,7 +567,7 @@ $v.video.addEventListener('timeupdate', function(){
         $v.controller.timeSeekPointer.setPosition($v.video.currentTime/$v.video.duration);
         $v.controller.setTime(sec, $v.controller.currentTime);
     }
-    if(sec in $v.comment.list && $v.video.paused === false && !$v.controller.commentButton.hasAttribute("data-off")){
+    if(Array.isArray($v.comment.list[sec]) && $v.video.paused === false && !$v.controller.commentButton.hasAttribute("data-off")){
         $v.comment.release($v.comment.list[sec], $v.comment.laneCheck());
     }
 });
@@ -892,7 +892,7 @@ $v.comment.get = function(){
                 continue;
             }
             var index = Math.floor(comments[i].位置/100);
-            if(index in $v.comment.list){
+            if(Array.isArray($v.comment.list[index])){
                 $v.comment.list[index].push([comments[i].本文.substring(0,64), comments[i].位置/100]);
             }
         }
@@ -1405,7 +1405,7 @@ $v.comment.get = function(){
                 continue;
             }
             var index = Math.floor(comments[i].vpos/100);
-            if(index in $v.comment.list){
+            if(Array.isArray($v.comment.list[index])){
                 $v.comment.list[index].push([comments[i].content.substring(0,64), comments[i].vpos/100]);
             }
         }
