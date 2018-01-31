@@ -587,7 +587,7 @@ class mQuery extends Array{
             if('name' in e && e.name.includes('-') && e.name !== name){ // trigger()から呼ばれて名前付きの場合
                 return;
             }
-            e.data = ('data' in e) ? e.data : option.data;
+            e.memo = ('memo' in e) ? e.memo : option.memo;
             e.name = ('name' in e) ? e.name : name;
             e.this = element;
             e.that = e.target;
