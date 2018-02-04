@@ -464,16 +464,12 @@ $v.screen.toggleFullscreen = function(){
 
 $v.screen.fullscreenEvent = function(){
     if($v.screen.isFullscreen()){
-        $v.screen.Width  = screen.width;
-        $v.screen.Height = screen.height;
         $v.screen.addEventListener('mousedown', $v.controller.toggle);
         $v.screen.addEventListener('mousemove', $v.screen.mousemoveEvent);
         $v.screen.style.cursor = "none";
         $v.controller.intoScreen();
     }
     else{
-        $v.screen.Width  = $v.fn.csslen($v.screen, 'width');
-        $v.screen.Height = $v.fn.csslen($v.screen, 'height');
         $v.screen.removeEventListener('mousedown', $v.controller.toggle);
         $v.screen.removeEventListener('mousemove', $v.screen.mousemoveEvent);
         if($v.screen.mousemoveTimer){
@@ -483,7 +479,8 @@ $v.screen.fullscreenEvent = function(){
         $v.controller.outofScreen();
     }
 
-    $v.comment.setting($v.screen.Height);
+    var rect = $v.screen.getBoundingClientRect();
+    $v.comment.setting(rect.height || screen.height); //IE＋フルスクリーン時にrect.heightが取得できない
     $v.comment.clear();
     $v.screen.focus();
 };
