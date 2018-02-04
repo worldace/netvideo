@@ -768,7 +768,7 @@ $v.comment.laneCheck = function(){
     var comments = $v.screen.children;
 
     for(var i = comments.length-1; i >= 0; i--){
-        if(comments[i].className !== 'jsplayer-comment'){
+        if(comments[i].classList[0] !== 'jsplayer-comment'){
             continue;
         }
         comments[i].pos = comments[i].getBoundingClientRect();
@@ -836,7 +836,7 @@ $v.comment.setting = function(height){
 $v.comment.clear = function(){
     var comments = $v.screen.children;
     for(var i = comments.length-1; i >= 0; i--){
-        if(comments[i].className === 'jsplayer-comment'){
+        if(comments[i].classList[0] === 'jsplayer-comment'){
             $v.screen.removeChild(comments[i]);
         }
     }
@@ -846,7 +846,7 @@ $v.comment.clear = function(){
 $v.comment.pause = function(){
     var comments = $v.screen.children;
     for(var i = 0; i < comments.length; i++){
-        if(comments[i].className === 'jsplayer-comment'){
+        if(comments[i].classList[0] === 'jsplayer-comment'){
             comments[i].style.animationPlayState = "paused";
         }
     }
@@ -856,7 +856,7 @@ $v.comment.pause = function(){
 $v.comment.run = function(){
     var comments = $v.screen.children;
     for(var i = 0; i < comments.length; i++){
-        if(comments[i].className === 'jsplayer-comment'){
+        if(comments[i].classList[0] === 'jsplayer-comment'){
             comments[i].style.animationPlayState = "running";
         }
     }
