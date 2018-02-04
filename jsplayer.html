@@ -1437,9 +1437,9 @@ $v.comment.post = function(){
 
     if($v.comment.post.url){
         var postdata = new FormData($v.form);
-        data.append('file', $v.video.src);
-        data.append('vpos', time.toFixed(2)*100);
-        data.append('comment', text);
+        postdata.append('file', $v.video.src);
+        postdata.append('vpos', time.toFixed(2)*100);
+        postdata.append('comment', text);
         $v.fn.ajax($v.comment.post.url, {method:'POST', data:postdata});
         return;
     }
