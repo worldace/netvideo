@@ -325,7 +325,7 @@ $v.entrypoint = function(url){
     $v.comment.addKeyframe(screen_width, 'jsplayer-normal-lane');
     $v.comment.setting(screen_height);
 
-    if(String(navigator.userAgent).indexOf('Edge/') >= 0){ //Edge(Fall Creators)でコメントが表示されないバグ対策
+    if(navigator.userAgent.indexOf('Edge/') >= 0){ //Edge(Fall Creators)でコメントが表示されないバグ対策
         var style = document.createElement('style');
         style.innerHTML = '.jsplayer-comment{opacity:1;}';
         document.head.appendChild(style);
@@ -461,16 +461,18 @@ $v.screen.toggleFullscreen = function(){
 
 
 $v.screen.fullscreenEvent = function(){
-    var rect = $v.screen.getBoundingClientRect(); //IE＋フルスクリーン時にwidth, heightが取得できない
-
     if($v.screen.isFullscreen()){
         $v.screen.addEventListener('mousedown', $v.controller.toggle);
         $v.screen.addEventListener('mousemove', $v.screen.mousemoveEvent);
         $v.screen.style.cursor = "none";
         $v.controller.intoScreen();
 
+        var rect = $v.screen.getBoundingClientRect();
+        if(navigator.userAgent.indexOf('Trident/') >= 0 || navigator.userAgent.indexOf('Edge/') >= 0){ //IEとEdge フルスクリーン時にwidth, heightが取得できない
+            rect = {width: screen.width, height: screen.height};
+        }
         if(!document.getElementById('jsplayer-fullscreen-lane')){
-            $v.comment.addKeyframe(rect.width || screen.width, 'jsplayer-fullscreen-lane');
+            $v.comment.addKeyframe(rect.width, 'jsplayer-fullscreen-lane');
         }
     }
     else{
@@ -481,9 +483,11 @@ $v.screen.fullscreenEvent = function(){
         }
         $v.screen.style.cursor = "auto";
         $v.controller.outofScreen();
+
+        var rect = $v.screen.getBoundingClientRect();
     }
 
-    $v.comment.setting(rect.height || screen.height);
+    $v.comment.setting(rect.height);
     $v.comment.clear();
     $v.screen.focus();
 };
