@@ -301,8 +301,6 @@
     ><form class="jsplayer-form" action="javascript:void(0)"
       ><input class="jsplayer-form-input" type="text" name="コメント" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
       ><input class="jsplayer-form-button" type="submit" value="コメントする" disabled
-      ><input class="jsplayer-form-vid" type="hidden" name="id" value=""
-      ><input class="jsplayer-form-time" type="hidden" name="動画投稿時間" value=""
     ></form
   ></div
 ></div>
@@ -879,8 +877,6 @@ $v.comment.get = function(){
 
     var url = "?" + $v.fn.param({
         "action"   : "commentget",
-        "id"       : $v.form.vid.value,
-        "登録時間" : $v.form.time.value,
         "件数"     : sec * 4,
         "nocache"  : Date.now()
     });
@@ -1120,8 +1116,6 @@ $v.controller.volumeButton.addEventListener('click', function(){
 $v.form        = $v.querySelector(".jsplayer-form");
 $v.form.input  = $v.querySelector(".jsplayer-form-input");
 $v.form.button = $v.querySelector(".jsplayer-form-button");
-$v.form.vid    = $v.querySelector(".jsplayer-form-vid");
-$v.form.time   = $v.querySelector(".jsplayer-form-time");
 
 
 $v.form.addEventListener('submit', function(event){
