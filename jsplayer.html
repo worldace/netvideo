@@ -313,17 +313,16 @@ var $v = document.querySelector('.jsplayer');
 
 
 $v.entrypoint = function(url){
-    var screen_width  = $v.fn.csslen($v.screen, 'width');
-    var screen_height = $v.fn.csslen($v.screen, 'height');
+    var screenRect = $v.screen.getBoundingClientRect();
 
-    $v.controller.style.width = screen_width + "px";
+    $v.controller.style.width = screenRect.width + "px";
 
     $v.controller.timeSeekBar.Width       = $v.fn.csslen($v.controller.timeSeekBar, 'width');
     $v.controller.volumeSeekPointer.Width = $v.fn.csslen($v.controller.volumeSeekPointer, 'width');
     $v.controller.timeSeekPointer.Width   = $v.fn.csslen($v.controller.timeSeekPointer, 'width');
 
-    $v.comment.addKeyframe(screen_width, 'jsplayer-normal-lane');
-    $v.comment.setting(screen_height);
+    $v.comment.addKeyframe(screenRect.width, 'jsplayer-normal-lane');
+    $v.comment.setting(screenRect.height);
 
     if(navigator.userAgent.indexOf('Edge/') >= 0){ //Edge(Fall Creators)でコメントが表示されないバグ対策
         var style = document.createElement('style');
