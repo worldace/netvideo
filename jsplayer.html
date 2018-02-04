@@ -430,7 +430,7 @@ $v.screen.showOSD = function(str){
 $v.screen.clearOSD = function(){
     var osd = $v.screen.children;
     for(var i = osd.length-1; i >= 0; i--){
-        if(osd[i].className === 'jsplayer-screen-osd'){
+        if(osd[i].classList[0] === 'jsplayer-screen-osd'){
             $v.screen.removeChild(osd[i]);
         }
     }
@@ -497,6 +497,12 @@ $v.screen.mousemoveEvent = function(){
     $v.screen.mousemoveTimer = window.setTimeout(function(){ $v.screen.style.cursor = "none"; }, 2500);
 };
 
+
+$v.screen.addEventListener('animationend', function(event){
+    if(event.target.classList[0] === 'jsplayer-comment'){
+        $v.screen.removeChild(event.target);
+    }
+});
 
 
 
