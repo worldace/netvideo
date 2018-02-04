@@ -899,7 +899,7 @@ $v.comment.get = function(){
             }
             var index = Math.floor(comments[i].位置/100);
             if(Array.isArray($v.comment.list[index])){
-                $v.comment.list[index].push([comments[i].本文.substring(0,48), comments[i].位置/100]);
+                $v.comment.list[index].push([comments[i].本文.substring(0,64), comments[i].位置/100]);
             }
         }
     });
@@ -910,7 +910,7 @@ $v.comment.post = function(){
     var sec  = $v.video.currentTime;
     var text = $v.form.input.value.trim();
 
-    if(text == "" || text.length > 48){
+    if(text == "" || text.length > 64){
         return;
     }
 
@@ -1412,7 +1412,7 @@ $v.comment.get = function(){
             }
             var index = Math.floor(comments[i].vpos/100);
             if(Array.isArray($v.comment.list[index])){
-                $v.comment.list[index].push([comments[i].content.substring(0,48), comments[i].vpos/100]);
+                $v.comment.list[index].push([comments[i].content.substring(0,64), comments[i].vpos/100]);
             }
         }
         console.log(comments.length + "件のコメント取得");
@@ -1430,7 +1430,7 @@ $v.comment.post = function(){
     var text = $v.form.input.value.trim();
 
 
-    if(text == "" || text.length > 48){
+    if(text == "" || text.length > 64){
         return;
     }
 
