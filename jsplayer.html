@@ -463,11 +463,17 @@ $v.screen.toggleFullscreen = function(){
 
 
 $v.screen.fullscreenEvent = function(){
+    var rect = $v.screen.getBoundingClientRect(); //IE＋フルスクリーン時にwidth, heightが取得できない
+
     if($v.screen.isFullscreen()){
         $v.screen.addEventListener('mousedown', $v.controller.toggle);
         $v.screen.addEventListener('mousemove', $v.screen.mousemoveEvent);
         $v.screen.style.cursor = "none";
         $v.controller.intoScreen();
+
+        if(!document.getElementById('jsplayer-fullscreen-lane')){
+            $v.comment.addKeyframe(rect.width || screen.width, 'jsplayer-fullscreen-lane');
+        }
     }
     else{
         $v.screen.removeEventListener('mousedown', $v.controller.toggle);
@@ -479,8 +485,7 @@ $v.screen.fullscreenEvent = function(){
         $v.controller.outofScreen();
     }
 
-    var rect = $v.screen.getBoundingClientRect();
-    $v.comment.setting(rect.height || screen.height); //IE＋フルスクリーン時にrect.heightが取得できない
+    $v.comment.setting(rect.height || screen.height);
     $v.comment.clear();
     $v.screen.focus();
 };
@@ -813,6 +818,7 @@ $v.comment.addKeyframe = function(width, name){
 
     var style = document.createElement('style');
     style.innerHTML = css;
+    style.id        = name;
     document.head.appendChild(style);
 };
 
