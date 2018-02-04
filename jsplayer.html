@@ -299,7 +299,7 @@
       ><span class="jsplayer-controller-fullscreenButton"></span
     ></div
     ><form class="jsplayer-form" action="javascript:void(0)"
-      ><input class="jsplayer-form-input" type="text" name="コメント" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
+      ><input class="jsplayer-form-input" type="text" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
       ><input class="jsplayer-form-button" type="submit" value="コメントする" disabled
     ></form
   ></div
@@ -1436,11 +1436,10 @@ $v.comment.post = function(){
     $v.form.input.value = "";
 
     if($v.comment.post.url){
-        var postdata = {
-            file    : $v.video.src,
-            vpos    : time.toFixed(2)*100,
-            comment : text,
-        };
+        var postdata = new FormData($v.form);
+        data.append('file', $v.video.src);
+        data.append('vpos', time.toFixed(2)*100);
+        data.append('comment', text);
         $v.fn.ajax($v.comment.post.url, {method:'POST', data:postdata});
         return;
     }
