@@ -315,17 +315,17 @@ var $v = document.querySelector('.jsplayer');
 
 
 $v.entrypoint = function(url){
-    $v.screen.Width  = $v.fn.csslen($v.screen, 'width');
-    $v.screen.Height = $v.fn.csslen($v.screen, 'height');
+    var screen_width  = $v.fn.csslen($v.screen, 'width');
+    var screen_height = $v.fn.csslen($v.screen, 'height');
 
-    $v.controller.style.width = $v.screen.Width + "px";
+    $v.controller.style.width = screen_width + "px";
 
     $v.controller.timeSeekBar.Width       = $v.fn.csslen($v.controller.timeSeekBar, 'width');
     $v.controller.volumeSeekPointer.Width = $v.fn.csslen($v.controller.volumeSeekPointer, 'width');
     $v.controller.timeSeekPointer.Width   = $v.fn.csslen($v.controller.timeSeekPointer, 'width');
 
-    $v.comment.keyframe($v.screen.Width);
-    $v.comment.setting($v.screen.Height);
+    $v.comment.addKeyframe(screen_width, 'jsplayer-normal-lane');
+    $v.comment.setting(screen_height);
 
     if(String(navigator.userAgent).indexOf('Edge/') >= 0){ //Edge(Fall Creators)でコメントが表示されないバグ対策
         var style = document.createElement('style');
@@ -805,14 +805,11 @@ $v.comment.release = function(comments, lane){
 };
 
 
-$v.comment.keyframe = function(width){
+$v.comment.addKeyframe = function(width, name){
     var css = "";
-    css += "@keyframes jsplayer-normal-lane{";
+    css += "@keyframes " + name + "{";
     css += "from{transform:translateX(0);}";
     css += "to{transform:translateX(-" + width*5 + "px);}}";
-    css += "@keyframes jsplayer-fullscreen-lane{";
-    css += "from{transform:translateX(0);}";
-    css += "to{transform:translateX(-" + screen.width*5 + "px);}}";
 
     var style = document.createElement('style');
     style.innerHTML = css;
@@ -896,7 +893,7 @@ $v.comment.get = function(){
             }
             var index = Math.floor(comments[i].位置/100);
             if(Array.isArray($v.comment.list[index])){
-                $v.comment.list[index].push([comments[i].本文.substring(0,64), comments[i].位置/100]);
+                $v.comment.list[index].push([comments[i].本文.substring(0,48), comments[i].位置/100]);
             }
         }
     });
@@ -907,7 +904,7 @@ $v.comment.post = function(){
     var sec  = $v.video.currentTime;
     var text = $v.form.input.value.trim();
 
-    if(text == "" || text.length > 64){
+    if(text == "" || text.length > 48){
         return;
     }
 
@@ -1409,7 +1406,7 @@ $v.comment.get = function(){
             }
             var index = Math.floor(comments[i].vpos/100);
             if(Array.isArray($v.comment.list[index])){
-                $v.comment.list[index].push([comments[i].content.substring(0,64), comments[i].vpos/100]);
+                $v.comment.list[index].push([comments[i].content.substring(0,48), comments[i].vpos/100]);
             }
         }
         console.log(comments.length + "件のコメント取得");
@@ -1427,7 +1424,7 @@ $v.comment.post = function(){
     var text = $v.form.input.value.trim();
 
 
-    if(text == "" || text.length > 64){
+    if(text == "" || text.length > 48){
         return;
     }
 
