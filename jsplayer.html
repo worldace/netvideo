@@ -549,7 +549,7 @@ $v.video.isSeekable = function(sec){
 $v.video.addEventListener('loadedmetadata', function(){
     $v.comment.get();
 
-    $v.controller.setBuffer();
+    $v.controller.timeSeekBar.setBuffer();
     $v.controller.setTime($v.video.duration, $v.controller.totalTime);
     $v.form.input.disabled  = false;
     $v.form.button.disabled = false;
@@ -595,7 +595,7 @@ $v.video.addEventListener('pause', function(){
 
 
 $v.video.addEventListener('progress', function(){
-    $v.controller.setBuffer();
+    $v.controller.timeSeekBar.setBuffer();
 });
 
 
