@@ -1052,7 +1052,7 @@ $v.controller.timeSeekPointer.addEventListener('mousedown', function(event){
 });
 
 
-$v.controller.totalTime.setTime = $v.controller.currentTime.setTime.bind($v.controller.totalTime);
+$v.controller.totalTime.setTime = $v.controller.currentTime.setTime;
 
 
 $v.controller.volumeButton.addEventListener('click', function(){
@@ -1077,7 +1077,7 @@ $v.controller.volumeSeek.addEventListener('click', function(event){
 });
 
 
-$v.controller.volumeSeekPointer.setPosition = $v.controller.timeSeekPointer.setPosition.bind($v.controller.volumeSeekPointer);
+$v.controller.volumeSeekPointer.setPosition = $v.controller.timeSeekPointer.setPosition;
 
 
 $v.controller.volumeSeekPointer.mousemoveEvent = function(event){
