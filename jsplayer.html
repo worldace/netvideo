@@ -998,19 +998,20 @@ $v.controller.playButton.addEventListener('click', function(){
 });
 
 
-$v.controller.commentButton.addEventListener('click', function(){
-    if($v.controller.commentButton.hasAttribute("data-off")){
-        $v.controller.commentButton.removeAttribute("data-off");
+$v.controller.timeSeek.addEventListener('wheel', function(event){
+    if(!$v.video.duration){
+        return;
     }
-    else{
-        $v.comment.clear();
-        $v.controller.commentButton.setAttribute("data-off", true);
-    }
+    (event.deltaY > 0) ? $v.video.setTime($v.video.currentTime+15) : $v.video.setTime($v.video.currentTime-15);
 });
 
 
-$v.controller.fullscreenButton.addEventListener('click', function(){
-    $v.screen.toggleFullscreen();
+$v.controller.timeSeek.addEventListener('click', function(event){
+    if(!$v.video.duration){
+        return;
+    }
+    var percent = $v.controller.timeSeekPointer.setPosition(event.clientX);
+    $v.video.currentTime = $v.video.duration * percent;
 });
 
 
@@ -1025,14 +1026,13 @@ $v.controller.timeSeekPointer.setPosition = function(time){
 };
 
 
-$v.controller.timeSeek.addEventListener('click', function(event){
-    if(!$v.video.duration){
-        return;
-    }
+$v.controller.timeSeekPointer.mousemoveEvent = function(event, seekend){
     var percent = $v.controller.timeSeekPointer.setPosition(event.clientX);
-    $v.video.currentTime = $v.video.duration * percent;
-
-});
+    $v.controller.setTime($v.video.duration*percent, $v.controller.currentTime);
+    if(seekend){
+        $v.video.currentTime = $v.video.duration * percent;
+    }
+};
 
 
 $v.controller.timeSeekPointer.addEventListener('mousedown', function(event){
@@ -1050,20 +1050,25 @@ $v.controller.timeSeekPointer.addEventListener('mousedown', function(event){
 });
 
 
-$v.controller.timeSeekPointer.mousemoveEvent = function(event, seekend){
-    var percent = $v.controller.timeSeekPointer.setPosition(event.clientX);
-    $v.controller.setTime($v.video.duration*percent, $v.controller.currentTime);
-    if(seekend){
-        $v.video.currentTime = $v.video.duration * percent;
+$v.controller.volumeButton.addEventListener('click', function(){
+    if($v.video.muted){
+        $v.video.muted = false;
+        $v.video.volume = 0.5;
     }
-};
+    else{
+        $v.video.volume = $v.video.volume ? 0 : 0.5;
+    }
+});
 
 
-$v.controller.timeSeek.addEventListener('wheel', function(event){
-    if(!$v.video.duration){
-        return;
-    }
-    (event.deltaY > 0) ? $v.video.setTime($v.video.currentTime+15) : $v.video.setTime($v.video.currentTime-15);
+$v.controller.volumeSeek.addEventListener('wheel', function(event){
+    (event.deltaY > 0) ? $v.video.setVolume($v.video.volume+0.1) : $v.video.setVolume($v.video.volume-0.1);
+});
+
+
+$v.controller.volumeSeek.addEventListener('click', function(event){
+    $v.video.muted = false;
+    $v.video.volume = $v.controller.volumeSeekPointer.setPosition(event.clientX);
 });
 
 
@@ -1078,10 +1083,9 @@ $v.controller.volumeSeekPointer.setPosition = function(vol){
 };
 
 
-$v.controller.volumeSeek.addEventListener('click', function(event){
-    $v.video.muted = false;
+$v.controller.volumeSeekPointer.mousemoveEvent = function(event){
     $v.video.volume = $v.controller.volumeSeekPointer.setPosition(event.clientX);
-});
+};
 
 
 $v.controller.volumeSeekPointer.addEventListener('mousedown', function(event){
@@ -1093,25 +1097,22 @@ $v.controller.volumeSeekPointer.addEventListener('mousedown', function(event){
 });
 
 
-$v.controller.volumeSeekPointer.mousemoveEvent = function(event){
-    $v.video.volume = $v.controller.volumeSeekPointer.setPosition(event.clientX);
-};
-
-
-$v.controller.volumeSeek.addEventListener('wheel', function(event){
-    (event.deltaY > 0) ? $v.video.setVolume($v.video.volume+0.1) : $v.video.setVolume($v.video.volume-0.1);
-});
-
-
-$v.controller.volumeButton.addEventListener('click', function(){
-    if($v.video.muted){
-        $v.video.muted = false;
-        $v.video.volume = 0.5;
+$v.controller.commentButton.addEventListener('click', function(){
+    if($v.controller.commentButton.hasAttribute("data-off")){
+        $v.controller.commentButton.removeAttribute("data-off");
     }
     else{
-        $v.video.volume = $v.video.volume ? 0 : 0.5;
+        $v.comment.clear();
+        $v.controller.commentButton.setAttribute("data-off", true);
     }
 });
+
+
+$v.controller.fullscreenButton.addEventListener('click', function(){
+    $v.screen.toggleFullscreen();
+});
+
+
 
 
 
