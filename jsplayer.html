@@ -940,15 +940,6 @@ $v.controller.commentButton     = $v.querySelector(".jsplayer-controller-comment
 $v.controller.fullscreenButton  = $v.querySelector(".jsplayer-controller-fullscreenButton");
 
 
-$v.controller.setBuffer = function(){
-    var buffer = $v.video.buffered;
-
-    if(buffer.length){
-        $v.controller.timeSeekBar.style.backgroundPosition = buffer.start(0) / $v.video.duration * $v.controller.timeSeekBar.Width + "px";
-        $v.controller.timeSeekBar.style.backgroundSize     = buffer.end(buffer.length-1) / $v.video.duration * $v.controller.timeSeekBar.Width + "px";
-    }
-};
-
 
 $v.controller.setTime = function(time, where){
     var min = Math.floor(time / 60);
@@ -1013,6 +1004,16 @@ $v.controller.timeSeek.addEventListener('click', function(event){
     var percent = $v.controller.timeSeekPointer.setPosition(event.clientX);
     $v.video.currentTime = $v.video.duration * percent;
 });
+
+
+$v.controller.timeSeekBar.setBuffer = function(){
+    var buffer = $v.video.buffered;
+
+    if(buffer.length){
+        $v.controller.timeSeekBar.style.backgroundPosition = buffer.start(0) / $v.video.duration * $v.controller.timeSeekBar.Width + "px";
+        $v.controller.timeSeekBar.style.backgroundSize     = buffer.end(buffer.length-1) / $v.video.duration * $v.controller.timeSeekBar.Width + "px";
+    }
+};
 
 
 $v.controller.timeSeekPointer.setPosition = function(time){
