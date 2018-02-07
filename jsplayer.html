@@ -438,8 +438,8 @@ $v.screen.clearOSD = function(){
 
 
 $v.screen.isFullscreen = function(){
-    var element = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-    return element === $v.screen;
+    var fullscreen = document.fullscreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+    return $v.screen === fullscreen;
 };
 
 
