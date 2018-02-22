@@ -799,27 +799,30 @@ $.style = function(css){
 };
 
 
-$.script = function(queue, callback){
+$.script = async function(queue){
     if(!Array.isArray(queue)){
         queue = [queue];
     }
-    if(!queue.length){
-        if(typeof callback === 'function'){
-            callback();
+    for(const v of queue){
+        await $.script.load(v)
+    }
+    return Promise.resolve();
+};
+
+
+$.script.load = function(url){
+    function async(success, fail){
+        const script = document.createElement('script');
+        if(url.match(/^module:/i)){
+            url = url.replace(/^module:/i, '');
+            script.type = 'module';
         }
-        return;
+        script.onload  = success;
+        script.onerror = fail;
+        script.src     = url;
+        document.body.appendChild(script);
     }
-    const script = document.createElement('script');
-    let   url    = queue.shift();
-
-    if(url.match(/^module:/i)){
-        url = url.replace(/^module:/i, '');
-        script.type = 'module';
-    }
-
-    script.onload  = () => $.script(queue, callback);
-    script.src     = url;
-    document.body.appendChild(script);
+    return new Promise(async);
 };
 
 
