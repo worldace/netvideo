@@ -804,9 +804,8 @@ $.script = async function(queue){
         queue = [queue];
     }
     for(const v of queue){
-        await $.script.load(v)
+        await $.script.load(v);
     }
-    return Promise.resolve();
 };
 
 
