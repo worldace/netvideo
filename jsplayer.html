@@ -134,7 +134,6 @@
     margin: 0 3px;
     padding: 0;
     cursor: pointer;
-    display: inline-block;
 }
 
 .jsplayer-controller-playButton{
@@ -171,7 +170,6 @@
 
 .jsplayer-controller-timeSeek,
 .jsplayer-controller-volumeSeek{
-    display: inline-block;
     margin: 0 5px;
     padding: 0;
     height: 20px;
@@ -216,13 +214,13 @@
     background-image: linear-gradient(to bottom, #ccc, #aaa);
     border: solid 1px #999;
     border-radius: 3px;
-    display: inline;
 }
 
 .jsplayer-form{
     width: 100%;
     margin: 0;
     padding: 0;
+    display: flex;
 }
 
 .jsplayer-form-input{
@@ -232,7 +230,6 @@
     border: 1px solid #888888;
     border-radius: 0;
     padding:4px 6px 3px 12px;
-    vertical-align:middle;
     ime-mode: active;
 }
 
@@ -246,7 +243,6 @@
     background-color: #5ba825;
     background: linear-gradient(to bottom, #84be5c 0%, #84be5c 50%, #5ba825 50%, #5ba825 100%);
     border: 1px solid #377d00;
-    vertical-align: middle;
     font-family: 'MS PGothic', Meiryo, sans-serif;
     cursor: pointer;
 }
@@ -275,35 +271,35 @@
 
 
 
-<div class="jsplayer"
-  ><div class="jsplayer-screen" tabindex="1"
-    ><video class="jsplayer-video" loop></video
-  ></div
-  ><div class="jsplayer-controller"
-    ><div class="jsplayer-controller-wrap"
-      ><span class="jsplayer-controller-playButton" data-pause></span
-      ><span class="jsplayer-controller-currentTime">00:00</span
-      ><div class="jsplayer-controller-timeSeek"
-        ><div class="jsplayer-controller-timeSeekBar"
-          ><span class="jsplayer-controller-timeSeekPointer"></span
-        ></div
-      ></div
-      ><span class="jsplayer-controller-totalTime">00:00</span
-      ><span class="jsplayer-controller-volumeButton"></span
-      ><div class="jsplayer-controller-volumeSeek"
-        ><div class="jsplayer-controller-volumeSeekBar"
-          ><span class="jsplayer-controller-volumeSeekPointer"></span
-        ></div
-      ></div
-      ><span class="jsplayer-controller-commentButton"></span
-      ><span class="jsplayer-controller-fullscreenButton"></span
-    ></div
-    ><form class="jsplayer-form" action="javascript:void(0)"
-      ><input class="jsplayer-form-input" type="text" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled
-      ><input class="jsplayer-form-button" type="submit" value="コメントする" disabled
-    ></form
-  ></div
-></div>
+<div class="jsplayer">
+  <div class="jsplayer-screen" tabindex="1">
+    <video class="jsplayer-video" loop></video>
+  </div>
+  <div class="jsplayer-controller">
+    <div class="jsplayer-controller-wrap">
+      <span class="jsplayer-controller-playButton" data-pause></span>
+      <span class="jsplayer-controller-currentTime">00:00</span>
+      <div class="jsplayer-controller-timeSeek">
+        <div class="jsplayer-controller-timeSeekBar">
+          <span class="jsplayer-controller-timeSeekPointer"></span>
+        </div>
+      </div>
+      <span class="jsplayer-controller-totalTime">00:00</span>
+      <span class="jsplayer-controller-volumeButton"></span>
+      <div class="jsplayer-controller-volumeSeek">
+        <div class="jsplayer-controller-volumeSeekBar">
+          <span class="jsplayer-controller-volumeSeekPointer"></span>
+        </div>
+      </div>
+      <span class="jsplayer-controller-commentButton"></span>
+      <span class="jsplayer-controller-fullscreenButton"></span>
+    </div>
+    <form class="jsplayer-form" action="javascript:void(0)">
+      <input class="jsplayer-form-input" type="text" value="" autocomplete="off" spellcheck="false" maxlength="60" tabindex="2" disabled>
+      <input class="jsplayer-form-button" type="submit" value="コメントする" disabled>
+    </form>
+  </div>
+</div>
 
 
 

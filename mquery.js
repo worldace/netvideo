@@ -799,10 +799,7 @@ $.style = function(css){
 };
 
 
-$.script = async function(queue){
-    if(!Array.isArray(queue)){
-        queue = [queue];
-    }
+$.script = async function(...queue){
     for(const v of queue){
         await $.script.load(v);
     }
