@@ -118,7 +118,7 @@ class mQuery extends Array{
 
 
     index(){
-        return this.$exists('parentNode') ? Array.from(this[0].parentNode.children).indexOf(this[0]) : -1;
+        return this.$exists('parentElement') ? Array.from(this[0].parentElement.children).indexOf(this[0]) : -1;
     }
 
 
@@ -221,20 +221,20 @@ class mQuery extends Array{
         }
         else if(mode === 'remove'){
             for(const position of target){
-                selection.push( position.parentNode.removeChild(position) );
+                selection.push( position.parentElement.removeChild(position) );
             }
         }
         else if(mode === 'prev' || mode === '1'){
             for(const position of target){
                 for(let i = 0; i < content.length; i++){
-                    selection.push( position.parentNode.insertBefore(this.$cloneElement(content[i]), position) );
+                    selection.push( position.parentElement.insertBefore(this.$cloneElement(content[i]), position) );
                 }
             }
         }
         else if(mode === 'firstchild' || mode === '-1'){
             for(const position of Array.from(target).reverse()){
                 for(let i = content.length - 1; i >= 0; i--){
-                    selection.unshift( position.insertBefore(this.$cloneElement(content[i]), position.firstChild) );
+                    selection.unshift( position.insertBefore(this.$cloneElement(content[i]), position.firstElementChild) );
                 }
             }
         }
@@ -248,14 +248,14 @@ class mQuery extends Array{
         else if(mode === 'next' || mode === '2'){
             for(const position of Array.from(target).reverse()){
                 for(let i = content.length - 1; i >= 0; i--){
-                    selection.unshift( position.parentNode.insertBefore(this.$cloneElement(content[i]), position.nextSibling) );
+                    selection.unshift( position.parentElement.insertBefore(this.$cloneElement(content[i]), position.nextElementSibling) );
                 }
             }
         }
         else{ // replace
             for(const position of target){
                 for(let i = 0; i < content.length; i++){
-                    selection.push( position.parentNode.replaceChild(this.$cloneElement(content[i]), position) );
+                    selection.push( position.parentElement.replaceChild(this.$cloneElement(content[i]), position) );
                 }
             }
         }
@@ -455,12 +455,12 @@ class mQuery extends Array{
 
 
     parent(selector){
-        return this.$setCollection(v => this.$traverseFamily(v, 'parentNode', selector, true));
+        return this.$setCollection(v => this.$traverseFamily(v, 'parentElement', selector, true));
     }
 
 
     parents(selector){
-        return this.$setCollection(v => this.$traverseFamily(v, 'parentNode', selector));
+        return this.$setCollection(v => this.$traverseFamily(v, 'parentElement', selector));
     }
 
 
@@ -500,15 +500,12 @@ class mQuery extends Array{
 
 
     siblings(selector){
-        return this.$setCollection(v => [...this.$traverseChild(v.parentNode, 'children', selector)].filter(v2 => v2 !== v));
+        return this.$setCollection(v => [...this.$traverseChild(v.parentElement, 'children', selector)].filter(v2 => v2 !== v));
     }
 
 
     * $traverseFamily(startElement, prop, selector, alone){
         for(let v = startElement[prop]; v; v = v[prop]){
-            if(v.nodeType !== 1){
-                continue;
-            }
             if(!selector || v.matches(selector)){
                 yield v;
             }
