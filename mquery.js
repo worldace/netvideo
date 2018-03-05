@@ -324,6 +324,16 @@ class mQuery extends Array{
     }
 
 
+    toggleAttr(name, value = ''){
+        return this.$each(v => v.hasAttribute(name) ? v.removeAttribute(name) : v.setAttribute(name, value));
+    }
+
+
+    hasAttr(name){
+        return this.some(v => ('hasAttribute' in v) && v.hasAttribute(name));
+    }
+
+
     css(name, value, priority = ''){
         if(value !== undefined){ // CSSを1つ設定
             if(value.match(/\!important/i)){
