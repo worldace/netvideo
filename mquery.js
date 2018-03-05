@@ -504,10 +504,10 @@ class mQuery extends Array{
     }
 
 
-    * $traverseFamily(startElement, prop, selector, alone){
-        for(let v = startElement[prop]; v; v = v[prop]){
-            if(!selector || v.matches(selector)){
-                yield v;
+    * $traverseFamily(el, prop, selector, alone){
+        while(el = el[prop]){
+            if(!selector || el.matches(selector)){
+                yield el;
             }
             if(alone){
                 break;
