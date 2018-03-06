@@ -200,23 +200,39 @@ class mQuery extends Array{
     $manipulate(mode, refs, adds, copy = false){
         mode = String(mode).toLowerCase();
 
-        if     (mode === 'prev' || mode === '1')        return this.$manipulation(this.$manipulate_prev, refs, adds, copy);
-        else if(mode === 'next' || mode === '2')        return this.$manipulation(this.$manipulate_next, refs.reverse(), adds.reverse(), copy).reverse();
-        else if(mode === 'firstchild' || mode === '-1') return this.$manipulation(this.$manipulate_firstchild, refs.reverse(), adds.reverse(), copy).reverse();
-        else if(mode === 'lastchild'  || mode === '-2') return this.$manipulation(this.$manipulate_lastchild, refs, adds, copy);
-        else if(mode === 'replace')                     return this.$manipulation(this.$manipulate_replace, refs, adds, copy);
-        else                                            throw `illegale position (move/moved/paste/pasted)`;
-    }
+        if(mode === 'prev' || mode === '1'){
+            mode = this.$manipulate_prev;
+        }
+        else if(mode === 'next' || mode === '2'){
+            mode = this.$manipulate_next;
+            refs.reverse();
+            adds.reverse();
+        }
+        else if(mode === 'firstchild' || mode === '-1'){
+            mode = this.$manipulate_firstchild;
+            refs.reverse();
+            adds.reverse();
+        }
+        else if(mode === 'lastchild'  || mode === '-2'){
+            mode = this.$manipulate_lastchild;
+        }
+        else if(mode === 'replace'){
+            mode = this.$manipulate_replace;
+        }
+        else{
+            throw `illegale position (move/moved/paste/pasted)`;
+        }
 
-
-    $manipulation(func, refs, adds, copy){
         const selection = [];
         for(const ref of refs){
             for(const add of adds){
-                const el = copy ? this.$cloneElement(add) : add;
-                selection.push( func(ref, el) );
+                selection.push( mode(ref, copy ? this.$cloneElement(add) : add) );
             }
             copy = true;
+        }
+
+        if(mode === this.$manipulate_next || mode === this.$manipulate_firstchild){
+            selection.reverse();
         }
         return this.$chain(selection);
     }
