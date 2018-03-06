@@ -205,12 +205,10 @@ class mQuery extends Array{
         }
         else if(mode === 'next' || mode === '2'){
             mode = this.$manipulate_next;
-            refs.reverse();
             adds.reverse();
         }
         else if(mode === 'firstchild' || mode === '-1'){
             mode = this.$manipulate_firstchild;
-            refs.reverse();
             adds.reverse();
         }
         else if(mode === 'lastchild'  || mode === '-2'){
@@ -231,9 +229,6 @@ class mQuery extends Array{
             copy = true;
         }
 
-        if(mode === this.$manipulate_next || mode === this.$manipulate_firstchild){
-            selection.reverse();
-        }
         return this.$chain(selection);
     }
 
