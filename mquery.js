@@ -168,32 +168,32 @@ class mQuery extends Array{
 
 
     move(selector, position){
-        return this.$chain(this.$manipulate(position, this.$toBox(selector), this));
+        return this.$manipulate(position, this.$toBox(selector), this);
     }
 
 
     moved(content, position){
-        return this.$chain(this.$manipulate(position, this, this.$toBox(content)));
+        return this.$manipulate(position, this, this.$toBox(content));
     }
 
 
     paste(selector, position){
-        return this.$chain(this.$manipulate(position, this.$toBox(selector), this, true));
+        return this.$manipulate(position, this.$toBox(selector), this, true);
     }
 
 
     pasted(content, position){
-        return this.$chain(this.$manipulate(position, this, this.$toBox(content), true));
+        return this.$manipulate(position, this, this.$toBox(content), true);
     }
 
 
     replace(selector){
-        return this.$chain(this.$manipulate('replace', this.$toBox(selector), this));
+        return this.$manipulate('replace', this.$toBox(selector), this);
     }
 
 
     replaced(content){
-        return this.$chain(this.$manipulate('replace', this, this.$toBox(content)));
+        return this.$manipulate('replace', this, this.$toBox(content));
     }
 
 
@@ -218,7 +218,7 @@ class mQuery extends Array{
             }
             copy = true;
         }
-        return selection;
+        return this.$chain(selection);
     }
 
 
