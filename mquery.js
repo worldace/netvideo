@@ -168,55 +168,53 @@ class mQuery extends Array{
 
 
     move(selector, position){
-        const content = this.$manipulate('remove');
-        return this.$chain(this.$manipulate(position, content, this.$toBox(selector)));
+        return this.$chain(this.$manipulate(position, this.$toBox(selector), this));
     }
 
 
     moved(content, position){
-        content = this.$manipulate('remove', null, this.$toBox(content));
-        return this.$chain(this.$manipulate(position, content));
+        return this.$chain(this.$manipulate(position, this, this.$toBox(content)));
     }
 
 
     paste(selector, position){
-        return this.$chain(this.$manipulate(position, this, this.$toBox(selector)));
+        return this.$chain(this.$manipulate(position, this.$toBox(selector), this, true));
     }
 
 
     pasted(content, position){
-        return this.$chain(this.$manipulate(position, this.$toBox(content)));
+        return this.$chain(this.$manipulate(position, this, this.$toBox(content), true));
     }
 
 
     replace(selector){
-        return this.$chain(this.$manipulate('replace', this, this.$toBox(selector)));
+        return this.$chain(this.$manipulate('replace', this.$toBox(selector), this));
     }
 
 
     replaced(content){
-        return this.$chain(this.$manipulate('replace', this.$toBox(content)));
+        return this.$chain(this.$manipulate('replace', this, this.$toBox(content)));
     }
 
 
-    $manipulate(mode, refs, adds, copy){
+    $manipulate(mode, refs, adds, copy = false){
         mode = String(mode).toLowerCase();
 
-        if     (mode === 'prev' || mode === '1')        return $manipulate_prev(refs, adds, copy);
-        else if(mode === 'next' || mode === '2')        return $manipulate_next(refs, adds, copy);
-        else if(mode === 'firstchild' || mode === '-1') return $manipulate_firstchild(refs, adds, copy);
-        else if(mode === 'lastchild' || mode === '-2')  return $manipulate_lastchild(refs, adds, copy);
-        else if(mode === 'replace')                     return $manipulate_replace(refs, adds, copy);
+        if     (mode === 'prev' || mode === '1')        return this.$manipulation(this.$manipulate_prev, refs, adds, copy);
+        else if(mode === 'next' || mode === '2')        return this.$manipulation(this.$manipulate_next, refs.reverse(), adds.reverse(), copy).reverse();
+        else if(mode === 'firstchild' || mode === '-1') return this.$manipulation(this.$manipulate_firstchild, refs.reverse(), adds.reverse(), copy).reverse();
+        else if(mode === 'lastchild'  || mode === '-2') return this.$manipulation(this.$manipulate_lastchild, refs, adds, copy);
+        else if(mode === 'replace')                     return this.$manipulation(this.$manipulate_replace, refs, adds, copy);
         else                                            throw `illegale position (move/moved/paste/pasted)`;
     }
 
 
-    $manipulate_prev(refs, adds, copy = false){
+    $manipulation(func, refs, adds, copy){
         const selection = [];
         for(const ref of refs){
             for(const add of adds){
                 const el = copy ? this.$cloneElement(add) : add;
-                selection.push( ref.parentElement.insertBefore(el, ref) );
+                selection.push( func(ref, el) );
             }
             copy = true;
         }
@@ -224,55 +222,28 @@ class mQuery extends Array{
     }
 
 
-    $manipulate_next(refs, adds, copy = false){
-        const selection = [];
-        for(const ref of refs.reverse()){
-            for(const add of adds.reverse()){
-                const el = copy ? this.$cloneElement(add) : add;
-                selection.unshift( ref.parentElement.insertBefore(el, ref.nextElementSibling) );
-            }
-            copy = true;
-        }
-        return selection;
+    $manipulate_prev(ref, add){
+        return ref.parentElement.insertBefore(add, ref);
     }
 
 
-    $manipulate_firstchild(refs, adds, copy = false){
-        const selection = [];
-        for(const ref of refs.reverse()){
-            for(const add of adds.reverse()){
-                const el = copy ? this.$cloneElement(add) : add;
-                selection.unshift( ref.insertBefore(el, ref.firstElementChild) );
-            }
-            copy = true;
-        }
-        return selection;
+    $manipulate_next(ref, add){
+        return ref.parentElement.insertBefore(add, ref.nextElementSibling);
     }
 
 
-    $manipulate_lastchild(refs, adds, copy = false){
-        const selection = [];
-        for(const ref of refs){
-            for(const add of adds){
-                const el = copy ? this.$cloneElement(add) : add;
-                selection.push( ref.appendChild(el) );
-            }
-            copy = true;
-        }
-        return selection;
+    $manipulate_firstchild(ref, add){
+        return ref.insertBefore(add, ref.firstElementChild);
     }
 
 
-    $manipulate_replace(refs, adds, copy = false){
-        const selection = [];
-        for(const ref of refs){
-            for(const add of adds){
-                const el = copy ? this.$cloneElement(add) : add;
-                selection.push( ref.parentElement.replaceChild(el, ref) );
-            }
-            copy = true;
-        }
-        return selection;
+    $manipulate_lastchild(ref, add){
+        return ref.appendChild(add);
+    }
+
+
+    $manipulate_replace(ref, add){
+        return ref.parentElement.replaceChild(add, ref);
     }
 
 
@@ -285,51 +256,6 @@ class mQuery extends Array{
     remove(){
         const selection = this.map(v => v.parentElement.removeChild(v));
         return this.$chain(selection);
-    }
-
-
-    $manipulate(mode = 'replace', content = [], target = this){
-        const selection = [];
-
-        mode = String(mode).toLowerCase();
-
-        if(mode === 'prev' || mode === '1'){
-            for(const position of target){
-                for(let i = 0; i < content.length; i++){
-                    selection.push( position.parentElement.insertBefore(this.$cloneElement(content[i]), position) );
-                }
-            }
-        }
-        else if(mode === 'firstchild' || mode === '-1'){
-            for(const position of Array.from(target).reverse()){
-                for(let i = content.length - 1; i >= 0; i--){
-                    selection.unshift( position.insertBefore(this.$cloneElement(content[i]), position.firstElementChild) );
-                }
-            }
-        }
-        else if(mode === 'lastchild' || mode === '-2'){
-            for(const position of target){
-                for(let i = 0; i < content.length; i++){
-                    selection.push( position.appendChild(this.$cloneElement(content[i])) );
-                }
-            }
-        }
-        else if(mode === 'next' || mode === '2'){
-            for(const position of Array.from(target).reverse()){
-                for(let i = content.length - 1; i >= 0; i--){
-                    selection.unshift( position.parentElement.insertBefore(this.$cloneElement(content[i]), position.nextElementSibling) );
-                }
-            }
-        }
-        else{ // replace
-            for(const position of target){
-                for(let i = 0; i < content.length; i++){
-                    selection.push( position.parentElement.replaceChild(this.$cloneElement(content[i]), position) );
-                }
-            }
-        }
-
-        return selection;
     }
 
 
