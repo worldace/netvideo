@@ -221,11 +221,16 @@ class mQuery extends Array{
             throw `illegale position (move/moved/paste/pasted)`;
         }
 
-        const selection = [];
+        let selection = [];
         for(const ref of refs){
+            const selection2 = [];
             for(const add of adds){
-                selection.push( mode(ref, copy ? this.$cloneElement(add) : add) );
+                selection2.push( mode(ref, copy ? this.$cloneElement(add) : add) );
             }
+            if(mode === this.$manipulate_firstchild || mode === $manipulate_next){
+                selection2.reverse();
+            }
+            selection = selection.concat(selection2);
             copy = true;
         }
 
