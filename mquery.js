@@ -603,7 +603,7 @@ class mQuery extends Array{
             e.memo = ('memo' in e) ? e.memo : option.memo;
             e.name = ('name' in e) ? e.name : name;
             e.this = element;
-            e.that = e.target;
+            e.self = e.target;
             if(handler.call(e.this, e) === false){
                 e.stopPropagation();
                 e.preventDefault();
