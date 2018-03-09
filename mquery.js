@@ -199,7 +199,6 @@ class mQuery extends Array{
 
     $manipulate(mode, refs, adds, copy = false){
         mode = String(mode).toLowerCase();
-        let reverseMode = false;
 
         if(mode === 'prev' || mode === '1'){
             mode = this.$manipulate_prev;
@@ -207,12 +206,12 @@ class mQuery extends Array{
         else if(mode === 'next' || mode === '2'){
             mode = this.$manipulate_next;
             adds.reverse();
-            reverseMode = true;
+            adds.reversed = true;
         }
         else if(mode === 'firstchild' || mode === '-1'){
             mode = this.$manipulate_firstchild;
             adds.reverse();
-            reverseMode = true;
+            adds.reversed = true;
         }
         else if(mode === 'lastchild'  || mode === '-2'){
             mode = this.$manipulate_lastchild;
@@ -229,7 +228,7 @@ class mQuery extends Array{
             const length = selection.length;
             for(const add of adds){
                 const result = mode(ref, copy ? this.$cloneElement(add) : add);
-                reverseMode ? selection.splice(length, 0, result) : selection.push(result);
+                adds.reversed ? selection.splice(length, 0, result) : selection.push(result);
             }
             copy = true;
         }
