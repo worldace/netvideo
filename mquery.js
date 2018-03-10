@@ -738,7 +738,7 @@ class mQuery extends Array{
         if(this.name() !== 'form'){
             return;
         }
-        const headers = new Headers({'X-Requested-With':'XMLHttpRequest'});
+        const headers = new Headers();
         const method  = this[0].method  || 'GET';
         const enctype = this[0].enctype || 'application/x-www-form-urlencoded';
         const action  = this[0].action  || '';
