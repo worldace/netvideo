@@ -880,7 +880,7 @@ $v.comment.get = function(){
         "nocache"  : Date.now()
     });
 
-    $v.fn.get(url, function(xhr){
+    function success(xhr){
         try{
             var comments = JSON.parse(xhr.responseText);
         }
@@ -897,7 +897,9 @@ $v.comment.get = function(){
                 $v.comment.list[index].push([comments[i].本文.substring(0,64), comments[i].位置/100]);
             }
         }
-    });
+    }
+
+    $v.fn.ajax({url:url, success:success});
 };
 
 
@@ -915,7 +917,8 @@ $v.comment.post = function(){
     var formdata = new FormData($v.form);
     formdata.append("本文", text);
     formdata.append("位置", sec.toFixed(2)*100);
-    $v.fn.post('?action=commentpost', formdata);
+
+    $v.fn.ajax({url:'?action=commentpost', method:'POST', body:formdata});
 };
 
 
@@ -1134,64 +1137,56 @@ $v.form.input.addEventListener('focus', function(event){
 $v.fn = {};
 
 
-$v.fn.get = function(url, success){
-    $v.fn.ajax(url, {method:"GET", success:success});
-};
-
-
-$v.fn.post = function(url, data, success){
-    $v.fn.ajax(url, {method:"POST", data:data, success:success});
-};
-
-
-$v.fn.ajax = function(url, option){ //method, data, timeout, credential, header, success, error, complete
-    option = option || {};
-    option.method  = option.method  || "GET";
-    option.timeout = option.timeout || 60;
-
-    var body = "";
-    var xhr  = new XMLHttpRequest();
-    xhr.open(option.method, url);
-
-    if(option.timeout >= 0){
-        xhr.timeout = option.timeout * 1000;
-    }
-    if(option.credential){
-        xhr.withCredentials = true;
-    }
-    if(option.method.match(/^POST$/i)){
-        if(option.data instanceof FormData){
-            body = option.data;
+$v.fn.ajax = function(setting){
+    setting = setting || {};
+    for(var key in this.ajax.setting){
+        if(key in setting){
+            continue;
         }
-        else{
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-            for(var key in option.data){
-                body += encodeURIComponent(key) + "=" + encodeURIComponent(option.data[key]) + "&";
+        setting[key] = this.ajax.setting[key];
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.open(setting.method, setting.url);
+    xhr.timeout = setting.timeout * 1000;
+    xhr.withCredentials = setting.credential;
+
+    if(setting.body && !(setting.body instanceof FormData)){ //FormData, String, Objectの3つのみ対応
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        if(typeof setting.body !== 'string'){
+            var body = '';
+            for(var key in setting.body){
+                body += encodeURIComponent(key) + "=" + encodeURIComponent(setting.body[key]) + "&";
             }
+            setting.body = body;
         }
     }
-    if(option.header){
-        for(var key in option.header){
-            xhr.setRequestHeader(key, option.header[key]);
-        }
+    console.log(setting);
+
+    for(var key in setting.header){
+        xhr.setRequestHeader(key, setting.header[key]);
     }
-    xhr.addEventListener('loadend', function(){
-        if(xhr.status >= 200 && xhr.status < 300 || xhr.status == 304){
-            if(typeof option.success === "function"){
-                option.success(xhr);
-            }
-        }
-        else{
-            if(typeof option.error === "function"){
-                option.error(xhr);
-            }
-        }
-        if(typeof option.complete === "function"){
-            option.complete(xhr);
-        }
+    //xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); //クロスドメイン時にこれがあるとエラーになる
+
+    xhr.addEventListener('loadend', function(event){
+        (xhr.status >= 200 && xhr.status < 400) ? setting.success(xhr) : setting.error(xhr);
+        setting.complete(xhr);
     });
 
-    xhr.send(body);
+    xhr.send(setting.body);
+};
+
+
+$v.fn.ajax.setting = {
+    url: '',
+    method: 'GET',
+    timeout: 60,
+    credential: false,
+    header: {},
+    body: null,
+    success: function(){},
+    error: function(){},
+    complete: function(){},
 };
 
 
@@ -1346,7 +1341,7 @@ $v.comment.get = function(){
             q      : "SELECT * FROM html WHERE url = 'http://himado.in/" + $v.query.himado + "' and xpath='//input[@type=\"hidden\"]'"
         });
 
-        $v.fn.ajax(url, {success: yql1_success, error: yql_error});
+        $v.fn.ajax({url: url, success: yql1_success, error: yql_error});
     }
 
 
@@ -1386,7 +1381,7 @@ $v.comment.get = function(){
             q      : "SELECT * FROM xml WHERE url = '" + himado_url + "'"
         });
 
-        $v.fn.ajax(url, {success: yql2_success, error: yql_error});
+        $v.fn.ajax({url: url, success: yql2_success, error: yql_error});
     }
 
     function yql2_success(xhr){
@@ -1437,7 +1432,7 @@ $v.comment.post = function(){
         postdata.append('file', $v.video.src);
         postdata.append('vpos', time.toFixed(2)*100);
         postdata.append('comment', text);
-        $v.fn.ajax($v.comment.post.url, {method:'POST', data:postdata});
+        $v.fn.ajax({url: $v.comment.post.url, method: 'POST', body: postdata});
         return;
     }
 
@@ -1445,21 +1440,28 @@ $v.comment.post = function(){
         return;
     }
 
+    var group_id = '';
+    if($v.query.group_id){
+        group_id = $v.query.group_id.split(',')[0];
+    }
+
     var postdata = $v.fn.param({
-        mode    : "comment",
-        id      : $v.query.himado,
-        vpos    : time.toFixed(2)*100,
-        comment : text,
-        adddate : Math.floor(Date.now()/1000)
+        mode     : "comment",
+        id       : $v.query.himado,
+        vpos     : time.toFixed(2)*100,
+        comment  : text,
+        mail     : '',
+        group_id : group_id,
+        adddate  : Math.floor(Date.now()/1000),
     });
 
     var yql = "https://query.yahooapis.com/v1/public/yql?" + $v.fn.param({
         format : "json",
         env    : "store://datatables.org/alltableswithkeys",
-        q      : "SELECT * FROM htmlpost WHERE url = 'http://himado.in/' AND postdata='" + postdata + "' AND xpath='//p'"
+        q      : "SELECT * FROM htmlpost WHERE url = 'http://himado.in/api/player' AND postdata='" + postdata + "' AND xpath='//p'",
     });
 
-    $v.fn.get(yql);
+    $v.fn.ajax({url:yql});
 };
 </script>
 
