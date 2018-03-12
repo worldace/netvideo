@@ -1163,9 +1163,9 @@ $v.fn.ajax = function(setting){
     }
 
     for(var key in setting.header){
-        xhr.setRequestHeader(key, setting.header[key]);
+        xhr.setRequestHeader(key, setting.header[key]); //クロスドメイン時に余計なヘッダがあるとエラーになる
+
     }
-    //xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); //クロスドメイン時にこれがあるとエラーになる
 
     xhr.addEventListener('loadend', function(event){
         (xhr.status >= 200 && xhr.status < 400) ? setting.success(xhr) : setting.error(xhr);

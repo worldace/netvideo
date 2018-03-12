@@ -1670,6 +1670,21 @@ function JSON追記(string $file, $data) :bool{
 
 
 
+function JSON属性($value, string $attr = 'data-json') :string{
+    $json = json_encode($value, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PARTIAL_OUTPUT_ON_ERROR);
+    return " {$attr}='{$json}'";
+}
+
+
+function fromphp($value, string $name = 'fromphp') :string{
+    $json  = json_encode($value, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
+    $valid = preg_match("/^[a-zA-Z_\$\x7f-\xff][a-zA-Z0-9_\$\x7f-\xff]*/", $name);
+
+    return ($json !== false and $valid)  ?  "<script>var $name = $json;</script>\n"  :  "";
+}
+
+
+
 function 配列保存(string $file, array $array){
     $return = file_put_contents($file, "<?php\nreturn " . var_export($array,true) . ";", LOCK_EX);
 
@@ -1819,15 +1834,6 @@ function CSV作成($array, array $設定 = []) :string{
     }
 
     return $return;
-}
-
-
-
-function fromphp($value, string $name = 'fromphp') :string{
-    $json  = json_encode($value, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
-    $valid = preg_match("/^[a-zA-Z_\$\x7f-\xff][a-zA-Z0-9_\$\x7f-\xff]*/", $name);
-
-    return ($json !== false and $valid)  ?  "<script>var $name = $json;</script>\n"  :  "";
 }
 
 
