@@ -1138,12 +1138,10 @@ $v.fn = {};
 
 
 $v.fn.ajax = function(setting){
-    setting = setting || {};
     for(var key in this.ajax.setting){
-        if(key in setting){
-            continue;
+        if(!(key in setting)){
+            setting[key] = this.ajax.setting[key];
         }
-        setting[key] = this.ajax.setting[key];
     }
 
     var xhr = new XMLHttpRequest();
@@ -1167,10 +1165,10 @@ $v.fn.ajax = function(setting){
 
     }
 
-    xhr.addEventListener('loadend', function(event){
+    xhr.onloadend = function(event){
         (xhr.status >= 200 && xhr.status < 400) ? setting.success(xhr) : setting.error(xhr);
         setting.complete(xhr);
-    });
+    };
 
     xhr.send(setting.body);
 };
@@ -1304,6 +1302,15 @@ $v.fn.minmax = function(min, val, max){
     else{
         return val;
     }
+};
+
+
+$v.fn.default = function(o1, o2){
+    var result = {};
+    Object.keys(o2).forEach(function(key){
+        result[key] = o1.hasOwnProperty(key) ? o1[key] : o2[key];
+    });
+    return result;
 };
 
 
