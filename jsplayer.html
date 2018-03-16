@@ -551,8 +551,6 @@ $v.video.addEventListener('loadedmetadata', function(){
     $v.form.button.disabled = false;
 
     $v.video.volume = $v.user.volume;
-
-    //$v.thumbnail.create();
 });
 
 
@@ -657,86 +655,6 @@ $v.video.addEventListener('error', function(event){
             break;
     }
 });
-
-
-//■ thumbnail
-$v.thumbnail = {};
-
-$v.thumbnail.mouseenter = false;
-
-
-$v.thumbnail.create = function(){
-    if('ontouchstart' in document){
-        return;
-    }
-
-    var width  = 192;
-    var height = width * $v.video.videoHeight / $v.video.videoWidth;
-
-    $v.thumbnail.video = $v.video.cloneNode(true);
-    $v.thumbnail.video.pause();
-    $v.thumbnail.video.muted        = true;
-    $v.thumbnail.video.className    = 'jsplayer-thumbnail';
-    $v.thumbnail.video.style.width  = width  + 'px';
-    $v.thumbnail.video.style.height = height + 'px';
-
-    $v.controller.timeSeek.addEventListener('mousemove', {
-        handleEvent: $v.fn.throttle(300, false, $v.thumbnail.show, false),
-        width : width,
-        height: height
-    });
-
-    $v.controller.timeSeek.addEventListener('mouseenter', function (){
-        $v.thumbnail.mouseenter = true;
-    });
-
-    $v.controller.timeSeek.addEventListener('mouseleave', function (){
-        $v.thumbnail.hide();
-        $v.thumbnail.mouseenter = false;
-    });
-
-    $v.controller.timeSeekBar.appendChild($v.thumbnail.video);
-};
-
-
-$v.thumbnail.show = function(event){
-    if(!$v.thumbnail.video){
-        return;
-    }
-    if(!$v.thumbnail.mouseenter){
-        $v.thumbnail.video.style.display = 'none';
-        return;
-    }
-
-    var bar = $v.controller.timeSeekBar.getBoundingClientRect();
-    var pos = event.clientX - bar.left;
-
-    var thumbnail_left = pos - this.width;
-    var thumbnail_top  = - this.height - 11;
-
-    $v.thumbnail.video.addEventListener('seeked', function handler(){
-        $v.thumbnail.video.style.left    = thumbnail_left + 'px';
-        $v.thumbnail.video.style.top     = thumbnail_top  + 'px';
-        $v.thumbnail.video.style.display = 'block';
-        $v.thumbnail.video.removeEventListener('seeked', handler);
-    });
-
-    var time  = pos / ($v.controller.timeSeekBar.Width - $v.controller.timeSeekPointer.Width) * $v.video.duration;
-    if($v.thumbnail.video.fastSeek){
-        $v.thumbnail.video.fastSeek(time);
-    }
-    else{
-        $v.thumbnail.video.currentTime = time;
-    }
-};
-
-
-$v.thumbnail.hide = function(){
-    if(!$v.thumbnail.video){
-        return;
-    }
-    $v.thumbnail.video.style.display = 'none';
-};
 
 
 
@@ -863,62 +781,6 @@ $v.comment.run = function(){
             comments[i].style.animationPlayState = "running";
         }
     }
-};
-
-
-$v.comment.get = function(){
-    var sec  = Math.floor($v.video.duration);
-
-    $v.comment.list = Array(sec+1); //動画時間+1の箱を作る [[],[],[],[]...]
-    for(var i = 0; i < $v.comment.list.length; i++){
-        $v.comment.list[i] = [];
-    }
-
-    var url = "?" + $v.fn.param({
-        "action"   : "commentget",
-        "件数"     : sec * 4,
-        "nocache"  : Date.now()
-    });
-
-    function success(xhr){
-        try{
-            var comments = JSON.parse(xhr.responseText);
-        }
-        catch(e){
-            return;
-        }
-
-        for(var i = 0; i < comments.length; i++){
-            if(comments[i].本文 == null){
-                continue;
-            }
-            var index = Math.floor(comments[i].位置/100);
-            if(Array.isArray($v.comment.list[index])){
-                $v.comment.list[index].push([comments[i].本文.substring(0,64), comments[i].位置/100]);
-            }
-        }
-    }
-
-    $v.fn.ajax({url:url, success:success});
-};
-
-
-$v.comment.post = function(){
-    var sec  = $v.video.currentTime;
-    var text = $v.form.input.value.trim();
-
-    if(text == "" || text.length > 64){
-        return;
-    }
-
-    $v.comment.list[Math.floor(sec+1)].unshift([text, sec+1, Math.floor(Date.now()/1000)]);
-    $v.form.input.value = "";
-
-    var formdata = new FormData($v.form);
-    formdata.append("本文", text);
-    formdata.append("位置", sec.toFixed(2)*100);
-
-    $v.fn.ajax({url:'?action=commentpost', method:'POST', body:formdata});
 };
 
 
@@ -1236,54 +1098,6 @@ $v.fn.loadLocalStorage = function(name){
     }
     catch(e){
     }
-};
-
-
-$v.fn.throttle = function(delay, noTrailing, callback, debounceMode){
-    //delay: 間引く間隔(ms)
-    //noTrailing: false(初期値)なら連続処理の終了時に関数を実行する。trueなら実行しない
-    //callback: 関数
-    //debounceMode: true:連続処理の開始時に1度だけ実行、false:連続処理の終了時に1度だけ実行
-
-    var timeoutID;
-    var lastExec = 0;
-
-    if(typeof noTrailing !== 'boolean'){
-        debounceMode = callback;
-        callback = noTrailing;
-        noTrailing = undefined;
-}
-
-    function wrapper(){
-        var self = this;
-        var elapsed = Number(new Date()) - lastExec;
-        var args = arguments;
-
-        function exec(){
-            lastExec = Number(new Date());
-            callback.apply(self, args);
-        }
-
-        function clear(){
-            timeoutID = undefined;
-        }
-
-        if(debounceMode && !timeoutID){
-            exec();
-        }
-
-        if(timeoutID){
-            clearTimeout(timeoutID);
-        }
-
-        if(debounceMode === undefined && elapsed > delay){
-            exec();
-        }
-        else if(noTrailing !== true){
-            timeoutID = setTimeout(debounceMode ? clear : exec, debounceMode === undefined ? delay - elapsed : delay);
-        }
-    }
-    return wrapper;
 };
 
 

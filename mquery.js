@@ -824,11 +824,17 @@ $.script = async function(...queue){
 };
 
 
-$.script.load = function(url){
+$.module = async function(...queue){
+    for(const v of queue){
+        await $.script.load(v, true);
+    }
+};
+
+
+$.script.load = function(url, module = false){
     function async(success, fail){
         const script = document.createElement('script');
-        if(url.match(/^module:/i)){
-            url = url.replace(/^module:/i, '');
+        if(module){
             script.type = 'module';
         }
         script.onload  = success;
