@@ -198,8 +198,8 @@ class mQuery extends Array{
 
 
     $manipulate(mode, refs, adds, copy = false){
-        let reversed = false;
         mode = String(mode).toLowerCase();
+        let reversed = false;
 
         if(mode === 'prev' || mode === '1'){
             mode = this.$manipulate_prev;
@@ -574,11 +574,35 @@ class mQuery extends Array{
             option  = {};
         }
 
+        const args = [];
+        args[0] = name.replace(/\-.*/, '').toLowerCase();
+        args[1] = function(e){
+            if(option.find && !e.target.matches(option.find)){ // デリゲート
+                return;
+            }
+            if('name' in e && e.name.includes('-') && e.name !== name){ // trigger()から呼ばれて名前付きの場合
+                return;
+            }
+            e.memo = ('memo' in e) ? e.memo : option.memo;
+            e.name = ('name' in e) ? e.name : name;
+            e.this = e.currentTarget;
+            e.self = e.target;
+            if(handler.call(e.this, e) === false){
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            if(option.once){ // 消す
+                const eventdata = $.data(e.this, `mquery.event.${name}`).filter(v => v !== args);
+                eventdata.length ? $.data(e.this, `mquery.event.${name}`, eventdata) : $.removeData(e.this, `mquery.event.${name}`);
+            }
+        };
+        args[2] = {once: Boolean(option.once), passive: Boolean(option.passive), capture: Boolean(option.capture)};
+
+
         for(const v of this){
             if(!('addEventListener' in v)){
                 continue;
             }
-            const args = this.$listenerArgs(name, option, handler, v);
 
             if($.hasData(v, `mquery.event.${name}`)){
                 if(name.includes('-')){ //名前付きは重複登録禁止
@@ -592,35 +616,6 @@ class mQuery extends Array{
             v.addEventListener(...args);
         }
         return this;
-    }
-
-
-    $listenerArgs(name, option, handler, element){
-        const args = [];
-        args[0] = name.replace(/\-.*/, '').toLowerCase();
-        args[1] = function(e){
-            if(option.find && !e.target.matches(option.find)){ // デリゲート
-                return;
-            }
-            if('name' in e && e.name.includes('-') && e.name !== name){ // trigger()から呼ばれて名前付きの場合
-                return;
-            }
-            e.memo = ('memo' in e) ? e.memo : option.memo;
-            e.name = ('name' in e) ? e.name : name;
-            e.this = element;
-            e.self = e.target;
-            if(handler.call(e.this, e) === false){
-                e.stopPropagation();
-                e.preventDefault();
-            }
-            if(option.once){ // 消す
-                const eventdata = $.data(element, `mquery.event.${name}`).filter(v => v !== args);
-                eventdata.length ? $.data(element, `mquery.event.${name}`, eventdata) : $.removeData(element, `mquery.event.${name}`);
-            }
-        };
-        args[2] = {once: Boolean(option.once), passive: Boolean(option.passive), capture: Boolean(option.capture)};
-
-        return args;
     }
 
 
