@@ -613,7 +613,7 @@ class mQuery extends Array{
             else{
                 $.data(v, `mquery.event.${name}`, [args]);
             }
-            v.addEventListener(...args);
+            v.addEventListener(args[0], args[1], args[2]);
         }
         return this;
     }
