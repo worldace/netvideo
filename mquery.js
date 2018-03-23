@@ -730,29 +730,27 @@ class mQuery extends Array{
     }
 
 
-    request(addParam = {}){
+    async fetch(addParam = {}){
         if(this.name() !== 'form'){
             return;
         }
-        const headers = new Headers();
         const method  = this[0].method  || 'GET';
-        const enctype = this[0].enctype || 'application/x-www-form-urlencoded';
         const action  = this[0].action  || '';
         let   url     = action.replace(/#.*/, '') || location.href;
         let   body;
 
-        const param = enctype.match(/multipart/i)  ?  new FormData(this[0])  :  this.serialize();
+        const param = new FormData(this[0]);
         Object.keys(addParam).forEach(k => param.append(k, addParam[k]));
 
         if(method.match(/(GET|HEAD)/i)){
-            url = url.replace(/\?.*/, '') + '?' + param;
+            url = url.replace(/\?.*/, '') + '?' + new URLSearchParams(param);
         }
         else{
             body = param;
-            headers.set('Content-Type', enctype);
         }
 
-        return new Request(url, {method, body, headers, credentials:'include'});
+        const response = await window.fetch(url, {method, body, credentials:'include'});
+        return (response.ok) ? response.text() : response;
     }
 
 
