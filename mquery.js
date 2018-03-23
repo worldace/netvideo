@@ -730,7 +730,7 @@ class mQuery extends Array{
     }
 
 
-    async fetch(addParam = {}){
+    async send(addParam = {}){
         if(this.name() !== 'form'){
             return;
         }
