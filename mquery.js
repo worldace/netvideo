@@ -750,7 +750,13 @@ class mQuery extends Array{
         }
 
         const response = await window.fetch(url, {method, body, credentials:'include'});
-        return (response.ok) ? response.text() : response;
+        
+        if(response.ok){
+            return (response.headers.get('Content-Type') === 'application/json') ? response.json() : response.text();
+        }
+        else{
+            return response;
+        }
     }
 
 
