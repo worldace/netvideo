@@ -1011,14 +1011,23 @@ $v.fn.ajax = function(setting){
     xhr.timeout = setting.timeout * 1000;
     xhr.withCredentials = setting.credential;
 
-    if(setting.body && !(setting.body instanceof FormData)){ //FormData, String, Objectの3つのみ対応
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-        if(typeof setting.body !== 'string'){
+    if(setting.body){
+        if(typeof setting.body === 'string'){
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        }
+        else if(typeof setting.body === 'object'){
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
             var body = '';
             for(var key in setting.body){
                 body += encodeURIComponent(key) + "=" + encodeURIComponent(setting.body[key]) + "&";
             }
             setting.body = body;
+        }
+        else if(setting.body instanceof FormData){
+            
+        }
+        else{
+            throw 'ajax error: setting.body';
         }
     }
 
