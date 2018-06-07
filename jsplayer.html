@@ -1012,7 +1012,10 @@ $v.fn.ajax = function(setting){
     xhr.withCredentials = setting.credential;
 
     if(setting.body){
-        if(typeof setting.body === 'string'){
+        if(setting.body instanceof FormData){
+            
+        }
+        else if(typeof setting.body === 'string'){
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
         }
         else if(typeof setting.body === 'object'){
@@ -1022,9 +1025,6 @@ $v.fn.ajax = function(setting){
                 body += encodeURIComponent(key) + "=" + encodeURIComponent(setting.body[key]) + "&";
             }
             setting.body = body;
-        }
-        else if(setting.body instanceof FormData){
-            
         }
         else{
             throw 'ajax error: setting.body';
